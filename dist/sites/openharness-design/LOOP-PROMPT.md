@@ -54,7 +54,7 @@ COPY / TRUTH GUARDRAILS (non-negotiable):
 DESIGN SYSTEM (reuse, do not reinvent):
 - Branded house on shared/ tokens: oh-tokens.css, oh-components.css, oh-site.css. Hanken
   Grotesk + IBM Plex Mono. Each brand differs by ACCENT ONLY (Baltor dir-d teal, Teleon violet,
-  parent blue, OHH ember, hubs green/teal-blue/amber). Never hardcode color/size — use tokens.
+  parent blue, OpenHubForAI ember, hubs green/teal-blue/amber). Never hardcode color/size — use tokens.
 - Every card surface composes .oh-card. Baltor demo pages reuse the .cd-* layer in
   context-enrichment/guided-demo.css. New shared components go in shared/oh-site.jsx as additive,
   backwards-compatible props (the OhDashboard.feature / OhAppShell.groups pattern).

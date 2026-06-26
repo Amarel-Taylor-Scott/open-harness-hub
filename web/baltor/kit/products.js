@@ -5,10 +5,10 @@
 
      AI Done Right          ── company / mission (parent site)
        ├── Baltor.ai             ── paid SaaS · context assurance (the moat)
-       └── Open Harness Hub      ── open funnel · build governed harnesses (free)
+       └── OpenHubForAI      ── open funnel · build governed harnesses (free)
 
    These are SEPARATE SITES that share the same underlying design-system
-   engineering. Baltor and OHH are SISTER products (peers) — neither is a parent;
+   engineering. Baltor and OpenHubForAI are SISTER products (peers) — neither is a parent;
    the only company-level brand is "AI Done Right".
 
    Renaming any brand is a ONE-LINE change: edit its `name` (and `wordmark`).
@@ -28,8 +28,8 @@
     // ---- Product 1: bounded build-a-pipeline product -----------------------
     openHarnessHub: {
       id: 'openharnesshub',
-      name: 'Open Harness Hub',          // ← one-line rename point
-      short: 'OHH',
+      name: 'OpenHubForAI',          // ← one-line rename point
+      short: 'OpenHubForAI',
       kind: 'pipelines',
       tagline: 'Build & monitor governed pipelines',
       blurb: 'Describe a task; assemble a governed, cited pipeline from vetted ' +
@@ -43,7 +43,7 @@
 
     // ---- Standalone brand: Baltor.ai (the paid context-assurance SaaS) -----
     // Under the company mission "AI Done Right". Own house direction
-    // (dir-d teal). Open Harness Hub is its SISTER product (free funnel), shown
+    // (dir-d teal). OpenHubForAI is its SISTER product (free funnel), shown
     // only as a small footer link — never a switcher or a parent.
     contextEnrichment: {
       id: 'baltor',
@@ -93,7 +93,7 @@
       brandScope: '',
       glyph: '◳',
       // sister product — quiet footer link only
-      supportedBy: { name: 'Open Harness Hub', short: 'OHH', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
+      supportedBy: { name: 'OpenHubForAI', short: 'OpenHubForAI', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
     },
   };
 

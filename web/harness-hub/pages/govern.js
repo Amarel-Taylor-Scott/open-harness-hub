@@ -1,4 +1,4 @@
-/* Open Harness Hub — govern module
+/* OpenHubForAI — govern module
    Faithful port of proto-wide.jsx (PTrustCenter, PAuditLog, PRoles, PKnowledgeEntry,
    PProvenance) and proto-pub.jsx (PPublish) to vanilla JS / no-build static front-end.
    Registers: /trust (light) · /audit-log · /roles · /k/:id · /p/:id · /publish (dark).
@@ -43,7 +43,7 @@
       return '<a href="' + p[0] + '">' + p[1] + '</a>';
     }).join('');
     return '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHubForAI</div>' +
       '<nav>' + navItems + familyLinks + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -98,7 +98,7 @@
     '</div>';
   }
 
-  OHH.register("/trust", renderTrust, null, { theme: "light" });
+  OpenHubForAI.register("/trust", renderTrust, null, { theme: "light" });
 
   /* =====================================================================
      /audit-log — PAuditLog (app shell, dark theme)
@@ -145,7 +145,7 @@
     if (btn) btn.addEventListener('click', function () { ctx.toast('Audit log exported (CSV)'); });
   }
 
-  OHH.register("/audit-log", renderAuditLog, mountAuditLog, { theme: "dark" });
+  OpenHubForAI.register("/audit-log", renderAuditLog, mountAuditLog, { theme: "dark" });
 
   /* =====================================================================
      /roles — PRoles (app shell, dark theme)
@@ -202,7 +202,7 @@
     if (btn) btn.addEventListener('click', function () { ctx.toast('New custom role'); });
   }
 
-  OHH.register("/roles", renderRoles, mountRoles, { theme: "dark" });
+  OpenHubForAI.register("/roles", renderRoles, mountRoles, { theme: "dark" });
 
   /* =====================================================================
      /k/:id — PKnowledgeEntry (app shell, dark theme)
@@ -262,7 +262,7 @@
     '</div>';
   }
 
-  OHH.register("/k/:id", renderKnowledgeEntry, null, { theme: "dark" });
+  OpenHubForAI.register("/k/:id", renderKnowledgeEntry, null, { theme: "dark" });
 
   /* =====================================================================
      /p/:id — PProvenance (app shell, dark theme)
@@ -308,7 +308,7 @@
     '</div>';
   }
 
-  OHH.register("/p/:id", renderProvenance, null, { theme: "dark" });
+  OpenHubForAI.register("/p/:id", renderProvenance, null, { theme: "dark" });
 
   /* =====================================================================
      /publish — PPublish (app shell, dark theme)
@@ -377,7 +377,7 @@
 
           '<div class="pt-panel" style="margin-top:14px">' +
             '<div class="oh-cc-id" style="font-family:var(--font-mono);font-size:10px;color:var(--fg-faint);margin-bottom:4px">local agent → ecosystem</div>' +
-            '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 8px;line-height:1.5">Configure how your Local Agent communicates with the Open Harness Hub agent when publishing. Private data never leaves; only the fact/page/repo you choose, plus its provenance.</p>' +
+            '<p style="font-size:12.5px;color:var(--fg-muted);margin:0 0 8px;line-height:1.5">Configure how your Local Agent communicates with the OpenHubForAI agent when publishing. Private data never leaves; only the fact/page/repo you choose, plus its provenance.</p>' +
             '<div class="pt-setting-row">' +
               '<div class="info">' +
                 '<div class="t">Let my Local Agent publish</div>' +
@@ -530,6 +530,6 @@
     }
   }
 
-  OHH.register("/publish", renderPublish, mountPublish, { theme: "dark" });
+  OpenHubForAI.register("/publish", renderPublish, mountPublish, { theme: "dark" });
 
 })();

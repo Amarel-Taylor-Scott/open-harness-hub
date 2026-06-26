@@ -1,4 +1,4 @@
-/* Open Harness Hub — SDG Solutions pages (vanilla port of proto-sdg.jsx).
+/* OpenHubForAI — SDG Solutions pages (vanilla port of proto-sdg.jsx).
    Routes: /solutions (PSolutions gallery) + /solutions/:n (PSolution goal detail).
    Marketing shell, light theme. No framework, no build step. */
 (function () {
@@ -74,7 +74,7 @@
         '>' + p[1] + '</a>';
     }).join('');
     return '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHubForAI</div>' +
       '<nav>' + navItems + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -204,7 +204,7 @@
   }
 
   // ---- register ----
-  window.OHH.register('/solutions', renderSolutions, onMountSolutions, { theme: 'light' });
-  window.OHH.register('/solutions/:n', renderSolution, onMountSolution, { theme: 'light' });
+  window.OpenHubForAI.register('/solutions', renderSolutions, onMountSolutions, { theme: 'light' });
+  window.OpenHubForAI.register('/solutions/:n', renderSolution, onMountSolution, { theme: 'light' });
 
 }());

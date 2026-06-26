@@ -44,7 +44,7 @@ function PLanding() {
   const [exMod, setExMod] = React.useState('text');
   const [heroV, hero] = window.useExperiment('ohh_hero', ['A', 'B']);
   const OHH_SUBHEADS = {
-    A: 'Describe a task and Open Harness Hub assembles a governed harness — vetted components and knowledge packs that measurably lift what your agent can do. Most of it deterministic and freezable, so you add capability without adding cost.',
+    A: 'Describe a task and OpenHubForAI assembles a governed harness — vetted components and knowledge packs that measurably lift what your agent can do. Most of it deterministic and freezable, so you add capability without adding cost.',
     B: 'Vetted components and knowledge packs, composed into a governed harness — mostly deterministic and freezable, so you add capability without adding model cost.',
     C: 'Stop wiring brittle pipelines. Describe the task; we assemble a cited, governed harness your agent can run — and an auditor can trace.',
   };

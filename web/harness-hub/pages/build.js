@@ -1,6 +1,6 @@
-/* Open Harness Hub — Build module: PBuild (/build) + PResults (/results)
+/* OpenHubForAI — Build module: PBuild (/build) + PResults (/results)
    Faithful vanilla-JS port of proto-pages-build.jsx PBuild and PResults.
-   No framework, no build step. Reads OHH.data for TIERS and PRIMS from ctx.
+   No framework, no build step. Reads OpenHubForAI.data for TIERS and PRIMS from ctx.
    Registers: /build (dark), /results (dark). */
 (function () {
   "use strict";
@@ -275,7 +275,7 @@
      Registration
   ================================================================ */
 
-  OHH.register("/build",   renderBuild,   onMountBuild,   { theme: "dark" });
-  OHH.register("/results", renderResults, onMountResults, { theme: "dark" });
+  OpenHubForAI.register("/build",   renderBuild,   onMountBuild,   { theme: "dark" });
+  OpenHubForAI.register("/results", renderResults, onMountResults, { theme: "dark" });
 
 })();

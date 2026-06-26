@@ -76,7 +76,7 @@ with `name/wordmark/domain/kind/blurb/accent/glyph/url/status` and, for private:
 `useSiteTheme(themeKey)` + `OhThemeToggle`; root class `oh dir-s theme-{light|dark} oh-site`;
 all tokens resolve per theme in `oh-tokens.css`; `--accent-weak` is translucent so hue
 survives both themes. **Per-site localStorage theme keys (24 distinct, keep them):**
-`teleon-theme`, Baltor + OHH + parent keys (see each main file), and per hub:
+`teleon-theme`, Baltor + OpenHubForAI + parent keys (see each main file), and per hub:
 `och- osh- oth- os2t- omcp- ocmp- obm- orh- otpl- oep- oenv- osbx- oag- orc- ost- orec-
 ohard- oenr- oopt- over-` + `theme`.
 

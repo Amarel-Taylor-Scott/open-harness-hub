@@ -1,4 +1,4 @@
-/* Open Harness Hub — identity client (realm: openharnesshub)
+/* OpenHubForAI — identity client (realm: openharnesshub)
    Talks to the LOCAL Identity & Access service (scripts/identity_local_service.py): the owner-locked
    separate-realms model — THIS product's realm only; sessions are realm-scoped opaque handles, useless
    in any other product's realm (no cross-realm account, no SSO).

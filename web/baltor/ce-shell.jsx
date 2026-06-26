@@ -23,7 +23,7 @@ function CELogo({ compact = false }) {
   );
 }
 
-// ---- the endorsement: "supported by Open Harness Hub" (never a switcher) ----
+// ---- the endorsement: "supported by OpenHubForAI" (never a switcher) ----
 function SupportedBy({ block = false }) {
   const s = BRANDCE.supportedBy;
   if (!s) return null;

@@ -1,4 +1,4 @@
-/* Open Harness Hub — ops screens: PStatus · PActivity · PSources
+/* OpenHubForAI — ops screens: PStatus · PActivity · PSources
    Faithful vanilla port of proto-ops.jsx. No React, no JSX, no imports.
    Registers: /status · /activity · /sources (all theme: dark). */
 (function () {
@@ -95,7 +95,7 @@
     "</div>";
   }
 
-  OHH.register("/status", renderStatus, null, { theme: "dark" });
+  OpenHubForAI.register("/status", renderStatus, null, { theme: "dark" });
 
   /* ============================== ACTIVITY + NOTIFICATIONS ============================== */
 
@@ -261,7 +261,7 @@
     }
   }
 
-  OHH.register("/activity", renderActivity, onMountActivity, { theme: "dark" });
+  OpenHubForAI.register("/activity", renderActivity, onMountActivity, { theme: "dark" });
 
   /* ============================== GITHUB VECTORIZED SOURCE SEARCH ============================== */
 
@@ -386,6 +386,6 @@
     }
   }
 
-  OHH.register("/sources", renderSources, onMountSources, { theme: "dark" });
+  OpenHubForAI.register("/sources", renderSources, onMountSources, { theme: "dark" });
 
 })();

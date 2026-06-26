@@ -1,9 +1,9 @@
-/* Open Harness Hub — requests / contribute module
+/* OpenHubForAI — requests / contribute module
    Ports: PRequests (/requests), PRequestNew (/requests/new),
           PRequestDetail (/requests/:id), PContribute (/contribute)
    Source: proto-wide.jsx (PRequests, PRequestDetail, PContribute)
    Style: proto-wide.css, proto-deep.css, proto-admin.css, proto.css atoms
-   No framework, no build step — vanilla ES5-style, self-registering via OHH.register. */
+   No framework, no build step — vanilla ES5-style, self-registering via OpenHubForAI.register. */
 (function () {
   "use strict";
 
@@ -458,11 +458,11 @@
   /* Registration                                                         */
   /* ------------------------------------------------------------------ */
 
-  OHH.register("/requests", renderRequests, onMountRequests, { theme: "dark" });
+  OpenHubForAI.register("/requests", renderRequests, onMountRequests, { theme: "dark" });
   /* /requests/new MUST be registered before /requests/:id so the literal "new"
      segment is matched first; the router tests routes in registration order. */
-  OHH.register("/requests/new", renderRequestNew, onMountRequestNew, { theme: "dark" });
-  OHH.register("/requests/:id", renderRequestDetail, onMountRequestDetail, { theme: "dark" });
-  OHH.register("/contribute", renderContribute, onMountContribute, { theme: "dark" });
+  OpenHubForAI.register("/requests/new", renderRequestNew, onMountRequestNew, { theme: "dark" });
+  OpenHubForAI.register("/requests/:id", renderRequestDetail, onMountRequestDetail, { theme: "dark" });
+  OpenHubForAI.register("/contribute", renderContribute, onMountContribute, { theme: "dark" });
 
 })();

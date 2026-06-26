@@ -1,7 +1,7 @@
-/* Open Harness Hub — product front-end core (no-build static implementation of the Claude
+/* OpenHubForAI — product front-end core (no-build static implementation of the Claude
    Design handoff). Faithful port of the prototype's Landing (PLanding) + logged-out Preview
    (PPreview); React/Babel is replaced with vanilla DOM per the handoff README. Additional
-   screens self-register via OHH.register() from web/pages/*.js (see web/README.md). */
+   screens self-register via OpenHubForAI.register() from web/pages/*.js (see web/README.md). */
 (function () {
   "use strict";
 
@@ -16,13 +16,13 @@
   };
   var MODALITIES = [["text", "Text", "⌶"], ["image", "Image", "◰"], ["audio", "Audio", "◵"], ["video", "Video", "▷"]];
 
-  // ---------------- canonical marketing nav (single source — exposed on window.OHH) ----------------
+  // ---------------- canonical marketing nav (single source — exposed on window.OpenHubForAI) ----------------
   // The marketing header (wordmark + top nav + Sign in / Get started) is otherwise hand-duplicated
   // across index.html and every web/pages/*.js shell, and the copies have already drifted (the
   // landing shows Compare while sub-pages drop it and add Workspace). To kill that drift the list
-  // and the header HTML are defined ONCE here and read everywhere via OHH.MKT_NAV / OHH.mktHeader().
+  // and the header HTML are defined ONCE here and read everywhere via OpenHubForAI.MKT_NAV / OpenHubForAI.mktHeader().
   // Canonical order is the landing header in index.html. No-magic-values: the wordmark mark SVG is
-  // part of the same duplicated header, so it lives here too (OHH.MKT_MARK_SVG) rather than being
+  // part of the same duplicated header, so it lives here too (OpenHubForAI.MKT_MARK_SVG) rather than being
   // re-pasted per file. Pages opt in by replacing their local mktHeader()/MKT_NAV with these.
   var MKT_MARK_SVG = '<span class="oh-mark" aria-hidden="true">' +
     '<svg width="18" height="18" viewBox="0 0 18 18" fill="none">' +
@@ -57,7 +57,7 @@
       return '<a href="' + esc(p[0]) + '">' + esc(p[1]) + "</a>";
     }).join("");
     return '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MKT_MARK_SVG + " Open Harness Hub</div>" +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MKT_MARK_SVG + " OpenHubForAI</div>" +
       "<nav>" + nav + family + "</nav>" +
       '<span class="pt-spacer"></span>' +
       '<div style="display:flex;gap:9px">' +
@@ -116,7 +116,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function token() { return new URLSearchParams(location.search).get("token") || ""; }
 
-  // ---------------- route registry (pages self-register via OHH.register) ----------------
+  // ---------------- route registry (pages self-register via OpenHubForAI.register) ----------------
   // pattern supports params: "/c/:slug". opts: { theme:'dark'|'light' } (app pages are dark).
   var ROUTES = [];
   function register(pattern, render, onMount, opts) {
@@ -136,8 +136,8 @@
     return null;
   }
   function ctx(params) {
-    return { OHH: window.OHH, PRIMS: PRIMS, esc: esc, navigate: navigate, toast: toast,
-             data: (window.OHH && window.OHH.data) || {}, params: params || {}, state: state, useFlag: useFlag };
+    return { OpenHubForAI: window.OpenHubForAI, PRIMS: PRIMS, esc: esc, navigate: navigate, toast: toast,
+             data: (window.OpenHubForAI && window.OpenHubForAI.data) || {}, params: params || {}, state: state, useFlag: useFlag };
   }
 
   // ---------------- theme: app routes dark, marketing light, manual toggle pins ----------------
@@ -579,8 +579,8 @@
   }
 
   // ---------------- boot ----------------
-  window.OHH = window.OHH || {};
-  Object.assign(window.OHH, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state,
+  window.OpenHubForAI = window.OpenHubForAI || {};
+  Object.assign(window.OpenHubForAI, { register: register, navigate: navigate, toast: toast, log: logEvent, PRIMS: PRIMS, MODALITIES: MODALITIES, esc: esc, renderRoute: renderRoute, state: state,
     MKT_NAV: MKT_NAV, FAMILY_LINKS: FAMILY_LINKS, MKT_MARK_SVG: MKT_MARK_SVG, mktHeader: mktHeader });
   applyScheme();
   initLanding();

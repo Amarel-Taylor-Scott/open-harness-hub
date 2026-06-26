@@ -27,7 +27,7 @@ AI Done Right                        platform company / portfolio   context-is-e
   Open network (live, open funnel)   9 registries via makeHub()
     ├── OpenContextHub.io  · OpenSkillsHub.io · OpenToolsHub.io
     ├── OpenSkillToTool.io · OpenMCPHub.io · OpenCompressionHub.io
-    └── OpenBenchmarkHub.io · OpenReviewHub.io · OpenHarnessHub.io
+    └── OpenBenchmarkHub.io · OpenReviewHub.io · OpenHubForAI.io
   Private bench (built, status:'private') 12 registries via makeHub()
     ├── OpenTemplatesHub.io · OpenEndpointHub.io · OpenEnvHub.io
     ├── OpenSandboxHub.io · OpenAgentHub.io · OpenReceiptHub.io · OpenStateHub.io
@@ -159,12 +159,12 @@ just documented:
   `OhAuditLog` inside Baltor's `AppShell`). Unique surfaces: the `/engine` lifecycle, Sources,
   Pipeline run, Verified corpora, Verify, Serve, Governance, Commons — plus static
   product-story pages (`.cd-*`) and 18 guided demos. See `CLAUDE-CODE.md §3.5`.
-- **OHH** — oldest; keeps its `pt-*` product pages but consumes the kit for all chrome +
+- **OpenHubForAI** — oldest; keeps its `pt-*` product pages but consumes the kit for all chrome +
   account pages (`OhAppShell`/`OhSettings`/`OhAuditLog`/`OhAuth`/`OhTopBar`/`OhFooter`).
   `.pt-panel` is aliased to `.oh-card`.
 
 ## Branded-house guarantees (don't break)
-1. Every card surface resolves to `.oh-card` (Baltor `.ce-*` + OHH `.pt-panel` compose it).
+1. Every card surface resolves to `.oh-card` (Baltor `.ce-*` + OpenHubForAI `.pt-panel` compose it).
 2. All sites load **Hanken Grotesk** as `--font-display`.
 3. Size against the shared `--fs-*`/`--pad-*` vars, never raw px.
 4. Per-site CSS adds *layout* only; never re-declares the shared surface/scale.
@@ -213,4 +213,4 @@ dev warning).
 - `UX-BACKLOG.md` — prioritized net-new UX opportunities.
 - `EXPERIMENTS.md` — the shared A/B + tracking engine.
 - Per-folder `README.md` — file map for each site.
-- `openharnesshub/PAGES.md` — OHH route catalog.
+- `openharnesshub/PAGES.md` — OpenHubForAI route catalog.

@@ -90,7 +90,7 @@ every site composes them. (Props shown are the prototype's shape — adapt to yo
   — signed-in app shell (sidebar + main). Supports a **flat `nav`** OR **grouped collapsible
   `groups`** (`[{label, items:[[href,glyph,label]], defaultOpen}]`), plus optional `header`
   (above nav), `foot` (replaces default footer), `topbar` (sticky bar over the page), and
-  `isActive(href)` override. OHH uses every slot; Teleon/hubs use plain `nav`.
+  `isActive(href)` override. OpenHubForAI uses every slot; Teleon/hubs use plain `nav`.
 - `OhFooter({ brand, tagline, cols })`.
 
 **Marketing skeletons:** `OhHero`, `OhSection`, `OhFeatures`, `OhBand`, `OhPageHead`, `OhRollup`.
@@ -114,7 +114,7 @@ section deep-linking into each site's `/cases/:id`.
 - **Baltor** — its account layer (auth, contact, settings, billing, usage, audit) + dashboard
   render via the kit; it keeps an in-house sidebar `AppShell` on purpose (its 3-tier brand mark
   + account footer are brand signatures), fully token/scale-driven.
-- **OHH** — chrome + account pages on the kit (`OhAppShell` with its grouped nav/Build/credits/
+- **OpenHubForAI** — chrome + account pages on the kit (`OhAppShell` with its grouped nav/Build/credits/
   topbar passed as slots; `OhSettings`/`OhAuditLog`/`OhAuth`; `OhTopBar`/`OhFooter`). Its unique
   **product** pages (catalog, flow canvas, foundry, registry…) stay bespoke `pt-*`, composing
   `.oh-card`. It keeps a command palette, scheme switcher, and tweak controls.
@@ -166,7 +166,7 @@ MCPTox. Full per-site backend map: **`BACKEND-STACK.md`**.
 - Each Babel file gets its own scope; cross-file sharing is `Object.assign(window, {…})`.
 - Mock data only; no backend, no network calls.
 - Dark mode: a `☾/☀` toggle persisted to `localStorage`, defaulting to `prefers-color-scheme`
-  (swaps `theme-light`/`theme-dark` on the root). OHH adds a route-based theme + scheme switcher.
+  (swaps `theme-light`/`theme-dark` on the root). OpenHubForAI adds a route-based theme + scheme switcher.
 
 ---
 
@@ -175,7 +175,7 @@ MCPTox. Full per-site backend map: **`BACKEND-STACK.md`**.
   `/c/:id` `/serve` `/verify` `/governance` `/dashboard` `/sources` `/pipeline` `/audit`
   `/settings` `/billing` `/usage` `/pricing` `/signin /signup /forgot /contact`. The Baltor docs
   **API** tab is the intended REST contract; fixtures live in `context-enrichment/ce-store.jsx`.
-- **OHH:** ~43 routes — catalog in `openharnesshub/PAGES.md`; map in `proto-main.jsx` `App()`.
+- **OpenHubForAI:** ~43 routes — catalog in `openharnesshub/PAGES.md`; map in `proto-main.jsx` `App()`.
 - **Parent:** single page with anchors. **Teleon / hubs:** see each `*-main.jsx`.
 
 ---
@@ -209,7 +209,7 @@ kit; one app per site (or one app with sub-domains).
 - `EXPERIMENTS.md` — the shared A/B + tracking engine.
 - `Design Acceptance Scorecard.html` — the consistency gate (10 criteria × 7 sites).
 - `UX-BACKLOG.md` — prioritized net-new UX opportunities.
-- Per-folder `README.md` — file map for each site. `openharnesshub/PAGES.md` — OHH routes.
+- Per-folder `README.md` — file map for each site. `openharnesshub/PAGES.md` — OpenHubForAI routes.
 
 ## 8. Known open items (honest state)
 - Accessibility: focus-visible is already shared in `oh-components.css`; a formal AA-contrast

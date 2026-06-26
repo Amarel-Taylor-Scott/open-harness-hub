@@ -104,7 +104,7 @@ Open any `*.html` in a browser — **no build step**. Entry files are listed in
   accent + "Private preview" banner). Opening one = a one-line `status:'private' → 'live'` flip.
 - **Bespoke per-hub depth** (OpenSkillToTool's `os2t-pages.jsx`, OpenReviewHub's `orh-pages.jsx`)
   attaches via gated hooks (`entryExtra` / `extraRoutes` / `convert.render`) — see `HANDOFF.md §3.5`.
-- **Baltor** has its own `ce-*` chrome; **OHH** has bespoke `pt-*` product pages — both reuse the
+- **Baltor** has its own `ce-*` chrome; **OpenHubForAI** has bespoke `pt-*` product pages — both reuse the
   shared primitives. **Teleon** is the cleanest reference (built entirely on the kit).
 
 ## 5. Prototype → production gap (must build)
@@ -133,4 +133,4 @@ expected in-browser Babel dev warning). Cross-link integrity checked (0 broken).
 `BACKEND-STACK.md` (backends) · `MARKETING.md` (copy) · `EXPERIMENTS.md` (A/B engine) ·
 **`screens/INDEX.md`** (a reference image per surface) · `Design Acceptance Scorecard.html`
 (gate) · `Demo Control Tower.html` (surface index) · per-folder `README.md` (file map per
-site) · `openharnesshub/PAGES.md` (OHH routes).
+site) · `openharnesshub/PAGES.md` (OpenHubForAI routes).

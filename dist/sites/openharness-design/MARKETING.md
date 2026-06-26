@@ -86,8 +86,8 @@ for site copy, sales decks, and onboarding). When a brand name/tagline changes, 
 - **Closing line:** Define capabilities. Not infrastructure.
 
 ## The open layer
-- **OpenHarnessHub.io** — *Build & monitor governed pipelines.* Hero: **"Power your agents with
-  governed harnesses."** Describe a task; OHH assembles a governed harness — vetted components
+- **OpenHubForAI.io** — *Build & monitor governed pipelines.* Hero: **"Power your agents with
+  governed harnesses."** Describe a task; OpenHubForAI assembles a governed harness — vetted components
   and knowledge packs that measurably lift what your agent can do, mostly deterministic and
   freezable so you add capability without adding cost. Pricing: open spec free forever; vetted
   components, live knowledge corpora & build-on-demand are the subscription (Pro $39/seat/mo).
@@ -103,7 +103,7 @@ for site copy, sales decks, and onboarding). When a brand name/tagline changes, 
 - **OpenMCPHub.io** — MCP server intelligence: registry, conformance, risk, install profiles. *Discovery is not trust.*
 - **OpenCompressionHub.io** — compression & context-budget intelligence. *Token reduction is not success unless fidelity survives.*
 - **OpenBenchmarkHub.io** — benchmark intelligence: cards, result records, suitability reports. *Evidence, not authority — a result cannot promote a candidate alone.*
-- **OpenHarnessHub.io** — open harnesses & evals for agentic infrastructure.
+- **OpenHubForAI.io** — open harnesses & evals for agentic infrastructure.
 
 All seven open `.io` hubs are prototype sites on the shared `makeHub` config; their domains are
 **proposed/unverified** pending owner trademark/domain clearance.
@@ -112,9 +112,9 @@ All seven open `.io` hubs are prototype sites on the shared `makeHub` config; th
 
 ## Naming & relationship rules (do not break)
 - "AI Done Right" is the **only** company-level brand. Baltor and OpenHubForAI are
-  **sister products** (peers) — neither is a parent. OHH appears on Baltor only as a quiet
+  **sister products** (peers) — neither is a parent. OpenHubForAI appears on Baltor only as a quiet
   "sister product" footer link — **never** a switcher or a parent.
 - Renaming any brand is a one-line edit in `products.js` (`name` / `wordmark`).
-- Each brand owns exactly one accent (Baltor teal · Teleon violet · parent blue · OHH ember ·
+- Each brand owns exactly one accent (Baltor teal · Teleon violet · parent blue · OpenHubForAI ember ·
   OpenContextHub green · OpenSkillsHub teal-blue · OpenToolsHub amber · OpenSkillToTool rose). Everything else
   (type, spacing, chrome, dark-mode) is identical across the family.

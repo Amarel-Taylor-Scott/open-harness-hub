@@ -1,4 +1,4 @@
-/* Open Harness Hub — Docs / open-spec hub (/docs)
+/* OpenHubForAI — Docs / open-spec hub (/docs)
    The open-core FREE layer: spec, seven-primitive grammar, SDK/CLI, export emitters.
    Polish-loop addition (the review removed dead "Docs" nav links — this gives them a real
    home and reinforces the open-core value prop). No React/JSX/build. Registers /docs (light). */
@@ -60,7 +60,7 @@
     }).join("");
   }
 
-  // the 7-layer context stack → OHH's real component coverage (docs/concepts/context-layer-and-the-desk.md)
+  // the 7-layer context stack → OpenHubForAI's real component coverage (docs/concepts/context-layer-and-the-desk.md)
   var LAYERS = [
     ["1", "Raw documentation", "MCP connectors — Confluence · GitLab · Postgres + source registry"],
     ["2", "Contextualized docs", "retrieval — chunkers · BM25 · dense · hybrid · exact-id · graph-RAG"],
@@ -83,7 +83,7 @@
   function render(ctx) {
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHubForAI</div>' +
       "<nav>" + navHtml(ctx) + "</nav>" +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -100,7 +100,7 @@
 
       '<h3 style="font-family:var(--font-display);margin:26px 0 10px">The context layer — the analyst’s desk</h3>' +
       '<div class="pt-panel">' +
-      '<div style="font-size:13px;color:var(--fg-muted);line-height:1.6;margin-bottom:10px">The model is an analyst at a desk; the context window is the desk — small and expensive, easily buried. Open Harness Hub keeps only the few distilled, cited pages that matter on it, and proves the result lifts over the bare model. It covers all seven layers of the context stack with real, governed components:</div>' +
+      '<div style="font-size:13px;color:var(--fg-muted);line-height:1.6;margin-bottom:10px">The model is an analyst at a desk; the context window is the desk — small and expensive, easily buried. OpenHubForAI keeps only the few distilled, cited pages that matter on it, and proves the result lifts over the bare model. It covers all seven layers of the context stack with real, governed components:</div>' +
       ctxLayers() + "</div>" +
 
       '<h3 style="font-family:var(--font-display);margin:26px 0 10px">Open & free <span class="oh-badge oh-badge--verified" style="vertical-align:middle"><span class="gl">✔</span> Apache-2.0</span></h3>' +
@@ -124,5 +124,5 @@
     // navigation handled by the global data-nav delegation in app.js
   }
 
-  OHH.register("/docs", render, onMount, { theme: "light" });
+  OpenHubForAI.register("/docs", render, onMount, { theme: "light" });
 })();

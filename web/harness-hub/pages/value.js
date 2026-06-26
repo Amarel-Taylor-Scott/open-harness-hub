@@ -1,7 +1,7 @@
-/* Open Harness Hub — value.js
+/* OpenHubForAI — value.js
    Ports PFreshness (/freshness) + PAttest (/attest) from proto-value.jsx.
    Vanilla ES5-flavoured JS, no framework, no build step.
-   Registers via OHH.register(); ctx injected at render time. */
+   Registers via OpenHubForAI.register(); ctx injected at render time. */
 
 (function () {
   "use strict";
@@ -218,7 +218,7 @@
           '<div class="pt-cert">' +
             '<div class="pt-seal">✓</div>' +
             '<h3>Provenance attestation</h3>' +
-            '<div class="by">Verified by Open Harness Hub</div>' +
+            '<div class="by">Verified by OpenHubForAI</div>' +
             '<div class="crow"><span class="k">Flow</span><span class="v">csddd-grade</span></div>' +
             '<div class="crow"><span class="k">Sourced as of</span><span class="v">2026-05-28</span></div>' +
             '<div class="crow"><span class="k">Valid through</span><span class="v">2026-08-26</span></div>' +
@@ -280,7 +280,7 @@
   /* ================================================================
      REGISTRATION
      ================================================================ */
-  OHH.register("/freshness", renderFreshness, onMountFreshness, { theme: "dark" });
-  OHH.register("/attest",    renderAttest,    onMountAttest,    { theme: "dark" });
+  OpenHubForAI.register("/freshness", renderFreshness, onMountFreshness, { theme: "dark" });
+  OpenHubForAI.register("/attest",    renderAttest,    onMountAttest,    { theme: "dark" });
 
 })();

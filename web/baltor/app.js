@@ -26,7 +26,7 @@
     }).join("");
     return '<header class="pt-mkt-top">' +
       '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK + " " + esc(BRAND) + "</div>" +
-      "<nav>" + nav + '<a href="/dashboard.html">Live dashboard</a><a href="/demo-console.html">Live demo</a><a href="/reviews.html">Review queue</a><a href="/admin-demo/">Demo</a><a href="/how-it-works.html">How it works</a><a href="https://aidoneright.dev">AI Done Right</a><a href="https://aidoneright.dev/gtm-launch-guide.html">Launch guide</a><a href="https://openharnesshub.com">Open Harness Hub</a></nav>' +
+      "<nav>" + nav + '<a href="/dashboard.html">Live dashboard</a><a href="/demo-console.html">Live demo</a><a href="/reviews.html">Review queue</a><a href="/admin-demo/">Demo</a><a href="/how-it-works.html">How it works</a><a href="https://aidoneright.dev">AI Done Right</a><a href="https://aidoneright.dev/gtm-launch-guide.html">Launch guide</a><a href="https://openharnesshub.com">OpenHubForAI</a></nav>' +
       '<span class="pt-spacer"></span>' +
       '<a class="oh-btn oh-btn--ghost oh-btn--sm" href="/how-it-works.html" style="margin-right:8px">See how it works</a>' +
       '<button class="oh-btn oh-btn--primary oh-btn--sm" data-nav="/pricing">Get started</button>' +

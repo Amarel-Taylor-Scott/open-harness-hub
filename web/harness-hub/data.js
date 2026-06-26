@@ -1,7 +1,7 @@
-/* Open Harness Hub — shared catalog/flow data, ported VERBATIM from the design prototype
-   (proto-store.jsx + proto-pages-build.jsx TIERS). Pages read OHH.data; never redeclare. */
-window.OHH = window.OHH || {};
-window.OHH.data = (function () {
+/* OpenHubForAI — shared catalog/flow data, ported VERBATIM from the design prototype
+   (proto-store.jsx + proto-pages-build.jsx TIERS). Pages read OpenHubForAI.data; never redeclare. */
+window.OpenHubForAI = window.OpenHubForAI || {};
+window.OpenHubForAI.data = (function () {
 const COMPONENTS = [
   { slug: 'esg-cite-first', primitive: 'action', type: 'harness', name: 'Cite-first ESG counsel', desc: 'Holds a deterministic citation gate before the model answers, so every CSDDD claim resolves to a sourced article across 13 languages.', lift: 0.41, cost: '$$', recurring: true, prov: 'sourced', license: 'MIT', lifecycle: 'stable', exec: 'code', industry: 'ESG' },
   { slug: 'csddd-articles', primitive: 'knowledge', type: 'knowledge-corpus', name: 'CSDDD article corpus', desc: 'The full CSDDD regulation at article level, across 13 languages, with per-fact provenance.', lift: 0.18, cost: '⌂', recurring: false, prov: 'sourced', license: 'CC-BY-4.0', lifecycle: 'stable', exec: 'static', industry: 'ESG' },

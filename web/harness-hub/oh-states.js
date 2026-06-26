@@ -1,4 +1,4 @@
-/* Open Harness Hub — shared empty / loading / error state primitives (UX-BACKLOG P1 #3).
+/* OpenHubForAI — shared empty / loading / error state primitives (UX-BACKLOG P1 #3).
    Three token-only kit functions every list/panel can use so the a11y + polish floor is uniform.
    No framework: each returns an HTML string built from design tokens (no hardcoded colors).
    Usage:  el.innerHTML = OhStates.empty({title, body, cta});

@@ -10,7 +10,7 @@ files or behind the existing showcase server.
 OpenHubForAI is the open builder/catalog surface in the three-site platform story:
 **AI Done Right** is the parent platform site, **Baltor** is the paid context-control
 product, and **OpenHubForAI** is the open funnel for governed harnesses that can consume
-Baltor context when live verified facts are needed. Keep OHH navigation linked to both
+Baltor context when live verified facts are needed. Keep OpenHubForAI navigation linked to both
 family sites so users understand when they are building a workflow versus subscribing to or
 serving verified context.
 

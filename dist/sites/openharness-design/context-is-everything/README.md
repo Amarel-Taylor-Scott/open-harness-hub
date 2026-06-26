@@ -18,7 +18,7 @@ Entry: **`Context is Everything.html`** → open in a browser.
 |---|---|
 | `Context is Everything.html` | Shell: loads React/Babel, fonts, shared CSS + `cie.css`, then `cie-main.jsx`. |
 | `cie.css` | Parent layout (`.cie-*`). Overrides `dir-s` neutrals + fonts under `.oh.dir-s.cie` / `.oh.dir-s.theme-{light\|dark}.cie` (keep that specificity). Cards compose shared `.oh-card`. |
-| `cie-main.jsx` | Whole page: `Top`, `Hero`, `Problem` (4 failure modes), `Products` (Baltor + OHH cards, each in its own accent), `Story` (Balto), `Band`, `Footer`. Theme state + toggle. Mounts `#root`. |
+| `cie-main.jsx` | Whole page: `Top`, `Hero`, `Problem` (4 failure modes), `Products` (Baltor + OpenHubForAI cards, each in its own accent), `Story` (Balto), `Band`, `Footer`. Theme state + toggle. Mounts `#root`. |
 
 ## Sections (anchor nav)
 `#top` hero ("AI, done right.") · `#thesis` the problem · `#products` the two

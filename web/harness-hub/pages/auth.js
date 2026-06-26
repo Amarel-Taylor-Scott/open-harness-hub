@@ -1,11 +1,11 @@
-/* Open Harness Hub — auth screen module
+/* OpenHubForAI — auth screen module
    Routes: /signin · /signup · /onboarding · /upgrade · /account/keys
    Minimal light shell. Originally ported from proto-wide.jsx (PSignin / POnboarding / PUpgrade);
    now WIRED to the local Identity & Access service via identity.js (realm: openharnesshub) —
    real register → onboard → login → session, honest degradation when the service is down
    (never fakes a login), and an API-keys console (raw key shown once, never persisted).
    SSO/Google stay disabled: real providers are an owner-gated CredentialProviderPort seam.
-   No build step, no framework, no imports. Registers via OHH.register(). */
+   No build step, no framework, no imports. Registers via OpenHubForAI.register(). */
 (function () {
   "use strict";
 
@@ -25,7 +25,7 @@
     '</svg></span>';
 
   function wordmarkHTML() {
-    return '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + AUTH_MARK_SVG + ' Open Harness Hub</div>';
+    return '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + AUTH_MARK_SVG + ' OpenHubForAI</div>';
   }
 
   // SSO providers are an owner-gated seam (CredentialProviderPort) — rendered disabled, never faked
@@ -418,20 +418,20 @@
   }
 
   /* ================================================================
-     Registration — each route gets its own OHH.register call
+     Registration — each route gets its own OpenHubForAI.register call
      ================================================================ */
   function registerAll() {
-    window.OHH.register("/signin",       renderSignin,     onMountSignin,     { theme: "light" });
-    window.OHH.register("/signup",       renderSignup,     onMountSignup,     { theme: "light" });
-    window.OHH.register("/onboarding",   renderOnboarding, onMountOnboarding, { theme: "light" });
-    window.OHH.register("/upgrade",      renderUpgrade,    onMountUpgrade,    { theme: "light" });
-    window.OHH.register("/account/keys", renderKeys,       onMountKeys,       { theme: "light" });
+    window.OpenHubForAI.register("/signin",       renderSignin,     onMountSignin,     { theme: "light" });
+    window.OpenHubForAI.register("/signup",       renderSignup,     onMountSignup,     { theme: "light" });
+    window.OpenHubForAI.register("/onboarding",   renderOnboarding, onMountOnboarding, { theme: "light" });
+    window.OpenHubForAI.register("/upgrade",      renderUpgrade,    onMountUpgrade,    { theme: "light" });
+    window.OpenHubForAI.register("/account/keys", renderKeys,       onMountKeys,       { theme: "light" });
   }
-  if (!window.OHH || typeof window.OHH.register !== "function") {
+  if (!window.OpenHubForAI || typeof window.OpenHubForAI.register !== "function") {
     // Guard: if app.js hasn't loaded yet the router isn't available.
     // Delay registration until after DOMContentLoaded so app.js can run first.
     document.addEventListener("DOMContentLoaded", function () {
-      if (window.OHH && typeof window.OHH.register === "function") { registerAll(); }
+      if (window.OpenHubForAI && typeof window.OpenHubForAI.register === "function") { registerAll(); }
     });
   } else {
     registerAll();

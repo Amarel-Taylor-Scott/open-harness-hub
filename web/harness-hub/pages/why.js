@@ -1,4 +1,4 @@
-/* Open Harness Hub — Why us / the wedge (/why)
+/* OpenHubForAI — Why us / the wedge (/why)
    The verified-context service is the BUSINESS; this page makes the wedge explicit:
    most platforms keep your docs CURRENT — we continuously verify they are CORRECT against
    external authoritative sources, and hunt for contradictions before an agent cites them.
@@ -21,7 +21,7 @@
   var COLS = [
     {
       key: "ohh", rec: true,
-      label: "Open Harness Hub",
+      label: "OpenHubForAI",
       sub: "verified-context service",
       line: "We continuously verify your corpus is correct against external authoritative sources, and hunt for contradictions before your agent cites them."
     },
@@ -132,7 +132,7 @@
   function render(ctx) {
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHubForAI</div>' +
       "<nav>" + navHtml(ctx) + "</nav>" +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -173,5 +173,5 @@
     // navigation handled by the global data-nav delegation in app.js
   }
 
-  OHH.register("/why", render, onMount, { theme: "light" });
+  OpenHubForAI.register("/why", render, onMount, { theme: "light" });
 })();

@@ -9,7 +9,7 @@
     ["Source trust checks", "Fetched pages are scored for source role, publisher identity, source stability, archive availability, suspicious markup, spam patterns, and context-injection risk."],
     ["Reconciliation before serving", "When sources differ on date, scope, or precedence, the fact stays out of served context until the resolution path is clear."],
     ["Archive and provenance", "Evidence spans, timestamps, source hashes, archive status, and adoption reasons travel with the serving package when the workflow needs them."],
-    ["Same discipline as OHH", "Open Harness Hub measures whether a harness lifts over a bare model. Baltor applies that discipline upstream: is the context current, supported, and safe to serve?"]
+    ["Same discipline as OpenHubForAI", "OpenHubForAI measures whether a harness lifts over a bare model. Baltor applies that discipline upstream: is the context current, supported, and safe to serve?"]
   ];
 
   function pillars() {

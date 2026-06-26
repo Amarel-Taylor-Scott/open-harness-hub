@@ -17,14 +17,14 @@ const NAV_GROUPS = [
   ['Foundry', [['Foundry', '/foundry', '⚗'], ['Workers', '/workers', '🛰']]],
   ['Account', [['Pricing', '/pricing', '$'], ['Settings', '/settings', '⚙'], ['Admin', '/admin', '⛨']]],
 ];
-// ---- OHH brand for the kit chrome ----
+// ---- OpenHubForAI brand for the kit chrome ----
 const OHH_BRAND = { name: 'OpenHubForAI', realm: 'openharnesshub', tld: '.io', glyph: '⎔', accent: 'var(--accent)' };
 const OHH_GROUPS = NAV_GROUPS.map(([label, items]) => ({ label, items: items.map(([lb, p, ic]) => [p, ic, lb]), defaultOpen: ['Explore', 'Workspace'].includes(label) }));
 function ohhActive(route) {
   return (p) => route === p || (p === '/build' && route === '/results') || (p === '/components' && route.startsWith('/c/')) || (p === '/run' && route === '/flow') || (p === '/requests' && route.startsWith('/requests'));
 }
 
-// Build pinned item (kit header slot) — keeps OHH's expandable Build menu
+// Build pinned item (kit header slot) — keeps OpenHubForAI's expandable Build menu
 function BuildMenu({ route }) {
   const [open, setOpen] = React.useState(true);
   return (

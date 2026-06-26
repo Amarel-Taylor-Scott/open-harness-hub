@@ -1,5 +1,5 @@
 /* global React */
-// Open Harness Hub — the four canonical artifacts, authored once.
+// OpenHubForAI — the four canonical artifacts, authored once.
 // Content is identical across directions (fair comparison); only the
 // scope class on the wrapper (set in app.jsx) changes the design language.
 
@@ -31,7 +31,7 @@ function Mark() {
 
 function Wordmark() {
   return (
-    <div className="oh-wordmark"><Mark /> Open Harness Hub</div>
+    <div className="oh-wordmark"><Mark /> OpenHubForAI</div>
   );
 }
 

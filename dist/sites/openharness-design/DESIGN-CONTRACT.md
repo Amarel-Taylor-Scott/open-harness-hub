@@ -72,7 +72,7 @@ Bespoke hub code lives in the hub's folder and attaches only through those hooks
 ## RULE 5 — Chrome & account flows come from the kit
 `OhTopBar`, `OhAppShell`, `OhFooter`, `OhAuth` (signin/signup/forgot), `OhDashboard`,
 `OhApiKeys`, `OhTeam`, `OhAuditLog`, `OhBilling`, `OhUsage`, `OhSettings`, `OhDocs`,
-`OhPricing` are implemented once and reused by every surface. Baltor and OHH wrap them in
+`OhPricing` are implemented once and reused by every surface. Baltor and OpenHubForAI wrap them in
 their own shells (`ce-*`, `pt-*`) — they do not reimplement them.
 
 ## RULE 6 — The A/B experiment engine is part of the design

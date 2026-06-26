@@ -1,6 +1,6 @@
-/* Open Harness Hub — /flow page (PFlow: interactive pipeline canvas + inspector drawer)
+/* OpenHubForAI — /flow page (PFlow: interactive pipeline canvas + inspector drawer)
    Faithful port of PFlow from proto-pages-build.jsx. No build step, no framework, vanilla ES5-
-   flavoured JS. Self-registers via OHH.register(). Read web/README.md before editing. */
+   flavoured JS. Self-registers via OpenHubForAI.register(). Read web/README.md before editing. */
 (function () {
   "use strict";
 
@@ -304,8 +304,8 @@
   }
 
   // ---------- register ----------
-  window.OHH = window.OHH || {};
-  if (window.OHH.register) {
-    window.OHH.register("/flow", render, onMount, { theme: "dark" });
+  window.OpenHubForAI = window.OpenHubForAI || {};
+  if (window.OpenHubForAI.register) {
+    window.OpenHubForAI.register("/flow", render, onMount, { theme: "dark" });
   }
 })();

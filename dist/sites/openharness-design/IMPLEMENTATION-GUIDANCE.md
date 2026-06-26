@@ -19,7 +19,7 @@ These are what make it a *branded house*. Violating any one breaks visual/brand 
    type/spacing size against `--fs-*` / `--pad-*`. **Never** hardcode a hex or a px for
    color/scale in a site stylesheet. (Layout px — grid gaps, fixed widths — is fine.)
 2. **One card primitive.** Every card/panel surface is the shared `.oh-card` (border + radius +
-   background + shadow). Don't re-declare per component. (Baltor `.ce-*` and OHH `.pt-panel`
+   background + shadow). Don't re-declare per component. (Baltor `.ce-*` and OpenHubForAI `.pt-panel`
    *compose* it — keep that.)
 3. **One type system.** `--font-display` = **Hanken Grotesk** everywhere; monospace for code/IDs.
    The `--fs-*` scale is shared — don't introduce new sizes.
@@ -84,7 +84,7 @@ Both caused real drift; see DESIGN-CONTRACT Rule 0's forbidden list.
   prototype-only constraint of in-browser Babel.
 - **`makeHub` as data vs code:** consider driving hubs from a CMS/DB config rather than a JS
   object literal — the shape in `HANDOFF.md §3.5` is the contract either way.
-- **Shared `OhRegistry`:** OHH's bespoke catalog and the `makeHub` browse grid could share one
+- **Shared `OhRegistry`:** OpenHubForAI's bespoke catalog and the `makeHub` browse grid could share one
   render component — optional consolidation noted in `HANDOFF.md §8`.
 - **Legacy paths:** folders keep original names so cross-links don't break. In a fresh codebase
   you can rename freely — just keep `products.js` the single source of identity.

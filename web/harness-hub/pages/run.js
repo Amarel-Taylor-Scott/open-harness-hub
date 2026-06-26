@@ -355,6 +355,6 @@
   /* ------------------------------------------------------------------
      Register the /run route
   ------------------------------------------------------------------ */
-  OHH.register("/run", render, onMount, { theme: "dark" });
+  OpenHubForAI.register("/run", render, onMount, { theme: "dark" });
 
 })();

@@ -14,7 +14,7 @@ Ordering ≈ value ÷ effort. Don't build all of it — pull the top item, proto
 
 ### 1. Cross-site portfolio switcher  ✅ SHIPPED
 **Status.** Done. `OhPortfolioMenu` lives in the kit (`oh-site.jsx`), rendered inside `OhTopBar`
-(so it appears on Teleon, the 3 hubs, and OHH marketing automatically) and wired into Baltor's
+(so it appears on Teleon, the 3 hubs, and OpenHubForAI marketing automatically) and wired into Baltor's
 `MarketingTop`. It reads `window.PORTFOLIO`, groups by `LAYERS` (Products / Open resources),
 shows each entity in its accent, and **auto-detects the current site from the URL** (marks it
 “HERE”). No-ops if `PORTFOLIO` isn't loaded. The parent is excluded by design — it *is* the map.
@@ -47,11 +47,11 @@ pricing layouts in one house. (Flagged in `HANDOFF.md` as an open item.)
 **Sites.** Baltor (Teleon already on it). **Effort.** S. Also nudges Scorecard C5/C6 up.
 
 ### 5. Command palette (⌘K)
-**Gap.** Power navigation is all sidebar clicks. Dense apps (Baltor 11 nav items, OHH ~43
+**Gap.** Power navigation is all sidebar clicks. Dense apps (Baltor 11 nav items, OpenHubForAI ~43
 routes) reward a fuzzy jump-to.
 **Move.** Shared `OhCommandK` — routes + primary actions from each site's nav config, fuzzy
 filter, keyboard-first. Config = the existing nav arrays.
-**Sites.** Baltor, OHH, Teleon. **Effort.** M.
+**Sites.** Baltor, OpenHubForAI, Teleon. **Effort.** M.
 
 ### 6. Notifications / inbox depth
 **Gap.** Teleon has `/notifications` (`OhNotifications`); Baltor's escalations (conflict review,

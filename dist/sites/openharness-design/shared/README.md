@@ -32,13 +32,13 @@ shape. The brand object is `{ name, tld, glyph, accent }`.
 |---|---|
 | `oh-tokens.css` | All design tokens (color, space, radii, shadow, type), scoped by `{dir-d \| dir-s \| …} × {theme-light \| theme-dark}`. Source of truth for every color. |
 | `oh-components.css` | Canonical primitives + the canonical scale variables. |
-| `oh-explorations.css` | Supplementary styles for OHH exploration/component cards. |
+| `oh-explorations.css` | Supplementary styles for OpenHubForAI exploration/component cards. |
 | `products.js` | Brand registry — `window.BRAND` + `window.PRODUCTS`. One-line brand renames. |
 
 ## Token scopes (`oh-tokens.css`)
 Apply a scope by putting classes on a root element, e.g. `<div class="oh dir-d theme-light">`.
 - `dir-d` → Baltor (teal accent)
-- `dir-s` → OHH (ember) and the parent (parent overrides neutrals/fonts under `.oh.dir-s.cie`)
+- `dir-s` → OpenHubForAI (ember) and the parent (parent overrides neutrals/fonts under `.oh.dir-s.cie`)
 - `theme-light` / `theme-dark` → light/dark neutral sets
 Key tokens: `--bg`, `--bg-subtle`, `--panel`, `--panel-2`, `--line`, `--line-strong`,
 `--fg`, `--fg-muted`, `--fg-faint`, `--accent`, `--accent-weak`, `--accent-ink`,
@@ -46,7 +46,7 @@ Key tokens: `--bg`, `--bg-subtle`, `--panel`, `--panel-2`, `--line`, `--line-str
 shadows `--e1…--e3`, fonts `--font-display`/`--font-mono`.
 
 ## Canonical primitives & scale (`oh-components.css`)
-- **Surface**: `.oh-card` (+ `.oh-card--pad`, `.oh-card--interactive`). `.pt-panel` (OHH) is
+- **Surface**: `.oh-card` (+ `.oh-card--pad`, `.oh-card--interactive`). `.pt-panel` (OpenHubForAI) is
   a compatibility alias listed alongside `.oh-card`.
 - **Controls**: `.oh-btn` (`--primary`/`--ghost`/`--sm`), `.oh-badge`
   (`--verified`/`--warn`/`--muted`/`--danger`/`--sm`).
@@ -71,4 +71,4 @@ The enrichment product key is historically `contextEnrichment`; its brand is **B
 
 ## Rules
 - Sites compose these classes/tokens; they do **not** re-declare surface/scale.
-- Keep `.pt-panel` in the `.oh-card` alias group so OHH stays on the shared surface.
+- Keep `.pt-panel` in the `.oh-card` alias group so OpenHubForAI stays on the shared surface.

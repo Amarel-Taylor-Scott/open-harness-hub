@@ -27,7 +27,7 @@ project `README.md`).
 ## 2. Shared-layer contract (`shared/`)
 - `oh-tokens.css` — colors/space/radii/shadow/type, scoped `{dir-d|dir-s} × {theme-light|theme-dark}`. **Only source of color.**
 - `oh-components.css` — canonical primitives + scale vars. **Change once → all sites update.**
-  - Surface: `.oh-card` (+`--pad`,`--interactive`); `.pt-panel` (OHH) is an alias in the same rule.
+  - Surface: `.oh-card` (+`--pad`,`--interactive`); `.pt-panel` (OpenHubForAI) is an alias in the same rule.
   - Controls: `.oh-btn`, `.oh-badge`. Account/interactive: `.oh-tabs/.oh-tab`, `.oh-table`,
     `.oh-segment`, `.oh-field`, `.oh-input`, `.oh-switch`, `.oh-setrow`.
   - Scale (on `.oh`): `--fs-eyebrow/h1/h2/h3/page-title/lead/body/small`, `--pad-card/-panel`,
@@ -46,7 +46,7 @@ project `README.md`).
 `/corpora` `/ingest` `/c/:id` `/serve` `/verify` `/governance` `/settings` `/pricing` · NotFound.
 **Parent**: single page, anchors `#thesis #architecture #portfolio #proof #fit`.
 **Teleon + all 16 hubs**: built on the kit; see §3.5 for the shared hub route map.
-**OHH**: ~43 routes — see `openharnesshub/PAGES.md` (route → purpose) and `proto-main.jsx` `App()`.
+**OpenHubForAI**: ~43 routes — see `openharnesshub/PAGES.md` (route → purpose) and `proto-main.jsx` `App()`.
 
 ## 3.5 makeHub registry engine (all 21 OpenHubForAI registries)
 `shared/oh-hub.jsx` → `makeHub(cfg)` renders an entire registry site from one config object.
@@ -83,7 +83,7 @@ Production must enforce private access server-side (the prototype only hides the
 ## 4. Theme & flags
 - Baltor/Parent: ☾/☀ toggle, `localStorage` `baltor-theme`/`cie-theme`, defaults to
   `prefers-color-scheme`; swaps `theme-light`/`theme-dark` on root.
-- OHH: route-based theme + scheme override switcher.
+- OpenHubForAI: route-based theme + scheme override switcher.
 - A/B: all live tests run on the **shared experiments engine** (`shared/oh-experiments.js` →
   `OHExp`/`useExperiment`; full guide `EXPERIMENTS.md`). Active experiments: `teleon_hero`,
   `baltor_hero`, `ohh_hero`, and per-hub `<hub>_landing` + `<hub>_subhead` — force via `?exp=key:Variant`, events fan out to `window.dataLayer`
@@ -105,7 +105,7 @@ by the fixtures in `ce-store.jsx` (`CORPORA`, `CONFLICTS`, `COMMONS`, `PUBLISHER
    or migrate to real ESM imports.
 
 ## 7. Verification status
-Last full sweep (this session): Baltor 14 routes + docs sub-tabs, Parent, OHH ~43 routes —
+Last full sweep (this session): Baltor 14 routes + docs sub-tabs, Parent, OpenHubForAI ~43 routes —
 all render, **zero horizontal overflow**, light + dark clean, console clean (only the
 expected in-browser Babel dev warning). Scratch screenshot folders removed.
 
@@ -124,15 +124,15 @@ driven, so it reads as part of the house without conforming structurally. Same r
 kept the engine grid on the Dashboard. Revisit only if the kit's `OhAppShell` grows a
 custom-logo / account-footer slot (the same additive pattern used for `OhDashboard.feature`).
 
-**Major remaining migration:** ~~OHH~~ — **done this session.** OHH (`openharnesshub/`) now
+**Major remaining migration:** ~~OpenHubForAI~~ — **done this session.** OpenHubForAI (`openharnesshub/`) now
 consumes the shared kit: it loads `oh-site.jsx`; its **app shell** renders via the kit's
 `OhAppShell` (extended this session with optional `groups` / `header` / `foot` / `topbar` /
-`isActive` slots so OHH's grouped collapsible nav, Build menu, credits/account footer and
+`isActive` slots so OpenHubForAI's grouped collapsible nav, Build menu, credits/account footer and
 breadcrumb+⌘K topbar are kept — no dumbing-down); its **account pages** render via `OhSettings`
 / `OhAuditLog` / `OhAuth`; and its **marketing chrome** (landing, use-case pages, preview,
-MarketingShell) renders via `OhTopBar` / `OhFooter`. OHH keeps its own scheme switcher,
+MarketingShell) renders via `OhTopBar` / `OhFooter`. OpenHubForAI keeps its own scheme switcher,
 command palette and tweaks (zoom/density/intensity, re-pointed to `.ohs-main`). The kit shell
-is adapted to OHH's fixed-height root by a 2-line scoped override (`.pt-root > .ohs-app` fills
+is adapted to OpenHubForAI's fixed-height root by a 2-line scoped override (`.pt-root > .ohs-app` fills
 the viewport; `.ohs-main` scrolls) in `proto.css`.
 
 **Kit extensions made this session (backwards-compatible, additive):** `OhDashboard` gained an
@@ -144,7 +144,7 @@ registry. Teleon and the hubs pass none of the new props and are unaffected.
 
 **Standardized pages + copy (this session):** added shared `OhAbout` (mission page — pulls
 `window.BRAND` + renders the family from `PORTFOLIO`) and `OhNotFound` (404); every site now
-routes `/about` → `OhAbout` and unknown → `OhNotFound` (Baltor/OHH/Teleon/hubs). Teleon's
+routes `/about` → `OhAbout` and unknown → `OhNotFound` (Baltor/OpenHubForAI/Teleon/hubs). Teleon's
 marketing was repositioned around *unbounded → deterministic*: outcomes **and** guardrails
 defined, self-improving/adapts when appropriate, at a fraction of a full agent's token cost
 (hero, How-it-works, band + `MARKETING.md`). Its hero example is now the 50-state
@@ -153,7 +153,7 @@ maximum-legal-interest-rate task (manual + source-fragile — the case Teleon is
 **Token discipline (this session):** the parent's `--cie-baltor`/`--cie-ohh` swatches are now
 driven from `PORTFOLIO.ENTITIES` accents at the root (`cie-main.jsx`) — the Baltor swatch had
 silently drifted (`#0e8a8f` vs canonical `#0e7c86`); fixed. A duplicate `.oh-switch` block in
-`oh-components.css` was de-duped, and OHH's one stray `#04130b` now inherits `--accent-ink`.
+`oh-components.css` was de-duped, and OpenHubForAI's one stray `#04130b` now inherits `--accent-ink`.
 
 **Other open items:**
   - **Baltor product-story surfaces (this session):** static `.cd-*` pages in `context-enrichment/`
@@ -164,9 +164,9 @@ silently drifted (`#0e8a8f` vs canonical `#0e7c86`); fixed. A duplicate `.oh-swi
   - **Open-standards story (this session):** all 7 hubs have a "Built on the open supply-chain
     stack" landing section; makeHub entry-detail has a per-artifact "Provenance & trust" block;
     Baltor receipts name Sigstore·Rekor / in-toto / CycloneDX AI-BOM. Mapping: `BACKEND-STACK.md`.
-  - **Bespoke remaining:** OHH's `pt-*` *product* pages (catalog, flow canvas, foundry) — unique
+  - **Bespoke remaining:** OpenHubForAI's `pt-*` *product* pages (catalog, flow canvas, foundry) — unique
     product UI, not chrome; correctly stay bespoke and compose `.oh-card` via the `.pt-panel`
-    alias. Optional future consolidation: extract a shared `OhRegistry` so OHH's catalog shares
+    alias. Optional future consolidation: extract a shared `OhRegistry` so OpenHubForAI's catalog shares
     render code with the makeHub browse pages.
 - Accessibility: a measured contrast pass (this session) nudged every scope's `--fg-faint` to
   clear ≥3.6:1 (was as low as 2.44:1 in light), family-wide via the shared tokens; the shared

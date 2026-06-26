@@ -1,6 +1,6 @@
-/* Open Harness Hub — deeper surfaces (vanilla ES5-style port of proto-deep.jsx)
+/* OpenHubForAI — deeper surfaces (vanilla ES5-style port of proto-deep.jsx)
    Registers: /foundry  /improve  /dashboards  /settings
-   Reads: ctx.data (OHH.data), ctx.PRIMS, ctx.esc, ctx.navigate, ctx.toast
+   Reads: ctx.data (OpenHubForAI.data), ctx.PRIMS, ctx.esc, ctx.navigate, ctx.toast
    DO NOT edit web/app.js, web/data.js, web/index.html, or any CSS. */
 (function () {
   "use strict";
@@ -103,7 +103,7 @@
     );
   }
 
-  OHH.register("/foundry", renderFoundry, null, { theme: "dark" });
+  OpenHubForAI.register("/foundry", renderFoundry, null, { theme: "dark" });
 
   /* ============================================================ IMPORT & IMPROVE */
   var FINDINGS = [
@@ -268,7 +268,7 @@
     if (exportBtn) exportBtn.addEventListener("click", function () { ctx.toast("Critique report exported (PDF)"); });
   }
 
-  OHH.register("/improve", renderImprove, onMountImprove, { theme: "dark" });
+  OpenHubForAI.register("/improve", renderImprove, onMountImprove, { theme: "dark" });
 
   /* ============================================================ DASHBOARDS */
   function buildSparkSVG(pts, color) {
@@ -363,7 +363,7 @@
     if (addBtn) addBtn.addEventListener("click", function () { ctx.toast("Pick a store / saved view to bind"); });
   }
 
-  OHH.register("/dashboards", renderDashboards, onMountDashboards, { theme: "dark" });
+  OpenHubForAI.register("/dashboards", renderDashboards, onMountDashboards, { theme: "dark" });
 
   /* ============================================================ SETTINGS */
   var SECTIONS = [
@@ -518,6 +518,6 @@
     }
   }
 
-  OHH.register("/settings", renderSettings, onMountSettings, { theme: "dark" });
+  OpenHubForAI.register("/settings", renderSettings, onMountSettings, { theme: "dark" });
 
 })();

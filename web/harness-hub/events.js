@@ -1,4 +1,4 @@
-/* Open Harness Hub — analytics + A/B beacon client (EVENTS.md contract).
+/* OpenHubForAI — analytics + A/B beacon client (EVENTS.md contract).
    Posts page/action/exposure/conversion events to the LOCAL events plane
    (scripts/events_local_service.py, port 9420) via navigator.sendBeacon — fire-and-forget,
    graceful NO-OP when the plane is down (the static prototype keeps working).

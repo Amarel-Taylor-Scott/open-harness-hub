@@ -1,5 +1,5 @@
 /* global React, PRIMS */
-// Open Harness Hub prototype — shared store, router, catalog data, shared atoms.
+// OpenHubForAI prototype — shared store, router, catalog data, shared atoms.
 
 // ---------------- catalog data (drives browse / search / detail / dashboard) ----------------
 const COMPONENTS = [

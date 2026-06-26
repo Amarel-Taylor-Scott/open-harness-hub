@@ -166,7 +166,7 @@ function PDashboards() {
 
 /* ============================== SETTINGS (deep config) ============================== */
 function Switch({ on, onClick }) { return <span className={'pt-switch' + (on ? ' on' : '')} onClick={onClick}><i /></span>; }
-// PSettings — now via the SHARED KIT (OhSettings), fed OHH's deep config sections.
+// PSettings — now via the SHARED KIT (OhSettings), fed OpenHubForAI's deep config sections.
 function OhhSeg({ opts, sel }) {
   return <div className="oh-segment">{opts.map((m, i) => <button key={m} className={i === sel ? 'on' : ''}>{m}</button>)}</div>;
 }

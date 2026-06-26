@@ -63,7 +63,7 @@
       '<div class="oh-state-msg" style="margin-top:26px;background:var(--accent-weak);border:1px solid color-mix(in srgb, var(--accent) 30%, var(--line));border-radius:var(--r-md);padding:16px 18px;display:block">' +
       '<div style="font-weight:600;color:var(--fg);margin-bottom:4px">One rule underneath it all</div>' +
       '<div style="font-size:13px;color:var(--fg-muted);line-height:1.6">Facts do not become served context just because one source or one model says so. Baltor keeps lineage, source counts, trust checks, archive state, and follow-up tasks so partial evidence can mature into verified context.</div>' +
-      '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/trust">See the trust policy →</button><a class="oh-btn oh-btn--ghost oh-btn--sm" href="https://openharnesshub.com">Build governed workflows in Open Harness Hub →</a></div>' +
+      '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/trust">See the trust policy →</button><a class="oh-btn oh-btn--ghost oh-btn--sm" href="https://openharnesshub.com">Build governed workflows in OpenHubForAI →</a></div>' +
       "</div>" +
       "</div></div></div>";
   }

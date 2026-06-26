@@ -175,7 +175,7 @@
       },
     ],
 
-    // -------- Open Harness Hub — governed pipelines --------
+    // -------- OpenHubForAI — governed pipelines --------
     openharnesshub: [
       {
         id: 'csddd-supplier-grading',
@@ -186,7 +186,7 @@
         metrics: [['4,000', 'suppliers graded'], ['13 langs', 'corpus coverage'], ['100%', 'findings cited']],
         challenge: 'The ESG team needed to grade suppliers against the EU Corporate Sustainability Due Diligence Directive — defensibly, at scale, and kept current as the articles change.',
         approach: [
-          'Described the task; Open Harness Hub assembled a governed harness from vetted classification, knowledge and grading components.',
+          'Described the task; OpenHubForAI assembled a governed harness from vetted classification, knowledge and grading components.',
           'Pinned the CSDDD article corpus (13 languages) as a live knowledge pack so amendments flow in via change-data-capture.',
           'Froze the deterministic stages so capability grew without per-run model cost.',
         ],

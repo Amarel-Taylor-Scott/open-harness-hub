@@ -1,4 +1,4 @@
-/* Open Harness Hub — side-by-side demo (/compare): bare model vs governed pipeline.
+/* OpenHubForAI — side-by-side demo (/compare): bare model vs governed pipeline.
    Makes the value prop visceral on clinical (Duecare-themed, SYNTHETIC) examples: the bare model
    is fluent but uncited and over-confident; the governed pipeline cites every claim, fires
    deterministic red-flag gates, and abstains when the corpus doesn't support an answer.
@@ -64,7 +64,7 @@
     var bare = side === "bare";
     var head = bare
       ? '<span class="oh-badge oh-badge--danger"><span class="gl">⚠</span> Bare model · no harness</span>'
-      : '<span class="oh-badge oh-badge--verified"><span class="gl">✔</span> Open Harness Hub pipeline</span>';
+      : '<span class="oh-badge oh-badge--verified"><span class="gl">✔</span> OpenHubForAI pipeline</span>';
     var body = bare ? ex.bare : ex.governed;
     var detail = bare
       ? '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--danger);margin:12px 0 4px">Failure modes</div><ul style="margin:0;padding:0;list-style:none">' + flawList(ex.bare.flaws, "--danger", "✗") + "</ul>"
@@ -97,13 +97,13 @@
     }).join("");
 
     return '<div class="pt-mkt pt-view">' +
-      '<header class="pt-mkt-top"><div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + " Open Harness Hub</div>" +
+      '<header class="pt-mkt-top"><div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + " OpenHubForAI</div>" +
       "<nav><a data-nav=\"/pipelines\">Explore</a><a data-nav=\"/compare\" style=\"color:var(--fg);font-weight:600\">Compare</a><a data-nav=\"/pricing\">Pricing</a><a data-nav=\"/docs\">Docs</a></nav>" +
       '<span class="pt-spacer"></span><button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button></header>' +
       '<div class="pt-mkt-body"><div class="pt-page" style="max-width:1000px;margin:0 auto">' +
       '<div class="pt-page-head"><div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:10px">See the lift</div>' +
       "<h1>Same model. The harness is the difference.</h1>" +
-      '<div class="sub">A bare frontier model vs the same model inside a governed Open Harness Hub pipeline, on real clinical decisions. The model is fixed — only the harness changes.</div></div>' +
+      '<div class="sub">A bare frontier model vs the same model inside a governed OpenHubForAI pipeline, on real clinical decisions. The model is fixed — only the harness changes.</div></div>' +
       '<div class="pt-chips" style="justify-content:flex-start;margin:0 0 18px">' + tabs + "</div>" +
       '<div class="oh-cc-id mono" style="margin-bottom:8px">task · ' + ctx.esc(ex.task) + "</div>" +
       '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:stretch">' + panel("bare", ex) + panel("governed", ex) + "</div>" +
@@ -122,6 +122,6 @@
     });
   }
 
-  OHH.register("/compare", render, onMount, { theme: "light" });
-  OHH.register("/compare/:n", render, onMount, { theme: "light" });
+  OpenHubForAI.register("/compare", render, onMount, { theme: "light" });
+  OpenHubForAI.register("/compare/:n", render, onMount, { theme: "light" });
 })();

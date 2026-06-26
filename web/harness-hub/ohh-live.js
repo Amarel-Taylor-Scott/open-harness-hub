@@ -1,4 +1,4 @@
-/* web/harness-hub/ohh-live.js — live seam between the full-design OHH surfaces and the real
+/* web/harness-hub/ohh-live.js — live seam between the full-design OpenHubForAI surfaces and the real
    backend (/api/build, /api/components, /api/export on this origin → scripts/showcase/server.py).
    The design prototype is the spec; this file only swaps FIXTURE data for REAL backend data when
    the backend answers, in the honest-fallback style of kit/oh-registry.js:

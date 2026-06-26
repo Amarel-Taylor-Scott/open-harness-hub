@@ -142,7 +142,7 @@ function PTrustCenter() {
       <div className="pt-page-head"><h1>Trust center</h1><div className="sub">The moat, on one page — how provenance, verification, and compliance actually work.</div></div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', marginBottom: 16, border: '1px solid var(--line)', borderLeft: '3px solid var(--accent)', borderRadius: 'var(--r-md)', background: 'var(--accent-weak)' }}>
         <span style={{ fontSize: 18 }}>◳</span>
-        <div style={{ flex: 1, fontSize: 13, lineHeight: 1.45, color: 'var(--fg)' }}>Verified, signed, always-current context is powered by <b>Baltor</b> — our context-assurance product. This page shows how it shows up inside Open Harness Hub.</div>
+        <div style={{ flex: 1, fontSize: 13, lineHeight: 1.45, color: 'var(--fg)' }}>Verified, signed, always-current context is powered by <b>Baltor</b> — our context-assurance product. This page shows how it shows up inside OpenHubForAI.</div>
         <a className="oh-btn oh-btn--ghost oh-btn--sm" href="../context-enrichment/Context Enrichment Prototype.html">Open Baltor →</a>
       </div>
       <div className="pt-trust-grid">{cards.map(([ic, t, d]) => (<div className="pt-trust-card" key={t}><div className="ic">{ic}</div><div className="t">{t}</div><div className="d">{d}</div></div>))}</div>
@@ -151,7 +151,7 @@ function PTrustCenter() {
 }
 
 /* ===== AUDIT LOG ===== */
-// PAuditLog — now via the SHARED KIT (OhAuditLog), fed OHH's governance receipts.
+// PAuditLog — now via the SHARED KIT (OhAuditLog), fed OpenHubForAI's governance receipts.
 function PAuditLog() {
   const { OhAuditLog } = window;
   return <OhAuditLog rows={[

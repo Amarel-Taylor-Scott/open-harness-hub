@@ -1,8 +1,8 @@
-/* Open Harness Hub — catalog.js
+/* OpenHubForAI — catalog.js
    Ports: PBrowse (/pipelines, /components), PDetail (/c/:slug),
           PDashboard (/app, /drafts), PPricing (/pricing)
    Vanilla ES5-style JS, no framework, no build step.
-   Reads OHH.data (COMPONENTS, BY_SLUG, MODALITIES, COST_LABEL, EXEC_COLOR, TIERS).
+   Reads OpenHubForAI.data (COMPONENTS, BY_SLUG, MODALITIES, COST_LABEL, EXEC_COLOR, TIERS).
    NEVER redeclares data; reads from ctx.data. */
 (function () {
   "use strict";
@@ -39,7 +39,7 @@
       return '<a href="' + p[0] + '">' + p[1] + '</a>';
     }).join('');
     return '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG_CATALOG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG_CATALOG + ' OpenHubForAI</div>' +
       '<nav>' + navItems + familyLinks + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<div style="display:flex;gap:9px">' +
@@ -52,8 +52,8 @@
   var PRIM_ORDER = ["input", "conditional", "knowledge", "action", "loop", "stop", "output"];
 
   var OWN_LABELS = [
-    ["free", "Free · Open Harness Hub"],
-    ["premium", "Premium · OHH (subscription)"],
+    ["free", "Free · OpenHubForAI"],
+    ["premium", "Premium · OpenHubForAI (subscription)"],
     ["community-free", "Community · free"],
     ["community-paid", "Community · paid"]
   ];
@@ -760,39 +760,39 @@
   // =====================================================
   // Route registrations
   // =====================================================
-  window.OHH = window.OHH || {};
+  window.OpenHubForAI = window.OpenHubForAI || {};
 
-  OHH.register("/pipelines", function (ctx) {
+  OpenHubForAI.register("/pipelines", function (ctx) {
     return renderBrowse(ctx, "pipeline");
   }, function (host, ctx) {
     onMountBrowse(host, ctx, "pipeline");
   }, { theme: "dark" });
 
-  OHH.register("/components", function (ctx) {
+  OpenHubForAI.register("/components", function (ctx) {
     return renderBrowse(ctx, "component");
   }, function (host, ctx) {
     onMountBrowse(host, ctx, "component");
   }, { theme: "dark" });
 
-  OHH.register("/c/:slug", function (ctx) {
+  OpenHubForAI.register("/c/:slug", function (ctx) {
     return renderDetail(ctx);
   }, function (host, ctx) {
     onMountDetail(host, ctx);
   }, { theme: "dark" });
 
-  OHH.register("/app", function (ctx) {
+  OpenHubForAI.register("/app", function (ctx) {
     return renderDashboard(ctx, false);
   }, function (host, ctx) {
     onMountDashboard(host, ctx);
   }, { theme: "dark" });
 
-  OHH.register("/drafts", function (ctx) {
+  OpenHubForAI.register("/drafts", function (ctx) {
     return renderDashboard(ctx, true);
   }, function (host, ctx) {
     onMountDashboard(host, ctx);
   }, { theme: "dark" });
 
-  OHH.register("/pricing", function (ctx) {
+  OpenHubForAI.register("/pricing", function (ctx) {
     return renderPricing(ctx);
   }, function (host, ctx) {
     onMountPricing(host, ctx);

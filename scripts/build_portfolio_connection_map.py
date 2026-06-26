@@ -106,7 +106,10 @@ def _self_test() -> int:
             fails.append(name)
 
     m = _load()
-    names = {h["name"] for h in m["hubs"]} | {c["name"] for c in m["core"]}
+    # recognized surfaces = hubs + core products + the umbrella (open_ecosystem) + the parent brand, so a
+    # products.js surface declared as the umbrella "OpenHubForAI" is valid (it is the store, not a hub).
+    names = ({h["name"] for h in m["hubs"]} | {c["name"] for c in m["core"]}
+             | {m["open_ecosystem"]["name"], m["parent"]["name"]})
     auth = _authoritative_names()
     missing = sorted(auth - names)
     ck("EVERY surface products.js declares is in the map (no hub omitted)", not missing, f"missing {missing}")

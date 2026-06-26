@@ -1,7 +1,7 @@
-/* Open Harness Hub — Admin portal · Checkout · Internet workers
+/* OpenHubForAI — Admin portal · Checkout · Internet workers
    Port of proto-admin.jsx to vanilla no-build static JS.
    Registers: /admin · /workers · /checkout (all dark theme).
-   Reads ctx.data (OHH.data from data.js); never redeclares shared data. */
+   Reads ctx.data (OpenHubForAI.data from data.js); never redeclares shared data. */
 (function () {
   "use strict";
 
@@ -396,10 +396,10 @@
   /*  Registration                                                        */
   /* ------------------------------------------------------------------ */
 
-  var OHH = window.OHH || {};
+  var OpenHubForAI = window.OpenHubForAI || {};
 
-  OHH.register("/admin",    renderAdmin,    onMountAdmin,    { theme: "dark" });
-  OHH.register("/workers",  renderWorkers,  onMountWorkers,  { theme: "dark" });
-  OHH.register("/checkout", renderCheckout, onMountCheckout, { theme: "dark" });
+  OpenHubForAI.register("/admin",    renderAdmin,    onMountAdmin,    { theme: "dark" });
+  OpenHubForAI.register("/workers",  renderWorkers,  onMountWorkers,  { theme: "dark" });
+  OpenHubForAI.register("/checkout", renderCheckout, onMountCheckout, { theme: "dark" });
 
 }());

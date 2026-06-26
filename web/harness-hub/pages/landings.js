@@ -1,4 +1,4 @@
-/* Open Harness Hub — Audience landing pages (/for/:who)
+/* OpenHubForAI — Audience landing pages (/for/:who)
    Faithful port of proto-landings.jsx → PUseCase.
    No React, no JSX, no build. Registers: /for/:who (marketing, light). */
 (function () {
@@ -92,7 +92,7 @@
   function renderNotFound(ctx) {
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHubForAI</div>' +
       '<nav>' + MKT_NAV.map(function (p) { return '<a data-nav="' + p[0] + '">' + p[1] + '</a>'; }).join('') + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -141,7 +141,7 @@
 
     return '<div class="pt-mkt pt-view">' +
       '<header class="pt-mkt-top">' +
-      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' Open Harness Hub</div>' +
+      '<div class="oh-wordmark" style="cursor:pointer" data-nav="/">' + MARK_SVG + ' OpenHubForAI</div>' +
       '<nav>' + mainNavHtml + '</nav>' +
       '<span class="pt-spacer"></span>' +
       '<button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>' +
@@ -170,5 +170,5 @@
     // No additional interactivity needed for this static marketing page.
   }
 
-  OHH.register("/for/:who", render, onMount, { theme: "light" });
+  OpenHubForAI.register("/for/:who", render, onMount, { theme: "light" });
 })();
