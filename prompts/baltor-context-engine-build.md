@@ -7,7 +7,7 @@
 
 ---
 
-You are working in the **Open Harness Hub / Baltor** repository. Read `CLAUDE.md` and
+You are working in the **OpenHubForAI / Baltor** repository. Read `CLAUDE.md` and
 `AGENTS.md` first; they override default behavior. This is a real, large codebase — **do
 not rewrite working code, and verify every external claim before asserting it.**
 
@@ -22,7 +22,7 @@ with verification as a rail *under* the pipeline, not a sequential column.
 The moat is **proprietary/governed data + continuous verification + freshness/CDC + measured
 fidelity + portable audit receipt — cheaper and fresher than long-context stuffing.** Do
 **not** market it as "capability the model can't reach." Brands are LOCKED: *Context is
-Everything* (company) · **Baltor.ai** (paid) · Open Harness Hub (open funnel) — do not
+Everything* (company) · **Baltor.ai** (paid) · OpenHubForAI (open funnel) — do not
 rename them.
 
 ## Hard rules (non-negotiable)

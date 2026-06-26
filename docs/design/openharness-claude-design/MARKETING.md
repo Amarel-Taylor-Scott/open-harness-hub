@@ -78,7 +78,7 @@ for site copy, sales decks, and onboarding). When a brand name/tagline changes, 
 ---
 
 ## Naming & relationship rules (do not break)
-- "AI Done Right" is the **only** company-level brand. Baltor and Open Harness Hub are
+- "AI Done Right" is the **only** company-level brand. Baltor and OpenHubForAI are
   **sister products** (peers) — neither is a parent. OHH appears on Baltor only as a quiet
   "sister product" footer link — **never** a switcher or a parent.
 - Renaming any brand is a one-line edit in `products.js` (`name` / `wordmark`).

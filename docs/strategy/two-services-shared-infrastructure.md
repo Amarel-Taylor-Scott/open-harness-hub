@@ -2,7 +2,7 @@
 
 > **Brand note (2026-05-29, locked — [[brand-architecture.md]]):** Service 2 below — the **Context Enrichment
 > service / CEaaS** — is branded **Baltor.ai** (in prose: **Baltor**), with modules **Verify · Corpus ·
-> Compress**. The company is **AI Done Right** (founding thesis: Context is Everything); **Open Harness Hub** (Service 1) keeps its
+> Compress**. The company is **AI Done Right** (founding thesis: Context is Everything); **OpenHubForAI** (Service 1) keeps its
 > name. "CEaaS" persists here and in code as the working/descriptive term for the same product.
 
 **Decision (owner, 2026-05-29):** run **two separate products/platforms on two domains**, sharing
@@ -16,7 +16,7 @@ are two genuinely distinct services that happen to sit on the same substrate.
 
 ## The two services
 
-### Service 1 — Open Harness Hub (build + monitor a pipeline)
+### Service 1 — OpenHubForAI (build + monitor a pipeline)
 *Build a governed pipeline and monitor it, with rules around input and output.* The seven-primitive
 builder, the governed recipe, observability, the I/O gates. Buyer: builders / applied teams
 assembling and operating AI pipelines. Domain: `openharnesshub.com`.

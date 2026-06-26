@@ -1,10 +1,10 @@
-# CLAUDE.md - Open Harness Hub Agent Instructions
+# CLAUDE.md - AI Done Right Agent Instructions
 
-> **READ `docs/BIBLE.md` FIRST** — the single north-star reference (vision · the 5 pillars · the ~35 Open\*Hub surfaces
+> **READ `docs/BIBLE.md` FIRST** — the single north-star reference (vision · the 5 pillars · the ~35 OpenHubForAI surfaces
 > + 103 registries · assumptions · guardrails · laws · contracts · hooks · tools). This file (CLAUDE.md) is the agent
 > operating layer; the BIBLE is the canonical *what + why*. If they ever disagree, the BIBLE wins.
 
-This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling Open Harness Hub.
+This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling OpenHubForAI.
 
 ## Portfolio (owner-decided 2026-06-06; updated 2026-06-09 — read FIRST)
 
@@ -16,7 +16,7 @@ high-fidelity Claude Code Max handoff lives in
 `README.md`, `CLAUDE-CODE.md`, and `HANDOFF.md`.
 
 Current design-family snapshot: parent + **Baltor** + **Teleon** + **22
-Open*Hubs** (9 live open registries + 13 private-bench registries; the count is
+OpenHubForAI registries** (9 live open registries + 13 private-bench registries; the count is
 computed by the family check, never hand-counted — don't trust this prose over
 `scripts/check_ai_done_right_surface_family.py`). The private bench includes the
 complete Baltor method spine (OpenReconciliationHub, OpenHardeningHub,
@@ -64,7 +64,7 @@ Full contract: `docs/codex/surface-and-development-contract.md`.
 A holding company owns three product layers. **Teleon** (`teleon.dev`, domain owned) = the purpose-driven,
 eval-gated, self-adaptive compute **runtime SaaS** — it owns PurposeTask/CapabilityTask, runtime selection,
 evidence ledger, promotion/policy gates, boundary approvals, adapters, the assurance dashboard. **Baltor**
-(`baltor.ai`) = the applied, customer-facing context product, **powered by Teleon** (a tenant). **OpenHarnessHub**
+(`baltor.ai`) = the applied, customer-facing context product, **powered by Teleon** (a tenant). **OpenHubForAI**
 = the open ecosystem (evals/harnesses/templates/skills) + the **open CapabilityTask spec (CTS)**.
 
 - **Architectural law (enforced by `scripts/check_portfolio_dependency_law.py` over
@@ -90,7 +90,7 @@ focus.
 ### The Foundational Law (owner-installed 2026-06-24 — frames what we build)
 
 We are building a **systems layer for executable capability** (Teleon indexes/optimizes it, Baltor governs its
-truth, Open*Hubs structure it, Observer watches its usage), not point products. Four reconciled filters govern it
+truth, OpenHubForAI structures it, Observer watches its usage), not point products. Four reconciled filters govern it
 (single source: `architecture/substrate_layers.json` → `foundational_law`; map of layers↔existing-assets↔gaps:
 `docs/strategy/computational-substrate-and-foundational-law.md`):
 

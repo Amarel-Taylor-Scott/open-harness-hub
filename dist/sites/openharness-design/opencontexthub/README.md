@@ -1,4 +1,4 @@
-# opencontexthub / openskillshub / opentoolshub — the Open*Hubs
+# opencontexthub / openskillshub / opentoolshub — the OpenHubForAI registries
 
 Three open-registry sites, each **built entirely on the shared hub module**
 (`../shared/oh-hub.jsx` + `oh-hub.css`, which sit on the site kit `oh-site.*`). A hub is

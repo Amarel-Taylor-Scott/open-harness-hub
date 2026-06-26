@@ -1,7 +1,7 @@
 # No Magic Values — Single Source of Truth
 
 > Context and rules for every agent and contributor (Codex, Claude Code,
-> Cursor, human PRs) working in Open Harness Hub. The goal: **no number,
+> Cursor, human PRs) working in OpenHubForAI. The goal: **no number,
 > string, count, path, model ID, dimension, threshold, or version that has
 > to be remembered and updated by hand in more than one place.**
 

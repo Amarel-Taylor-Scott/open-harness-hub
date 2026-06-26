@@ -14,7 +14,7 @@
 
 **Positioning (LOCKED):** *Models don't fail. Their context does.* — *Verified, current, and provable context
 for the agents you already run.* Pillars: **Verified · Current · Efficient · Provable.** Stack: **Teleon**
-(runtime engine) → **Baltor** (customer-facing governed context, powered by Teleon) → **Open\*Hubs** (free
+(runtime engine) → **Baltor** (customer-facing governed context, powered by Teleon) → **OpenHubForAI registries** (free
 developer funnel, `OpenHubForAI.io`).
 
 ---
@@ -46,7 +46,7 @@ worker pool + one authority feed, ~`$250–$1.5k/mo` infra.)
 - A **stale/weak-context audit** of their corpus: the facts their agent would otherwise cite that are stale,
   contradicted, unsourced, or low-confidence — each with a source handle and a portable receipt.
 - A **governed context package** they can export and feed to **their own agent/RAG stack** (the join is one
-  governed object, two doors — free freezable snapshot via Open\*Hubs, live serving via Baltor).
+  governed object, two doors — free freezable snapshot via OpenHubForAI registries, live serving via Baltor).
 - A **before/after report** (§6) quantifying stale-fact catch, manual-review-hours reduced, and % of served
   facts carrying source + receipt.
 - A reconciliation of contradictory authorities with **lineage to the losers** (nothing deleted — losing
@@ -95,7 +95,7 @@ brings us in):** the engineering/ML lead building the RAG/agent who keeps hittin
 **How to source the list (no cold-list purchase, no fabrication):**
 - **Founder-led outbound** to the personas above in the beachhead segments — warm intros first, then targeted
   direct outreach.
-- **The Open\*Hubs developer funnel (`OpenHubForAI.io`):** developers who adopt the open spec/SDK/harness and
+- **The OpenHubForAI registries developer funnel (`OpenHubForAI.io`):** developers who adopt the open spec/SDK/harness and
   hit "my agent cites stale facts" **self-identify the company that needs Baltor.** The free funnel is the
   top-of-pipe; the pilot is the conversion.
 - **Inbound from the demo:** the OFAC / CFPB correctness demo + a sample before/after report act as the lead

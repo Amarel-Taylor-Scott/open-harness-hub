@@ -2,7 +2,7 @@
 
 > **Naming is now locked** ([[brand-architecture.md]], 2026-05-29): the paid SaaS this doc calls
 > "CEaaS / verified-context SaaS / Name TBD" is **Baltor.ai** (in prose: **Baltor**); the company
-> is **AI Done Right** (founding thesis: Context is Everything); **Open Harness Hub** keeps its name. This doc owns *positioning*; brand
+> is **AI Done Right** (founding thesis: Context is Everything); **OpenHubForAI** keeps its name. This doc owns *positioning*; brand
 > identity/messaging lives in [[brand-architecture.md]].
 
 The single throughline that consolidates the strategy. Deep-dives feed this doc; don't duplicate them:
@@ -16,7 +16,7 @@ The single throughline that consolidates the strategy. Deep-dives feed this doc;
 multi-tool, a Task-Execution agent that does API *write* actions, model-agnostic, no-code builder — Jan
 2026). **Orchestration / actions / build-UX are becoming table stakes.** The two things that stay *ours*,
 orthogonal to whoever has the slickest orchestration:
-1. **Open / portable / low-end** — Open Harness Hub for the devs Contextual treats as a funnel.
+1. **Open / portable / low-end** — OpenHubForAI for the devs Contextual treats as a funnel.
 2. **Verified context, upstream** — the service that checks the *corpus* against authoritative truth, kept
    current, with provenance — feeding *any* agent, including Contextual itself.
 
@@ -46,7 +46,7 @@ Their architecture even has an Enterprise-Knowledge layer at the bottom that **m
 corpus answer of their own — the exact slot we supply (strengthens the upstream + acquisition logic).
 
 ## Name + tagline (LOCKED — see [[brand-architecture.md]])
-**Open Harness Hub** (`openharnesshub.com`) — **the harness layer that powers trustworthy agents.**
+**OpenHubForAI** (`openharnesshub.com`) — **the harness layer that powers trustworthy agents.**
 Bridge to "agent" in language/SEO (*"Power your agents with governed harnesses"* / *"harnesses for agents
 you can trust"*), never by renaming (that collapses the harness-vs-agent line the two-product split needs,
 and drops us into the commoditizing agent category). The metaphor *is* the pitch: a harness reins in
@@ -55,7 +55,7 @@ Harness.io.) The verified-context product is **Baltor.ai** (prose: **Baltor**) a
 **AI Done Right** (founding thesis: Context is Everything) — both now locked; only trademark/domain clearance remains open.
 
 ## The two products (one governed object, two doors)
-- **Open Harness Hub — the bounded, governed harness** (free/OSS funnel + low-end wedge). Assemble + monitor
+- **OpenHubForAI — the bounded, governed harness** (free/OSS funnel + low-end wedge). Assemble + monitor
   a governed pipeline of seven primitives; components admitted only on **measured lift**; **open, portable,
   works with the agent you already run** (Claude Code/Codex). *Value prop:* "the open, governed harness
   layer for agents — buildable, measurable, yours."

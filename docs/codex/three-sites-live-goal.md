@@ -10,7 +10,7 @@ LOCKED brand architecture (`docs/strategy/brand-architecture.md`).
 |---|---|---|---|---|
 | `context-is-everything` | **Context is Everything** — parent / mission landing | 8002 | `web/context-is-everything` | `Context is Everything` |
 | `baltor` | **Baltor** — verified-context SaaS | 8001 | `web/baltor` | `Baltor` |
-| `harness-hub` | **Open Harness Hub** — open builder funnel | 8000 | `web/harness-hub` | `Open Harness Hub` |
+| `harness-hub` | **OpenHubForAI** — open builder funnel | 8000 | `web/harness-hub` | `OpenHubForAI` |
 
 One backend (`scripts.showcase`); `OH_PRODUCT` pins which `web/<id>/` folder a server serves. Each site
 gets its own port → its own persistent tunnel → one shared access token.

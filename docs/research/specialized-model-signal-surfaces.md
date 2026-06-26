@@ -1,6 +1,6 @@
 # Specialized Model Signal Surfaces
 
-Task-specific models are high-value source signals for Open Harness Hub because a publisher has already spent time collecting data, defining labels, choosing metrics, and validating a narrow capability. The model weights are useful, but the surrounding context is often more reusable: task definitions, label schemas, datasets, preprocessing assumptions, examples, metrics, failure modes, intended-use boundaries, and deployment notes.
+Task-specific models are high-value source signals for OpenHubForAI because a publisher has already spent time collecting data, defining labels, choosing metrics, and validating a narrow capability. The model weights are useful, but the surrounding context is often more reusable: task definitions, label schemas, datasets, preprocessing assumptions, examples, metrics, failure modes, intended-use boundaries, and deployment notes.
 
 This means a fine-tuned model repo can be mined into knowledge objects and pipeline primitives even when the hub does not host or call the model. A general LLM, retrieval stack, evaluator, or cheap classifier can reuse the captured context to build an approximate workflow, route uncertain cases to a specialist model, or decide that specialist training is justified.
 

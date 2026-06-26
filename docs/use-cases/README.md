@@ -10,7 +10,7 @@ governed object is consumed through **two doors**.
 
 Two products ride one shared backend ([[../strategy/two-services-shared-infrastructure.md]]):
 
-- **Open Harness Hub (OHH)** — assemble and monitor a *bounded* governed
+- **OpenHubForAI (OHH)** — assemble and monitor a *bounded* governed
   pipeline, with rules around input and output. Sells governed **pipelines**.
 - **Baltor / Baltor** — refine content into token-efficiency tiers
   (raw → compressed → hyper-efficient) and serve governed corpora + tools into

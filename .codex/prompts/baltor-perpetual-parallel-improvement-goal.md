@@ -1,6 +1,6 @@
 # /goal: Baltor Perpetual Parallel Improvement
 
-Work autonomously in this repo. Improve Baltor/Open Harness Hub continuously
+Work autonomously in this repo. Improve Baltor/OpenHubForAI continuously
 until the human interrupts, a workspace/tool limit stops the run, or a real
 safety/destructive-action blocker prevents progress. Do not stop at proposals.
 Implement, validate, record, integrate parallel-agent outputs, and repeat.

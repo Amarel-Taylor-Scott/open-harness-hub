@@ -22,7 +22,7 @@
 >
 > **North Star v3 — RECONCILED (LOCKED + enforced 2026-06-06; supersedes the "two products" framing above):**
 > the portfolio is **three layers** — **Baltor** (applied governed context engine) → **Teleon** (runtime / control
-> plane; the descent brain) → **OpenHarnessHub** (open ecosystem) — under the **AI Done Right** holding brand
+> plane; the descent brain) → **OpenHubForAI** (open ecosystem) — under the **AI Done Right** holding brand
 > (which owns no runtime/customer data). Enforced by the dependency law Baltor→Teleon→OHH
 > (`architecture/portfolio_dependency_law.json`). Moat split (locked): **Baltor governs what becomes TRUE; Teleon
 > governs what becomes EFFICIENT.** The component registry remains the **substrate**. Canonical:

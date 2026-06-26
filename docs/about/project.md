@@ -1,6 +1,6 @@
 # About the project
 
-The Open Harness Hub is an industry-agnostic catalog of the modular
+The OpenHubForAI is an industry-agnostic catalog of the modular
 pieces of an AI-assisted system. It generalizes patterns from Taylor
 Amarel's [DueCare safety ecosystem](https://github.com/TaylorAmarelTech/gemma4_comp)
 and the [LLM Safety Framework](https://github.com/TaylorAmarelTech/llm-safety-framework).

@@ -63,7 +63,7 @@ stable harness preamble and schema block should appear first and be versioned by
 This helps two layers:
 
 - provider prefix caches can reuse repeated stable prompt prefixes;
-- Open Harness Hub can reuse trajectory fragments, tool-call patterns, and
+- OpenHubForAI can reuse trajectory fragments, tool-call patterns, and
   verified output skeletons from its own object database.
 
 ## Cheap Default Shape

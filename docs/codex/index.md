@@ -1,6 +1,6 @@
 # Codex Operating Guide
 
-This folder gives Codex sessions a stable operating model for scaling Open Harness Hub toward more than one million reusable AI primitives, procedure objects, facts, tools, and pipeline components.
+This folder gives Codex sessions a stable operating model for scaling OpenHubForAI toward more than one million reusable AI primitives, procedure objects, facts, tools, and pipeline components.
 
 Start with:
 

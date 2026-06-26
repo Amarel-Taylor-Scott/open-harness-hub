@@ -1,4 +1,4 @@
-# MongoDB collections — Open Harness Hub
+# MongoDB collections — OpenHubForAI
 
 The document-store mapping uses one collection per component `type`. The
 `_id` of every document is the component `id`. The full manifest is the

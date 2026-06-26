@@ -1,6 +1,6 @@
 # Product, Market, and Monetization Brief
 
-Open Harness Hub is a registry and generation platform for reusable AI pipeline
+OpenHubForAI is a registry and generation platform for reusable AI pipeline
 components. It helps users move from "I need an AI workflow" to a deployable,
 priced, evaluated, and maintainable pipeline.
 
@@ -18,7 +18,7 @@ model calls rather than reusable operational components.
 
 ## The Product
 
-Open Harness Hub standardizes and indexes:
+OpenHubForAI standardizes and indexes:
 
 - harnesses, pipelines, tools, rule packs, and RAG packs;
 - prompts, prompt templates, procedures, and question sets;
@@ -90,7 +90,7 @@ expand to the agencies who serve them.
 
 ## Differentiation
 
-Open Harness Hub is not just an agent builder. It focuses on reusable
+OpenHubForAI is not just an agent builder. It focuses on reusable
 components, source-governed knowledge objects, ratings, evals, cost-aware model
 routing, deployment blueprints, trajectory reuse, and private registries — all
 behind the capability-lift bar.

@@ -1,6 +1,6 @@
 # North Star Platform Architecture
 
-Open Harness Hub should scale as a database-backed component registry and factory, not as a pile of files.
+OpenHubForAI should scale as a database-backed component registry and factory, not as a pile of files.
 
 The north star is a system where public and verified source surfaces become governed source records, normalized knowledge objects, entity links, labels, dimensions, embeddings, review tickets, and deployable pipeline blueprints. Static docs and repository files are useful bootstrap and export surfaces, but the production product should be backed by canonical database storage, replayable object batches, and auditable workers.
 

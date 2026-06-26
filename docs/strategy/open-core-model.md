@@ -1,6 +1,6 @@
-# Open-Core Model — what "Open" in Open Harness Hub means
+# Open-Core Model — what "Open" in OpenHubForAI means
 
-> **Name (current):** **Open Harness Hub** / `openharnesshub.com`. We keep the
+> **Name (current):** **OpenHubForAI** / `openharnesshub.com`. We keep the
 > high-traffic "harness" keyword but let **"Hub"** carry the breadth (a hub of many
 > component types — Knowledge Corpus, Conditional, Action, Loop, …, not just
 > harnesses) and **"Open"** carry this open-core split. The breadth lives in the

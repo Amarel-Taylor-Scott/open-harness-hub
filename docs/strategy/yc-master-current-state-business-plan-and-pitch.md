@@ -26,7 +26,7 @@ uses it verbatim and never re-opens it.
 - **Pillars:** **Verified · Current · Efficient · Provable.**
 
 **Company:** AI Done Right (founding thesis: Context is Everything). **Paid SaaS:** **Baltor.ai** (modules: **Verify · Corpus · Compress**,
-with proof built into all three — not a separate SKU). **Open funnel:** **Open Harness Hub** (free; build the
+with proof built into all three — not a separate SKU). **Open funnel:** **OpenHubForAI** (free; build the
 governed workflow that consumes Baltor). One backend; the join is *one governed object, two doors*.
 
 ---
@@ -204,7 +204,7 @@ context packages · premium public context feeds · frontier-model overage.
 
 ### 4.3 Open-core monetization boundary (the join)
 
-- **Free funnel (Open Harness Hub):** open spec/SDK/engine; a **freezable** verified snapshot pulled into an
+- **Free funnel (OpenHubForAI):** open spec/SDK/engine; a **freezable** verified snapshot pulled into an
   OHH harness is free.
 - **Paid (Baltor):** **live, kept-fresh** serving against a dynamic corpus; governed corpora subscriptions
   (Corpus); build-on-demand for a domain we don't yet carry (the **capability-request** is the demand-capture

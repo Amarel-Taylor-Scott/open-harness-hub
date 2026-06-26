@@ -6,7 +6,7 @@ about the current product direction.
 
 ## Current Product Truth
 
-Baltor is the business. Open Harness Hub is the open funnel and component
+Baltor is the business. OpenHubForAI is the open funnel and component
 substrate.
 
 Baltor keeps enterprise agent context verified, current, reconciled, traceable,

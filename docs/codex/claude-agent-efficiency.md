@@ -1,6 +1,6 @@
 # Claude Agent Efficiency Plan
 
-This guide is for using Claude 4.x/4.8/4.7-style coding agents to reorganize Open Harness Hub without falling into slow static-site or one-file-per-row loops.
+This guide is for using Claude 4.x/4.8/4.7-style coding agents to reorganize OpenHubForAI without falling into slow static-site or one-file-per-row loops.
 
 ## The Problem
 

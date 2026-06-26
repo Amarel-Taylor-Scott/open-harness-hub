@@ -25,7 +25,7 @@ Parent brand **AI Done Right** ("AI, done right."); "Context is Everything" is t
 Reconciliation · Anti-Fragility/Hardening · Enhancement · Optimization · Verification+Receipts/Provenance. Echo
 **Verified · Current · Efficient · Provable**. Fragility/held-out is ONE lens, never the whole pitch. Teleon =
 purpose-defined eval-gated self-adaptive runtime (CapabilityTask stable, implementation evolves, evidence decides,
-policy gates promotion, humans approve boundaries). Open*Hubs = registries, not truth authorities (discovery≠trust).
+policy gates promotion, humans approve boundaries). OpenHubForAI = registries, not truth authorities (discovery≠trust).
 
 ## COPY/TRUTH GUARDRAILS
 Served answer is governed; model never decides truth; held-out contradictions shown SEPARATELY, never served;

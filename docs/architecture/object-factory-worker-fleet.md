@@ -1,6 +1,6 @@
 # Object Factory Worker Fleet
 
-Open Harness Hub can start with local LLM-assisted object generation, but a million-object registry needs a dedicated worker fleet. The worker fleet turns source pages, documents, procedures, repositories, workflow files, and user-submitted materials into normalized candidate objects that can be reviewed, deduplicated, embedded, labeled, and published.
+OpenHubForAI can start with local LLM-assisted object generation, but a million-object registry needs a dedicated worker fleet. The worker fleet turns source pages, documents, procedures, repositories, workflow files, and user-submitted materials into normalized candidate objects that can be reviewed, deduplicated, embedded, labeled, and published.
 
 The key design point is separation of responsibilities. A worker should do one bounded transformation, emit reproducible records, and leave an audit trail. LLM calls are routed through a provider-neutral model wrapper so the same job can run on a local model, an OpenAI-compatible endpoint, a managed cloud API, or a tenant-provided key.
 

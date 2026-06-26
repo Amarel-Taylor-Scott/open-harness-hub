@@ -1,7 +1,7 @@
 # Inference-Time Capability Watch — two 2026 results vs. the lift+governance thesis
 
 > **Purpose.** A skeptical, precise read of two results the owner flagged in 2026,
-> mapped onto Open Harness Hub's two load-bearing axes: **capability lift over a
+> mapped onto OpenHubForAI's two load-bearing axes: **capability lift over a
 > bare model** ([master-goal.md](../codex/master-goal.md)) and **durable +
 > governed** lift ([capability-valleys.md](../concepts/capability-valleys.md),
 > [`scripts/eval/reason_codes.py`](../../scripts/eval/reason_codes.py)).

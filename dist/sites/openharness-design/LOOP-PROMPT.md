@@ -39,7 +39,7 @@ PRODUCT POSITIONING (keep every surface aligned to this):
   never the whole pitch.
 - Teleon = purpose-defined, eval-gated, self-adaptive runtime (CapabilityTask stays stable,
   implementation evolves, evidence decides, policy gates promotion, humans approve boundaries).
-- Open*Hubs = open registries; NOT truth authorities. "Discovery is not trust."
+- OpenHubForAI = open registries; NOT truth authorities. "Discovery is not trust."
 
 COPY / TRUTH GUARDRAILS (non-negotiable):
 - The served answer is governed; the model never decides truth. Held-out contradictions are

@@ -41,7 +41,7 @@ data) is in the files below.
 
 1. **One design law:** all 5 surfaces use the SAME shared kit and differ ONLY by accent and copy. You edit a kit file
    once and it applies to all 5. Never style one surface in isolation, and never fork the kit.
-2. **Copy rules:** no placeholders ("OpenHubForAI", never "Open*Hubs"); no em or en dashes; no strategy leakage
+2. **Copy rules:** no placeholders ("OpenHubForAI", never "OpenHubForAI registries"); no em or en dashes; no strategy leakage
    ("moat", "wedge", "private bench"); real, confident sales and marketing copy.
 3. **Integration safety:** backends are reached only through same-origin seams (`/api/observer/...`); the proof gate
    (`PYTHONPATH=. python3 scripts/run_proofs.py`) must stay green.

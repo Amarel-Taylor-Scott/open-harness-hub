@@ -1,4 +1,4 @@
-# Redis / DynamoDB key shapes — Open Harness Hub
+# Redis / DynamoDB key shapes — OpenHubForAI
 
 Key-value stores are used as a **runtime cache**, not authoritative
 storage. The canonical store is PostgreSQL (or any backend in `db/`);

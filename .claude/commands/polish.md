@@ -1,5 +1,5 @@
 ---
-description: Polish the Open Harness Hub product app end-to-end — every screen, funnel, gate, endpoint — and make every surface sell its value proposition. Runnable autonomous loop.
+description: Polish the OpenHubForAI product app end-to-end — every screen, funnel, gate, endpoint — and make every surface sell its value proposition. Runnable autonomous loop.
 ---
 
 Run the **app-polish loop**: read and follow `docs/codex/app-polish-loop.md` against the

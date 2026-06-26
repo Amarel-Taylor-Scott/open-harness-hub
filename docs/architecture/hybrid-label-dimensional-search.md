@@ -1,6 +1,6 @@
 # Hybrid Label and Dimensional Search
 
-Vector search is necessary but not sufficient for a million-object registry. Open Harness Hub should combine pgvector with hierarchical labels, custom label sets, schema.org-style types, entity graph edges, and model-generated dimensions.
+Vector search is necessary but not sufficient for a million-object registry. OpenHubForAI should combine pgvector with hierarchical labels, custom label sets, schema.org-style types, entity graph edges, and model-generated dimensions.
 
 The result is hybrid search:
 

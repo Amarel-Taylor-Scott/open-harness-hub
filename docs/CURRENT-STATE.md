@@ -8,7 +8,7 @@ A holding company (**AI Done Right**, with legacy `contextiseverything` code pat
   CapabilityTask, runtime selection, evidence ledger, promotion/policy gates, boundary approvals, adapters).
 - **Baltor** (`baltor.ai`) — applied **governed-context** product, a **tenant of Teleon** (intake → reconcile →
   anti-fragile → enhance → optimize → consume, under a continuous-verification rail; source handles + receipts).
-- **Open ecosystem:** the current design-family proof covers 21 Open*Hub prototype surfaces: 9 live open hubs
+- **Open ecosystem:** the current design-family proof covers 21 OpenHubForAI registry prototype surfaces: 9 live open hubs
   plus 12 private-bench hubs, including the full Baltor method spine
   Reconcile → Harden → Enhance → Optimize → Verify.
 
@@ -27,8 +27,8 @@ a truth authority — Baltor governs truth, Teleon runs capabilities.
   (from `scripts/report_current_state.py`) + `docs/status/current-state.md`. THIS doc is the hand-written orientation;
   those are the machine-generated maturity/opportunity reports.
 - **Every web surface (pages · views · routes · primitives):** the full itemized inventory of all sites — the Baltor
-  SPA + the admin page/API routes, the portfolio_lib static launch sites, the OpenHarnessHub app, plus the UI design-system and
-  product primitives, each with status + gaps — lives in `docs/portfolio-web-surface-inventory.md`. The
+  SPA + the admin page/API routes, the portfolio_lib static launch sites, the OpenHubForAI app, plus the UI design-system and
+  product primitives, each with status + gaps — lives in `docs/DESIGN-BIBLE.md` (canonical; the 2026-06-09 snapshot is `docs/portfolio-web-surface-inventory.md`). The
   orientation stays here; the exhaustive page/view/route enumeration lives there.
 
 ## 3. Built recently (this period)

@@ -2,12 +2,12 @@
 description: Polish BOTH products to launch quality and keep BOTH trycloudflare tunnels live (autonomous, no-stop)
 ---
 
-Adopt the autonomous **app-polish builder** role for **both** Open Harness Hub products and **begin
+Adopt the autonomous **app-polish builder** role for **both** OpenHubForAI products and **begin
 immediately**. Goal: drive both products to launch quality and keep both public tunnels live.
 
 ## The two products (one shared backend)
 
-- **Open Harness Hub** — *bounded*: assemble a governed pipeline, run it, monitor I/O rules. Pinned
+- **OpenHubForAI** — *bounded*: assemble a governed pipeline, run it, monitor I/O rules. Pinned
   brand `harness-hub`. Home `/`. Tunnel → `dist/showcase-share-url-harness-hub.txt`.
 - **Baltor** — *unbounded* content refinery: ingest → raw/compressed/hyper-efficient
   tiers → host/download → serve corpora+tools into open agent loops. Pinned brand `baltor`.

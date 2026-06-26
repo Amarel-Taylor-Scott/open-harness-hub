@@ -2,7 +2,7 @@
 
 ## Objective
 
-Scale Open Harness Hub into a validated, searchable, signed, versioned, and deployable registry of more than one million AI pipeline components and subcomponents.
+Scale OpenHubForAI into a validated, searchable, signed, versioned, and deployable registry of more than one million AI pipeline components and subcomponents.
 
 The registry should let a user describe a task, role, procedure, policy, alert workflow, or domain problem and receive:
 

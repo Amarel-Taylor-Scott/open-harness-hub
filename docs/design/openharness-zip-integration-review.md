@@ -22,10 +22,10 @@ The archive contains three usable design tracks:
   story.
 - `openharness/context-enrichment/`: the older Context Enrichment prototype,
   now interpreted as Baltor.
-- `openharness/openharnesshub/`: Open Harness Hub prototype, route inventory,
+- `openharness/openharnesshub/`: OpenHubForAI prototype, route inventory,
   design canvas, and app shell.
 
-The repo already carries the Open Harness Hub handoff under
+The repo already carries the OpenHubForAI handoff under
 `web/harness-hub/design/`. That handoff remains the design source of truth for
 the open product surface.
 
@@ -36,7 +36,7 @@ the open product surface.
 - Keep brand roles distinct:
   - AI Done Right (founding thesis: Context is Everything): parent mission and platform story.
   - Baltor: paid context-control and context-assurance product.
-  - Open Harness Hub: open catalog, builder, registry, and funnel.
+  - OpenHubForAI: open catalog, builder, registry, and funnel.
 - Treat the old `context-enrichment` prototype as Baltor source material, not
   as a fourth brand.
 - Keep the Baltor admin demo operational and quiet: entry page is a launcher;
@@ -55,7 +55,7 @@ the open product surface.
 ## Current Gaps
 
 - Baltor and AI Done Right (founding thesis: Context is Everything) are visually related but still less aligned
-  to the Open Harness Hub shared component system than the zip export intends.
+  to the OpenHubForAI shared component system than the zip export intends.
 - The Baltor admin demo has modular CSS, but its panels are still custom
   `ad-*` components rather than mapped aliases to the shared `oh-*` primitives.
 - Some docs still mention old product states, including earlier admin-demo

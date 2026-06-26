@@ -4,7 +4,7 @@
 > registered). Everything outward-facing is HELD pending owner authorization on three decisions (bottom).
 
 ## Strategy (owner, locked direction)
-Portfolio = a sales machine, not just architecture. **Open\*Hub websites = inbound proof funnels · diagnostics =
+Portfolio = a sales machine, not just architecture. **OpenHubForAI websites = inbound proof funnels · diagnostics =
 credibility · Teleon = operational efficiency · Baltor = governance/compliance/trust · AI Done Right =
 routes leads.** Sell a **specific pain diagnosis**, not abstract architecture. Every lead gets a **proof
 artifact**, not a generic pitch. Product routing:
@@ -38,11 +38,11 @@ review · Baltor≠legal advice, Teleon≠replaces K8s. Enforced by `src/baltor/
 5. **HELD — Teleon Task Sprawl Analyzer** (runs on provided/public-static docs; no third-party probe).
 6. **HELD — Baltor Chatbot Guardrail Audit** (runs on customer-provided transcripts by default; live third-party
    probe requires written authorization).
-7. **HELD — Open\*Hub diagnostics** (self/provided audits).
+7. **HELD — OpenHubForAI diagnostics** (self/provided audits).
 8. **HELD — Evidence pack generator** (must pass `gate_evidence_pack`).
 9. **HELD — Lead scorer.**
 10. **HELD — Outreach generator** (draft-only; must pass `gate_outreach`).
-11. **HELD — Open\*Hub lead CTAs** (website copy).
+11. **HELD — OpenHubForAI lead CTAs** (website copy).
 12. **HELD — Example evidence packs** (synthetic/category-only; real-company packs gated).
 13. **HELD — Sales dashboard/API** (internal only).
 14. Redteam — **BUILT (core):** `check_sales_guardrails.py` (A–M). QUEUED: full `check_sales_lead_funnel_redteam`.
@@ -54,4 +54,4 @@ review · Baltor≠legal advice, Teleon≠replaces K8s. Enforced by `src/baltor/
    probes (per-target written authorization recorded) · public-static-metadata only.
 2. **Outreach handling** — draft-only internal (recommended) · draft + you send manually · automated send (advise against).
 3. **First diagnostic to build** — Teleon Task Sprawl (on provided docs) · Baltor Chatbot Guardrail (on provided
-   transcripts) · Open\*Hub self-audits. + whether to seed any **real** named companies (with approval).
+   transcripts) · OpenHubForAI self-audits. + whether to seed any **real** named companies (with approval).

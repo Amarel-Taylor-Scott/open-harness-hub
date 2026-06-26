@@ -10,7 +10,7 @@ docstrings; where they disagree with a live verification below, the live verific
 |---|---|---|---|
 | 8000–8003 | showcase app servers (OHH·Baltor·CIE·Teleon) + same-origin seam proxies | LIVE | browsers/tunnels |
 | 9410 | identity realms (25 realms, disk-persisted, hash-only keys) | LIVE | every surface (sign-up, sessions, API keys) |
-| 9423 | Open*Hub registry (catalogs for ALL hubs, workspace, review/promotion gate) | LIVE | all 21 hubs + products |
+| 9423 | OpenHubForAI registry (catalogs for ALL hubs, workspace, review/promotion gate) | LIVE | all 21 hubs + products |
 | 9420 | events/analytics plane (PII-guarded ingest) | LIVE | every surface (page beacons) |
 | 9430 | Teleon capability runtime (MODEL-BUILT runs + receipts + promotion gate) | LIVE | Teleon app |
 | 9301 | Baltor live-ops backend (event bus, pipeline, context gateway, OIPS projection) | LIVE | Baltor surfaces |

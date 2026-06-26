@@ -37,7 +37,7 @@ WITHOUT leaking secrets, bypassing governance, or creating a duplicate LLM wrapp
 Preference requests intent · Router decides execution · Receipt records reality · Fallback is never silent ·
 LLM output is never truth · Agent output is never truth · Tool output is never truth · Baltor governs truth ·
 Teleon runs capabilities · CapabilityTask stays stable, implementation evolves, evidence decides, policy gates
-promotion, humans approve boundary expansion. Open*Hubs = registries, not truth authorities (discovery≠trust).
+promotion, humans approve boundary expansion. OpenHubForAI = registries, not truth authorities (discovery≠trust).
 
 ## NON-NEGOTIABLE GUARDRAILS
 No commit/push/pip/npm-dep-mutation/real-containers/real-or-paid-cloud/paid-providers/production-secrets.

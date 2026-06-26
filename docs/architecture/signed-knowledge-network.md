@@ -1,6 +1,6 @@
 # Signed Knowledge Network
 
-Open Harness Hub can become a network for signed RAG and LLM pipeline objects: people, organizations, projects, governments, and agents publish knowledge objects that can be verified, indexed, embedded, composed into pipelines, and revoked when stale or unauthorized.
+OpenHubForAI can become a network for signed RAG and LLM pipeline objects: people, organizations, projects, governments, and agents publish knowledge objects that can be verified, indexed, embedded, composed into pipelines, and revoked when stale or unauthorized.
 
 This is not only a content upload feature. It is an identity, provenance, consent, and trust layer for reusable AI context.
 

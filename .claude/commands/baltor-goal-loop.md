@@ -16,7 +16,7 @@ anti-fragile → enhanced → optimized, source-linked **context packs**, under 
 **Continuous Verification + Adversarial Validation** rail, served with lineage + receipts. Moat =
 **proprietary/governed data + continuous verification + freshness/CDC + measured fidelity +
 portable receipt** (NOT "capability the next model can't reach"). Brands LOCKED (Context is
-Everything · Baltor.ai · Open Harness Hub). "Oracle" is retired as PRODUCT language → "Context
+Everything · Baltor.ai · OpenHubForAI). "Oracle" is retired as PRODUCT language → "Context
 Engine"/"Context Fabric"/"Context Assurance"/"Context Receipt" (keep the technical "oracle source"
 term; document in `docs/product-language.md`). **Baltor owns the contract; backend tools are
 swappable infra.**

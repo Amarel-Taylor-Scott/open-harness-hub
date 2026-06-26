@@ -1,6 +1,6 @@
 # Billion Component Goal
 
-> The north-star goal for Open Harness Hub. It mirrors and supersedes
+> The north-star goal for OpenHubForAI. It mirrors and supersedes
 > `docs/codex/million-object-goal.md`: same priority formula, same row
 > families, same safety non-negotiables — but the target is **thousands of
 > millions of components** (10⁸–10⁹+), every component is **vectorized and
@@ -11,7 +11,7 @@ The million goal is the proven floor. This is the ceiling we build toward.
 
 ## Objective
 
-Scale Open Harness Hub into a validated, signed, versioned, deduped, and
+Scale OpenHubForAI into a validated, signed, versioned, deduped, and
 deployable registry of **thousands of millions** of reusable AI pipeline
 components and subcomponents — and make all of it reachable two ways:
 

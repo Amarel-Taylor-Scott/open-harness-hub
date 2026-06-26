@@ -12,7 +12,7 @@ We are not designing point products. We are building a **systems layer for execu
 ```
 Google indexes information.        Teleon indexes executable capability   (governs EFFICIENCY).
                                    Baltor governs truth                   (governs TRUTH).
-                                   Open*Hubs structure machine knowledge  (discovery ≠ trust).
+                                   OpenHubForAI registries structure machine knowledge  (discovery ≠ trust).
                                    Observer watches intelligence usage itself.
 ```
 

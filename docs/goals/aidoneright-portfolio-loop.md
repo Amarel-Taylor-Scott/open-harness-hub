@@ -14,7 +14,7 @@ Improve and polish all aspects of the AI Done Right portfolio:
 - AI Done Right parent / portfolio site
 - Baltor governed-context product
 - Teleon purpose-defined capability runtime
-- all live Open*Hub registry sites
+- all live OpenHubForAI registry sites
 - all private bench hubs
 - the full Baltor method spine:
   - OpenReconciliationHub
@@ -45,9 +45,9 @@ Teleon runs capabilities: CapabilityTask / PurposeTask, runtime selection,
 execution backends, candidate paths, scorecards, evidence ledgers, promotion
 gates, rollback, local emulators, provider adapters, and boundary approvals.
 
-Open*Hubs are registries and discovery surfaces: discovery is not trust,
+OpenHubForAI registries are discovery surfaces: discovery is not trust,
 candidate is not active, benchmark result is not promotion authority, and
-Open*Hubs are not truth authorities.
+OpenHubForAI registries are not truth authorities.
 
 Shared internal surfaces are projection/control surfaces: Shared Inference
 Gateway, Shared Template Registry, Demo Control Tower, Teleon PurposeTask
@@ -56,8 +56,8 @@ Control Tower, and future service-auth/control-plane surfaces.
 Dependency law:
 
 - Baltor may depend on Teleon.
-- Teleon may consume Open*Hub resources.
-- Open*Hubs do not depend on Baltor truth.
+- Teleon may consume OpenHubForAI resources.
+- OpenHubForAI registries do not depend on Baltor truth.
 - Baltor governs truth.
 - Teleon runs capabilities.
 - Dashboards are projection-only.
@@ -79,7 +79,7 @@ Do not:
 - create fake URLs
 - put raw API keys in config, HTML, logs, receipts, screenshots, docs, or prototypes
 - let dashboards write truth
-- make Open*Hubs truth authorities
+- make OpenHubForAI registries truth authorities
 - let LLM output become truth
 - let agent output become truth
 - let benchmark result promote a candidate
@@ -176,7 +176,7 @@ P1 - Create or improve service-to-service consumption docs and architecture:
 P2 - Add checks/proofs for:
 
 - no raw secrets in prototypes
-- Open*Hub projection-only access
+- OpenHubForAI projection-only access
 - product boundary preservation
 - no stale parent-brand hardcodes
 
@@ -286,7 +286,7 @@ Forbidden:
 - raw keys in HTML
 - raw keys in logs
 - shared organization keys in agent sandboxes
-- Open*Hub public pages executing gated tools
+- OpenHubForAI public pages executing gated tools
 - cross-tenant reads
 - direct provider SDK calls from product/business code
 - free/prototype LLM endpoints handling sensitive data by default
@@ -522,7 +522,7 @@ no crash, no secret, no forbidden mutation from public pages. Artifacts:
 - **Teleon agent capability:** list CapabilityTasks → run local deterministic capability
   → view receipt → forbidden boundary expansion requires human approval → LLM fallback
   while disabled fails closed or uses the local stub → no raw secrets → events tracked.
-- **Open*Hub:** landing → search/browse → entry detail → provenance/trust rail →
+- **OpenHubForAI:** landing → search/browse → entry detail → provenance/trust rail →
   dashboard → publish/submit local fixture → lands in review queue (never public-active)
   → "discovery is not trust" present → no execution from public listings → private hubs
   show the private-preview banner.
@@ -567,7 +567,7 @@ updated · proof/check results recorded.
 ### Gate loop commands
 
 ```text
-/loop 1200 /goal follow docs/goals/aidoneright-portfolio-loop.md and add the Browser E2E + Local Service Emulation Gate as mandatory: use Playwright or equivalent to crawl every surface from products.js and Control Tower, test every route/link/button/form/tab/CTA/account-console action, attempt local registration/login/org/API-key/service-account/MCP flows, verify Baltor↔Teleon service consumption, verify Open*Hub projection-only behavior, record local analytics/A-B events, capture desktop/mobile screenshots and HTML snapshots, check console/network/no-overflow/no-raw-secrets, start all services from a local service registry with health/ready endpoints, expose/check TryCloudflare or reverse-proxy URLs when available, emulate Cloud-Run-like services locally, and complete one proof-backed increment per cycle. No fake URLs, no real secrets, no paid cloud, no direct provider bypass, no overclaims.
+/loop 1200 /goal follow docs/goals/aidoneright-portfolio-loop.md and add the Browser E2E + Local Service Emulation Gate as mandatory: use Playwright or equivalent to crawl every surface from products.js and Control Tower, test every route/link/button/form/tab/CTA/account-console action, attempt local registration/login/org/API-key/service-account/MCP flows, verify Baltor↔Teleon service consumption, verify OpenHubForAI projection-only behavior, record local analytics/A-B events, capture desktop/mobile screenshots and HTML snapshots, check console/network/no-overflow/no-raw-secrets, start all services from a local service registry with health/ready endpoints, expose/check TryCloudflare or reverse-proxy URLs when available, emulate Cloud-Run-like services locally, and complete one proof-backed increment per cycle. No fake URLs, no real secrets, no paid cloud, no direct provider bypass, no overclaims.
 ```
 
 Parser-safe short form:
@@ -581,7 +581,7 @@ Parser-safe short form:
 Use this in Codex/Claude Code:
 
 ```text
-/goal follow the instructions in docs/goals/aidoneright-portfolio-loop.md. Work one proof-backed increment only. First verify current state from README.md, HANDOFF.md, products.js, Control Tower, and hub READMEs. Prioritize stale surface counts, dead links, parent-brand consistency, method-spine completeness, and the new service-to-service auth model: service consumption matrix, service identities, API key policy, secret refs, public/private projection boundaries. Preserve product positioning: AI Done Right parent; Baltor governs truth/context; Teleon runs capabilities; Open*Hubs are registries only; discovery is not trust; output is not truth; dashboards are projection-only. No raw secrets, no fake URLs, no cloud, no network LLM, no installs, no overclaims. If backend flywheel is not applicable, mark NOT_APPLICABLE_DESIGN_REPO and run static/design checks instead. Return files changed, checks run, honest gaps, and next target.
+/goal follow the instructions in docs/goals/aidoneright-portfolio-loop.md. Work one proof-backed increment only. First verify current state from README.md, HANDOFF.md, products.js, Control Tower, and hub READMEs. Prioritize stale surface counts, dead links, parent-brand consistency, method-spine completeness, and the new service-to-service auth model: service consumption matrix, service identities, API key policy, secret refs, public/private projection boundaries. Preserve product positioning: AI Done Right parent; Baltor governs truth/context; Teleon runs capabilities; OpenHubForAI registries are discovery surfaces only; discovery is not trust; output is not truth; dashboards are projection-only. No raw secrets, no fake URLs, no cloud, no network LLM, no installs, no overclaims. If backend flywheel is not applicable, mark NOT_APPLICABLE_DESIGN_REPO and run static/design checks instead. Return files changed, checks run, honest gaps, and next target.
 ```
 
 ## Loop Command
@@ -589,13 +589,13 @@ Use this in Codex/Claude Code:
 If the environment asks for `/loop interval prompt`, use:
 
 ```text
-/loop 1200 /goal follow the instructions in docs/goals/aidoneright-portfolio-loop.md. Work one proof-backed increment per cycle. Start with current-state verification, then repair the highest-priority mismatch. Prioritize service-to-service auth, API keys, service accounts, secret refs, projection-only Open*Hub boundaries, method-spine docs, Control Tower links, stale counts, and handoff freshness. Stop only if STOP_REQUESTED exists.
+/loop 1200 /goal follow the instructions in docs/goals/aidoneright-portfolio-loop.md. Work one proof-backed increment per cycle. Start with current-state verification, then repair the highest-priority mismatch. Prioritize service-to-service auth, API keys, service accounts, secret refs, projection-only OpenHubForAI boundaries, method-spine docs, Control Tower links, stale counts, and handoff freshness. Stop only if STOP_REQUESTED exists.
 ```
 
 ## Emergency Short Goal
 
 ```text
-/goal follow docs/goals/aidoneright-portfolio-loop.md. Verify reality, fix one highest-priority issue, run checks, update receipt/docs. Preserve AI Done Right/Baltor/Teleon/Open*Hub boundaries. Build service-auth docs/matrix if no higher-priority breakage exists. No secrets, no fake URLs, no installs, no cloud, no overclaims.
+/goal follow docs/goals/aidoneright-portfolio-loop.md. Verify reality, fix one highest-priority issue, run checks, update receipt/docs. Preserve AI Done Right/Baltor/Teleon/OpenHubForAI boundaries. Build service-auth docs/matrix if no higher-priority breakage exists. No secrets, no fake URLs, no installs, no cloud, no overclaims.
 ```
 
 ## Final Response Format

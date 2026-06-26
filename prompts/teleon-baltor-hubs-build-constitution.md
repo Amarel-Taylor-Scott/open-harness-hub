@@ -89,13 +89,13 @@ candidate.
   `scripts/run_proofs.py`, and the `check_*` family.
 
 ### SYSTEM 3 — OPEN HUB FEDERATION · the machine's world model
-The **OpenHarnessHub** ecosystem + the open **CapabilityTask spec (CTS)**. A machine-readable global registry
+The **OpenHubForAI** ecosystem + the open **CapabilityTask spec (CTS)**. A machine-readable global registry
 layer where, eventually, **every executable capability in existence is represented**. This is the machine's world
 model and the open funnel.
 
 - Real homes: `architecture/registry_ontology.json` (the federation index — a registry-of-registries),
   `src/teleon/registry/port.py` (the universal menu: `list/lookup/search/explain`),
-  `architecture/hub_profiles.json` (the Open\*Hub surfaces). **Counts are computed** by
+  `architecture/hub_profiles.json` (the OpenHubForAI surfaces). **Counts are computed** by
   `scripts/check_ai_done_right_surface_family.py` — never hand-type the number of hubs or registries.
 
 ### SYSTEM 4 — OBSERVER / SPOTTER · the coding-session review, supervisor & assistant

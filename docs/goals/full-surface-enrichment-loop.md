@@ -2,7 +2,7 @@
 
 > Owner ask (2026-06-24): a loop to run for the **next ~3 days, iterating every ~30 minutes**, filling gaps and
 > generating **records, metadata, embeddings, tools, descriptions, use-cases** for **all** aspects of the project —
-> from Baltor, to Teleon, to the Open\*Hubs, to the new **Observer/Spotter** supervisor/monitor/session-review tool.
+> from Baltor, to Teleon, to the OpenHubForAI registries, to the new **Observer/Spotter** supervisor/monitor/session-review tool.
 
 ## The one command
 
@@ -35,7 +35,7 @@ cold-start; steady state is cadence-driven):
 | **Teleon** | `build_million_records` | scaled candidate **records** via governed variation mutation (industry × geo × season × …) |
 | **Teleon** | `distill_kaggle_kernels` | candidate registry **entries** distilled from mined Kaggle kernels (lossless, candidate-only) |
 | **Teleon** | `build_capability_mvp` | the capability showcase, counts recomputed from the registries |
-| **Hubs** | `build_hub_sites --all` | all 22 Open\*Hub surfaces rebuilt from the registries |
+| **Hubs** | `build_hub_sites --all` | all 22 OpenHubForAI surfaces rebuilt from the registries |
 | **Hubs** | `build_hub_browser` | the browse-everything hub table |
 | **Observer** | `build_spotter_surface` | the Spotter surface (taxonomy + live review, computed counts) |
 | **Observer** | `build_code_genome_index` | code-genome dogfood over `src/teleon` (candidate internal-reinvention) |
@@ -60,7 +60,7 @@ cold-start; steady state is cadence-driven):
   modes; `review == route_session("review_only")`; `capture.py` ingests Claude Code/Codex transcripts (proven on a
   real 2847-line session); `session_store.py` is the session schema + the accept/reject **outcome** loop (the moat).
   Patterns single-sourced in `architecture/behavioral_heuristics.json` (#103).
-- **Hubs:** 22 Open\*Hubs; profiles in `architecture/hub_profiles.json` (`check_hub_profiles`); sites built by
+- **Hubs:** 22 OpenHubForAI registries; profiles in `architecture/hub_profiles.json` (`check_hub_profiles`); sites built by
   `build_hub_sites.py`. Counts are **computed** by `scripts/check_ai_done_right_surface_family.py` — never hand-typed.
 - **Baltor / Teleon split (architectural law):** Baltor → Teleon → OpenHarnessHub, **never the reverse**
   (`check_portfolio_dependency_law.py`). Brand: product = **Teleon**; **AI Done Right** is the parent.

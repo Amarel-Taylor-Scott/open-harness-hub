@@ -1,4 +1,4 @@
-# openharnesshub/ — Open Harness Hub
+# openharnesshub/ — OpenHubForAI
 
 The open, free **funnel** product: build governed harnesses (composed pipelines of
 primitives) and consume Baltor's verified context. Hash-routed React SPA, ~43 routes.

@@ -9,7 +9,7 @@ admission criterion, published and peer-reviewed by a third party.
 
 ## The mapping is one-to-one
 
-| SkillsBench | Open Harness Hub | Where |
+| SkillsBench | OpenHubForAI | Where |
 |---|---|---|
 | a **skill** (`SKILL.md` + scripts/ + references/) | an **Action** (harness/processor/persona/tool/rubric) | `catalog/harnesses/…`, `scripts/foundry/skillsbench.py` |
 | **lift** = Δ pass-rate (with − without) | `pipeline_score − bare_model_score` | `scripts/foundry/measure.py` |

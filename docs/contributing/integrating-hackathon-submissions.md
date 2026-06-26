@@ -1,7 +1,7 @@
 # Integrating hackathon submissions as verified-evidence pipelines
 
 This guide explains how to port any Hugging Face Space, Kaggle kernel,
-or hackathon submission into the Open Harness Hub catalog as a
+or hackathon submission into the OpenHubForAI catalog as a
 verified-evidence pipeline + reusable design patterns. Designed for
 contributors and authors who want their work in the registry.
 
@@ -195,7 +195,7 @@ attribution:
 ```
 
 Authors should list themselves in `authors:` at the top of each
-manifest. Open Harness Hub contributors are listed as a SECOND
+manifest. OpenHubForAI contributors are listed as a SECOND
 author for the catalog port specifically.
 
 ## How to submit

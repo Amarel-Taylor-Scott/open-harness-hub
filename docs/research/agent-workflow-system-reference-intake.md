@@ -1,6 +1,6 @@
 # Agent Workflow System Reference Intake
 
-Open Harness Hub should study mature agent and workflow ecosystems as reference sources for workflow shapes, skill formats, tool permissioning, memory designs, hub/marketplace patterns, and deployment models.
+OpenHubForAI should study mature agent and workflow ecosystems as reference sources for workflow shapes, skill formats, tool permissioning, memory designs, hub/marketplace patterns, and deployment models.
 
 This should be done as controlled reference intake, not blind global installation. Many of these systems execute code, install plugins, run browser tooling, or connect to external accounts. The default path is:
 

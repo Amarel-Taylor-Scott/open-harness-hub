@@ -11,7 +11,7 @@
 ## 0. North-star vision
 
 We are building a **systems layer for executable capability** — not point products. Teleon indexes/optimizes it,
-Baltor governs its truth, the Open\*Hubs structure it, AIDevObserver watches its usage. The binding goal is **DEPTH
+Baltor governs its truth, OpenHubForAI structures it, AIDevObserver watches its usage. The binding goal is **DEPTH
 BEFORE BREADTH**: every layer must serve the ONE vertical being proven to a paying customer. Scale is the ambition
 (billions→trillions of components), but breadth without a revenue vertical is the failure mode.
 
@@ -44,7 +44,7 @@ Group* → AI Done Right, 2026-06-09.) Canonical portfolio architecture:
 | **Teleon** | teleon.dev | purpose-driven, eval-gated, self-adaptive compute **runtime** | `web/teleon` | EFFICIENCY |
 | **AIDevObserver** | aidevobserver.io | watches AI **usage** — post-session review + intra-session coaching (renamed from *Teleon Observer* 2026-06-25) | `src/teleon/observer` (web demo built) | the WEDGE |
 | **Baltor** | baltor.ai | managed, verified, provable **context**, powered by Teleon (a tenant) | `web/baltor` | TRUTH |
-| **Open\*Hubs** | **OpenHubForAI.io** (ONE site) | the open **store** both products consume + the open CapabilityTask spec | `web/harness-hub` | the COMMONS |
+| **OpenHubForAI** | **OpenHubForAI.io** (ONE site) | the open **store** both products consume + the open CapabilityTask spec | `web/harness-hub` | the COMMONS |
 
 **Naming law:** product = Teleon; staff dashboard = Teleon Control Tower; customer dashboard = Capability Assurance
 Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc: `docs/strategy/teleon-naming-and-domain.md`.
@@ -57,7 +57,7 @@ Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc:
   `architecture/portfolio_dependency_law.json`): **Baltor → Teleon → OpenHarnessHub, NEVER the reverse.** Teleon must
   never import Baltor; OpenHarnessHub imports neither. PurposeTask is **Teleon**, not a Baltor subsystem.
 - **Component flow** (diagram: `dist/sites/openharness-design/diagrams/component-flow.html`): components are published
-  to the Open\*Hubs store → the Teleon runtime SELECTS + PROVES them on real examples → Baltor SERVES them as verified
+  to the OpenHubForAI store → the Teleon runtime SELECTS + PROVES them on real examples → Baltor SERVES them as verified
   context. Consumption flows up; dependency points down. AIDevObserver watches the usage.
 - **Hosting:** Teleon + Baltor deploy same region/private network (low latency) but stay **separable** (separate
   service/data/identity/IaC + a versioned API + graceful local fallback).
@@ -68,13 +68,13 @@ Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc:
 
 ---
 
-## 4. The Open\*Hubs (surfaces) + the 103 registries (the named profiles)
+## 4. The OpenHubForAI surfaces + the 103 registries (the named profiles)
 
 **UI/UX CONSOLIDATION (owner 2026-06-25):** all hubs + registries live under **ONE site — `OpenHubForAI.io`**. Each
 hub/registry is a **section**, NOT a separate domain — the per-hub `OpenXxxHub.io` domains are retired as live
 surfaces (names stay as section labels). The BACKEND keeps per-hub/registry **data separation** (separate
 datasets/databases) — only the UI/UX is unified. One storefront, many catalogs. (NOT `OpenAIHub.io` — OpenAI
-trademark.) This also retires the OpenHarnessHub-prominence question: with one site, no hub is privileged.
+trademark.) This also retires the old hub-prominence question: with one site, no hub is privileged.
 
 **FLEXIBLE FACETS, not rigid stores (owner 2026-06-25):** the browsable unit is the **RECORD** (a tool, model, prompt,
 skill, dataset…). The hubs + registries become **facets** of one faceted catalog — browse/filter by category (the old
@@ -94,7 +94,7 @@ in the ontology): **static** (curated + indexed), **discovery** (crawls the worl
 (pointer-only — indexes *where* external registries live; pointer ≠ copy, discovery ≠ trust). The `maps_to_hub` link
 is the ONLY explicit hub↔registry binding, and nothing yet enforces it stays valid — a candidate contract.
 
-**(a) The Open\*Hub SURFACES** — the storefronts. ~35 are named across the design + data (sources:
+**(a) The OpenHubForAI SURFACES** — the storefronts. ~35 are named across the design + data (sources:
 `architecture/hub_profiles.json` = 28 detailed profiles; `architecture/candidate_open_hubs.json` = 9 existing + 16
 candidates; family count computed by `scripts/check_ai_done_right_surface_family.py`). By name: OpenAgentHub ·
 OpenBenchmarkHub · OpenCompressionHub · OpenContextHub · OpenContradictionHub · OpenCurrentContextHub · OpenDatasetHub ·

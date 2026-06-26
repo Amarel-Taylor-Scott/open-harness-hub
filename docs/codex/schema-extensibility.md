@@ -60,7 +60,7 @@ have been an open vocabulary. A taxonomy that changes is data, not schema.
   change must. Hash the normalized body, not the wrapper (see CLAUDE.md ID/hash discipline).
 - **Forward-compatible reads.** Consumers ignore unknown attributes rather than erroring — old code
   reads new rows. (Same principle as `OHH.product()` reading a config it didn't ship with.)
-- **One source of truth across products.** Both Open Harness Hub and Context Layer read the *same*
+- **One source of truth across products.** Both OpenHubForAI and Context Layer read the *same*
   schemas, vocabularies, and dimension definitions — the two-product split
   ([[two-services-shared-infrastructure.md]]) shares the backend precisely so a facet added for one is
   instantly available to the other. A facet must never be a per-service column. See

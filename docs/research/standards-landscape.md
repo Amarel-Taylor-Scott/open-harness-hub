@@ -1,6 +1,6 @@
 # Standards landscape & alignment plan
 
-> Draft research synthesis. Maps the Open Harness Hub taxonomy against
+> Draft research synthesis. Maps the OpenHubForAI taxonomy against
 > existing standards (schema.org, W3C, AI-specific, eval, provenance,
 > privacy) and recommends where to adopt, where to adapt, and where to
 > invent.

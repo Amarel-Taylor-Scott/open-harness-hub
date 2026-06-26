@@ -216,7 +216,7 @@ Seed narrative:
    packaged for consumption.
 2. Baltor is the control layer that continuously syncs, versions, verifies,
    reconciles, and serves context.
-3. Open Harness Hub creates the open standards and developer funnel.
+3. OpenHubForAI creates the open standards and developer funnel.
 4. AI Done Right (founding thesis: Context Is Everything) owns the category narrative.
 5. The moat is the worker/procedure loop: expensive nondeterministic resolution
    becomes deterministic infrastructure over time.

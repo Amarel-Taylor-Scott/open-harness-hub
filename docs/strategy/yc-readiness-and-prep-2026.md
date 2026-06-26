@@ -26,7 +26,7 @@ A holding company (**AI Done Right**, `aidoneright.dev`) over three layers:
   sign what happened."*
 - **Teleon** (`teleon.dev`) — the thin **control plane** that descends each capability from the unbounded/inefficient
   default (frontier model on everything) to the most bounded/efficient path that still meets the requirement.
-- **OpenHarnessHub** — the open ecosystem + CapabilityTask spec.
+- **OpenHubForAI** — the open ecosystem + CapabilityTask spec.
 
 **Not a wrapper:** real layering enforced in code (dependency law Baltor→Teleon→OHH, plane separation, ports for every
 backend). "AI is infrastructure, not a feature" — this is infrastructure.

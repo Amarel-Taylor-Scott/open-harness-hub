@@ -1,5 +1,5 @@
 ---
-title: Open Harness Hub Playground
+title: OpenHubForAI Playground
 emoji: 🧩
 colorFrom: blue
 colorTo: gray
@@ -11,9 +11,9 @@ license: mit
 short_description: Browse + run the 360+ catalog harnesses across 24 industry verticals.
 ---
 
-# Open Harness Hub — Playground
+# OpenHubForAI — Playground
 
-Pick any pipeline from the [Open Harness Hub](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
+Pick any pipeline from the [OpenHubForAI](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
 catalog (363 validated manifests, 24 industry verticals), plug in
 sample data, and watch the DAG execute step-by-step. This Space
 reads pipelines directly from the catalog at runtime.
@@ -142,7 +142,7 @@ Open a PR against the main repo with a new manifest under
   Impact Track: Digital Equity & Inclusivity) — refugee bureaucracy
   translation with Verbraucherzentrale-grounded fraud detection.
   Live demo: https://huggingface.co/spaces/Svityk/bill-info-ai
-- **Open Harness Hub Spec** (`docs/spec/HARNESS_HUB_SPEC.md`) —
+- **OpenHubForAI Spec** (`docs/spec/HARNESS_HUB_SPEC.md`) —
   the portable Docker-Hub-for-harnesses standard Hassan Gasim
   proposed.
 - **Peer-registry comparison** (`docs/comparison/peer-registries.md`)

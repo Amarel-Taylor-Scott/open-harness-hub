@@ -2,7 +2,7 @@
 
 A side-by-side of the LLM-ecosystem registries Hassan mentioned
 ("Hugging Face, vector DBs") plus the others Taylor references, and
-which gaps Open Harness Hub fills.
+which gaps OpenHubForAI fills.
 
 ## The landscape
 
@@ -18,7 +18,7 @@ which gaps Open Harness Hub fills.
 | **Pinecone / Weaviate / Chroma** | vector DBs | the rules + personas + rubrics around the retrieval | infrastructure layer, no semantic content |
 | **Docker Hub** | container images | not the operational workflows - just the binaries inside the container | infrastructure layer, no logic |
 
-## What Open Harness Hub adds
+## What OpenHubForAI adds
 
 **Full coverage of the 6-step canonical chain** that real production
 pipelines follow:
@@ -76,7 +76,7 @@ They could each absorb part of this scope. But:
 
 ```
    ┌───────────────────────────────────────────────────────────┐
-   │  Open Harness Hub catalog (200 YAML manifests, 14 types)  │
+   │  OpenHubForAI catalog (200 YAML manifests, 14 types)  │
    └────────────────────────────┬──────────────────────────────┘
                                 ▼
          ┌──────────────────────────────────────────┐

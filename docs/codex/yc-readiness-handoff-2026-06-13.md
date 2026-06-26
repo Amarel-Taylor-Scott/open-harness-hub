@@ -62,7 +62,7 @@ Full delta: `git diff 6c5f27a0~1..HEAD`. Each item below cites its commit.
    one-liners across 4 docs. Recommendation (grounded in the locked Baltor=applied-product decision + the
    sharpened wedge below): pick **Baltor, product-first**, ONE sentence —
    *"Baltor continuously verifies your AI's context is CORRECT — not just current — against authoritative
-   sources, and proves it with a portable receipt."* Demote Teleon / AI-Done-Right / Open*Hubs to "how it's
+   sources, and proves it with a portable receipt."* Demote Teleon / AI-Done-Right / OpenHubForAI registries to "how it's
    built." Codex spec: reconcile the headline + 50-char line across `archive/legacy/docs/strategy/yc-application-draft-2026-06.md`
    + `…/yc-master-…md`; resolve the open owner-decision in the draft. **Do not change `architecture/brand.json`.**
 2. **Component-count framing.** `1,045` (6 Action-types) vs `2,655` (all components) are different SCOPES, not

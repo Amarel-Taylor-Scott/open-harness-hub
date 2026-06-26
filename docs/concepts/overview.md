@@ -1,6 +1,6 @@
 # Overview
 
-The Open Harness Hub is a **specification + content catalog + static
+The OpenHubForAI is a **specification + content catalog + static
 site**. It standardizes how the modular pieces of an AI-assisted
 system are described, so they can be combined into pipelines,
 benchmarks, and tools across any industry.

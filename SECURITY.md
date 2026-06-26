@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-The Open Harness Hub is a content catalog plus tooling. Security
+The OpenHubForAI is a content catalog plus tooling. Security
 patches land on `main` only; consumers pin to a release tag and
 upgrade.
 

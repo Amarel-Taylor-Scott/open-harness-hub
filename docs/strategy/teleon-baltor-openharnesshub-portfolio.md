@@ -1,4 +1,4 @@
-# Portfolio architecture — Teleon · Baltor · Open*Hubs (under AI Done Right)
+# Portfolio architecture — Teleon · Baltor · OpenHubForAI registries (under AI Done Right)
 
 **Status:** OWNER-DECIDED 2026-06-06. This is the canonical brand + dependency architecture. It supersedes the
 single-company framing in [brand-architecture-and-naming] and the "Purpose Runtime as a Baltor subsystem"
@@ -11,7 +11,7 @@ framing. The dependency law below is enforced by `scripts/check_portfolio_depend
 AI Done Right    (umbrella IP · brands · standards strategy · shared R&D/security/governance · cap table)
 ├── Teleon.dev      — ITS OWN product + the runtime: program capabilities in PLAIN TEXT -> auto-adapt to the cheapest-BOUNDED form within your guardrails (governs EFFICIENCY)
 ├── Baltor.ai       — ITS OWN product: fully MANAGED company-/department-/initiative-wide governed context, powered by Teleon (a TENANT) (governs TRUTH)
-└── Open*Hubs       — the open STORE both products consume: context · tools · models · steps · DAG components · reconciliation/robustness/enrichment rules · modules (run on Teleon or custom compute) · skills · harnesses · evals · templates · specs
+└── OpenHubForAI registries       — the open STORE both products consume: context · tools · models · steps · DAG components · reconciliation/robustness/enrichment rules · modules (run on Teleon or custom compute) · skills · harnesses · evals · templates · specs
 ```
 
 **Moat split (LOCKED 2026-06-21):** Baltor governs what becomes **TRUE**; Teleon governs what becomes **EFFICIENT**
@@ -39,7 +39,7 @@ Baltor-specific agents/task catalogs/business logic. **No longer owns directly:*
 runtime, PurposeTask infrastructure, runtime switching, the promotion/eval control plane, or generic task
 dashboard primitives — those are Teleon's. **Story:** *Baltor is powered by Teleon.*
 
-### The Open*Hub family (split 2026-06-06; expanded design family 2026-06-09)
+### The OpenHubForAI family (split 2026-06-06; expanded design family 2026-06-09)
 The open ecosystem is a focused hub family, not one junk drawer (bridge graph:
 `architecture/open_hubs_bridge_graph.json`; **none is a truth authority**):
 - **OpenContextHub.io** — reference context artifacts · context packs · schemas · source-handle maps ·
@@ -86,7 +86,7 @@ Baltor ──────────────► Teleon ──────�
 
 ## Vocabulary (standardize across all three)
 **PurposeTask** (stable purpose-level contract; product language) · **CapabilityTask** (the formal/spec name,
-stewarded by OpenHarnessHub) · **ImplementationCandidate** (a means under test) · **RuntimeBinding** (where it
+stewarded by OpenHubForAI) · **ImplementationCandidate** (a means under test) · **RuntimeBinding** (where it
 runs) · **EvidenceLedger** (runs/evals/traces/receipts/scorecards/cost/latency/safety) · **PromotionGate**
 (evidence+policy decision) · **BoundaryApproval** (human approval for an ends change) · **TaskOrientation**
 (operational memory) · **AssurancePortal** (staff/customer trust visibility). Staff dashboard = **Teleon Control

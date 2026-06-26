@@ -23,7 +23,7 @@ as `legacy.html` (lossless), and every legacy functional page keeps its URL
 web/
   context-is-everything/   AI Done Right — parent portfolio site (cie-main.jsx + kit) +
                            Demo Control Tower.html (operator index over every surface).
-  harness-hub/             Open Harness Hub — full proto surface (~40 routes; proto-*.jsx) with the
+  harness-hub/             OpenHubForAI — full proto surface (~40 routes; proto-*.jsx) with the
                            logged-out funnel wired live: landing task → /api/build → real assembled
                            flow in the preview (ohh-live.js seam; no fixture lift claims on live builds).
   baltor/                  Baltor — full ce-* surface (marketing + docs + app console + 25+ guided
@@ -46,7 +46,7 @@ regardless, and every origin additionally serves:
   — so the 21 non-product design surfaces stay reachable and the **verbatim** `../<sibling>/…`
   cross-surface links inside the transplanted code resolve;
 - same-origin service seams (ports single-sourced in `architecture/` registries):
-  `/api/identity/*` → identity realms (9410) · `/registry/*` → Open*Hub registry (9423) ·
+  `/api/identity/*` → identity realms (9410) · `/registry/*` → OpenHubForAI registry (9423) ·
   `/analytics/*` → events plane (9420) · Baltor live-ops `/api/demo|events|context|…` →
   `baltor_admin_demo_server` (9301). The full-design kit clients honor these via the injected
   `OHH_*_BASE` overrides and fall back honestly to design data when a service is down.

@@ -8,7 +8,7 @@
 > Docker Hub for container environments."_
 > - Hassan Gasim, May 2026
 
-This document distills the [Open Harness Hub](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
+This document distills the [OpenHubForAI](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
 implementation into a portable, vendor-neutral specification for any
 team that wants to publish or consume **harnesses** - host-agnostic,
 industry-agnostic descriptions of repeatable LLM-pipeline workflows.
@@ -139,7 +139,7 @@ production repos), the most-recurring shape is:
 [trace recorded for compliance / board oversight]
 ```
 
-This shape is **invariant across industries**. The Open Harness Hub
+This shape is **invariant across industries**. The OpenHubForAI
 reference implementation runs the IDENTICAL chain across:
 
 - **ESG / Supply-Chain DD** (CSDDD + 12 jurisdictions + 13 languages)

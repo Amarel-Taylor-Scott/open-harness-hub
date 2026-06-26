@@ -43,7 +43,7 @@ Non-negotiables (full list + audit commands in DESIGN-CONTRACT.md):
   - NO substitutions: no icon libraries (glyphs are unicode), no component libraries
     (shadcn/MUI/Chakra/Ant), no font swaps (Hanken Grotesk + IBM Plex Mono only),
     no new colors beyond each brand's one --accent from shared/products.js.
-  - ONE ENGINE: all 21 Open*Hubs render from a single makeHub port + config objects.
+  - ONE ENGINE: all 21 OpenHubForAI registries render from a single makeHub port + config objects.
     Bespoke hub depth attaches only via entryExtra / extraRoutes / convert.render.
   - The A/B experiment engine (oh-experiments.js) ships with identical semantics and
     ALL declared variants (per-hub ledeVariants A/B/C, hero tests, ?exp= forcing,
@@ -99,7 +99,7 @@ Open any `*.html` in a browser — **no build step**. Entry files are listed in
   from it. `oh-tokens.css` (only source of color) → `oh-components.css` (primitives + scale)
   → `oh-site.jsx` (chrome + primitive pages: auth, billing, settings, docs, …) →
   `oh-hub.jsx` `makeHub(cfg)` (a whole registry site from one config object).
-- **21 Open*Hubs are config-only** — each `<hub>/<hub>-main.jsx` is a `makeHub({…})` object +
+- **21 OpenHubForAI registries are config-only** — each `<hub>/<hub>-main.jsx` is a `makeHub({…})` object +
   a `products.js` entry. 9 are live; **12 are a "private bench"** (`status:'private'`, muted
   accent + "Private preview" banner). Opening one = a one-line `status:'private' → 'live'` flip.
 - **Bespoke per-hub depth** (OpenSkillToTool's `os2t-pages.jsx`, OpenReviewHub's `orh-pages.jsx`)

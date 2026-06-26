@@ -10,7 +10,7 @@ held together by one **governance spine**.
 > truth and efficiency separable.** The model proposes; the registry, the type system, and the descent dispose.
 
 The product family: a holding company over **Baltor** (governs **truth** — provenance, verify, CDC), **Teleon** (governs
-**efficiency** — the compiler/runtime, the descent), and **OpenHarnessHub** (the open ecosystem + the CapabilityTask
+**efficiency** — the compiler/runtime, the descent), and **OpenHubForAI** (the open ecosystem + the CapabilityTask
 spec). Canonical: `docs/strategy/teleon-baltor-openharnesshub-portfolio.md`, visual map at `dist/architecture/index.html`.
 
 ---

@@ -161,7 +161,7 @@ Use this example session (it produces the payload above):
 
 ## Copy rules (hard, enforced)
 
-1. No placeholders. Real names, real words. Write "OpenHubForAI", never "Open*Hubs". No "Lorem", "TODO", "coming soon".
+1. No placeholders. Real names, real words. Write "OpenHubForAI", never "OpenHubForAI registries". No "Lorem", "TODO", "coming soon".
 2. No em dashes or en dashes anywhere. Use commas, periods, parentheses, or colons.
 3. No strategy leakage in public copy: no "moat", "wedge", "private bench", "win one vertical", pricing or competitive strategy.
 4. Real, confident sales and marketing copy: benefit-led headlines, concrete value, clear calls to action.

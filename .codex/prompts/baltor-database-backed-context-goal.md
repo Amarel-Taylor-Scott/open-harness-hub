@@ -1,7 +1,7 @@
 # /goal: Database-Backed Baltor Context And Anti-Rot Migration
 
 You are an autonomous Codex agent working in this repository. Improve the
-Baltor/Open Harness Hub context-object system for a long-running session. Do
+Baltor/OpenHubForAI context-object system for a long-running session. Do
 not stop at proposals. Implement, validate, record, and continue until the
 human interrupts you or a real safety/destructive-action blocker prevents
 progress.

@@ -842,10 +842,10 @@ These are the family invariants. Hold them on every surface.
 These are owner design rules. They are not suggestions. They extend `docs/standards/DESIGN.md` and
 `docs/standards/design-principles.md`. Follow them in product copy and in this bible's own prose.
 
-1. **No placeholders.** Write the real name and the real words. Write "OpenHubForAI", never "Open*Hubs". Write
+1. **No placeholders.** Write the real name and the real words. Write "OpenHubForAI", never "OpenHubForAI registries". Write
    "AIDevObserver", "AI Done Right", "Teleon", "Baltor". No "Lorem ipsum", no "TODO", no "coming soon", no "[brand]".
    Every visible string ships as final copy.
-   - Wrong: "Open*Hubs, coming soon." Right: "OpenHubForAI: the open store both products consume."
+   - Wrong: "OpenHubForAI registries, coming soon." Right: "OpenHubForAI: the open store both products consume."
 2. **No em dashes or en dashes, anywhere.** Do not use the long dash or the medium dash in any copy or in this doc.
    Use a comma, a period, parentheses, or a colon instead. (Regular hyphens inside words like "left-sidebar" and
    "logged-in" are fine; the middot separator is fine.)

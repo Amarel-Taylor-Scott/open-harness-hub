@@ -1,6 +1,6 @@
 # Capability Valleys — a theory of *defensible* LLM gaps
 
-This is the foundational "where do we build?" document for Open Harness Hub. A
+This is the foundational "where do we build?" document for OpenHubForAI. A
 component earns a place only if it lets an LLM do something it cannot do
 reliably alone (the [capability-lift bar](../../scripts/eval/durable_gap_harness.py)).
 But "the model is bad at X" is not enough. Most gaps **close on their own**, and

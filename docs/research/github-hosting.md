@@ -1,6 +1,6 @@
 # GitHub hosting plan
 
-A concrete, end-to-end plan for hosting the Open Harness Hub on GitHub
+A concrete, end-to-end plan for hosting the OpenHubForAI on GitHub
 in a way that doubles as a Claude Code plugin marketplace, an MCP
 server distribution, a Croissant dataset index, and a static
 documentation site.

@@ -11,7 +11,7 @@ shared/                  design system + site kit (oh-site.*) + brand registry (
 context-is-everything/   parent / portfolio site (AI Done Right) + Demo Control Tower
 context-enrichment/      Baltor.ai — paid SaaS · context assurance (app + docs)
 teleon/                  Teleon.dev — purpose-driven runtime (reference kit site)
-openharnesshub/          Open Harness Hub — bespoke pt-* product site on the kit
+openharnesshub/          OpenHubForAI — bespoke pt-* product site on the kit
 open{context,skills,tools,skilltotool,mcp,compression,benchmark,review}hub/
                          9 LIVE registries — config-only via makeHub()
 open{templates,endpoint,env,sandbox,agent,receipt,state}hub/ +
@@ -48,7 +48,7 @@ project `README.md`).
 **Teleon + all 16 hubs**: built on the kit; see §3.5 for the shared hub route map.
 **OHH**: ~43 routes — see `openharnesshub/PAGES.md` (route → purpose) and `proto-main.jsx` `App()`.
 
-## 3.5 makeHub registry engine (all 21 Open*Hubs)
+## 3.5 makeHub registry engine (all 21 OpenHubForAI registries)
 `shared/oh-hub.jsx` → `makeHub(cfg)` renders an entire registry site from one config object.
 Every `<hub>/<hub>-main.jsx` is just that config + a `PORTFOLIO.ENTITIES` entry; bespoke
 per-hub surfaces live in the hub folder (e.g. `openskilltotool/os2t-pages.jsx`,

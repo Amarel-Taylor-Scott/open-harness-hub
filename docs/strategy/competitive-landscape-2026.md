@@ -14,7 +14,7 @@ facts. This is a positioning document — `serves_truth=false`; it is not a Balt
 must not be cited as one. No insurance examples; no `_reference/` material.
 
 **Where this product sits.** Parent brand **AI Done Right**. **Teleon** is the runtime engine →
-**Baltor** is the customer-facing governed-context product, *powered by Teleon* → **Open\*Hubs** (free
+**Baltor** is the customer-facing governed-context product, *powered by Teleon* → **OpenHubForAI registries** (free
 developer funnel under `OpenHubForAI.io`). The competitor below is the customer-facing layer, so the
 column we defend is **Baltor's**. One-liner (LOCKED): *"Models don't fail. Their context does."* —
 *"Verified, current, and provable context for the agents you already run."* Pillars: **Verified · Current
@@ -171,7 +171,7 @@ acquisition target — which is the friendly end of this objection.
 
 ## 6 · Open-core is a moat, not a giveaway
 
-The free **Open\*Hubs** funnel (under `OpenHubForAI.io`) is the **demand-capture and trust-building top
+The free **OpenHubForAI registries** funnel (under `OpenHubForAI.io`) is the **demand-capture and trust-building top
 of the moat**, not a leak of it:
 
 - **The open layer is the spec, SDK, and engine; the paid layer is the *live governed data*.** A
@@ -179,7 +179,7 @@ of the moat**, not a leak of it:
   **cannot** self-serve is the thing that decays the instant it is frozen — **live, kept-fresh serving
   against a dynamic corpus**, governed corpora subscriptions, and build-on-demand for a domain we don't
   yet carry. Freshness, custody, and the receipt are the recurring product; the snapshot is the sample.
-- **The funnel feeds the paid layer.** Open\*Hub developers wire governed components into bounded
+- **The funnel feeds the paid layer.** OpenHubForAI developers wire governed components into bounded
   pipelines, hit the moment they need *live + provable + fresh*, and convert to Baltor — **one governed
   object, two doors** (a free freezable snapshot, a paid live layer), one COGS, two GTMs.
 - **Open is a defense against the seam itself commoditizing.** If the assembler interface is open and

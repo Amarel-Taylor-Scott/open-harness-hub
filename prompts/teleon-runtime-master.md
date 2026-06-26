@@ -3,11 +3,11 @@
 > **NAME (OWNER-DECIDED 2026-06-06 — domain `teleon.dev` owned).** Canonical naming + portfolio — single
 > sources: `docs/strategy/teleon-naming-and-domain.md` + `docs/strategy/teleon-baltor-openharnesshub-portfolio.md`:
 > - **Portfolio:** a HoldCo owns **Teleon** (this runtime SaaS, `teleon.dev`), **Baltor** (`baltor.ai`, the
->   applied product — a TENANT of Teleon), and **OpenHarnessHub** (the open ecosystem + the open CapabilityTask
+>   applied product — a TENANT of Teleon), and **OpenHubForAI** (the open ecosystem + the open CapabilityTask
 >   spec). Dependency law: Baltor → Teleon → OpenHarnessHub, never the reverse
 >   (`architecture/portfolio_dependency_law.json`).
 > - **Runtime product / SaaS:** **Teleon** — the purpose-driven, eval-gated, self-adaptive compute runtime.
-> - **Open standard (neutral, stewarded by OpenHarnessHub):** **Capability Task Specification (CTS)** / the
+> - **Open standard (neutral, stewarded by OpenHubForAI):** **Capability Task Specification (CTS)** / the
 >   "Open CapabilityTask Spec"; the formal object/kind is **CapabilityTask**. *Teleon implements the spec.*
 > - **Core object (product language):** **PurposeTask** (`PurposeTaskSpec`, shipped; an instance is
 >   colloquially "a teleon") — Teleon is the reference implementation of CTS.
@@ -151,5 +151,5 @@ gated, self-adaptive compute runtime; develop it as an independent product under
 caution (see the naming doc). Claims the MAPE-K/progressive-delivery/EDD/control-plane lineage; centers the
 implementation-portfolio + compiler wedge; builds the risks (eval saturation · evidence-plane cost · judge
 calibration · interfering loops · policy-as-code) in as first-class; composes the shipped substrate (no
-rebuild), now extracting into `src/teleon/`. Standard stays neutral (CTS, stewarded by OpenHarnessHub); Teleon =
+rebuild), now extracting into `src/teleon/`. Standard stays neutral (CTS, stewarded by OpenHubForAI); Teleon =
 reference impl. Self-adapt means, never ends.*

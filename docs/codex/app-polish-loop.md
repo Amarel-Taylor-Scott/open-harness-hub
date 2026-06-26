@@ -1,6 +1,6 @@
 # App-Polish Loop — make the product undeniable, one surface at a time
 
-Runnable goal for `/polish`. The job: take the Open Harness Hub product front-end (`web/`,
+Runnable goal for `/polish`. The job: take the OpenHubForAI product front-end (`web/`,
 implemented from the Claude Design handoff) from "works" to **acquirer-grade** — every screen,
 funnel, gate, and endpoint polished, and every surface *selling the value proposition*. This
 is a loop with no terminal state; pick the weakest surface, polish it, verify, repeat.

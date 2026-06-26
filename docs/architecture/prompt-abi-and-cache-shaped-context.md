@@ -1,6 +1,6 @@
 # Prompt ABI and token-efficient context
 
-Open Harness Hub should treat repeated system prompts, tool schemas, output
+OpenHubForAI should treat repeated system prompts, tool schemas, output
 contracts, and verified context-pack headers as runtime assets, not incidental
 prompt text. The practical abstraction is a **Prompt ABI**: a canonical,
 versioned prefix layout that lets compatible harnesses and pipelines reuse

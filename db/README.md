@@ -1,6 +1,6 @@
-# Database mappings — Open Harness Hub
+# Database mappings — OpenHubForAI
 
-Every Open Harness Hub manifest persists in the database shape of your
+Every OpenHubForAI manifest persists in the database shape of your
 choice. The **canonical schema is PostgreSQL** (`postgres/schema.sql`);
 the other backends derive from it.
 

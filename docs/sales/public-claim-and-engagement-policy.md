@@ -1,6 +1,6 @@
 # Sales — public-claim + engagement policy (the safety gate)
 
-The sales/lead-proof system is **proof-first selling**: Open\*Hub attracts → diagnostics prove → evidence packs
+The sales/lead-proof system is **proof-first selling**: OpenHubForAI attracts → diagnostics prove → evidence packs
 convert → Teleon sells operational efficiency, Baltor sells governed context / chatbot safety. This doc is the
 **guardrail that everything else passes through** (built first, on purpose).
 
@@ -39,7 +39,7 @@ register.
 DiagnosticRun/ReviewApproval), the pain-hypothesis catalog, synthetic seeds, the guard module, the redteam proof.
 
 **HELD for owner authorization (outward-facing / legal blast radius):** the live diagnostic tools (Task Sprawl
-Analyzer, Chatbot Guardrail Audit, Open\*Hub scanners), the evidence-pack generator, lead scorer, **outreach
+Analyzer, Chatbot Guardrail Audit, OpenHubForAI scanners), the evidence-pack generator, lead scorer, **outreach
 generator**, the sales dashboard/API, and **any real named-company seeds**. These are scoped behind the three
 decisions in the build prompt and are not built until the owner confirms input/authorization model + outreach
 handling + first target.

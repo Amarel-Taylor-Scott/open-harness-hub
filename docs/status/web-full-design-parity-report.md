@@ -14,7 +14,7 @@ gate) · seams: `scripts/showcase/server.py` · verification: `e2e/full_design_a
 ## Scope
 
 The three WIRED product front-ends now serve the full-design surfaces, wired to real local
-backends. The other 21 design surfaces (Teleon + the Open*Hubs + internal planes) are served
+backends. The other 21 design surfaces (Teleon + the OpenHubForAI registries + internal planes) are served
 verbatim from the bundle on every product origin (root mounts + `/design/`), so every
 cross-surface link in the verbatim code resolves; the Demo Control Tower indexes them.
 

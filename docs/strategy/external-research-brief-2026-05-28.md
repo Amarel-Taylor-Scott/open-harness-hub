@@ -10,7 +10,7 @@
 > point-in-time research transcript kept for lineage. Dated regulatory and product facts below are snapshots, not
 > current truth; re-verify against the canonical docs and the live sources before relying on them.
 
-# Open Harness Hub — External Research Brief (2026-05-28)
+# OpenHubForAI — External Research Brief (2026-05-28)
 
 Three strategic sharpenings: (1) split the lift gate by **durability**
 (transient vs structural); (2) lead with **governance as the product**, not the

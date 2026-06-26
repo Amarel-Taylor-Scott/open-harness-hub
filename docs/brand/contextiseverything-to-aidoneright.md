@@ -25,8 +25,8 @@ preserved in `brand.json` as `superseded.earlier_tagline_candidate` so the decis
 ## What did NOT change (scope)
 
 - **Products keep their names: Baltor and Teleon.** The distinctive, ownable marks are the PRODUCTS
-  (Baltor, Teleon, the Open\*Hubs). The parent name is the **promise, not the legal moat**.
-- The **Open\*Hub.io network** is marketing / lead-gen, not the parent identity.
+  (Baltor, Teleon, the OpenHubForAI registries). The parent name is the **promise, not the legal moat**.
+- The **OpenHubForAI.io network** is marketing / lead-gen, not the parent identity.
 - The `holding_company` **slug** in `company_portfolio_map.json` stays `contextiseverything` — it is a
   code identifier, not a display string. This rename is display-strings-only; we do not churn
   identifiers (and `check_brand_canonical` asserts the slug is preserved).
@@ -50,7 +50,7 @@ Baltor product narrative. It is *demoted from parent tagline*, not retired from 
 "AI Done Right" is a **common phrase** (eLearning courses, IP-law webinars, USPTO/AI commentary, an
 `aidoneright.com.au` consulting site). Use **AIDoneRight.dev** as the operating brand + domain +
 parent site, **not** as the sole legal/trademark moat. Keep the distinctive product marks (Baltor,
-Teleon, Open\*Hubs) ownable. **Run a formal trademark search before heavy spend** (owner legal
+Teleon, OpenHubForAI registries) ownable. **Run a formal trademark search before heavy spend** (owner legal
 action — out of repo scope).
 
 ## Rollback

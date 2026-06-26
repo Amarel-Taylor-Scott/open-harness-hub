@@ -32,7 +32,7 @@ These are what make it a *branded house*. Violating any one breaks visual/brand 
 6. **Zero horizontal overflow**, every route, every breakpoint. Mobile reflows to one column.
 7. **Accessibility floors:** body contrast ≥ 4.5:1, secondary text ≥ 3.6:1; a visible
    `:focus-visible` ring on every interactive (incl. text inputs); mobile hit targets ≥ 44px.
-8. **The registry pattern.** All 21 Open*Hubs are **one engine** (`makeHub`) driven by config —
+8. **The registry pattern.** All 21 OpenHubForAI registries are **one engine** (`makeHub`) driven by config —
    do not fork 21 bespoke registry UIs. A new hub = a config object + a `products.js` entry.
 9. **Private-first is a security boundary.** `status:'private'` must be enforced **server-side**
    in production (the prototype only hides a banner). Never expose a private hub's data publicly

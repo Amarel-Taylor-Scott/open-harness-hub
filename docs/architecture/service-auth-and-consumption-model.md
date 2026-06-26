@@ -52,7 +52,7 @@ rejects obvious raw secret literals.
 
 2. **API keys are for external client access, not internal service trust.**
    Customer SDKs, CLI clients, and publisher integrations may use scoped API
-   keys. Internal Baltor/Teleon/Open*Hub calls should use service identity plus
+   keys. Internal Baltor/Teleon/OpenHubForAI calls should use service identity plus
    short-lived tokens.
 
 3. **No shared god token.**
@@ -64,7 +64,7 @@ rejects obvious raw secret literals.
    workspace, purpose, object, action, data class, and freshness/security policy.
 
 5. **Candidate does not mean trusted.**
-   Open*Hub registries expose discoverable metadata. Baltor and Teleon must
+   OpenHubForAI registries expose discoverable metadata. Baltor and Teleon must
    still evaluate, verify, or gate artifacts before use.
 
 6. **Every privileged call produces an audit event or receipt.**
@@ -77,7 +77,7 @@ rejects obvious raw secret literals.
 | --- | --- | --- | --- |
 | Human user | Browser UI, console user | OIDC/session | Maps to tenant memberships and roles. |
 | External API client | Customer SDK, CLI, webhook publisher | Scoped API key or OAuth client | Keys are hashed at rest; raw value shown once. |
-| Service account | Baltor, Teleon, Open*Hub APIs, workers | Short-lived JWT/OAuth token, mTLS cert, or SPIFFE SVID | Internal service-to-service trust. |
+| Service account | Baltor, Teleon, OpenHubForAI APIs, workers | Short-lived JWT/OAuth token, mTLS cert, or SPIFFE SVID | Internal service-to-service trust. |
 | Worker identity | Ingestion, foundry, measurement, enrichment, retrieval, governance | Service account plus queue role | Least privilege per queue and datastore. |
 | Publisher identity | Open registry submitters | OIDC + signing key or verified publisher account | Needed for provenance and promotion. |
 | Break-glass identity | Human operator | Time-boxed approval + hardware/SSO MFA | Must emit high-severity audit events. |
@@ -93,7 +93,7 @@ rejects obvious raw secret literals.
 | Product API -> retrieval/enrichment | internal service token | tenant, data class, freshness, route purpose | platform access audit |
 | Product API -> queue | service token + enqueue scope | tenant, job kind, budget, approval policy | queued job receipt |
 | Worker -> datastore | workload identity / IAM role | table/bucket/secret least privilege | job trace + DB audit |
-| Open*Hub -> registry backend | API key/OIDC for publishers; public read for public metadata | candidate status, publisher rights, private-first gate | registry audit |
+| OpenHubForAI -> registry backend | API key/OIDC for publishers; public read for public metadata | candidate status, publisher rights, private-first gate | registry audit |
 | Private bench hub -> any backend | internal service identity only | status must remain private until owner flips to live | private access audit |
 | Webhook source -> ingestion | signed webhook or connector OAuth | source tenant, connector grant, replay window | source event receipt |
 
@@ -167,7 +167,7 @@ Teleon:
 - May request Baltor context packs through Baltor's policy gate.
 - Must not write Baltor canonical facts or reconciliation decisions.
 
-Open*Hubs:
+OpenHubForAI registries:
 
 - Own public and private registry metadata.
 - Public reads may be unauthenticated for live public entries.
@@ -222,7 +222,7 @@ Phase 3 - enterprise:
 ## Open Design Questions
 
 - Which identity provider should be the first production implementation?
-- Do Open*Hub publisher accounts live in one shared registry backend or per hub?
+- Do OpenHubForAI publisher accounts live in one shared registry backend or per hub?
 - Which service mesh/workload identity path is preferred for the first cloud?
 - Should customer API keys be accepted directly by Baltor/Teleon or exchanged
   for short-lived access tokens at an API gateway?

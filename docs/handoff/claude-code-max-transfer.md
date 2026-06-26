@@ -1,6 +1,6 @@
 # Claude Code Max Transfer
 
-> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
+> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, OpenHubForAI as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
 
 Updated: 2026-06-09
 
@@ -38,8 +38,8 @@ private bench hubs, the method-spine docs, and the production-readiness gap.
 
 ## Current Portfolio Facts
 
-- AI Done Right parent + Baltor + Teleon + 21 Open*Hub prototype surfaces
-- 9 live Open*Hub registries
+- AI Done Right parent + Baltor + Teleon + 21 OpenHubForAI prototype surfaces
+- 9 live OpenHubForAI registries
 - 12 private bench hubs
 - Full method spine: OpenReconciliationHub, OpenHardeningHub,
   OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub

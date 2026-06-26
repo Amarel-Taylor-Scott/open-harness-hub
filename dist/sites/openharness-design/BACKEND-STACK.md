@@ -124,7 +124,7 @@ JSON Schema / SemVer):
 
 | Registry | Backend it needs beyond the common registry CRUD + search + signing |
 |---|---|
-| **All Open*Hubs** (common) | Entry CRUD + facet search, JSON-Schema validation per entry, semver + changelog, cosign signature + Rekor log, in-toto/SLSA provenance, CycloneDX AI-BOM, OpenSSF-Scorecard risk score, account layer (auth/keys/team/billing/usage/audit). |
+| **All OpenHubForAI registries** (common) | Entry CRUD + facet search, JSON-Schema validation per entry, semver + changelog, cosign signature + Rekor log, in-toto/SLSA provenance, CycloneDX AI-BOM, OpenSSF-Scorecard risk score, account layer (auth/keys/team/billing/usage/audit). |
 | **OpenSkillToTool** | The convert pipeline: skill-spec → typed JSON-Schema I/O **contract inference**, least-privilege **scope binding**, a **determinism harness** (N runs → identical shape) + **eval-pack replay** with a parity gate, then sign + publish. Plus the tool **runtime** over MCP **and** HTTP with scope enforcement at call time. (`os2t-pages.jsx` is the UI spec.) |
 | **OpenReviewHub** | A **review runner**: clean-clone build, re-run released evals, reproduce reported metrics; produce the claim→evidence→verdict ledger + axis scorecard. Signed, scoped review records. (`orh-pages.jsx` is the UI spec.) |
 | **OpenEndpointHub** | Endpoint probing + a **data-class × jurisdiction eligibility** policy engine; gateway routing that emits the `ModelInvocationReceipt` (see Shared Inference Gateway); quarantine of shared-key/bypass endpoints. |

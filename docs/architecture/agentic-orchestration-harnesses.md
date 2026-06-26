@@ -1,6 +1,6 @@
 # Agentic Orchestration Harnesses
 
-Open Harness Hub should catalog the orchestration layer separately from the
+OpenHubForAI should catalog the orchestration layer separately from the
 agent. Long-running Codex, Claude Code, or other coding-agent work is less
 about a single prompt and more about durable goal state, restart behavior,
 budget controls, worktree isolation, progress evidence, and completion audits.

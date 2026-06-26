@@ -1,7 +1,7 @@
 # Claude Code Handoff — AI Done Right
 
 > Brand: **AI Done Right** (`aidoneright.dev`, *"AI, done right."*). The platform (Baltor,
-> Teleon) is the company; the `Open*Hub` sites are the open, top-of-funnel lead-gen. Folder/
+> Teleon) is the company; the `OpenHubForAI` sites are the open, top-of-funnel lead-gen. Folder/
 > file paths keep their **legacy names** (`context-is-everything/`, repo root `openharness/`)
 > so ~20 cross-links don't break — only the displayed brand changed. See `CLAUDE.md`.
 >
@@ -38,7 +38,7 @@ The surfaces (entry HTML in each folder) — **full table in `README.md`**:
 | Private bench (makeHub, `status:'private'`) | OpenTemplatesHub · OpenEndpointHub · OpenEnvHub · OpenSandboxHub · OpenAgentHub · OpenReceiptHub · OpenStateHub · **+ 5 Baltor-stage method hubs:** OpenReconciliationHub · OpenHardeningHub · OpenEnrichmentHub · OpenOptimizationHub · OpenVerificationHub |
 
 > Folder note: `context-enrichment/` IS Baltor (historical key). See `CLAUDE.md` at the repo root.
-> **All 21 Open*Hubs render from `makeHub` (config-only)** — 9 live + 12 private bench. Bespoke
+> **All 21 OpenHubForAI registries render from `makeHub` (config-only)** — 9 live + 12 private bench. Bespoke
 > per-hub surfaces (OpenSkillToTool's `os2t-pages.jsx`, OpenReviewHub's `orh-pages.jsx`) are
 > folder-local and composed via makeHub's gated hooks (`entryExtra` / `extraRoutes` /
 > `convert.render`), so the kit stays generic. **Private-bench hubs use a muted accent + a
@@ -64,7 +64,7 @@ to preserve when you implement. Everything flows from `shared/`:
 - **`shared/oh-site.css` + `oh-site.jsx`** — the **SITE KIT** (the thing to port to real
   components first; see §3).
 - **`shared/oh-hub.css` + `oh-hub.jsx`** — `makeHub(cfg)`: an entire open-registry site from one
-  config object. All 21 Open*Hubs are config-only (9 live + 12 private bench).
+  config object. All 21 OpenHubForAI registries are config-only (9 live + 12 private bench).
 - **`shared/products.js`** — single source of truth for brand identity + the `PORTFOLIO`
   registry. **Brand renames are one-line edits here.** Messaging guide: `MARKETING.md`.
 - **`shared/oh-experiments.js`** — framework-agnostic A/B + event-tracking engine

@@ -1,6 +1,6 @@
 # Case study: serving this repo's context to Claude Code (Baltor dogfood)
 
-**Subject:** Open Harness Hub's own documentation and governed corpora.
+**Subject:** OpenHubForAI's own documentation and governed corpora.
 **Consumer:** the Claude Code (and MCP-client) agents that build this very repo — including the
 subagent that wrote this file.
 **Service:** Baltor ([[../strategy/context-enrichment-service.md]]) — the

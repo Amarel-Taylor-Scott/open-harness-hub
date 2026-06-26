@@ -1,8 +1,8 @@
-# Open*Hub Surface Counts
+# OpenHubForAI Surface Counts
 
 Updated: 2026-06-09
 
-This page records the current AI Done Right Open*Hub design-family counts. Do
+This page records the current AI Done Right OpenHubForAI design-family counts. Do
 not use it as the source of truth; recompute from
 `dist/sites/openharness-design/shared/products.js` with
 `python3 scripts/check_ai_done_right_surface_family.py --self-test`.
@@ -13,14 +13,14 @@ not use it as the source of truth; recompute from
 | --- | ---: | --- |
 | Parent | 1 | AI Done Right |
 | Products | 2 | Baltor, Teleon |
-| Live Open*Hubs | 9 | `products.js` layer `open` |
+| Live OpenHubForAI registries | 9 | `products.js` layer `open` |
 | Private bench hubs | 12 | `products.js` layer `candidate` |
-| Open*Hub prototype surfaces | 21 | live + private bench |
-| Total design-family surfaces | 24 | parent + products + Open*Hubs |
+| OpenHubForAI prototype surfaces | 21 | live + private bench |
+| Total design-family surfaces | 24 | parent + products + OpenHubForAI registries |
 | Operational Demo Control Tower registry surfaces | 20 | `architecture/demo_surface_registry.json` |
 | Static launch sites | 7 | `scripts/portfolio_lib.py` |
 
-## Live Open*Hubs
+## Live OpenHubForAI registries
 
 - OpenContextHub
 - OpenSkillsHub
@@ -64,6 +64,6 @@ Tower link, and parent bench card remain required.
 
 ## Boundary Reminder
 
-Open*Hubs are registries and discovery surfaces. They do not serve Baltor truth,
+OpenHubForAI registries are discovery surfaces. They do not serve Baltor truth,
 do not promote Teleon candidates, and do not execute gated tools from public
 pages. Discovery is not trust; benchmark result is not promotion authority.

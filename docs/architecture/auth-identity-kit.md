@@ -7,7 +7,7 @@ can have similar UI, backend elements."* This is the standard.
 
 - **Shared KIT** — one set of flow shapes, object shapes, and primitives lives in
   `src/openharnesshub/auth_kit/` (the open, bottom layer). Same UI components, same backend elements.
-- **Separate, INDEPENDENT realms** — each product (Baltor, Teleon, every Open\*Hub) calls `make_realm(...)` to
+- **Separate, INDEPENDENT realms** — each product (Baltor, Teleon, every OpenHubForAI) calls `make_realm(...)` to
   get its **own** identity realm: its own accounts, its own sessions, its own registration. **There is no
   cross-realm account and no single-sign-on.** Logging in to Baltor has nothing to do with Teleon.
 
@@ -58,7 +58,7 @@ A-only identifier can't log in to B), **no cross-realm SSO** (disjoint stores), 
 ## Built (2026-06-09): the local Identity & Access service
 
 Per-product realm **instantiation is done** — realms are DATA in
-`architecture/identity_realm_registry.json` (parent + Baltor + Teleon + every **live** Open\*Hub, drift-gated
+`architecture/identity_realm_registry.json` (parent + Baltor + Teleon + every **live** OpenHubForAI, drift-gated
 against the owning `products.js`; private bench hubs are excluded — internal service identity only), run by
 `scripts/identity_local_service.py`:
 

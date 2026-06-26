@@ -94,6 +94,6 @@ populated, error (the message plus retry).
 
 ## Copy rules and governance
 
-1. No placeholders ("OpenHubForAI", never "Open*Hubs"); no em or en dashes; no strategy leakage; real copy.
+1. No placeholders ("OpenHubForAI", never "OpenHubForAI registries"); no em or en dashes; no strategy leakage; real copy.
 2. serves_truth=false. A registry or record is a pointer and a shape, not asserted truth. Show `status` honestly
    (live / partial / gap); never present a `gap` or `partial` record as verified.

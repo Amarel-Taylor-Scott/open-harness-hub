@@ -8,7 +8,7 @@ re-open brand, pricing, or strategy; it names the buyer, the acute pain, and the
 > **Positioning (from the anchor, used verbatim):** Parent **AI Done Right** (`aidoneright.dev`).
 > Three layers: **Teleon** (`teleon.dev`) = the purpose-driven, eval-gated runtime SaaS (the engine);
 > **Baltor** (`baltor.ai`) = the applied, customer-facing **governed context** product, *powered by Teleon*;
-> **Open\*Hubs** (consolidating under `OpenHubForAI.io`) = the free open developer funnel.
+> **OpenHubForAI registries** (consolidating under `OpenHubForAI.io`) = the free open developer funnel.
 > One-liner (LOCKED): *"Models don't fail. Their context does."* /
 > *"Verified, current, and provable context for the agents you already run."*
 > Pillars: **Verified · Current · Efficient · Provable.**

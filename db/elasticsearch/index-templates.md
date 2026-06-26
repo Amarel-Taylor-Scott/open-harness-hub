@@ -1,4 +1,4 @@
-# Elasticsearch / OpenSearch index templates — Open Harness Hub
+# Elasticsearch / OpenSearch index templates — OpenHubForAI
 
 Use Elasticsearch (or OpenSearch, the API-compatible fork) when:
 

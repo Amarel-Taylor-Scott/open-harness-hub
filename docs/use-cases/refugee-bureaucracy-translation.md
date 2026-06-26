@@ -96,7 +96,7 @@ Gemma 4 weights. Self-hosting keeps refugee financial documents on
 the organisation's own infrastructure - something closed APIs cannot
 do.
 
-The Open Harness Hub catalog complements this with:
+The OpenHubForAI catalog complements this with:
 - Standards-format publication (Croissant / MCP / Agent Skills emitters
   for the pipeline manifest)
 - Vocabulary fork point for additional consumer-protection authorities

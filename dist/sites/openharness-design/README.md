@@ -11,7 +11,7 @@ one shared design system. These are design artifacts (a precise spec to implemen
 > **Brand:** the company is **AI Done Right** (`aidoneright.dev`), tagline **"AI, done
 > right."** Thesis across every property: **discovery is not trust** — take open,
 > discoverable AI building blocks and turn them into governed, evidence-backed capability.
-> The platform is the company; the `Open*Hub` sites are the open, top-of-funnel lead-gen.
+> The platform is the company; the `OpenHubForAI` sites are the open, top-of-funnel lead-gen.
 
 > ⚠️ **Legacy paths, current brand.** Folders/files keep their original names
 > (`context-is-everything/Context is Everything.html`, repo root `openharness/`) so the
@@ -97,7 +97,7 @@ Just open the HTML in a browser — no build step. Each folder has its own `READ
   all of it.
 - **`oh-hub.css` + `oh-hub.jsx`** — **`makeHub(cfg)`**: an entire open-registry site
   (landing + browse graph + entry detail + the full account console) from a single config
-  object. **All 21 Open*Hubs are config-only.** See [makeHub config](#makehub-the-registry-engine).
+  object. **All 21 OpenHubForAI registries are config-only.** See [makeHub config](#makehub-the-registry-engine).
 - **`products.js`** — **single source of truth for brand + portfolio.** `window.BRAND`,
   `window.PRODUCTS`, `window.PORTFOLIO` (`GROUP`/`ENTITIES`/`LAYERS`/`PORTS` — drives the
   parent). **Renames are one-line edits.** Also runs the [flip-to-public](#private-first--flip-to-public)

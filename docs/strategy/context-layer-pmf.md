@@ -1,4 +1,4 @@
-# Context-layer PMF — Open Harness Hub on the consumption thesis
+# Context-layer PMF — OpenHubForAI on the consumption thesis
 
 **The market the public tape just validated is exactly ours.** In the SNOW (Q1 FY27 product
 rev $1.33B, +34%), MDB (Q1 FY27 $687.6M, +25% re-accel, Atlas +29% with a record $117M net-new),
@@ -6,7 +6,7 @@ DDOG (+32%), and NET (+34% on agentic) prints, the common story is a **consumpti
 "context layer"**: AI doesn't replace the data platform, it feeds it more work — retrieval,
 memory, real-time signals, governance, billed per query / per GB / per inference. Altman's
 "AI augments, not replaces" walk-back is the bull case: every augmented workflow needs trustworthy
-data underneath it. **Open Harness Hub sits in that market — but at the seam the raw infra leaves open.**
+data underneath it. **OpenHubForAI sits in that market — but at the seam the raw infra leaves open.**
 
 ## Where OHH sits (and the wedge)
 
@@ -16,7 +16,7 @@ open-source memory/RAG frameworks (Mem0, Zep, Letta, LlamaIndex, LLMLingua, GPTC
 frameworks generally lack enterprise governance — no glossary, lineage, or entity resolution, which
 is precisely the seam the commercial context-layer vendors are selling into."*
 
-**That seam is Open Harness Hub.** OHH is not another vector DB or memory lib. It is the **open,
+**That seam is OpenHubForAI.** OHH is not another vector DB or memory lib. It is the **open,
 governed *assembler*** of the context layer: a network of components — each admitted only on
 **measured lift**, carrying **provenance**, and **composable** under the seven-primitive grammar —
 that you wire (and swap) into a governed pipeline. The infra is the substrate; OHH is the lift +

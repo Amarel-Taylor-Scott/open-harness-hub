@@ -105,7 +105,7 @@ safe enough to serve under the current policy.
 ## Baltor Method Spine
 
 The AI Done Right design-family handoff now represents Baltor's full engine as
-five private-first Open*Hub method registries. These are standards/lead-gen
+five private-first OpenHubForAI method registries. These are standards/lead-gen
 surfaces, not truth authorities:
 
 | Stage | Private-first method hub | Product promise |

@@ -1,6 +1,6 @@
 # Attribution
 
-The Open Harness Hub is a community catalog. Every artifact carries
+The OpenHubForAI is a community catalog. Every artifact carries
 its own `attribution` block; this file lists notable upstream
 contributors whose work is integrated into the catalog as
 verified-evidence pipelines + design patterns + reference shapes.
@@ -161,7 +161,7 @@ should reference, see
 - Every artifact's `attribution` block (source URL + author + license)
   is mandatory
 - Catalog ports of upstream work cite the upstream + add
-  "Open Harness Hub contributors" as a secondary author for the port
+  "OpenHubForAI contributors" as a secondary author for the port
 - Author attribution is corrected on receipt of PR or issue from the
   original creator
 - The catalog never claims primary authorship of work it ports —

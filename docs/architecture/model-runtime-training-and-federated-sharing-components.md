@@ -1,6 +1,6 @@
 # Model Runtime, Training, and Federated Sharing Components
 
-Open Harness Hub should treat model operations as composable components, not as hidden deployment details. A user should be able to ask for a cheap local pipeline, a Kubernetes-hosted inference service, a fine-tuning job, or a federated reviewed-knowledge network and receive searchable building blocks with cost, risk, runtime, and review metadata.
+OpenHubForAI should treat model operations as composable components, not as hidden deployment details. A user should be able to ask for a cheap local pipeline, a Kubernetes-hosted inference service, a fine-tuning job, or a federated reviewed-knowledge network and receive searchable building blocks with cost, risk, runtime, and review metadata.
 
 ## Component Families
 

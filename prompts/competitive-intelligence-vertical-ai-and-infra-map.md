@@ -47,5 +47,5 @@ check_no_direct_provider_bypass, baltor_flywheel --once.
 
 ## Conclusion (captured)
 Teleon = purpose-defined runtime + backend routing + self-adaptive capability execution. Baltor = governed context
-+ source handles + reconciliation + freshness + safe consumption. Open\*Hubs = public lead-gen registries. We sit
++ source handles + reconciliation + freshness + safe consumption. OpenHubForAI registries = public lead-gen registries. We sit
 between and underneath the four layers — the governance/runtime/evidence layer their customers increasingly need.

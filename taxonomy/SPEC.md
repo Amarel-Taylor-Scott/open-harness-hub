@@ -1,11 +1,11 @@
-# Open Harness Hub — Taxonomy Specification
+# OpenHubForAI — Taxonomy Specification
 
 > Version: 0.1.0
 > Status: Draft for public review
 > Audience: Authors of harness/pipeline/benchmark catalogs
 
 This document defines the controlled vocabulary, component types, and
-manifest fields used by the Open Harness Hub. Every entry in `catalog/`
+manifest fields used by the OpenHubForAI. Every entry in `catalog/`
 must conform to one of the component schemas in `schemas/`.
 
 The taxonomy is industry-agnostic. Industry-specific terms (e.g.
@@ -612,7 +612,7 @@ splits:
 record_schema: "schemas/eval_record.json"
 provenance:
   origin: "scraped + curated"
-  collected_by: "Open Harness Hub contributors"
+  collected_by: "OpenHubForAI contributors"
   collected_through: "2026-04-30"
   license: "CC-BY-4.0"
   anonymization: "PII-redacted; sha256 audit log retained"

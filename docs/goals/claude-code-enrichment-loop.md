@@ -2,7 +2,7 @@
 
 > Owner ask (2026-06-24): a **Claude Code loop** — a `/loop` command, **not** the `./enrich` Python daemon — to run
 > for the **next ~3 days, iterating every ~30 minutes**, filling gaps and generating **records, metadata, embeddings,
-> tools, descriptions, use-cases** for **every** surface: **Baltor · Teleon · the Open\*Hubs · the new
+> tools, descriptions, use-cases** for **every** surface: **Baltor · Teleon · the OpenHubForAI registries · the new
 > Observer/Spotter supervisor·monitor·session-reply tool · Discovery**.
 
 **This is the Claude Code driver. `./enrich` / `scripts/enrichment_loop.py` are the deterministic Python version — do
@@ -63,7 +63,7 @@ rate-limited (HTTP 429). I still drive the **bulk deterministic workers** for sc
 | Surface | What "enrich" means here | Bulk worker to run | Your model-quality layer |
 |---|---|---|---|
 | **Teleon** (registry federation, ~100+ registries in `architecture/registry_ontology.json`; menu `src/teleon/registry/port.py`) | per-record embeddings · descriptions · long-descriptions · use-cases · labels · keywords; new records via population; close ontology `gap_to_close` | `python3 scripts/registry_loop.py --run --with-population` (drives `src/teleon/registry/{populate,enrich}.py`); `python3 scripts/build_million_records.py`; `python3 scripts/distill_kaggle_kernels.py` | write real use-cases/descriptions for thin entries; add a missing registry entry or close a `gap_to_close` with a correct shape |
-| **Hubs** (22 Open\*Hubs; profiles `architecture/hub_profiles.json`) | hub profile fields, computed counts, rebuilt surfaces | `python3 scripts/build_hub_sites.py --all` | fill a hub profile's missing wedge/description/use-case fields with real copy |
+| **Hubs** (22 OpenHubForAI registries; profiles `architecture/hub_profiles.json`) | hub profile fields, computed counts, rebuilt surfaces | `python3 scripts/build_hub_sites.py --all` | fill a hub profile's missing wedge/description/use-case fields with real copy |
 | **Observer / Spotter** — the **supervisor·monitor·session-reply** tool (`src/teleon/observer/{router,capture,review,session_store}.py`; patterns in `architecture/behavioral_heuristics.json`) | new intervention types, behavioral-heuristic records, session-outcome examples (the accept/reject moat loop), descriptions/use-cases per module | `python3 scripts/build_spotter_surface.py`; `python3 scripts/build_code_genome_index.py` | add a real behavioral heuristic (pattern → intervention), a new intervention type, or labeled session-outcome examples |
 | **Baltor** (applied context product) | one applied-context flywheel cycle; context records/metadata | `PYTHONPATH=. python3 scripts/baltor_flywheel.py --once` | enrich a context-record's metadata/use-cases where thin |
 | **Discovery** (tool harvest) | new staged candidate tools from the forges | `python3 scripts/harvest_tools.py --run` *(network; honest rate-limit stop — skip if 403)* | classify/label a freshly harvested batch; promote nothing without license + dedupe |

@@ -13,7 +13,7 @@
 
 ## The goal
 Drive every product surface from **unbounded & inefficient → most-bounded & most-efficient** — provably, and only as
-far as the requirement needs. Cover all three sites: **Baltor** (applied context product), **Open Harness Hub** (open
+far as the requirement needs. Cover all three sites: **Baltor** (applied context product), **OpenHubForAI** (open
 ecosystem + CapabilityTask spec), **AI Done Right** (parent brand). Each increment is **proof-gated** (flywheel GREEN),
 governed (candidate≠active, serves_truth=false), and honest (deterministic where appropriate; cheaper-but-effective
 otherwise; missing reported, never fabricated).
@@ -35,7 +35,7 @@ otherwise; missing reported, never fabricated).
 - **Descent engine** — the self-optimizing capability unit; more descent axes/strategies with measured before→after.
 - **Capability catalog** — screen governed candidates (gap/lift) from registries/feeds toward promotion-readiness;
   profession deterministic calculators; candidate≠active throughout.
-- **Three-site surfaces** — Baltor admin/context-control demos; Open Harness Hub registries + standards interop
+- **Three-site surfaces** — Baltor admin/context-control demos; OpenHubForAI registries + standards interop
   (OKF / native / FtM / SKILL.md); AI Done Right parent pages. Keep copy single-sourced and counts computed.
 - **GTM / business** — competitor analysis, hosting/cloud/K8s/serverless/model costs, worker economics, pricing,
   marketing budget, pro-forma financials, fundraising, launch ops (see `docs/strategy/baltor-gtm-fundraising-plan.md`).

@@ -44,4 +44,4 @@ The catalog promotes that boundary from a one-shot UX choice to a reusable patte
 
 ## Attribution
 
-The CiteMind port is licensed MIT; catalog port credits "Open Harness Hub contributors" as port author and the CiteMind team as primary upstream. Direct upstream repo URL + author handle pending CiteMind team confirmation.
+The CiteMind port is licensed MIT; catalog port credits "OpenHubForAI contributors" as port author and the CiteMind team as primary upstream. Direct upstream repo URL + author handle pending CiteMind team confirmation.

@@ -95,6 +95,6 @@ Run the PART 8 proofs `--self-test`; regress `demo_offline_full_baltor` · `chec
 distinct · ContextIsEverything brand risk recorded · redteam fails safely · Baltor demo green · flywheel green.
 
 **Mental model:** AI Done Right (founding thesis: ContextIsEverything) = the portfolio/thesis. Teleon.dev = the infrastructure company.
-Baltor = the governed context company. OpenHarnessHub = the open capability ecosystem. Infrastructure:
+Baltor = the governed context company. OpenHubForAI = the open capability ecosystem. Infrastructure:
 co-located for latency/dev-speed · contract-separated for product clarity · account-separated for security/
 spinout · data-separated for trust · brand-separated for customer clarity.

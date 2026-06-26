@@ -17,7 +17,7 @@
   evidence receipts, safe consumption, audit/review packs). We do **not** become Harvey/OpenEvidence.
 - **Teleon** = purpose-defined runtime / CapabilityTask control plane over any capability (not just code); routes
   across compute/inference backends; evidence-gated promotion; human approval for boundary expansion.
-- **Open\*Hubs** = lead-gen registries + benchmarks + proof surfaces.
+- **OpenHubForAI registries** = lead-gen registries + benchmarks + proof surfaces.
 
 ## Company → category → our implication (facts unverified)
 | Company | Layer | Implication for us |

@@ -2,7 +2,7 @@
 
 This is the Codex/Claude Code Max handoff goal for polishing and researching
 the full AI Done Right portfolio family: Baltor, Teleon, the parent portfolio,
-Open Harness Hub, every Open*Hub registry, and the shared backend/security
+OpenHubForAI, every OpenHubForAI registry, and the shared backend/security
 plane that makes the prototypes production-real.
 
 The work is not limited to today's visible static pages. Each loop must discover
@@ -19,7 +19,7 @@ architecture into a production-ready implementation brief:
   reconciled, optimized, and provable context for AI-assisted work.
 - **Teleon.dev** is the paid purpose-driven runtime: intent-native,
   eval-gated, self-adaptive capability execution.
-- **Open*Hubs** are the open top-of-funnel registries. Discovery is not trust;
+- **OpenHubForAI registries** are the open top-of-funnel registries. Discovery is not trust;
   every open artifact remains candidate until governed by the right product
   layer.
 - **The full Baltor engine spine** is represented as private-first method hubs:
@@ -55,7 +55,7 @@ python3 scripts/check_ai_done_right_surface_family.py --self-test
 ```
 
 This reads `dist/sites/openharness-design/shared/products.js`, verifies the
-product/open/private layer split, confirms the 9 live Open*Hubs, 12 private
+product/open/private layer split, confirms the 9 live OpenHubForAI registries, 12 private
 bench hubs, five Baltor method hubs, and checks that every referenced prototype
 HTML exists.
 
@@ -69,7 +69,7 @@ As of the 2026-06-09 handoff, the design family is:
 
 - Parent: AI Done Right, legacy path `context-is-everything/`.
 - Products: Baltor.ai and Teleon.dev.
-- Live Open*Hubs: OpenContextHub, OpenSkillsHub, OpenToolsHub,
+- Live OpenHubForAI registries: OpenContextHub, OpenSkillsHub, OpenToolsHub,
   OpenSkillToTool, OpenMCPHub, OpenCompressionHub, OpenBenchmarkHub,
   OpenReviewHub, OpenHarnessHub.
 - Private bench: OpenTemplatesHub, OpenEndpointHub, OpenEnvironmentHub,
@@ -77,7 +77,7 @@ As of the 2026-06-09 handoff, the design family is:
 - Baltor method hubs: OpenReconciliationHub, OpenHardeningHub,
   OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub.
 
-The current high-level total is parent + 2 products + 21 Open*Hubs = 24
+The current high-level total is parent + 2 products + 21 OpenHubForAI registries = 24
 surfaces. Treat this as a checked snapshot, not a durable magic value.
 
 ## Baltor Spine
@@ -118,8 +118,8 @@ Each loop should pick the highest-impact failing workstream.
 3. **Portfolio and brand clarity**
    - Keep AI Done Right as the parent display brand.
    - Preserve legacy paths unless every cross-link is swept.
-   - Keep products and Open*Hubs distinct: Baltor governs what agents know;
-     Teleon governs what agents do; Open*Hubs make components discoverable.
+   - Keep products and OpenHubForAI registries distinct: Baltor governs what agents know;
+     Teleon governs what agents do; OpenHubForAI registries make components discoverable.
 
 4. **Prototype-to-production gap**
    - Replace in-browser Babel with a real build plan.

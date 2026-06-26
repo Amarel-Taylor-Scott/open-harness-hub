@@ -1,4 +1,4 @@
-# Vector DB spec — Open Harness Hub
+# Vector DB spec — OpenHubForAI
 
 Two indexes:
 

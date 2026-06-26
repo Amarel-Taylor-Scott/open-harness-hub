@@ -100,13 +100,13 @@ now table stakes they have.)
 (Baltor checking the corpus vs authoritative truth). Orchestration is becoming commodity; *whose context is
 provably correct* is not.
 
-**Naming (the call): keep "Open Harness Hub" — do NOT rename to "Open Agent Hub."** The whole two-product
+**Naming (the call): keep "OpenHubForAI" — do NOT rename to "Open Agent Hub."** The whole two-product
 split depends on the harness-vs-agent line (OHH = the *bounded, governed harness*; Baltor serves verified
 context *into* open agents); "Open Agent Hub" collapses it and drops us into the most crowded, commoditizing
 category (LangGraph/CrewAI/AutoGPT). "Harness" is distinctive + precise for technical buyers (and "eval
 harness"/"agent harness" are established terms — lineage, not liability). **But use "agent" in taglines /
 positioning / SEO** for findability — distinctive name for the *what*, popular word for *discoverability*:
-e.g. *"Open Harness Hub — governed agents you can actually trust"* / "the governance layer for agents."
+e.g. *"OpenHubForAI — governed agents you can actually trust"* / "the governance layer for agents."
 Bridge term when "harness" needs a gloss: **"governed agents."** Reversible (brand is config).
 
 ## The demand is real (RAG-failure sentiment)

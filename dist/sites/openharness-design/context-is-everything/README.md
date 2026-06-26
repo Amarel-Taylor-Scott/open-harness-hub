@@ -8,7 +8,7 @@ Renders the portfolio from `shared/products.js` → `window.PORTFOLIO` (`GROUP`,
 spine: purpose → contract → runtime selection → candidate → evidence → eval-gated
 promotion/rollback) · **Portfolio** (3-layer stack: open supply graphs → Teleon runtime →
 governed products) · **How it fits** (the ports between entities). Live entities (Baltor,
-OpenHarnessHub) link to their sites; Teleon + the three new Open*Hubs are portfolio cards
+OpenHarnessHub) link to their sites; Teleon + the three new OpenHubForAI registries are portfolio cards
 with status pills (`building`/`planned`) until their sites exist.
 
 Entry: **`Context is Everything.html`** → open in a browser.

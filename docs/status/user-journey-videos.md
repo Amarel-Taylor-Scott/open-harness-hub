@@ -16,7 +16,7 @@ tempo-fits clips to chapter gaps (≤1.4×), and muxes onto the H.264 track (29/
 verified). Two of ~230 chapter clips failed TTS and stay caption-only: journey-2-baltor c15,
 site-openreceipthub c2. Per-chapter PNG close-ups live in `media/user-journey-videos/stills/`.
 
-## Open Harness Hub — PUBLIC URL: landing → live build → live registry → sign-up → live canvas + real export → configuration
+## OpenHubForAI — PUBLIC URL: landing → live build → live registry → sign-up → live canvas + real export → configuration
 
 `artifacts/e2e/videos/journey-1-openharnesshub.mp4` · 101s · 25 chapters · against `expansion-cat-manual-podcasts.trycloudflare.com`
 

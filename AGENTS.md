@@ -1,4 +1,4 @@
-# AGENTS.md — Open Harness Hub
+# AGENTS.md — AI Done Right
 
 > Orientation for AI assistants (Claude Code, Cursor, Copilot,
 > Windsurf, Aider, Zed, Warp, RooCode, …) opening this repository.

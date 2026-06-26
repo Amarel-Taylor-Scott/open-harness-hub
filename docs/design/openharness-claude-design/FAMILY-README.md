@@ -38,7 +38,7 @@ TryCloudflare URLs rotate on every launch; the live record is `dist/surface-urls
 
 1. **Build the AIDevObserver logged-in app shell** using `OhAppShell` (the left sidebar: Sessions list, Review report, Findings, Settings), matching the family. The kit, the shell component, and a worked example are all in DESIGN-ASSETS.md.
 2. **Elevate the marketing pages** of all 5 surfaces toward a richer, shipped-product feel, while keeping the one design law (shared kit, differ only by accent and copy).
-3. **Follow the copy rules** (also enforced in DESIGN-BIBLE): no placeholders ("OpenHubForAI", never "Open*Hubs"), no em or en dashes, no strategy leakage in public copy, real sales and marketing copy.
+3. **Follow the copy rules** (also enforced in DESIGN-BIBLE): no placeholders ("OpenHubForAI", never "OpenHubForAI registries"), no em or en dashes, no strategy leakage in public copy, real sales and marketing copy.
 
 ## Brand
 
@@ -61,5 +61,5 @@ These open the method language around Baltor's engine. They are not truth author
 - Do not break the one design law: the shared kit is the only style source; accent and copy are the only per-surface variables.
 - Do not design against `surface_server.py` (it is a fallback, not the live renderer).
 - Do not hardcode counts, colors, ports, or brand copy that has an owning source (recompute or read the spec; family count via `python3 scripts/check_ai_done_right_surface_family.py --self-test`).
-- Do not present private bench hubs as public production surfaces, or present Open*Hub discovery as trust.
+- Do not present private bench hubs as public production surfaces, or present OpenHubForAI discovery as trust.
 - Do not let Teleon own Baltor truth, or Baltor become a generic runtime.

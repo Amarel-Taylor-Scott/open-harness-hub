@@ -5,7 +5,7 @@ updates** — that's the point. Never hardcode colors or sizes in a site stylesh
 from these tokens/primitives.
 
 ## Shared site kit — `oh-site.css` + `oh-site.jsx`
-A new brand (Teleon, the Open*Hubs) should be **config + a few unique pages**, never a
+A new brand (Teleon, the OpenHubForAI registries) should be **config + a few unique pages**, never a
 re-implemented shell. The kit provides identical chrome, page skeletons, and primitive
 pages; only the accent color differs.
 

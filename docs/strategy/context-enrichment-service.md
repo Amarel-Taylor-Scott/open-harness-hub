@@ -5,7 +5,7 @@
 > "CEaaS / Context Enrichment" is the working/descriptive term used in this spec and in code; the brand is
 > Baltor.
 
-Baltor is a **content + corpus refinery**, not a pipeline builder (that's Open Harness Hub — see
+Baltor is a **content + corpus refinery**, not a pipeline builder (that's OpenHubForAI — see
 [[two-services-shared-infrastructure.md]]). You give it content (or use our unique governed corpora);
 it refines that content into **token-efficiency tiers**, hosts them (or hands them back), and feeds
 the corpora + tools into whatever open-ended agent you already run (Claude Code, Cursor, any MCP

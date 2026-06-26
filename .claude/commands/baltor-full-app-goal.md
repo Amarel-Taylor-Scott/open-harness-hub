@@ -46,7 +46,7 @@ gateway, not a doc-chatbot. Any agent asks for context; Baltor returns the **sma
 source-linked, policy-compliant context pack** for the task, with evidence, relationships, history,
 lineage, and a portable **receipt**. Moat = governed/proprietary data + continuous verification +
 freshness/CDC + measured fidelity + portable receipt. Brands LOCKED (AI Done Right ·
-Baltor.ai · Open Harness Hub). **"Oracle" is retired as product language** → Context Engine / Context
+Baltor.ai · OpenHubForAI). **"Oracle" is retired as product language** → Context Engine / Context
 Fabric / Context Assurance / Context Receipt (keep the technical "oracle source" term only).
 
 ## Visual rules (frontend)

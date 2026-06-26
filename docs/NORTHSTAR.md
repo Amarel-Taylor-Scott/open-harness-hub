@@ -1,7 +1,7 @@
 # NORTHSTAR — the single current-truth entry point
 
-> **Superseded by `docs/BIBLE.md`** (the comprehensive vision + laws) + **`docs/DESIGN-BIBLE.md`** (design/UX) — those
-> two are canonical now; read them + `CLAUDE.md` first. This file remains as a quick index. Last reconciled **2026-06-25**.
+> **Canonical sources — `docs/BIBLE.md`** (the comprehensive vision + laws) + **`docs/DESIGN-BIBLE.md`** (design/UX) — those
+> two are canonical now; read them + `CLAUDE.md` first. This file is a deliberately-kept quick index, not a superseded doc. Last reconciled **2026-06-25**.
 
 ## The five brand pillars (single source: `architecture/surface_capability_spec.json`)
 
@@ -13,7 +13,7 @@ A holding company, **AI Done Right** (`aidoneright.dev`, "AI, done right."), ove
 | **Teleon.dev** | the purpose-driven, eval-gated, self-adaptive compute **runtime** | `web/teleon` |
 | **AIDevObserver** | watches AI **usage** — reviews the SESSION (post) + helps intra-session (renamed from *Teleon Observer* 2026-06-25) | `src/teleon/observer` (web surface + demo queued) |
 | **Baltor.ai** | managed, verified, provable **context**, powered by Teleon | `web/baltor` |
-| **Open\*Hubs** | the open **store** both products consume + the open CapabilityTask spec | `web/harness-hub` |
+| **OpenHubForAI** | the open **store** both products consume + the open CapabilityTask spec | `web/harness-hub` |
 
 **Architectural law** (enforced by `scripts/check_portfolio_dependency_law.py`): Baltor → Teleon → OpenHarnessHub,
 **never the reverse**. Naming/architecture detail: `docs/strategy/teleon-baltor-openharnesshub-portfolio.md` (canonical,
@@ -21,7 +21,7 @@ unchanged). Foundational law (the four filters): `architecture/substrate_layers.
 
 ## Surfaces are durable + northstar (the 2026-06-25 pass)
 
-- **One design system** (owner 2026-06-25): Baltor · Teleon · AIDevObserver · Open\*Hubs share the SAME layout /
+- **One design system** (owner 2026-06-25): Baltor · Teleon · AIDevObserver · OpenHubForAI share the SAME layout /
   HTML / CSS / fonts — the shared kit (`shared/oh-site.jsx` + `oh-tokens/components/site.css`) — and differ ONLY in
   color scheme + copy. Enforced by `check_northstar_design` (kit-consistency). AIDevObserver still needs its shared-kit
   surface (today it has a standalone functional `/demo` only).

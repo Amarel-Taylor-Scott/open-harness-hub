@@ -1,15 +1,15 @@
-# web/ — Open Harness Hub product front-end
+# web/ — OpenHubForAI product front-end
 
 This is the **implementation of the Claude Design handoff** (claude.ai/design) for the
-Open Harness Hub product UI. The design medium was a React/Babel prototype; per the
+OpenHubForAI product UI. The design medium was a React/Babel prototype; per the
 handoff's own instruction ("recreate pixel-perfectly in whatever technology fits the
 target codebase") this is a **no-build static front-end** — plain HTML + one vanilla JS
 file + the prototype's own CSS, ported verbatim. No Node toolchain, deployable as static
 files or behind the existing showcase server.
 
-Open Harness Hub is the open builder/catalog surface in the three-site platform story:
+OpenHubForAI is the open builder/catalog surface in the three-site platform story:
 **AI Done Right** is the parent platform site, **Baltor** is the paid context-control
-product, and **Open Harness Hub** is the open funnel for governed harnesses that can consume
+product, and **OpenHubForAI** is the open funnel for governed harnesses that can consume
 Baltor context when live verified facts are needed. Keep OHH navigation linked to both
 family sites so users understand when they are building a workflow versus subscribing to or
 serving verified context.

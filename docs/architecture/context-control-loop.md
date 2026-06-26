@@ -7,7 +7,7 @@ consistent, and modular enough to strengthen when a dependency becomes fragile.
 
 ## Core thesis
 
-Open Harness Hub and Baltor create value by doing five things together:
+OpenHubForAI and Baltor create value by doing five things together:
 
 1. **Adversarially validate context.** Treat retrieved documents, memory,
    prompt blocks, tool outputs, and generated intermediate state as untrusted
@@ -121,5 +121,5 @@ strengthen weak dependencies with better primitives,
 and prove the resulting pipeline lifts over a bare model.
 ```
 
-That is the shared core of Open Harness Hub and Baltor: governed context that is
+That is the shared core of OpenHubForAI and Baltor: governed context that is
 verified, current, reconciled, modular, token-efficient, and measurable.

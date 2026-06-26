@@ -5,7 +5,7 @@ selection → candidate → evidence → eval-gated promotion / rollback). Part 
 AI Done Right.
 
 **This is the reference site for the shared site kit** — it is built almost entirely from
-`shared/oh-site.*`. Use it as the template when scaffolding the Open*Hubs.
+`shared/oh-site.*`. Use it as the template when scaffolding the OpenHubForAI registries.
 
 Entry: **`Teleon Prototype.html`** → open in a browser.
 

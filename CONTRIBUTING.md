@@ -1,4 +1,4 @@
-# Contributing to Open Harness Hub
+# Contributing to OpenHubForAI
 
 Welcome! The hub grows by contributions. There are two ingest paths
 (see [SPEC §12](taxonomy/SPEC.md#12-ingest-paths)):

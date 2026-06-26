@@ -1,6 +1,6 @@
 # License
 
-The Open Harness Hub project is licensed under the **MIT License**.
+The OpenHubForAI project is licensed under the **MIT License**.
 
 Individual catalog components may carry different licenses - see the
 `license` field on each manifest. The default for new contributions is

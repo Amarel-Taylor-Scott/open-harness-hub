@@ -1,6 +1,6 @@
 # Codex Transfer
 
-> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, Open Harness Hub as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
+> Historical snapshot (2026-06-09). Kept for lineage. It describes an earlier state and may name superseded things (for example Hanken Grotesk, surface_server as the renderer, OpenHubForAI as the headline brand). Current canonical: docs/BIBLE.md, docs/CURRENT-STATE.md, and docs/DESIGN-BIBLE.md.
 
 Updated: 2026-06-09
 
@@ -22,7 +22,7 @@ network LLM calls, fake URLs, or overclaims.
 - Source of truth: `dist/sites/openharness-design/shared/products.js`
 - Current count: 24 design-family surfaces
 - Parent/product split: AI Done Right parent + Baltor + Teleon
-- Open*Hub count: 21 prototype surfaces
+- OpenHubForAI count: 21 prototype surfaces
 - Live hubs: 9
 - Private bench hubs: 12
 - Operational Demo Control Tower registry: 20 surfaces

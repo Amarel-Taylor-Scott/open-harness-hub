@@ -49,7 +49,7 @@ progressive-disclosure mechanic everywhere.
 
 ## The overlap (and where the hub is a superset)
 
-| Concept | Claude Code skills | Agent Skills standard | Open Harness Hub |
+| Concept | Claude Code skills | Agent Skills standard | OpenHubForAI |
 |---|---|---|---|
 | Atomic catalog unit | Skill folder | Skill folder | Harness, Pipeline, RulePack, KnowledgePack, LogicPack, Tool, Persona, Adapter, Rubric, Dataset, Processor, Schema (**12 types**) |
 | Format | YAML frontmatter + markdown | YAML frontmatter + markdown | YAML manifest with JSON-Schema validation |

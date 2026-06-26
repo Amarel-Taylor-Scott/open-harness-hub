@@ -53,7 +53,7 @@ Only fragments that are legally reusable, privacy-screened, and verified should
 enter the shared cache. Tenant-private fragments can still be useful inside a
 tenant boundary but must not leak into public or cross-tenant indexes.
 
-For Open Harness Hub, this means public synthetic examples and curated
+For OpenHubForAI, this means public synthetic examples and curated
 fragments can be shared broadly, while real customer trajectories require
 tenant isolation, redaction, retention controls, and explicit consent.
 

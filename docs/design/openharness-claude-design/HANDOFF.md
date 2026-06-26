@@ -47,7 +47,7 @@ edit `_CSS_TEMPLATE` once and it propagates to all 5. Full SAFE-vs-LOCKED map: `
 ## Family shape (computed — never hand-counted)
 
 The live shipped model is the **5 surfaces** above. The wider design family (parent + Baltor + Teleon + the
-Open\*Hub registries — 9 live open registries + private-bench registries) is a **computed** count, never typed into
+OpenHubForAI registries — 9 live open registries + private-bench registries) is a **computed** count, never typed into
 prose. Recompute before editing docs, screenshots, or Control Tower copy:
 
 ```bash
@@ -93,7 +93,7 @@ authorization; audit events + receipts for privileged calls. Brief:
 - Brand + accent values come from the owning source (`architecture/surface_capability_spec.json`); route maps and
   surface counts are generated / recomputed, never typed.
 - Private-first is not claimed as production security until enforced server-side.
-- Open\*Hub discovery is never presented as trust; Teleon never owns Baltor truth, and Baltor never becomes a
+- OpenHubForAI discovery is never presented as trust; Teleon never owns Baltor truth, and Baltor never becomes a
   generic runtime.
 
 ## Do not regress (brand + structure)

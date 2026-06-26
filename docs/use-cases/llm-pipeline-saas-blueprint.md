@@ -1,6 +1,6 @@
 # LLM pipeline-as-a-service blueprint
 
-This product direction turns Open Harness Hub into a SaaS that helps a user describe what they want to accomplish with LLMs inside their own hosting environment, then returns deployable pipeline options with cost, risk, runtime, and setup tradeoffs.
+This product direction turns OpenHubForAI into a SaaS that helps a user describe what they want to accomplish with LLMs inside their own hosting environment, then returns deployable pipeline options with cost, risk, runtime, and setup tradeoffs.
 
 The core interaction:
 

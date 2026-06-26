@@ -15,7 +15,7 @@ repo shape from owning sources every cycle, then fix the highest-impact gap.
 Polish this repository into a credible, shippable, review-ready platform:
 
 - **Baltor** is a clear, working governed-context product.
-- **Open Harness Hub** is a usable public standards/catalog and builder funnel.
+- **OpenHubForAI** is a usable public standards/catalog and builder funnel.
 - **Context is Everything / AI Done Right** explains the portfolio and why
   governed context is the durable control layer.
 - **Teleon, OpenContextHub, OpenSkillsHub, OpenToolsHub, OpenHarnessHub, and

@@ -16,9 +16,9 @@ superseded "Anneal"). Portfolio context: [teleon-baltor-openharnesshub-portfolio
 | **Holding company / parent display brand** | **AI Done Right** — `aidoneright.dev` (**LOCKED 2026-06-08**); prior working name *ContextIsEverything* kept as founding thesis | umbrella IP/brands/standards/structure; owns no runtime/customer-data |
 | **Runtime product / SaaS** | **Teleon** — `teleon.dev` (owned) | the purpose-driven, eval-gated, self-adaptive compute runtime |
 | **Applied product** | **Baltor** — `baltor.ai` | customer-facing context/intelligence product, **powered by Teleon** (a tenant) |
-| **Open ecosystem + standard** | **OpenHarnessHub** | evals/harnesses/templates/skills/adapters/examples + the **open CapabilityTask spec** |
+| **Open ecosystem + standard** | **OpenHubForAI** | evals/harnesses/templates/skills/adapters/examples + the **open CapabilityTask spec** |
 | **Core object (product language)** | **PurposeTask** | runtime-agnostic; an instance is colloquially "a teleon" |
-| **Core object (formal/spec)** | **CapabilityTask** | the spec name; the spec is stewarded by OpenHarnessHub |
+| **Core object (formal/spec)** | **CapabilityTask** | the spec name; the spec is stewarded by OpenHubForAI |
 | **Open standard** | **Capability Task Specification (CTS)** / "Open CapabilityTask Spec" | neutral; *Teleon implements it* |
 | **Staff dashboard** | **Teleon Control Tower** | (supersedes "Purpose Runtime Control Tower") |
 | **Customer dashboard** | **Capability Assurance Portal** | unchanged |
@@ -51,7 +51,7 @@ for *market confusion / trademark* — so:
 ## Domains
 - **Owned:** `teleon.dev` (product).
 - **Unverified candidates** (registrar/WHOIS/trademark before purchase): `capabilitytasks.org` / `.io` (the
-  open spec, stewarded under OpenHarnessHub); `baltor.ai` (applied product — confirm current status); adjacent
+  open spec, stewarded under OpenHubForAI); `baltor.ai` (applied product — confirm current status); adjacent
   `teleon*` defensive domains.
 
 ## Superseded / rejected
@@ -72,3 +72,5 @@ Code identifiers (`PurposeTaskSpec`, `architecture/capability_*.json`) do **not*
 - 2026-06-06 — Owner LOCKED "Teleon" and **purchased `teleon.dev`.** Portfolio confirmed (HoldCo · Teleon ·
   Baltor · OpenHarnessHub). PurposeTask stays the formal object (CapabilityTask = spec synonym). `teleon.ai`
   adjacency recorded as a positioning/trademark caution. Supersedes the "Purpose Runtime" naming doc.
+  (Brand-name refresh 2026-06-26: the open-ecosystem layer's display name is now **OpenHubForAI**; the prior
+  **OpenHarnessHub** product name is preserved as legacy/path context and as the specific harnesses registry under it.)

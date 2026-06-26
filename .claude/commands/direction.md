@@ -1,5 +1,5 @@
 ---
-description: Resilient operating loop for Open Harness Hub — never stop early, branch on every block
+description: Resilient operating loop for OpenHubForAI — never stop early, branch on every block
 ---
 
 Load the resilience engine and apply it to the current autonomous run. Read and

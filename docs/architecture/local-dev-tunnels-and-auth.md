@@ -101,7 +101,7 @@ The authoritative service-auth policy is still
 - AI Done Right is the parent/platform brand.
 - Baltor governs context and truth.
 - Teleon runs capabilities.
-- Open*Hubs are registries and discovery surfaces only.
+- OpenHubForAI registries are discovery surfaces only.
 - Discovery is not trust.
 - Output is not truth.
 - Dashboards and Control Towers are projection-only.
