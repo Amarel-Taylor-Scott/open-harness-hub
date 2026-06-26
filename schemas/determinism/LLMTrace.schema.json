@@ -1,0 +1,26 @@
+{
+  "$id": "determinism/LLMTrace", "title": "LLMTrace", "type": "object", "additionalProperties": false,
+  "description": "One single-model LLM invocation captured for the determinism ledger. An LLMTrace is RAW PROPOSAL evidence: it records what one model returned for one prompt, with model/provider identity and a prompt_hash handle, but it is NEVER truth on its own. It carries its own schema/grounding/deterministic validation results so the miner can tell a validated, grounded proposal from an ungrounded one — but only a WorkflowTrace with verified=true (adjudicated/source-grounded/receipt-backed) is mineable. The raw prompt/response bytes are NOT inlined here (they live in the object store / private tenant store, referenced by prompt_hash + response_ref); no secrets, no PII. Deterministic when created_at is injected.",
+  "required": ["schema_version", "llm_trace_id", "tenant_id", "source_scope", "workflow_id", "step_id", "model_id", "provider_id", "prompt_hash", "response_ref", "schema_validation", "grounding_validation", "deterministic_validation", "proposed_decision", "source_handles", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["LLMTrace"]},
+    "llm_trace_id": {"type": "string", "description": "content-addressed id (sha256 over model+prompt_hash+response_ref); deterministic"},
+    "tenant_id": {"type": "string"},
+    "source_scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"], "description": "tenant_private LLM output can never train a global rule unless anonymized + approved"},
+    "workflow_id": {"type": "string"},
+    "step_id": {"type": "string"},
+    "model_id": {"type": "string", "description": "the model that produced this proposal"},
+    "model_version": {"type": "string"},
+    "provider_id": {"type": "string", "description": "routed via the single LLMGateway; a direct-provider bypass is a contract violation"},
+    "prompt_hash": {"type": "string", "description": "hash handle for the prompt; the raw prompt is NOT inlined (private prompts → object/tenant store)"},
+    "response_ref": {"type": "string", "description": "opaque content-addressed ref (objref:sha256:...) to the stored raw response; never inlined here"},
+    "schema_validation": {"type": "string", "enum": ["pass", "fail", "skipped", "not_applicable"]},
+    "grounding_validation": {"type": "string", "enum": ["pass", "fail", "skipped", "not_applicable"], "description": "did this proposal cite real source handles, or is it ungrounded (allegation/summary)"},
+    "deterministic_validation": {"type": "string", "enum": ["pass", "fail", "skipped", "not_applicable"], "description": "did Baltor's deterministic authority agree with this proposal (evidence the proposal is safe to mine toward)"},
+    "proposed_decision": {"type": "string", "description": "the model's proposed output — a PROPOSAL, never the served truth on its own"},
+    "is_truth": {"type": "boolean", "enum": [false], "description": "structurally pinned false: a single LLM proposal is NEVER truth (truth comes from a validator/adjudication)"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "handles the proposal cited; an ungrounded proposal carries an empty list and is not mineable"},
+    "latency_ms": {"type": "integer", "description": "optional observability field; not used for truth"},
+    "created_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

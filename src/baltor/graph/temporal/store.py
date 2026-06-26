@@ -49,7 +49,7 @@ class TemporalGraphStore:
             first_observed_at=now, last_observed_at=now, created_at=now, updated_at=now)
         self.upsert_node(node)
         oid = observation_id(temporal_fact_id_=node.temporal_fact_id, observed_at=now, content_hash_=ch)
-        self._obs.append({"schema_version": "TemporalFactObservation.v1", "observation_id": oid,
+        self._obs.append({"schema_version": "TemporalFactObservation", "observation_id": oid,
                           "temporal_fact_id": node.temporal_fact_id, "canonical_fact_key": canonical_fact_key,
                           "tenant_id": tenant_id, "value_normalized": value_normalized, "content_hash": ch,
                           "source_authority": source_authority, "source_handles": list(source_handles),
@@ -83,7 +83,7 @@ class TemporalGraphStore:
             raise ValueError(f"unknown edge_source {edge_source!r}")
         token = observed_at or policy_version or policy_id or "static"
         eid = edge_id(tenant_id=tenant_id, from_id=from_id, edge_type=edge_type, to_id=to_id, observed_at_or_policy=token)
-        edge = {"schema_version": "TemporalFactEdge.v1", "edge_id": eid, "tenant_id": tenant_id,
+        edge = {"schema_version": "TemporalFactEdge", "edge_id": eid, "tenant_id": tenant_id,
                 "from_temporal_fact_id": from_id, "to_temporal_fact_id": to_id, "edge_type": edge_type,
                 "edge_source": edge_source, "observed_at": observed_at, "policy_id": policy_id,
                 "policy_version": policy_version, "receipt_id": receipt_id, "confidence": confidence,

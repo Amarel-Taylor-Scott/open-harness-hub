@@ -18,7 +18,7 @@ MEMORY_OPS = ("memory.write", "memory.recall", "memory.profile", "memory.capture
 
 
 def _trace(op: str, provider_id: str, now: str, produced: list) -> dict:
-    return {"schema_version": "MemoryTrace.v1", "trace_id": "tr-" + (produced[0] if produced else op)[:16],
+    return {"schema_version": "MemoryTrace", "trace_id": "tr-" + (produced[0] if produced else op)[:16],
             "tenant_id": "", "container": "memory", "operation": op, "provider_id": provider_id,
             "request_handle": op, "produced_artifact_ids": produced, "held_out_artifact_ids": [],
             "rejected_artifact_ids": [], "rollback_target": "", "occurred_at": now}

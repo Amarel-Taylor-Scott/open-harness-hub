@@ -23,7 +23,7 @@ Asserts:
   I. RUNTIME PROFILE never fabricated: with observations → source 'observed' + p95; without → 'unavailable' +
      nulls; the success-criteria latency bound is derived from the observed p95.
   J. DETERMINISM: lifting the same workload twice with the same imported_at yields identical output.
-  K. SCHEMA CONFORMANCE: workload/profile/purpose_draft/capability_draft/adoption_plan conform to their .v1
+  K. SCHEMA CONFORMANCE: workload/profile/purpose_draft/capability_draft/adoption_plan conform to their 
      schemas (required present · no extra keys · enum/const honored).
   L. CONNECTOR SEAM: offline connectors are the default; the live connector is a labelled seam that raises with
      the real provider API; the whole pipeline runs with no network.
@@ -83,8 +83,8 @@ def _self_test() -> int:
             fails.append(name)
 
     vocab = model.runtime_class_vocabulary()
-    schemas = {n: _load_schema(n) for n in ("ImportedWorkload.v1", "RuntimeProfile.v1", "PurposeTaskDraft.v1",
-                                            "CapabilityTaskDraft.v1", "AdoptionPlan.v1")}
+    schemas = {n: _load_schema(n) for n in ("ImportedWorkload", "RuntimeProfile", "PurposeTaskDraft",
+                                            "CapabilityTaskDraft", "AdoptionPlan")}
 
     # observations only for the invoice job → exercises observed vs unavailable profiles
     obs = {"invoice-extraction": {"observed_window": "14d", "invocations": 124322, "p50_latency_ms": 4300,
@@ -187,9 +187,9 @@ def _self_test() -> int:
 
     # K. schema conformance
     for r in results:
-        for obj, sname in ((r.workload, "ImportedWorkload.v1"), (r.runtime_profile, "RuntimeProfile.v1"),
-                           (r.purpose_draft, "PurposeTaskDraft.v1"), (r.capability_draft, "CapabilityTaskDraft.v1"),
-                           (r.adoption_plan, "AdoptionPlan.v1")):
+        for obj, sname in ((r.workload, "ImportedWorkload"), (r.runtime_profile, "RuntimeProfile"),
+                           (r.purpose_draft, "PurposeTaskDraft"), (r.capability_draft, "CapabilityTaskDraft"),
+                           (r.adoption_plan, "AdoptionPlan")):
             errs = _validate(obj, schemas[sname])
             check(f"K: {r.workload['native_name']} {sname} conforms", not errs, "; ".join(errs[:3]))
 

@@ -73,7 +73,7 @@ from scripts.context_workers.workers.refresh import refresh_plan
     capabilities=("pipeline_orchestration", "deterministic_first_pass"),
     task_types=("context.pipeline.pass",),
     image="baltor-worker-orchestrator",
-    output_contract="context_pass.v1",
+    output_contract="context_pass",
 )
 def pipeline_pass(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     text = str(payload.get("text") or "")

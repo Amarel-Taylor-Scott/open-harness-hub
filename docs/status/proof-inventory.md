@@ -1,6 +1,6 @@
 # Proof Inventory
 
-**709** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
+**713** proofs registered in the flywheel (`scripts/baltor_flywheel.py`).
 
 - `scripts/ingest/context_rot.py`
 - `scripts/ingest/document_decompose.py`
@@ -711,3 +711,7 @@
 - `src/teleon/synthesis/codeblock_loop.py`
 - `src/teleon/registry/browse.py`
 - `scripts/openhub_browse_server.py`
+- `src/teleon/registry/index.py`
+- `scripts/check_registry_reconciliation.py`
+- `scripts/registry_api_server.py`
+- `scripts/check_object_wrapper_hygiene.py`

@@ -1,0 +1,20 @@
+{
+  "$id": "CanonicalFact", "title": "CanonicalFact", "type": "object", "additionalProperties": true,
+  "required": ["schema_version", "fact_id", "subject", "predicate", "object", "scope", "status", "source_handle", "content_hash"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["CanonicalFact"]},
+    "fact_id": {"type": "string"},
+    "subject": {"type": "string"},
+    "predicate": {"type": "string"},
+    "object": {"type": "string"},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_override", "system_reference"]},
+    "status": {"type": "string", "enum": ["candidate", "verified_current", "stale", "contested", "superseded", "held_out", "tenant_override", "needs_human", "deprecated"]},
+    "source_handle": {"type": "string"},
+    "content_hash": {"type": "string"},
+    "authority_rank": {"type": "integer"},
+    "fragility_id": {"type": "string"},
+    "supporting_assertion_ids": {"type": "array", "items": {"type": "string"}},
+    "tenant_id": {"type": "string"},
+    "unit": {"type": "string"}
+  }
+}

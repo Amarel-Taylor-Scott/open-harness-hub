@@ -7,9 +7,9 @@ Asserts (against scripts.api_inference_handler.handle, the server source, and we
   A. SURFACE: handle() owns the 8 inference routes (the 6 GET projections + resolve-preference + structured-local);
      the read routes equal api_projection.ROUTES minus the compute route.
   B. GET PROJECTIONS: every GET route returns 200 with its projection.
-  C. ERRORS: an unknown route → 404 ErrorEnvelope.v1; resolve-preference with no layers → 400 ErrorEnvelope.v1.
+  C. ERRORS: an unknown route → 404 ErrorEnvelope; resolve-preference with no layers → 400 ErrorEnvelope.
   D. RESOLVE: POST resolve-preference returns a ResolvedInferencePreference with numeric model-class codes.
-  E. COMPUTE-NOT-TRUTH: POST structured-local returns is_truth=false + a ModelInvocationReceipt.v1 whose
+  E. COMPUTE-NOT-TRUTH: POST structured-local returns is_truth=false + a ModelInvocationReceipt whose
      policy_checks.llm_output_is_truth is false; the receipt is recorded and then projected by GET receipts.
   F. NO SECRET LEAK: no secret-VALUE pattern (the handler's own guard regex) appears in ANY response.
   G. DETERMINISM: structured-local with the same `now` twice yields the same receipt_id.
@@ -65,26 +65,26 @@ def _self_test() -> int:
 
     c404, p404 = H.handle("GET", "/api/inference/does-not-exist", None)
     responses.append(p404)
-    check("C: unknown route → 404 ErrorEnvelope.v1",
-          c404 == 404 and p404.get("schema_version") == "ErrorEnvelope.v1" and p404.get("error_type") == "not_found")
+    check("C: unknown route → 404 ErrorEnvelope",
+          c404 == 404 and p404.get("schema_version") == "ErrorEnvelope" and p404.get("error_type") == "not_found")
     c400, p400 = H.handle("POST", "/api/inference/resolve-preference", {})
     responses.append(p400)
-    check("C: resolve-preference with no layers → 400 ErrorEnvelope.v1",
-          c400 == 400 and p400.get("schema_version") == "ErrorEnvelope.v1")
+    check("C: resolve-preference with no layers → 400 ErrorEnvelope",
+          c400 == 400 and p400.get("schema_version") == "ErrorEnvelope")
 
     cr, pr = H.handle("POST", "/api/inference/resolve-preference", {"layers": _LAYERS})
     responses.append(pr)
     mc = pr.get("effective", {}).get("model_class_preference", {})
     check("D: resolve-preference → ResolvedInferencePreference with numeric codes",
-          cr == 200 and pr.get("schema_version") == "ResolvedInferencePreference.v1"
+          cr == 200 and pr.get("schema_version") == "ResolvedInferencePreference"
           and isinstance(mc.get("tier_code"), int) and isinstance(mc.get("specialization_codes"), list))
 
     cs, ps = H.handle("POST", "/api/inference/structured-local",
                       {"object_id": "demo.object", "preference_layers": _LAYERS, "input_text": "hi", "now": "2026-06-05T00:00:00Z"})
     responses.append(ps)
     rcpt = ps.get("receipt", {})
-    check("E: structured-local → 200, is_truth=false, ModelInvocationReceipt.v1, output-not-truth",
-          cs == 200 and ps.get("is_truth") is False and rcpt.get("schema_version") == "ModelInvocationReceipt.v1"
+    check("E: structured-local → 200, is_truth=false, ModelInvocationReceipt, output-not-truth",
+          cs == 200 and ps.get("is_truth") is False and rcpt.get("schema_version") == "ModelInvocationReceipt"
           and rcpt.get("receipt_id") and rcpt.get("policy_checks", {}).get("llm_output_is_truth") is False)
     crc, prc = H.handle("GET", "/api/inference/receipts", None)
     responses.append(prc)
@@ -115,7 +115,7 @@ def _self_test() -> int:
     check("I: UI contains no secret-value pattern", not H._LEAK.search(ui))
 
     print("\n" + ("PASS — check_inference_api_handler: the Shared LLM Plane is served end-to-end — the handler answers "
-                  "every /api/inference route safely (errors are ErrorEnvelope.v1), structured-local output is a "
+                  "every /api/inference route safely (errors are ErrorEnvelope), structured-local output is a "
                   "candidate (never truth) with a ModelInvocationReceipt, the admin server delegates GET+POST, and the "
                   "read-only UI consumes the projection with no secret leak." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1

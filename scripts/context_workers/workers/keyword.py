@@ -16,7 +16,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("keyword_analysis", "facet_counts"),
     task_types=("keyword.extract",),
     image="baltor-worker-cpu",
-    output_contract="keywords.v1",
+    output_contract="keywords",
 )
 def keyword_analysis(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     text = " ".join(c.get("text", "") for c in payload.get("chunks", [])) or str(payload.get("text") or "")

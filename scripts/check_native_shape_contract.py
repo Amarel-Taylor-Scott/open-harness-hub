@@ -4,10 +4,10 @@ format-preservation contract schemas exist, parse with stdlib-validator keywords
 example that PASSES and at least one invalid example that FAILS, and the load-bearing governance invariants
 hold:
 
-  * NativeDiff.v1 — every changed field REQUIRES a receipt_id (a same-schema value may change ONLY when
+  * NativeDiff — every changed field REQUIRES a receipt_id (a same-schema value may change ONLY when
     verified; NO change is allowed without a receipt — the original is never silently overwritten).
-  * NativeExportReceipt.v1 — REQUIRES source_hash AND export_hash so an export is reproducible/auditable.
-  * SidecarOverlay.v1 — REQUIRES held_out_claims AND field_map keys to exist (even when empty) so a reader
+  * NativeExportReceipt — REQUIRES source_hash AND export_hash so an export is reproducible/auditable.
+  * SidecarOverlay — REQUIRES held_out_claims AND field_map keys to exist (even when empty) so a reader
     can always distinguish omission (held out, still visible) from erasure (never allowed).
 
 Lossless-distillation framing: the original input is never overwritten — the projection is a view, the
@@ -64,83 +64,83 @@ def _self_test() -> int:
     schemas: dict[str, dict] = {}
     examples: dict[str, dict] = {}
     for stem in _SCHEMAS:
-        sp = _SCHEMA_DIR / f"{stem}.v1.schema.json"
-        ep = _EX_DIR / f"{stem}.v1.example.json"
-        check(f"{stem}.v1 schema file exists", sp.is_file(), str(sp))
-        check(f"{stem}.v1 example file exists", ep.is_file(), str(ep))
+        sp = _SCHEMA_DIR / f"{stem}.schema.json"
+        ep = _EX_DIR / f"{stem}.example.json"
+        check(f"{stem} schema file exists", sp.is_file(), str(sp))
+        check(f"{stem} example file exists", ep.is_file(), str(ep))
         if sp.is_file():
             schemas[stem] = json.loads(sp.read_text(encoding="utf-8"))
         if ep.is_file():
             examples[stem] = json.loads(ep.read_text(encoding="utf-8"))
 
-    # every schema declares $id native/<Stem>.v1, type object, additionalProperties:false, required + properties,
+    # every schema declares $id native/<Stem>, type object, additionalProperties:false, required + properties,
     # and uses ONLY stdlib-validator keywords (so the proof validator is authoritative for these contracts).
     for stem, sc in schemas.items():
-        check(f"{stem}.v1 $id is native/{stem}.v1", sc.get("$id") == f"native/{stem}.v1", str(sc.get("$id")))
-        check(f"{stem}.v1 is an object with additionalProperties:false",
+        check(f"{stem} $id is native/{stem}", sc.get("$id") == f"native/{stem}", str(sc.get("$id")))
+        check(f"{stem} is an object with additionalProperties:false",
               sc.get("type") == "object" and sc.get("additionalProperties") is False)
-        check(f"{stem}.v1 declares required + properties", bool(sc.get("required")) and bool(sc.get("properties")))
-        check(f"{stem}.v1 uses only stdlib-validator keywords", _keys_ok(sc))
+        check(f"{stem} declares required + properties", bool(sc.get("required")) and bool(sc.get("properties")))
+        check(f"{stem} uses only stdlib-validator keywords", _keys_ok(sc))
 
     # valid example passes; every invalid example is correctly REJECTED.
     for stem, ex in examples.items():
         sc = schemas[stem]
         valid = ex.get("valid")
-        check(f"{stem}.v1 has a 'valid' example", valid is not None)
+        check(f"{stem} has a 'valid' example", valid is not None)
         if valid is not None:
             errs = _validate(valid, sc)
-            check(f"{stem}.v1 valid example validates clean", errs == [], str(errs[:4]))
+            check(f"{stem} valid example validates clean", errs == [], str(errs[:4]))
         invalids = [(k, v) for k, v in ex.items() if k.startswith("invalid")]
-        check(f"{stem}.v1 ships at least one invalid example", len(invalids) >= 1)
+        check(f"{stem} ships at least one invalid example", len(invalids) >= 1)
         for k, v in invalids:
-            check(f"{stem}.v1 {k} is correctly REJECTED", _validate(v, sc) != [])
+            check(f"{stem} {k} is correctly REJECTED", _validate(v, sc) != [])
 
-    # ---- NativeDiff.v1: every changed field REQUIRES a receipt_id (no verified change without a receipt) ----
+    # ---- NativeDiff: every changed field REQUIRES a receipt_id (no verified change without a receipt) ----
     nd = schemas.get("NativeDiff", {})
     cf_items = nd.get("properties", {}).get("changed_fields", {}).get("items", {})
     cf_required = set(cf_items.get("required", []))
-    check("NativeDiff.v1 changed_fields[].required includes path/old_value/new_value/decision/receipt_id",
+    check("NativeDiff changed_fields[].required includes path/old_value/new_value/decision/receipt_id",
           {"path", "old_value", "new_value", "decision", "receipt_id"} <= cf_required,
           str(sorted({"path", "old_value", "new_value", "decision", "receipt_id"} - cf_required)))
-    check("NativeDiff.v1 REQUIRES receipt_id on a changed field", "receipt_id" in cf_required)
+    check("NativeDiff REQUIRES receipt_id on a changed field", "receipt_id" in cf_required)
     nd_valid = examples.get("NativeDiff", {}).get("valid", {})
     if nd and nd_valid:
         # a changed field with NO receipt_id must be rejected (the load-bearing rule)
         broken = json.loads(json.dumps(nd_valid))
         broken["changed_fields"][0].pop("receipt_id", None)
-        check("NativeDiff.v1 rejects a changed field missing receipt_id", _validate(broken, nd) != [])
+        check("NativeDiff rejects a changed field missing receipt_id", _validate(broken, nd) != [])
         # an empty changed_fields array is the normal passthrough case (allowed)
         empty = json.loads(json.dumps(nd_valid)); empty["changed_fields"] = []
-        check("NativeDiff.v1 allows an empty changed_fields (passthrough = no change)", _validate(empty, nd) == [])
+        check("NativeDiff allows an empty changed_fields (passthrough = no change)", _validate(empty, nd) == [])
 
-    # ---- NativeExportReceipt.v1: REQUIRES source_hash AND export_hash (reproducible/auditable) ----
+    # ---- NativeExportReceipt: REQUIRES source_hash AND export_hash (reproducible/auditable) ----
     ner = schemas.get("NativeExportReceipt", {})
     ner_req = set(ner.get("required", []))
-    check("NativeExportReceipt.v1 requires source_hash AND export_hash",
+    check("NativeExportReceipt requires source_hash AND export_hash",
           {"source_hash", "export_hash"} <= ner_req, str(sorted({"source_hash", "export_hash"} - ner_req)))
     ner_valid = examples.get("NativeExportReceipt", {}).get("valid", {})
     if ner and ner_valid:
         for f in ("source_hash", "export_hash"):
             broken = {k: v for k, v in ner_valid.items() if k != f}
-            check(f"NativeExportReceipt.v1 rejects a receipt missing '{f}'", _validate(broken, ner) != [])
+            check(f"NativeExportReceipt rejects a receipt missing '{f}'", _validate(broken, ner) != [])
 
-    # ---- SidecarOverlay.v1: held_out_claims AND field_map keys MUST exist (omission != erasure) ----
+    # ---- SidecarOverlay: held_out_claims AND field_map keys MUST exist (omission != erasure) ----
     so = schemas.get("SidecarOverlay", {})
     so_req = set(so.get("required", []))
-    check("SidecarOverlay.v1 requires held_out_claims AND field_map keys",
+    check("SidecarOverlay requires held_out_claims AND field_map keys",
           {"held_out_claims", "field_map"} <= so_req, str(sorted({"held_out_claims", "field_map"} - so_req)))
     so_valid = examples.get("SidecarOverlay", {}).get("valid", {})
     if so and so_valid:
         for f in ("held_out_claims", "field_map"):
             broken = {k: v for k, v in so_valid.items() if k != f}
-            check(f"SidecarOverlay.v1 rejects a sidecar missing '{f}' key", _validate(broken, so) != [])
+            check(f"SidecarOverlay rejects a sidecar missing '{f}' key", _validate(broken, so) != [])
         # held_out_claims/field_map MAY be empty arrays — empty means 'none held out', not 'erased'
         empty = json.loads(json.dumps(so_valid)); empty["held_out_claims"] = []; empty["field_map"] = []
-        check("SidecarOverlay.v1 allows empty held_out_claims/field_map (present-but-empty, not erased)",
+        check("SidecarOverlay allows empty held_out_claims/field_map (present-but-empty, not erased)",
               _validate(empty, so) == [])
         # a verified field fact carries source_handle + verification lineage (governance, not just a value)
         ff = so_valid.get("field_facts", [])
-        check("SidecarOverlay.v1 example field_facts carry source_handle + verification_receipt_id",
+        check("SidecarOverlay example field_facts carry source_handle + verification_receipt_id",
               all(f.get("source_handle") and f.get("verification_receipt_id")
                   for f in ff if f.get("claim_status") == "verified") and len(ff) > 0)
 
@@ -150,9 +150,9 @@ def _self_test() -> int:
     for stem in ("NativeProjection", "NativeDiff", "NativeExportReceipt"):
         sc = schemas.get(stem, {})
         modes = set(sc.get("properties", {}).get("output_mode", {}).get("enum", []))
-        check(f"{stem}.v1 output_mode enum == the 8 native output modes", modes == expected_modes,
+        check(f"{stem} output_mode enum == the 8 native output modes", modes == expected_modes,
               str(sorted(expected_modes ^ modes)))
-        check(f"{stem}.v1 output_mode enum has NO destructive 'overwrite' mode",
+        check(f"{stem} output_mode enum has NO destructive 'overwrite' mode",
               not any("overwrite" in m for m in modes))
 
     print(f"\n{'PASS — check_native_shape_contract: 5 native contract schemas exist + parse (stdlib keywords only); each has a passing valid example and a rejected invalid example; NativeDiff requires receipt_id per changed field; NativeExportReceipt requires source_hash AND export_hash; SidecarOverlay requires held_out_claims + field_map (present, may be empty — omission is never erasure); output_mode is a bounded enum with no overwrite mode.' if not fails else f'{len(fails)} FAILURES: {fails}'}")

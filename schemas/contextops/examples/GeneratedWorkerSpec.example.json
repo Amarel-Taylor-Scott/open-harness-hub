@@ -1,0 +1,82 @@
+{
+  "valid": {
+    "schema_version": "GeneratedWorkerSpec",
+    "spec_id": "gwspec-cfpb-deadline-0d1e2f3a",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "verification_recipe_id": "vrecipe-cfpb-deadline-8b9c0d1e",
+    "extractor_snippet_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "rides_existing_worker_framework": true,
+    "command_type": "contextops.run_verification",
+    "proof_scripts": ["scripts/check_contextops_contracts.py"],
+    "idempotency_key_template": "verify:{fact_key}:{source_hash}",
+    "retry_policy": {
+      "max_attempts": 3,
+      "backoff": "exponential_backoff",
+      "dlq": "contextops.verification.dlq"
+    },
+    "registration_status": "proposed",
+    "produces": "fact_verification_run",
+    "requires_human_approval": false,
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_active_registration": {
+    "schema_version": "GeneratedWorkerSpec",
+    "spec_id": "gwspec-bad-1",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "verification_recipe_id": "vrecipe-cfpb-deadline-8b9c0d1e",
+    "extractor_snippet_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "rides_existing_worker_framework": true,
+    "command_type": "contextops.run_verification",
+    "proof_scripts": ["scripts/check_contextops_contracts.py"],
+    "idempotency_key_template": "verify:{fact_key}:{source_hash}",
+    "retry_policy": {
+      "max_attempts": 3,
+      "backoff": "exponential_backoff",
+      "dlq": "contextops.verification.dlq"
+    },
+    "registration_status": "active",
+    "produces": "fact_verification_run",
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_second_runtime": {
+    "schema_version": "GeneratedWorkerSpec",
+    "spec_id": "gwspec-bad-2",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "verification_recipe_id": "vrecipe-cfpb-deadline-8b9c0d1e",
+    "extractor_snippet_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "rides_existing_worker_framework": false,
+    "command_type": "contextops.run_verification",
+    "proof_scripts": ["scripts/check_contextops_contracts.py"],
+    "idempotency_key_template": "verify:{fact_key}:{source_hash}",
+    "retry_policy": {
+      "max_attempts": 3,
+      "backoff": "exponential_backoff",
+      "dlq": "contextops.verification.dlq"
+    },
+    "registration_status": "proposed",
+    "produces": "fact_verification_run",
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_missing_retry_policy": {
+    "schema_version": "GeneratedWorkerSpec",
+    "spec_id": "gwspec-bad-3",
+    "tenant_id": "acme",
+    "source_scope": "global_public",
+    "fact_key": "cfpb.error_resolution.investigation_deadline",
+    "verification_recipe_id": "vrecipe-cfpb-deadline-8b9c0d1e",
+    "extractor_snippet_id": "xsnip-duration-1005-11-9c0d1e2f",
+    "rides_existing_worker_framework": true,
+    "command_type": "contextops.run_verification",
+    "proof_scripts": ["scripts/check_contextops_contracts.py"],
+    "idempotency_key_template": "verify:{fact_key}:{source_hash}",
+    "registration_status": "proposed",
+    "produces": "fact_verification_run",
+    "created_at": "2026-06-05T00:00:00Z"
+  }
+}

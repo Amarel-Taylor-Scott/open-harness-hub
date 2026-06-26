@@ -103,7 +103,7 @@ def readiness_status(
     rotted_candidates = rotted.get("candidates") or []
 
     return {
-        "kind": "baltor.registry-readiness-status.v1",
+        "kind": "baltor.registry-readiness-status",
         "repo": str(ROOT),
         "status": {
             "ready": (

@@ -83,7 +83,7 @@ _REG_RANK = 100
 _FAQ_RANK = 10
 
 _TASK = {
-    "schema_version": "ResearchTask.v1",
+    "schema_version": "ResearchTask",
     "task_id": "rtask-cfpb-reference",
     "tenant_id": _TENANT,
     "source_scope": "global_public",

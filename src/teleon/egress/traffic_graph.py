@@ -31,8 +31,8 @@ from src.teleon.io.event_io import redact_secrets
 
 _REPO = Path(__file__).resolve().parents[3]
 
-SCHEMA_VERSION = "TeleonEgressObservation.v1"
-GRAPH_SCHEMA_VERSION = "TeleonEgressGraph.v1"
+SCHEMA_VERSION = "TeleonEgressObservation"
+GRAPH_SCHEMA_VERSION = "TeleonEgressGraph"
 LOCAL_EGRESS_GRAPH_PROVIDER_ID = "egress_graph.local_sqlite@v1"
 DEFAULT_DB_PATH = str(_REPO / ".agent" / "teleon.egress_graph.local.db")
 EGRESS_SERVES_TRUTH = False

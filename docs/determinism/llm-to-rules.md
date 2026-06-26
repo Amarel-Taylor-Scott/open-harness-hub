@@ -76,8 +76,8 @@ abstains. Every fallback is recorded as a `RoutingEvent` with `is_authoritative=
 
 ## Contracts
 
-`PatternCandidate.v1` · `RuleCandidate.v1` · `RuleReplayReport.v1` · `ShadowRunReport.v1` ·
-`RulePromotionReceipt.v1` · `DeterministicRule.v1` · `FallbackPolicy.v1`.
+`PatternCandidate` · `RuleCandidate` · `RuleReplayReport` · `ShadowRunReport` ·
+`RulePromotionReceipt` · `DeterministicRule` · `FallbackPolicy`.
 
 ## Inputs / Outputs
 

@@ -82,7 +82,7 @@ def instantiate_schema_object(object_family: str, *, out_dir: Path, now: str, ob
         raise FileExistsError(f"refusing to overwrite {target.name} (allow_overwrite=False)")
     target.write_text(json.dumps(obj, indent=2), encoding="utf-8")
     receipt = {
-        "schema_version": "TemplateInstantiationReceipt.v1",
+        "schema_version": "TemplateInstantiationReceipt",
         "receipt_id": "tplrcpt_" + hashlib.blake2b(f"{object_family}|{oid}|{now}".encode(), digest_size=10).hexdigest(),
         "schema_template_id": tpl["schema_template_id"], "object_family": object_family, "object_id": oid,
         "output_path": str(target.relative_to(_REPO)) if str(target).startswith(str(_REPO)) else str(target),

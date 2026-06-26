@@ -51,7 +51,7 @@ backbone is ~75–80% built, the remaining gaps are wiring, not a rebuild.** The
 prerequisites the original answer named as missing have all landed this session:
 - **ungameable gate** — train/holdout split, answer-key-parrot regression-proof (`scripts/teleon_local_runtime.py`).
 - **single receipted model plane** — ChatRoute is a shim over OIPS; every call mints+persists a `ModelInvocationReceipt` with `executed_base_host` (`scripts/model_routes.py` + `src/teleon/inference/receipts.py`).
-- **capability→runtime COMPILER** — `src/teleon/compiler/` (`compile.py`/`emit.py`): a promoted capability + gate evidence + receipts compiles deterministically (byte-identical ×5) to a K8s Job / Fly Machine / local process, OTel logging attrs on every unit, **only-promoted-compiles enforced in code AND schema** (`schemas/runtime/CompiledRuntimeUnit.v1.schema.json`). 40/40 self-test, drift-gated, dependency-law clean.
+- **capability→runtime COMPILER** — `src/teleon/compiler/` (`compile.py`/`emit.py`): a promoted capability + gate evidence + receipts compiles deterministically (byte-identical ×5) to a K8s Job / Fly Machine / local process, OTel logging attrs on every unit, **only-promoted-compiles enforced in code AND schema** (`schemas/runtime/CompiledRuntimeUnit.schema.json`). 40/40 self-test, drift-gated, dependency-law clean.
 - **measured-lift promotion bridge** — `scripts/eval/promotion_bridge.py` gates on lift + durability (reason_codes single-source).
 
 Still substrate-real from before: CapabilityTask/PurposeTask spec, FleetLedger + supervisor,

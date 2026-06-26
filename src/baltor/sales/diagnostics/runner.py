@@ -48,7 +48,7 @@ def start_diagnostic(*, tool: str, mode: str | None, authorization_basis: str, i
     if reasons:
         return None, sorted(set(reasons))
     run = {
-        "schema_version": "DiagnosticRun.v1",
+        "schema_version": "DiagnosticRun",
         "run_id": _rid(tool, mode_key, authorization_basis, input_source, now),
         "tool": tool, "company_id": company_id, "authorization_basis": authorization_basis,
         "input_source": input_source, "is_live_probe": is_live_probe, "mode": mode_key,

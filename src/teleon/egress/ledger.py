@@ -13,7 +13,7 @@ from typing import Any
 from src.teleon.egress.traffic_graph import DEFAULT_DB_PATH, EGRESS_SERVES_TRUTH
 from src.teleon.experiments.ids import sha256_hex
 
-LEDGER_SCHEMA_VERSION = "TeleonEgressLedger.v1"
+LEDGER_SCHEMA_VERSION = "TeleonEgressLedger"
 DEFAULT_LEDGER_DB_PATH = DEFAULT_DB_PATH.replace("egress_graph", "egress_ledger")
 
 

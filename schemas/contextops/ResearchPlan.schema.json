@@ -1,0 +1,120 @@
+{
+  "$id": "contextops/ResearchPlan",
+  "title": "ResearchPlan",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A bounded agent's PLAN for how it will attempt a ResearchTask \u2014 the ordered steps it intends to take, the access each step needs, and the stop conditions. The plan is a PROPOSAL recorded before execution so the work is traceable and replayable; it does not authorize anything beyond the parent ResearchTask.bounds. Every plan carries the task_id it serves and a step budget that must not exceed the task bound. produces is pinned to source_discovery_report. Deterministic when planned_at is injected.",
+  "required": [
+    "schema_version",
+    "plan_id",
+    "task_id",
+    "tenant_id",
+    "source_scope",
+    "steps",
+    "step_budget",
+    "stop_conditions",
+    "produces",
+    "planned_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "ResearchPlan"
+      ]
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "content-addressed over (task_id, steps); version in metadata, never in the id"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "the ResearchTask this plan serves (lineage back-link)"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "description": "the ordered steps the agent intends to take; each is a proposal, not an authorization",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_no",
+          "action",
+          "access"
+        ],
+        "properties": {
+          "step_no": {
+            "type": "integer"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "search",
+              "fetch",
+              "compare",
+              "extract_candidate",
+              "score_authority",
+              "summarize"
+            ],
+            "description": "what the step does; none of these serve or promote a fact"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "fixture",
+              "http_get_allowlisted",
+              "api_allowlisted",
+              "local_file",
+              "none"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "description": "the source/query the step targets (a handle or query string, not a secret)"
+          }
+        }
+      }
+    },
+    "step_budget": {
+      "type": "integer",
+      "description": "must be <= the parent ResearchTask.bounds.max_steps (the proof checks lineage at runtime)"
+    },
+    "stop_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "authority_bar_met",
+          "budget_exhausted",
+          "no_source_found",
+          "conflict_detected",
+          "human_escalation"
+        ]
+      },
+      "description": "the conditions under which the agent stops; at least one must be present"
+    },
+    "produces": {
+      "type": "string",
+      "enum": [
+        "source_discovery_report"
+      ],
+      "description": "pinned \u2014 a plan's execution yields a SourceDiscoveryReport, never a fact"
+    },
+    "planned_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

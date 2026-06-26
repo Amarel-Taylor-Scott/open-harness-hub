@@ -61,7 +61,7 @@ def _proper_noun_candidates(text: str) -> list[str]:
     capabilities=("proper_noun_detection", "local_rules", "entity_extraction"),
     task_types=("proper_noun.extract", "entity.proper_noun.detect"),
     image="baltor-worker-cpu",
-    output_contract="proper_nouns.v1",
+    output_contract="proper_nouns",
 )
 def proper_noun_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = _source_chunks(payload)
@@ -97,7 +97,7 @@ def proper_noun_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult
     capabilities=("regex_extraction", "fact_signals", "local_rules"),
     task_types=("regex.extract", "fact.regex.detect"),
     image="baltor-worker-cpu",
-    output_contract="regex_facts.v1",
+    output_contract="regex_facts",
 )
 def regex_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = _source_chunks(payload)
@@ -143,7 +143,7 @@ def regex_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("nlp_signals", "local_rules", "text_statistics"),
     task_types=("nlp.signals", "text.statistics"),
     image="baltor-worker-cpu",
-    output_contract="nlp_signals.v1",
+    output_contract="nlp_signals",
 )
 def nlp_signals(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = _source_chunks(payload)
@@ -188,7 +188,7 @@ def _document_tree_files(payload: dict[str, Any]) -> list[dict[str, Any]]:
     capabilities=("document_graph", "lineage_edges", "local_rules"),
     task_types=("document_graph.build", "source_tree.graph"),
     image="baltor-worker-cpu",
-    output_contract="document_graph.v1",
+    output_contract="document_graph",
 )
 def document_graph_build(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     files = _document_tree_files(payload)
@@ -322,7 +322,7 @@ class _PythonGraphVisitor(ast.NodeVisitor):
     capabilities=("code_graph", "ast_parse", "regex_extraction", "local_rules"),
     task_types=("code_graph.build", "code.symbols.extract"),
     image="baltor-worker-cpu",
-    output_contract="code_graph.v1",
+    output_contract="code_graph",
 )
 def code_graph_build(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     records = _code_text_records(payload)

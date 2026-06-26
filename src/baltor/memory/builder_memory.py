@@ -54,7 +54,7 @@ def _capture(provider, *, now: int, memory_type: str, body: dict, tags: list) ->
                           "container_tags": ["builder", memory_type, *tags],
                           "metadata": {"memory_type": memory_type, "promotion_eligible": False,
                                        "claim_status": "workflow_trace", "redactions": redactions}})
-    trace = {"schema_version": "MemoryTrace.v1", "trace_id": "tr-" + art["content_hash"][:16],
+    trace = {"schema_version": "MemoryTrace", "trace_id": "tr-" + art["content_hash"][:16],
              "tenant_id": TENANT, "container": "builder", "operation": "write", "provider_id": art["provider_id"],
              "request_handle": memory_type, "produced_artifact_ids": [art["artifact_id"]],
              "held_out_artifact_ids": [], "rejected_artifact_ids": [], "rollback_target": "",
@@ -98,7 +98,7 @@ def recall_builder_context(provider, query: str, *, now: int, limit: int = 10) -
     """MemoryRecallBundle: project-scoped recall. Results are candidate context, NOT facts."""
     res = provider.search({"tenant_id": TENANT, "project": PROJECT, "query": query, "limit": limit})
     arts = res.get("results", res.get("artifacts", []))
-    return {"schema_version": "MemoryRecallBundle.v1", "tenant_id": TENANT, "project": PROJECT,
+    return {"schema_version": "MemoryRecallBundle", "tenant_id": TENANT, "project": PROJECT,
             "query": query, "occurred_at": now, "claim_status": "candidate_context",
             "is_truth": False, "memory_artifact_ids": [a["artifact_id"] for a in arts], "artifacts": arts}
 
@@ -110,7 +110,7 @@ def build_session_context_bundle(provider, *, now: int) -> dict:
     flywheel = recall_builder_context(provider, "flywheel green total", now=now, limit=1)
     targets = recall_builder_context(provider, "next_target target", now=now, limit=1)
     return {
-        "schema_version": "MemoryContextInjection.v1", "context_id": "ctx-" + str(now),
+        "schema_version": "MemoryContextInjection", "context_id": "ctx-" + str(now),
         "tenant_id": TENANT, "project_id": PROJECT, "generated_at": now,
         "advisory": True, "is_truth": False, "contains_served_facts": False,
         "active_target_artifacts": state["memory_artifact_ids"],

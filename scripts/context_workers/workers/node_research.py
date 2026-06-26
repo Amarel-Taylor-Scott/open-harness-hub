@@ -292,7 +292,7 @@ def _needed_facts(node_type: str) -> list[str]:
     capabilities=("osint_catalog", "node_enrichment", "preflight", "authorization_gate"),
     task_types=("node.research.catalog", "osint.node_research.catalog"),
     image="baltor-worker-research",
-    output_contract="node_research_catalog.v1",
+    output_contract="node_research_catalog",
 )
 def node_research_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     tools = {}
@@ -322,7 +322,7 @@ def node_research_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResu
     capabilities=("node_research_planning", "fact_verification", "osint_routing", "evidence_requirements"),
     task_types=("node.research.plan", "osint.node_research.plan"),
     image="baltor-worker-research",
-    output_contract="node_research_plan.v1",
+    output_contract="node_research_plan",
 )
 def node_research_plan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     raw_nodes = payload.get("nodes") or payload.get("entities") or payload.get("proper_nouns") or []
@@ -460,7 +460,7 @@ def _run_tool(ctx: TaskContext, node: dict[str, Any], tool: str, payload: dict[s
     capabilities=("node_enrichment", "osint", "evidence_capture", "fact_verification"),
     task_types=("node.research.enrich", "osint.node_research.enrich"),
     image="baltor-worker-research",
-    output_contract="node_research_evidence.v1",
+    output_contract="node_research_evidence",
 )
 def node_research_enrich(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     node = payload.get("node") if isinstance(payload.get("node"), dict) else {}
@@ -508,7 +508,7 @@ def node_research_enrich(ctx: TaskContext, payload: dict[str, Any]) -> TaskResul
     capabilities=("evidence_scoring", "verification_tiers", "provenance"),
     task_types=("node.evidence.score", "fact.evidence.score"),
     image="baltor-worker-audit",
-    output_contract="node_evidence_score.v1",
+    output_contract="node_evidence_score",
 )
 def node_evidence_score(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     evidence = payload.get("node_evidence") if isinstance(payload.get("node_evidence"), list) else payload.get("evidence")

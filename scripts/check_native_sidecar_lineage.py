@@ -52,7 +52,7 @@ def _reference_export() -> dict:
                         "content_hash": _h("faq-30"), "claim_status": "fact"},
     }
     sidecar = {
-        "schema_version": "SidecarOverlay.v1",
+        "schema_version": "SidecarOverlay",
         "source_hash": _h("source-bytes"),
         "artifact_ids": ["fact-rege-10", "fact-product", "fact-note", "fact-faq-30"],
         "field_map": field_map,

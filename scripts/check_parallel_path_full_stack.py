@@ -65,7 +65,7 @@ _LAYERS: list[tuple[str, str, Callable[[], int], str]] = [
 # ── in-process composition smoke fixtures (the SAME CFPB invariant the stack rides on) ──────────────────
 _NOW = "2026-06-06T00:00:00Z"
 _SLOT = RECONCILIATION_CAPABILITY_SLOT
-_OUTPUT_CONTRACT = "consumption/ContextResponse.v1"
+_OUTPUT_CONTRACT = "consumption/ContextResponse"
 _REG_HANDLE = "ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i"
 _HELD_OUT_FAQ = "30 days"
 _SERVED_ANSWER = {"answer": "10 business days", "claim_status": "verified_current"}
@@ -74,8 +74,8 @@ _INPUT_SNAPSHOT = {"question": "deadline?", "candidates": [{"handle": _REG_HANDL
 
 def _path(path_id: str, mode: str) -> dict[str, Any]:
     return {
-        "schema_version": "PathDefinition.v1", "path_id": path_id, "capability_slot": _SLOT,
-        "input_contract": "consumption/ConsumptionRequest.v1", "output_contract": _OUTPUT_CONTRACT,
+        "schema_version": "PathDefinition", "path_id": path_id, "capability_slot": _SLOT,
+        "input_contract": "consumption/ConsumptionRequest", "output_contract": _OUTPUT_CONTRACT,
         "mode": mode, "promotion_criteria": "criteria/recon-equivalence", "rollback_target": "path-fs-baseline",
         "defined_at": _NOW,
     }

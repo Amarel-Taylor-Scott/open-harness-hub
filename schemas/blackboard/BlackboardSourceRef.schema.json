@@ -1,0 +1,19 @@
+{
+  "$id": "blackboard/BlackboardSourceRef",
+  "title": "BlackboardSourceRef",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A SOURCE reference posted to the blackboard: a stable provenance handle that observations/syntheses cite. handle is a content handle — a ctx:// resource handle or a doc#section locator (the pattern requires one of those forms) — so every cited source resolves to a real, addressable location, never free text. authority_rank is a numeric weight used during reconciliation (higher-authority sources win conflicts); it is graph data, not a display label. retrieved_at records when the source was read (freshness lineage).",
+  "required": [
+    "source_id",
+    "handle",
+    "authority_rank",
+    "retrieved_at"
+  ],
+  "properties": {
+    "source_id": {"type": "string", "description": "unique id of this source reference (cited by entry source_refs[])"},
+    "handle": {"type": "string", "pattern": "^(ctx://|doc#).+", "description": "stable provenance handle: a ctx:// resource handle or a doc#section locator — never free text"},
+    "authority_rank": {"type": "integer", "minimum": 0, "description": "numeric authority weight for reconciliation (higher wins conflicts); graph data, not a display label"},
+    "retrieved_at": {"type": "string", "description": "ISO-8601 timestamp when this source was retrieved/read (freshness lineage)"}
+  }
+}

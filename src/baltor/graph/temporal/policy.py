@@ -23,7 +23,7 @@ def project_current(store: TemporalGraphStore, *, canonical_fact_key: str, tenan
                     now: str = EPOCH, write_edges: bool = True) -> dict:
     """Project the governed current state for a fact_key. Sets node.current_state on every candidate and
     (optionally) writes CONTRADICTS edges between the winner and each held-out loser. Returns a
-    TemporalFactState.v1 dict. Deterministic + reconstructable from observations + this policy."""
+    TemporalFactState dict. Deterministic + reconstructable from observations + this policy."""
     cands = store.by_fact_key(canonical_fact_key, tenant_id)
     # tenant_override is a per-tenant lane and never changes the global winner; handle separately.
     globals_ = [n for n in cands if n.scope in ("global_public", "system_reference")]
@@ -73,7 +73,7 @@ def project_current(store: TemporalGraphStore, *, canonical_fact_key: str, tenan
     held = [{"temporal_fact_id": n.temporal_fact_id, "value": n.value_normalized, "source_authority": n.source_authority,
              "reason": "lower_authority_conflict"} for n in globals_ if n.current_state == HELD_OUT]
     sup = [{"temporal_fact_id": n.temporal_fact_id, "value": n.value_normalized} for n in globals_ if n.current_state == SUPERSEDED]
-    return {"schema_version": "TemporalFactState.v1", "canonical_fact_key": canonical_fact_key, "tenant_id": tenant_id,
+    return {"schema_version": "TemporalFactState", "canonical_fact_key": canonical_fact_key, "tenant_id": tenant_id,
             "scope": "global_public", "current_temporal_fact_id": winner.temporal_fact_id if winner else "",
             "current_value": winner.value_normalized if winner else "", "current_unit": winner.unit if winner else "",
             "current_state": winner.current_state if winner else (STALE if globals_ else "candidate"),

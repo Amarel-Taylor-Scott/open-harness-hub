@@ -16,7 +16,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("fact_risk_scoring", "review_prioritization"),
     task_types=("fact.review_prioritize", "fact.refresh_candidate.detect"),
     image="baltor-worker-audit",
-    output_contract="fact_review_queue.v1",
+    output_contract="fact_review_queue",
 )
 def fragility_scan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     claims = payload.get("claims") or []

@@ -10,7 +10,7 @@ def _coverage(handles: Any, baseline_handles: list[str]) -> float
 def _result_record(*, path: dict[str, Any], result: RunnerResult, mode_field: str, baseline_handles: list[str], run_input_snapshot_hash: str) -> dict[str, Any]
     # Build one per-path result record (baseline or candidate) for the ParallelPathRun.
 def run_parallel(capability_slot: str, input_snapshot: Any, baseline_path: dict[str, Any], candidate_paths: list[dict[str, Any]], *, runner: Runner, now: str, validate: bool=True) -> dict[str, Any]
-    # Run the baseline + each candidate on the SAME ``input_snapshot``; return a ``ParallelPathRun.v1`` dict.
+    # Run the baseline + each candidate on the SAME ``input_snapshot``; return a ``ParallelPathRun`` dict.
 def served_output(run: dict[str, Any]) -> dict[str, Any]
     # Return the ONLY output the engine may serve: the baseline result.
 ```

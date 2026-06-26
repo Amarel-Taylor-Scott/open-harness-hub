@@ -6,10 +6,10 @@ A **Fragile Context Audit** is a *diagnostic*, not a verdict. It shows where a t
 
 ## How an audit runs (reuses the sales subsystem — no new pipeline)
 
-- `schemas/sales/TargetCompany.v1.schema.json` — the (synthetic or authorized) **TargetCompany** the audit is scoped to.
-- `schemas/sales/DiagnosticRun.v1.schema.json` — the **DiagnosticRun**: the prompts asked and the answers observed.
-- `schemas/sales/EvidencePack.v1.schema.json` — the **EvidencePack**: the findings, drafted, `public_claim_safe` false by default.
-- `schemas/sales/ReviewApproval.v1.schema.json` — the **ReviewApproval**: a human (and, for regulated categories, legal) signs off before anything leaves.
+- `schemas/sales/TargetCompany.schema.json` — the (synthetic or authorized) **TargetCompany** the audit is scoped to.
+- `schemas/sales/DiagnosticRun.schema.json` — the **DiagnosticRun**: the prompts asked and the answers observed.
+- `schemas/sales/EvidencePack.schema.json` — the **EvidencePack**: the findings, drafted, `public_claim_safe` false by default.
+- `schemas/sales/ReviewApproval.schema.json` — the **ReviewApproval**: a human (and, for regulated categories, legal) signs off before anything leaves.
 
 Everything passes through the safety gate in `docs/sales/public-claim-and-engagement-policy.md` (single sources: `architecture/sales_public_claim_policy.json`, `architecture/sales_engagement_policy.json`; guard `src/baltor/sales/claim_guard.py`, redteam `scripts/check_sales_guardrails.py`).
 

@@ -24,13 +24,13 @@ time is injected (`now`), ids are content-addressed via `hashlib`, no RNG.
 
 | Schema | Role |
 |---|---|
-| `SourceArtifact.v1` | The governed record of one fetched object. **Requires** `tenant_id`, `source_id`, `source_version`, `source_handle`, `content_hash`, `scope`, `authority`, `artifact_type`, `created_at` (+ `lineage`, `security`). |
-| `IngestionReceipt.v1` | Idempotent proof one ingest happened; `decision ∈ ingested\|duplicate\|non_consumable\|rejected`. |
-| `SyncState.v1` | Durable per-(tenant, source) sync state: active cursor, last run, mode. |
-| `SyncCursor.v1` | A single point-in-stream marker the planner emits/applies idempotently. |
-| `SourceHandle.v1` | The parsed, scope-aware form of the `ctx://` handle every artifact carries home. |
-| `IngestionRun.v1` | One connector execution: plan, cursor window, counts, terminal status. |
-| `IngestionError.v1` | A structured, non-fatal failure record; never produces a served fact. |
+| `SourceArtifact` | The governed record of one fetched object. **Requires** `tenant_id`, `source_id`, `source_version`, `source_handle`, `content_hash`, `scope`, `authority`, `artifact_type`, `created_at` (+ `lineage`, `security`). |
+| `IngestionReceipt` | Idempotent proof one ingest happened; `decision ∈ ingested\|duplicate\|non_consumable\|rejected`. |
+| `SyncState` | Durable per-(tenant, source) sync state: active cursor, last run, mode. |
+| `SyncCursor` | A single point-in-stream marker the planner emits/applies idempotently. |
+| `SourceHandle` | The parsed, scope-aware form of the `ctx://` handle every artifact carries home. |
+| `IngestionRun` | One connector execution: plan, cursor window, counts, terminal status. |
+| `IngestionError` | A structured, non-fatal failure record; never produces a served fact. |
 
 All schemas use **stdlib-validator keywords only** (`type`/`required`/`properties`/`enum`/`additionalProperties`/
 `items`), validated by `scripts/runtime/schema_validator.py`. Each ships a valid + invalid example under

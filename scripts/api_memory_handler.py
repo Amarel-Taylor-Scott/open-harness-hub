@@ -123,7 +123,7 @@ def _record_trace(provider_id: str, op: str, tenant_id: str, *, count: int = 0, 
     seq = len(_TRACES)
     trace_id = "mtr-" + hashlib.sha256(f"{seq}|{provider_id}|{op}|{tenant_id}".encode()).hexdigest()[:16]
     trace = {
-        "schema_version": "MemoryTrace.v1",
+        "schema_version": "MemoryTrace",
         "trace_id": trace_id,
         "seq": seq,
         "provider_id": provider_id or "(none)",

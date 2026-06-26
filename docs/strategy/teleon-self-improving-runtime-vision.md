@@ -10,7 +10,7 @@ asserts a brand/positioning sentence, that is owner-approvable, not owner-decide
 
 The owner's intuition that we "missed things" is **correct and specific**: the
 capability→runtime **compiler now exists in code** (`src/teleon/compiler/compile.py`,
-`emit.py`, `schemas/runtime/CompiledRuntimeUnit.v1.schema.json` — all currently
+`emit.py`, `schemas/runtime/CompiledRuntimeUnit.schema.json` — all currently
 `git status` **untracked `??`**), but **every doc, ledger entry, and rubric still
 says it is missing / "NEXT P2"** (`docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md`
 §"is Teleon the backbone yet?" → *"NO — about 40% of the substrate exists, and none
@@ -61,12 +61,12 @@ a sequenced plan).
 ```
 
 ### Stage 1 — Intent / contract intake (PurposeTask / CapabilityTask) — **BUILT (controller) + DESIGNED (intake queue)**
-- A `PurposeTaskSpec.v1` declares purpose · `input_contract` · `output_contract` ·
+- A `PurposeTaskSpec` declares purpose · `input_contract` · `output_contract` ·
   `connected_to` (the blast radius) · `success_criteria` (MEASURABLE) ·
   `promotion_criteria` · `allowed_runtime_classes` (vendor-neutral) · `safety_class`
   · `tenant_scope` (`docs/architecture/purpose-task-self-adapting-execution.md` §"What
   a PurposeTask is").
-- `CapabilityTask.v1` is the durable-ledger row (`schemas/workers/CapabilityTask.v1.schema.json`):
+- `CapabilityTask` is the durable-ledger row (`schemas/workers/CapabilityTask.schema.json`):
   `task_id, tenant_id, capability_id, required_resource_class, sla_policy_id,
   max_attempts, …`. **PurposeTask = product language; CapabilityTask = the formal/spec
   name** (`docs/strategy/teleon-baltor-openharnesshub-portfolio.md` §Vocabulary).
@@ -86,7 +86,7 @@ The owner's "the benchmark IS the spec" is realized as `success_criteria` +
 The two expressions are converging (see Gap D-2):
 - The live runtime hardcodes per-capability example suites with a real
   train/holdout split (`scripts/teleon_local_runtime.py`, `CAPABILITIES` + `_suite`).
-- **RESOLVED (2026-06-11):** `PurposeTaskSpec.v1` + `CapabilityTask.v1` now carry a
+- **RESOLVED (2026-06-11):** `PurposeTaskSpec` + `CapabilityTask` now carry a
   first-class, validated **`eval_suite`** (inline `examples` XOR `benchmark_ref`,
   `gate_threshold`/`holdout_policy` single-sourced from `teleon_local_runtime`
   PROMOTE_AT/TRAIN_PARITY, judge). The runtime-gate seam
@@ -155,7 +155,7 @@ This is the headline finding. **The compiler exists** and is faithful to every l
   retry ceiling, `activeDeadlineSeconds`/`ttl` from the budget), `emit_local_process`
   (always-available offline). Every emitter stamps **OTel attrs** onto env/labels/
   annotations and **never writes a secret value** — only secret-ref names.
-- Contract: `schemas/runtime/CompiledRuntimeUnit.v1.schema.json` (registered shape).
+- Contract: `schemas/runtime/CompiledRuntimeUnit.schema.json` (registered shape).
 - `EXEC_TARGETS = ("fly_machine", "k8s_job", "local_process")`; `RUNNER_MODULE =
   "scripts.teleon_local_runtime"` (the unit's argv = `-m` that module + the capability id).
 - **The owner's exact sentence is now answerable YES in code:** *"take contracts/
@@ -416,7 +416,7 @@ governed object, two doors** (OHH free funnel + the governed live layer — memo
 ## D. What we MISSED / gaps, contradictions, and the competitive read
 
 ### D-1. The compiler exists but the whole record says it doesn't (THE big miss)
-`src/teleon/compiler/{compile,emit,fixtures}.py` + `schemas/runtime/CompiledRuntimeUnit.v1.schema.json`
+`src/teleon/compiler/{compile,emit,fixtures}.py` + `schemas/runtime/CompiledRuntimeUnit.schema.json`
 are **untracked `??`** and absent from `.research-notes/autonomous-session-ledger.md`,
 while `docs/architecture/capability-rubric-and-deep-dive-2026-06-11.md` and the ledger
 (cont 5/6) still call the compiler **"none of the compiler"** / **"NEXT P2"**. The
@@ -428,8 +428,8 @@ and add the ledger entry. (Owner-gated where outward-facing.)
 
 ### D-2. The "benchmark/eval IS the spec" promise as a declared contract field — **FIELD BUILT 2026-06-11; live-gate wire-in + named-suite registry remain**
 The vision is "describe the requirements, the benchmarks/evaluation systems." A
-first-class **`eval_suite`** field now exists on `PurposeTaskSpec.v1` AND
-`CapabilityTask.v1.schema.json` (inline `examples` XOR `benchmark_ref`,
+first-class **`eval_suite`** field now exists on `PurposeTaskSpec` AND
+`CapabilityTask.schema.json` (inline `examples` XOR `benchmark_ref`,
 `gate_threshold`/`holdout_policy` single-sourced from `teleon_local_runtime`, judge;
 `docs/architecture/eval-as-contract.md`, proof `scripts/check_eval_suite_contract.py`).
 A user **can now hand Teleon the evaluation system** as a declared, validated input
@@ -548,12 +548,12 @@ mostly BUILT, which is the under-told story.
 
 ## Appendix — primary sources cited
 Source (BUILT): `src/teleon/purpose_tasks/{purpose_task,adaptation_ladder,runtime_binding,projections}.py` ·
-`src/teleon/compiler/{compile,emit,fixtures}.py` (UNTRACKED) · `schemas/runtime/CompiledRuntimeUnit.v1.schema.json` (UNTRACKED) ·
+`src/teleon/compiler/{compile,emit,fixtures}.py` (UNTRACKED) · `schemas/runtime/CompiledRuntimeUnit.schema.json` (UNTRACKED) ·
 `src/teleon/experiments/{parallel_paths,path_promotion}.py` · `src/teleon/runtime/{execution_backend_selector,capability_binding}.py` ·
 `src/teleon/workers/durable_fleet_ledger.py` · `src/teleon/templates/instantiator.py` · `src/teleon/digestion/digester.py` ·
 `src/teleon/lift/pipeline.py` · `src/teleon/inference/{oips,receipts}.py` · `src/teleon/agent_gateway/gateway.py` ·
 `scripts/teleon_local_runtime.py` · `architecture/{capability_adaptation_ladder,capability_runtime_classes}.json` ·
-`schemas/workers/CapabilityTask.v1.schema.json`.
+`schemas/workers/CapabilityTask.schema.json`.
 Docs: `docs/strategy/{teleon-baltor-openharnesshub-portfolio,north-stars,yc-context-landscape-2026-06}.md` ·
 `docs/concepts/{component-taxonomy-and-stages,capability-valleys}.md` ·
 `docs/codex/{master-goal,north-star,lossless-distillation,change-verification-contract}.md` ·

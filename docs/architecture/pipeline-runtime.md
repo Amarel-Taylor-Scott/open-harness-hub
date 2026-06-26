@@ -21,7 +21,7 @@ plugins, runs are durable ledger records, artifacts are content-addressed. The *
   any pipeline; N workers drain concurrently).
 - **Routes:** `POST /api/dev/pipelines/run`, `GET /api/dev/pipelines`, `/pipelines/runs`,
   `/pipelines/runs/<id>`. Dashboard: `/dev` "Pipeline runtime" panel (projection from the ledger).
-- **Manifests:** `pipelines/cfpb_structured_ingest.v1.json`, `.v2.json`, `unstructured_pdf_docling.v0.json`.
+- **Manifests:** `pipelines/cfpb_structured_ingest.json`, `.v2.json`, `unstructured_pdf_docling.json`.
 
 ## Reprocessing: input version AND pipeline version (the requirement)
 The idempotency key is `{tenant_id}:{source_id}:{document_version}:{pipeline_id}:{pipeline_version}`

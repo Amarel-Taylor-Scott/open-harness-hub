@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scripts.check_purpose_task_contracts — PROOF: the PurposeTaskSpec.v1 contract is real + governs the PurposeTask PoC.
+"""scripts.check_purpose_task_contracts — PROOF: the PurposeTaskSpec contract is real + governs the PurposeTask PoC.
 
 Asserts: the schema loads; a valid spec validates; invalid specs FAIL (missing required · bad schema_version
 enum · wrong type); the contract registry covers PurposeTaskSpec; and a PROVISIONED PoC spec (from
@@ -21,18 +21,18 @@ if _REPO not in sys.path:
 from scripts.runtime import schema_validator as sv
 from src.baltor import purpose_tasks as ct
 
-_REF = "purpose_tasks/PurposeTaskSpec.v1"
+_REF = "purpose_tasks/PurposeTaskSpec"
 _NOW = "2026-06-06T00:00:00Z"
 
 
 def _valid_spec():
     return {
-        "schema_version": "PurposeTaskSpec.v1",
+        "schema_version": "PurposeTaskSpec",
         "task_id": "purpose_tasks.demo@v1",
         "purpose": "Pull X from a source.",
         "capability_slot": "fetch_demo",
-        "input_contract": "DemoQuery.v1",
-        "output_contract": "DemoRecord.v1",
+        "input_contract": "DemoQuery",
+        "output_contract": "DemoRecord",
         "success_criteria": {"max_cost": 5.0, "min_source_handles": 1},
         "promotion_criteria": {"cost_tolerance": 0.0},
         "connected_to": ["demo.consumer"],
@@ -51,9 +51,9 @@ def _self_test() -> int:
     # schema loads
     try:
         schema = sv.load_schema(_REF)
-        check("PurposeTaskSpec.v1 schema loads", schema.get("$id") == _REF)
+        check("PurposeTaskSpec schema loads", schema.get("$id") == _REF)
     except Exception as e:
-        check("PurposeTaskSpec.v1 schema loads", False, str(e)); schema = {}
+        check("PurposeTaskSpec schema loads", False, str(e)); schema = {}
 
     # valid spec validates
     check("a valid PurposeTaskSpec validates (no errors)", sv.validate_ref(_valid_spec(), _REF) == [],
@@ -62,7 +62,7 @@ def _self_test() -> int:
     # invalid specs FAIL
     missing = _valid_spec(); del missing["capability_slot"]
     check("missing required field FAILS validation", sv.validate_ref(missing, _REF) != [])
-    badver = _valid_spec(); badver["schema_version"] = "PurposeTaskSpec.v2"
+    badver = _valid_spec(); badver["schema_version"] = "NotAPurposeTaskSpec"
     check("bad schema_version enum FAILS validation", sv.validate_ref(badver, _REF) != [])
     badtype = _valid_spec(); badtype["success_criteria"] = "not-an-object"
     check("wrong type (success_criteria) FAILS validation", sv.validate_ref(badtype, _REF) != [])
@@ -74,15 +74,15 @@ def _self_test() -> int:
 
     # the PROVISIONED PoC spec is contract-valid (what the PoC actually runs)
     poc_reg = {"fetch_demo": [
-        {"impl_id": "impl.a", "priority": 70, "handler": lambda _i: {"output": {}, "output_contract": "DemoRecord.v1", "cost": 1.0, "source_handles": ["h"]}},
-        {"impl_id": "impl.b", "priority": 60, "handler": lambda _i: {"output": {}, "output_contract": "DemoRecord.v1", "cost": 1.0, "source_handles": ["h"]}},
+        {"impl_id": "impl.a", "priority": 70, "handler": lambda _i: {"output": {}, "output_contract": "DemoRecord", "cost": 1.0, "source_handles": ["h"]}},
+        {"impl_id": "impl.b", "priority": 60, "handler": lambda _i: {"output": {}, "output_contract": "DemoRecord", "cost": 1.0, "source_handles": ["h"]}},
     ]}
     provisioned = ct.provision(_valid_spec(), poc_reg)
     errs = sv.validate_ref(provisioned, _REF)
     check("a PROVISIONED PurposeTask spec validates (current_impl_id/alternatives/rollback_target are contract-shaped)",
           errs == [], str(errs[:3]))
 
-    print("\n" + ("PASS — check_purpose_task_contracts: PurposeTaskSpec.v1 is a real, registered contract; valid specs "
+    print("\n" + ("PASS — check_purpose_task_contracts: PurposeTaskSpec is a real, registered contract; valid specs "
                   "pass, invalid specs fail, and the provisioned PoC spec is contract-bound."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1

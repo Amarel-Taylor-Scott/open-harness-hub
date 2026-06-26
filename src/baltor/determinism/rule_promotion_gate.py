@@ -81,7 +81,7 @@ class RulePromotionReceipt:
     pattern_candidate_id: str
     human_review_signed: bool
     created_at: str = EPOCH
-    schema_version: str = "RulePromotionReceipt.v1"
+    schema_version: str = "RulePromotionReceipt"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "receipt_id": self.receipt_id,

@@ -15,7 +15,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("refresh_planning", "queue_policy"),
     task_types=("fact.refresh.plan",),
     image="baltor-worker-cpu",
-    output_contract="refresh_jobs.v1",
+    output_contract="refresh_jobs",
 )
 def refresh_plan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     updates = payload.get("updates") or []
@@ -33,7 +33,7 @@ def refresh_plan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("source_search", "verification_packet"),
     task_types=("verify.official_source.find", "verify.second_source.find"),
     image="baltor-worker-research",
-    output_contract="verification_packet.v1",
+    output_contract="verification_packet",
 )
 def search_verify(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     query = str(payload.get("query") or "")

@@ -1,0 +1,129 @@
+{
+  "$id": "contextops/GeneratedWorkerSpec",
+  "title": "GeneratedWorkerSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The SPEC for a durable verifier worker a codegen agent proposed (the M4 rung) \u2014 what it WOULD become, not an active worker. It REQUIRES proof_scripts (the proofs that must pass before it could ever be registered), an idempotency_key_template (so re-runs collapse, not duplicate), and a retry/DLQ policy (durable execution discipline). It rides the EXISTING durable worker framework \u2014 it never defines a 2nd runtime. registration_status is pinned [proposed]: in the lean core nothing auto-registers/executes; MAIN integrates and a proof gate + (for high-risk) human approval stands between this spec and any execution. Deterministic when created_at is injected.",
+  "required": [
+    "schema_version",
+    "spec_id",
+    "tenant_id",
+    "source_scope",
+    "fact_key",
+    "verification_recipe_id",
+    "extractor_snippet_id",
+    "rides_existing_worker_framework",
+    "proof_scripts",
+    "idempotency_key_template",
+    "retry_policy",
+    "registration_status",
+    "produces",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "GeneratedWorkerSpec"
+      ]
+    },
+    "spec_id": {
+      "type": "string",
+      "description": "content-addressed over (verification_recipe_id, extractor_snippet_id); version in metadata, never in the id"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "fact_key": {
+      "type": "string"
+    },
+    "verification_recipe_id": {
+      "type": "string",
+      "description": "the VerificationRecipe this worker would run (lineage)"
+    },
+    "extractor_snippet_id": {
+      "type": "string",
+      "description": "the proof-gated ExtractorSnippet this worker would execute (lineage)"
+    },
+    "rides_existing_worker_framework": {
+      "type": "boolean",
+      "enum": [
+        true
+      ],
+      "description": "PINNED true \u2014 a generated worker rides the EXISTING durable worker framework; it never spawns a 2nd runtime/worker framework"
+    },
+    "command_type": {
+      "type": "string",
+      "description": "the existing durable command type this worker handles (e.g. contextops.run_verification) \u2014 declared, not newly invented here"
+    },
+    "proof_scripts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "REQUIRED \u2014 the proof scripts that must PASS before this spec could ever be registered/executed; an empty list is not a valid spec (no worker without a proof)"
+    },
+    "idempotency_key_template": {
+      "type": "string",
+      "description": "REQUIRED \u2014 the deterministic idempotency key template (e.g. 'verify:{fact_key}:{source_hash}') so re-runs collapse rather than duplicate"
+    },
+    "retry_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "REQUIRED \u2014 durable retry + dead-letter discipline",
+      "required": [
+        "max_attempts",
+        "backoff",
+        "dlq"
+      ],
+      "properties": {
+        "max_attempts": {
+          "type": "integer"
+        },
+        "backoff": {
+          "type": "string",
+          "enum": [
+            "none",
+            "fixed_backoff",
+            "exponential_backoff"
+          ]
+        },
+        "dlq": {
+          "type": "string",
+          "description": "the dead-letter queue name failed runs land in (no silent drop)"
+        }
+      }
+    },
+    "registration_status": {
+      "type": "string",
+      "enum": [
+        "proposed"
+      ],
+      "description": "PINNED proposed \u2014 in the lean core nothing auto-registers/executes; MAIN integrates behind a proof gate (red-team: registration_status='active'/'registered' is rejected)"
+    },
+    "produces": {
+      "type": "string",
+      "enum": [
+        "fact_verification_run"
+      ],
+      "description": "pinned \u2014 when (later) run, the worker produces a FactVerificationRun (candidate + receipt), never a served fact"
+    },
+    "requires_human_approval": {
+      "type": "boolean",
+      "description": "true for high-risk generated code \u2014 a human-approval hook gates registration"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

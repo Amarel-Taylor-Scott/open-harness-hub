@@ -1,0 +1,36 @@
+{
+  "$id": "determinism/RulePromotionReceipt", "title": "RulePromotionReceipt", "type": "object", "additionalProperties": false,
+  "description": "The receipt that promotes a RuleCandidate to an active DeterministicRule (M6→M7). It is the single warrant the promotion gate emits ONLY when every bar is met, and it REQUIRES the evidence handles: a replay_report_id AND a shadow_report_id (you cannot promote without both), plus a fallback_policy (no active rule without a fallback). The boolean gate fields record what was checked: schema_valid, handles_preserved (source handles survive the rule), precision_met (against the rule_class threshold), unsafe_fp_zero (==0 for a truth_serving rule), tenant_safe (no tenant_private→global leak), traces_preserved (lossless — the distilled-from traces are kept). For a truth_serving FIRST promotion human_review_signed must be true. distilled_from_trace_ids carries the lossless link the promoted rule inherits. Deterministic when promoted_at is injected.",
+  "required": ["schema_version", "promotion_receipt_id", "tenant_id", "source_scope", "rule_candidate_id", "promoted_rule_id", "rule_class", "replay_report_id", "shadow_report_id", "fallback_policy", "schema_valid", "handles_preserved", "precision_met", "unsafe_fp_zero", "tenant_safe", "traces_preserved", "human_review_signed", "distilled_from_trace_ids", "promoted_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["RulePromotionReceipt"]},
+    "promotion_receipt_id": {"type": "string", "description": "content-addressed id over the candidate + report ids + gate results; deterministic"},
+    "tenant_id": {"type": "string"},
+    "source_scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "rule_candidate_id": {"type": "string", "description": "the candidate promoted"},
+    "promoted_rule_id": {"type": "string", "description": "the resulting DeterministicRule id"},
+    "rule_class": {"type": "string", "enum": ["truth_serving", "routing", "optimization", "ui_projection", "reconciliation"], "description": "sets the bar — truth_serving requires unsafe_fp_zero AND human_review_signed for a first promotion"},
+    "replay_report_id": {"type": "string", "description": "REQUIRED — the RuleReplayReport proving precision over historical verified traces"},
+    "shadow_report_id": {"type": "string", "description": "REQUIRED — the ShadowRunReport proving no unsafe live mismatch"},
+    "fallback_policy": {
+      "type": "object", "additionalProperties": false,
+      "description": "REQUIRED — the fallback the promoted rule carries; promotion without a fallback is invalid",
+      "required": ["fallback_target", "trigger"],
+      "properties": {
+        "fallback_target": {"type": "string", "enum": ["llm_gateway", "human_review", "hold_out", "deterministic_authority"]},
+        "trigger": {"type": "string", "enum": ["low_confidence", "unknown_inputs", "out_of_distribution", "rule_abstains", "schema_mismatch"]},
+        "policy_id": {"type": "string"}
+      }
+    },
+    "schema_valid": {"type": "boolean", "description": "the rule body + I/O validate against schema"},
+    "handles_preserved": {"type": "boolean", "description": "the rule preserves source handles on every decision it serves"},
+    "precision_met": {"type": "boolean", "description": "replay precision met the rule_class threshold"},
+    "unsafe_fp_zero": {"type": "boolean", "description": "unsafe_false_positives==0 in replay AND unsafe_mismatch_count==0 in shadow; MUST be true for truth_serving"},
+    "tenant_safe": {"type": "boolean", "description": "no tenant_private trace was used to make a global decision; tenant_leak_count==0"},
+    "traces_preserved": {"type": "boolean", "description": "LOSSLESS — the LLM/consensus/adjudication traces this rule was distilled from are KEPT, not deleted"},
+    "human_review_signed": {"type": "boolean", "description": "an accountable human signed off; REQUIRED true for a truth_serving rule's first promotion"},
+    "distilled_from_trace_ids": {"type": "array", "items": {"type": "string"}, "description": "the lossless link the promoted rule inherits; these traces are never deleted"},
+    "rollback_target_id": {"type": "string", "description": "the prior path the rule reverts to if rolled back (the LLM/human fallback path); promotion is reversible"},
+    "promoted_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

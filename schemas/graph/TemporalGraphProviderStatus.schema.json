@@ -1,0 +1,35 @@
+{
+  "$id": "graph/TemporalGraphProviderStatus",
+  "title": "TemporalGraphProviderStatus",
+  "description": "Status of a temporal_graph_provider (baltor_local active; graphiti candidate/emulated/unavailable).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "provider_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "candidate",
+        "emulated",
+        "unavailable"
+      ]
+    },
+    "available": {
+      "type": "boolean"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "credential_ref": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "provider_id",
+    "status",
+    "available"
+  ]
+}

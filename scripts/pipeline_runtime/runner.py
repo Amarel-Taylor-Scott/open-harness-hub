@@ -40,20 +40,20 @@ class _Default(dict):
 
 # ── gates (declared in the manifest; evaluated over produced artifacts) ───────
 def _gate_all_facts_handled(arts: dict) -> bool:
-    return all("#" in f.get("source_handle", "") for f in arts.get("AtomicFactSet.v1", {}).get("facts", []))
+    return all("#" in f.get("source_handle", "") for f in arts.get("AtomicFactSet", {}).get("facts", []))
 
 
 def _gate_narratives_not_promotable(arts: dict) -> bool:
-    return all(not a.get("promotion_eligible", False) for a in arts.get("HeldOutAllegationSet.v1", {}).get("allegations", []))
+    return all(not a.get("promotion_eligible", False) for a in arts.get("HeldOutAllegationSet", {}).get("allegations", []))
 
 
 def _gate_receipt_counts_match(arts: dict) -> bool:
-    rc = arts.get("Receipt.v1", {})
-    return rc.get("facts_served") == arts.get("VerifiedFactSet.v1", {}).get("count")
+    rc = arts.get("Receipt", {})
+    return rc.get("facts_served") == arts.get("VerifiedFactSet", {}).get("count")
 
 
 def _gate_doc_tree_leaves(arts: dict) -> bool:
-    t = arts.get("DocumentTree.v1", {})
+    t = arts.get("DocumentTree", {})
     return t.get("node_count", 0) > 0 and bool(t.get("leaf_handles")) and all("#" in h for h in t.get("leaf_handles", []))
 
 

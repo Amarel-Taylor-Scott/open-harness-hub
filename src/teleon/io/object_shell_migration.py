@@ -1,4 +1,4 @@
-"""src.teleon.io.object_shell_migration — LOSSLESS migration of an object family to the canonical ObjectShell.v1.
+"""src.teleon.io.object_shell_migration — LOSSLESS migration of an object family to the canonical ObjectShell.
 
 Distillation is never replacement: migrating an object to the shared 14-section shell PRESERVES the original verbatim
 in `payload` (rehydratable to byte-identity), records the migration in `lineage` (migrated_from + original payload
@@ -12,7 +12,7 @@ from src.teleon.templates.instantiator import compose_object_shell, _content_has
 
 
 def migrate_to_shell(obj: dict, *, object_type: str, id_field: str, source_schema: str, now: str) -> dict:
-    """Wrap any object as an ObjectShell.v1, losslessly. The original is preserved in payload; lineage records the
+    """Wrap any object as an ObjectShell, losslessly. The original is preserved in payload; lineage records the
     migration + the original payload hash; content_hash/derived_from/policy/created_at are carried forward."""
     shell = compose_object_shell(object_id=str(obj.get(id_field) or obj.get("object_id") or "(unknown)"),
                                  object_type=object_type, mixin_ids=None, now=now, payload=obj)
@@ -26,7 +26,7 @@ def migrate_to_shell(obj: dict, *, object_type: str, id_field: str, source_schem
     shell["created_at"] = obj.get("created_at") or now
     shell["lineage"] = {
         "migrated_from": source_schema,
-        "migration": "ObjectShell.v1",
+        "migration": "ObjectShell",
         "original_preserved": True,          # the original lives verbatim in payload (rehydratable)
         "original_payload_hash": _content_hash(obj),
         "derived_from": derived,

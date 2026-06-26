@@ -35,14 +35,14 @@ _SLOT = "reconcile_dates"
 
 def _registry() -> dict:
     def _h(impl):
-        return lambda x: {"output": f"{impl}:{x}", "output_contract": "ReconcileResult.v1", "cost": 1.0,
+        return lambda x: {"output": f"{impl}:{x}", "output_contract": "ReconcileResult", "cost": 1.0,
                           "source_handles": ["ctx://acme/source/BILL-782"]}
     return {_SLOT: [{"impl_id": i, "priority": p, "handler": _h(i)} for i, p in (("v1", 30), ("v2", 20), ("v3", 10))]}
 
 
 def _post_promotion_spec() -> dict:
     # exactly the shape `adapt` produces after promoting v2 over v1 (prior kept as fallback + rollback_target).
-    return {"task_id": "pt_reconcile_001", "capability_slot": _SLOT, "output_contract": "ReconcileResult.v1",
+    return {"task_id": "pt_reconcile_001", "capability_slot": _SLOT, "output_contract": "ReconcileResult",
             "current_impl_id": "v2", "alternatives": ["v1", "v3"], "rollback_target": "v1"}
 
 

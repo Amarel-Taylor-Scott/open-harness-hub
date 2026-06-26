@@ -5,14 +5,14 @@
 
 **Owner.** `web/baltor/consume.html` (served by `scripts/baltor_admin_demo_server.py` at `GET /consume`).
 **Data sources.** `GET /api/context/serve?tenant_id=demo&corpus=cfpb&require_optimized=true` (ungated projection
-of the served `ContextResponse.v1`) and `GET /api/runtime/sections` (the maturity scoreboard).
+of the served `ContextResponse`) and `GET /api/runtime/sections` (the maturity scoreboard).
 
 ## Panels
 
 One **"Run CFPB Ingestion → Consumption"** button →
 Answer · Ingestion/Source artifacts · Atomic facts (served) · Held-out allegations/warnings · Artifact
 ledger·Vectors·Graph (lineage) · Conflicts·Reconciliation · Receipts (verification·optimization·consumption) ·
-Freshness · ContextResponse.v1 (raw) · Section maturity · Provider status (candidates).
+Freshness · ContextResponse (raw) · Section maturity · Provider status (candidates).
 
 ## Reference result visible
 

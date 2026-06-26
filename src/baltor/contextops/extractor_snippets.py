@@ -29,12 +29,12 @@ from dataclasses import dataclass
 
 from src.baltor.contracts.artifacts.fact_assertion import SCOPES
 
-#: the ONLY claim_status an extractor may mint — pinned, matching ExtractorSnippet.v1 + the contract layer.
+#: the ONLY claim_status an extractor may mint — pinned, matching ExtractorSnippet + the contract layer.
 #: Single-sourced from the contracts layer so it can never drift from the ports' CANDIDATE_CLAIM_STATUS.
 from src.baltor.contracts.governance import CANDIDATE_CLAIM_STATUS as CANDIDATE_STATUS  # noqa: E402
 #: an extractor candidate is always a factual claim shape (never an allegation/conclusion) — from CLAIM_SHAPED.
 CANDIDATE_CLAIM_TYPE = "atomic_fact"
-#: what an extractor produces — pinned, matching ExtractorSnippet.v1.produces.
+#: what an extractor produces — pinned, matching ExtractorSnippet.produces.
 PRODUCES = "fact_assertion_candidate"
 
 #: the nine deterministic extraction primitives this lane ships (single source — matches the contract enum).
@@ -124,7 +124,7 @@ class FactAssertionCandidate:
         return "fac-" + hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]
 
     def to_dict(self) -> dict:
-        return {"schema_version": "FactAssertionCandidate.v1", "candidate_id": self.candidate_id,
+        return {"schema_version": "FactAssertionCandidate", "candidate_id": self.candidate_id,
                 "fact_key": self.fact_key, "extractor_type": self.extractor_type, "value": self.value,
                 "unit": self.unit, "source_handle": self.source_handle, "scope": self.scope,
                 "claim_status": self.claim_status, "claim_type": self.claim_type, "produces": self.produces,

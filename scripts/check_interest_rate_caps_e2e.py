@@ -56,7 +56,7 @@ _TX_AFTER_CHANGE = ("", "")
 
 
 def _result(output):
-    return {"output": output, "output_contract": "RateCap.v1", "cost": 1.0, "latency_ms": 3,
+    return {"output": output, "output_contract": "RateCap", "cost": 1.0, "latency_ms": 3,
             "error": None, "source_handles": ["ctx://gov/state-rate-caps"]}
 
 
@@ -92,18 +92,18 @@ def _self_test() -> int:
     # The deterministic CA/NY tools know their exact source (still correct); TX's source page changed.
     reg = {
         "cap_TX": [
-            {"impl_id": "tx.parser.v1_oldformat", "priority": 30,   # worked before the page changed
+            {"impl_id": "tx.parser_oldformat", "priority": 30,   # worked before the page changed
              "handler": lambda _i: _result(f"{_TX_AFTER_CHANGE[0]}|{_TX_AFTER_CHANGE[1]}")},
-            {"impl_id": "tx.parser.v2_newformat", "priority": 20,   # adapted to the new page → correct
+            {"impl_id": "tx.parser_newformat", "priority": 20,   # adapted to the new page → correct
              "handler": lambda _i: _result(f"{_NEW_WORLD['TX'][0]}|{_NEW_WORLD['TX'][1]}")},
         ],
-        "cap_CA": [{"impl_id": "ca.api.v1", "priority": 30,
+        "cap_CA": [{"impl_id": "ca.api", "priority": 30,
                     "handler": lambda _i: _result(f"{_NEW_WORLD['CA'][0]}|{_NEW_WORLD['CA'][1]}")}],
     }
-    tx_spec = {"capability_id": "rate-cap-TX", "capability_slot": "cap_TX", "output_contract": "RateCap.v1",
+    tx_spec = {"capability_id": "rate-cap-TX", "capability_slot": "cap_TX", "output_contract": "RateCap",
                "success_criteria": {"max_cost": 5.0}, "eval_suite": _suite("TX", _NEW_WORLD),
-               "source_dependencies": ["tx-rate-source"], "alternatives": ["tx.parser.v2_newformat"]}
-    ca_spec = {"capability_id": "rate-cap-CA", "capability_slot": "cap_CA", "output_contract": "RateCap.v1",
+               "source_dependencies": ["tx-rate-source"], "alternatives": ["tx.parser_newformat"]}
+    ca_spec = {"capability_id": "rate-cap-CA", "capability_slot": "cap_CA", "output_contract": "RateCap",
                "success_criteria": {"max_cost": 5.0}, "eval_suite": _suite("CA", _NEW_WORLD),
                "source_dependencies": ["ca-rate-source"], "alternatives": []}
 
@@ -114,8 +114,8 @@ def _self_test() -> int:
     ck("3: the TX tool SILENTLY BROKE on the changed source (benchmark fail) and was detected",
        tx is not None and tx.drifted is True)
     ck("4a: side-by-side promotion HEALED it to a parser that re-passes the benchmark (prior kept as rollback)",
-       tx and tx.status == rh.HEAL_STATUS_HEALED and tx.served_impl_id == "tx.parser.v2_newformat"
-       and tx.rollback_target == "tx.parser.v1_oldformat")
+       tx and tx.status == rh.HEAL_STATUS_HEALED and tx.served_impl_id == "tx.parser_newformat"
+       and tx.rollback_target == "tx.parser_oldformat")
     ck("4b: CA (a different source) was UNTOUCHED by the TX change", "rate-cap-CA" not in outs)
     # transient vs problematic: classify WHY. a stale-format break is STRUCTURAL (needs a new parser),
     # not a transient blip → the durability taxonomy is the single source of that call
@@ -134,7 +134,7 @@ def _self_test() -> int:
 
     # 5 — OUTPUT to Baltor with LINEAGE + a REFRESH mechanism (governed record + CDC refresh handle)
     cap, date = _NEW_WORLD["TX"]
-    fact_record = mint_record("VerifiedRateCap.v1",
+    fact_record = mint_record("VerifiedRateCap",
                               {"state": "TX", "cap": cap, "effective_date": date,
                                "refresh": {"cdc_source": "tx-rate-source", "policy": "on_source_change"},
                                "served_by": tx.served_impl_id},
@@ -164,7 +164,7 @@ def _self_test() -> int:
     # 8 — COMPRESSION (lossless): compress to the answer-critical facts; rehydrate proves nothing vital lost
     def compress(record: dict) -> dict:
         return {"state": record["state"], "cap": record["cap"], "effective_date": record["effective_date"],
-                "src": record["provenance"]["inputs"], "schema_version": "CompressedRateCap.v1"}
+                "src": record["provenance"]["inputs"], "schema_version": "CompressedRateCap"}
     compressed = compress(fact_record)
     ck("8: compression keeps the answer-critical facts + source handles (lossless for the question)",
        compressed["cap"] == cap and compressed["effective_date"] == date and compressed["src"])

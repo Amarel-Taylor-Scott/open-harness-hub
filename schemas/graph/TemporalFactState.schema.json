@@ -1,0 +1,48 @@
+{
+  "$id": "graph/TemporalFactState",
+  "title": "TemporalFactState",
+  "description": "The governed current state of a fact_key for a tenant/scope.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "canonical_fact_key": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string"
+    },
+    "current_temporal_fact_id": {
+      "type": "string"
+    },
+    "current_value": {
+      "type": "string"
+    },
+    "current_state": {
+      "type": "string"
+    },
+    "held_out": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "superseded": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "as_of": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "canonical_fact_key",
+    "tenant_id",
+    "current_state",
+    "as_of"
+  ]
+}

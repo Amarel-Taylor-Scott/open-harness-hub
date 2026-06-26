@@ -28,7 +28,7 @@ if _REPO not in sys.path:
 from src.baltor import purpose_tasks as ct
 
 _NOW = "2026-06-06T00:00:00Z"
-_OC = "DeadlineRecord.v1"
+_OC = "DeadlineRecord"
 _INPUT = {"query": "card dispute error-resolution deadline"}
 
 
@@ -57,22 +57,22 @@ def _v4_leaks(_inp):      # cheap but LEAKS the held-out FAQ "30 days" → must 
 
 
 def _registry(priorities=None):
-    p = priorities or {"impl.v1_expensive": 70, "impl.v2_cheap": 65, "impl.v3_drops_handle": 60, "impl.v4_leaks": 55}
+    p = priorities or {"impl_expensive": 70, "impl_cheap": 65, "impl_drops_handle": 60, "impl_leaks": 55}
     return {"fetch_card_deadline": [
-        {"impl_id": "impl.v1_expensive", "priority": p["impl.v1_expensive"], "handler": _v1_expensive},
-        {"impl_id": "impl.v2_cheap", "priority": p["impl.v2_cheap"], "handler": _v2_cheap},
-        {"impl_id": "impl.v3_drops_handle", "priority": p["impl.v3_drops_handle"], "handler": _v3_drops_handle},
-        {"impl_id": "impl.v4_leaks", "priority": p["impl.v4_leaks"], "handler": _v4_leaks},
+        {"impl_id": "impl_expensive", "priority": p["impl_expensive"], "handler": _v1_expensive},
+        {"impl_id": "impl_cheap", "priority": p["impl_cheap"], "handler": _v2_cheap},
+        {"impl_id": "impl_drops_handle", "priority": p["impl_drops_handle"], "handler": _v3_drops_handle},
+        {"impl_id": "impl_leaks", "priority": p["impl_leaks"], "handler": _v4_leaks},
     ]}
 
 
 def _spec():
     return {
-        "schema_version": "PurposeTaskSpec.v1",
+        "schema_version": "PurposeTaskSpec",
         "task_id": "purpose_tasks.fetch_card_deadline@v1",
         "purpose": "Pull the Reg-E error-resolution deadline for a card dispute.",
         "capability_slot": "fetch_card_deadline",
-        "input_contract": "DeadlineQuery.v1",
+        "input_contract": "DeadlineQuery",
         "output_contract": _OC,
         "success_criteria": {"max_cost": 5.0, "min_source_handles": 1},
         "promotion_criteria": {"cost_tolerance": 0.0},
@@ -95,12 +95,12 @@ def _self_test() -> int:
     # A. PROVISION BY CAPABILITY (by number, not code)
     spec = ct.provision(_spec(), reg)
     check("A: provisioned by capability → highest-priority impl bound (no per-task code)",
-          spec["current_impl_id"] == "impl.v1_expensive", spec.get("current_impl_id"))
-    check("A: alternatives recorded in priority order", spec["alternatives"][0] == "impl.v2_cheap", str(spec["alternatives"]))
+          spec["current_impl_id"] == "impl_expensive", spec.get("current_impl_id"))
+    check("A: alternatives recorded in priority order", spec["alternatives"][0] == "impl_cheap", str(spec["alternatives"]))
     # re-prioritize → rebinds (selection is numeric/non-fragile, not a hard-coded choice)
-    reg2 = _registry({"impl.v1_expensive": 50, "impl.v2_cheap": 90, "impl.v3_drops_handle": 60, "impl.v4_leaks": 55})
+    reg2 = _registry({"impl_expensive": 50, "impl_cheap": 90, "impl_drops_handle": 60, "impl_leaks": 55})
     spec2 = ct.provision(_spec(), reg2)
-    check("A: re-prioritizing rebinds the impl (numeric, non-fragile)", spec2["current_impl_id"] == "impl.v2_cheap", spec2["current_impl_id"])
+    check("A: re-prioritizing rebinds the impl (numeric, non-fragile)", spec2["current_impl_id"] == "impl_cheap", spec2["current_impl_id"])
 
     # B. SELF-MONITOR detects drift (cost breach)
     res = ct.run_current(spec, reg, _INPUT)
@@ -110,12 +110,12 @@ def _self_test() -> int:
 
     # C. SELF-ADAPT — equivalent + cheaper candidate is PROMOTED; prior kept as fallback; never served early
     out = ct.adapt(spec, reg, _INPUT, now=_NOW, promotion_criteria=spec["promotion_criteria"],
-                   candidate_impl_id="impl.v2_cheap", held_out_strings=held)
+                   candidate_impl_id="impl_cheap", held_out_strings=held)
     check("C: equivalent cheaper candidate PROMOTED", out["promoted"] is True, str(out.get("decision", {}).get("reason")))
-    check("C: candidate became current after promotion", out["spec"]["current_impl_id"] == "impl.v2_cheap")
-    check("C: prior impl kept as fallback alternative", "impl.v1_expensive" in out["spec"]["alternatives"])
-    check("C: rollback_target = prior baseline", out["spec"]["rollback_target"] == "impl.v1_expensive", str(out["spec"].get("rollback_target")))
-    check("C: candidate NEVER served before promotion (served = baseline)", out["served_path_id"] == "impl.v1_expensive", out["served_path_id"])
+    check("C: candidate became current after promotion", out["spec"]["current_impl_id"] == "impl_cheap")
+    check("C: prior impl kept as fallback alternative", "impl_expensive" in out["spec"]["alternatives"])
+    check("C: rollback_target = prior baseline", out["spec"]["rollback_target"] == "impl_expensive", str(out["spec"].get("rollback_target")))
+    check("C: candidate NEVER served before promotion (served = baseline)", out["served_path_id"] == "impl_expensive", out["served_path_id"])
     # after adaptation the task is back within criteria
     res2 = ct.run_current(out["spec"], reg, _INPUT)
     h2 = ct.evaluate_health(res2, spec["success_criteria"], held_out_strings=held)
@@ -123,18 +123,18 @@ def _self_test() -> int:
 
     # D. GOVERNANCE — unsafe candidates REJECTED, baseline preserved
     bad_handle = ct.adapt(spec, reg, _INPUT, now=_NOW, promotion_criteria=spec["promotion_criteria"],
-                          candidate_impl_id="impl.v3_drops_handle", held_out_strings=held)
+                          candidate_impl_id="impl_drops_handle", held_out_strings=held)
     check("D: candidate that DROPS a source handle is REJECTED", bad_handle["promoted"] is False)
-    check("D: baseline preserved after rejection", bad_handle["spec"]["current_impl_id"] == "impl.v1_expensive")
+    check("D: baseline preserved after rejection", bad_handle["spec"]["current_impl_id"] == "impl_expensive")
     bad_leak = ct.adapt(spec, reg, _INPUT, now=_NOW, promotion_criteria=spec["promotion_criteria"],
-                        candidate_impl_id="impl.v4_leaks", held_out_strings=held)
+                        candidate_impl_id="impl_leaks", held_out_strings=held)
     check("D: candidate that LEAKS the held-out FAQ '30 days' is REJECTED", bad_leak["promoted"] is False)
 
     # determinism
     out_b = ct.adapt(ct.provision(_spec(), reg), reg, _INPUT, now=_NOW,
-                     promotion_criteria=_spec()["promotion_criteria"], candidate_impl_id="impl.v2_cheap",
+                     promotion_criteria=_spec()["promotion_criteria"], candidate_impl_id="impl_cheap",
                      held_out_strings=held)
-    check("determinism: adapt is repeatable", out_b["promoted"] is True and out_b["served_path_id"] == "impl.v1_expensive")
+    check("determinism: adapt is repeatable", out_b["promoted"] is True and out_b["served_path_id"] == "impl_expensive")
 
     print("\n" + ("PASS — check_purpose_task_poc: a PurposeTask is provisioned BY CAPABILITY (numeric, not code), "
                   "self-monitors vs success_criteria, and self-adapts via the governed Parallel-Path Engine — "

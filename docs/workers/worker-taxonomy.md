@@ -16,7 +16,7 @@ outbox, two-process exactly-once); it is **not** a second worker framework.
 
 `can_publish_truth` is true for exactly `{reconciliation_policy, native_export, distillation_determinism,
 human_review_signoff}` — and even those publish via a gate, never by LLM opinion. `open_ended_agent`,
-`browser`, `model_inference`, `utility`, etc. have `CanonicalFact.v1` + `ContextResponse.v1` in
+`browser`, `model_inference`, `utility`, etc. have `CanonicalFact` + `ContextResponse` in
 `forbidden_outputs`; the router refuses those outputs.
 
 ## The 18 buckets (queue prefix · determinism · can-publish-truth)

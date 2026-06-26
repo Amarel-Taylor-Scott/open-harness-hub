@@ -21,35 +21,35 @@ def _self_test() -> int:
             fails.append(name)
 
     good = CommandEnvelope(command_type="pipeline.run_step", tenant_id="acme", run_id="r", queue="q").to_dict()
-    check("a valid CommandEnvelope passes its schema", is_valid(good, "envelopes/CommandEnvelope.v1"), str(validate_ref(good, "envelopes/CommandEnvelope.v1")))
+    check("a valid CommandEnvelope passes its schema", is_valid(good, "envelopes/CommandEnvelope"), str(validate_ref(good, "envelopes/CommandEnvelope")))
 
     missing = dict(good); missing.pop("run_id")
-    check("a missing required field FAILS", not is_valid(missing, "envelopes/CommandEnvelope.v1"))
+    check("a missing required field FAILS", not is_valid(missing, "envelopes/CommandEnvelope"))
 
     wrong_type = dict(good); wrong_type["payload"] = "not-an-object"
-    check("a wrong type FAILS", not is_valid(wrong_type, "envelopes/CommandEnvelope.v1"))
+    check("a wrong type FAILS", not is_valid(wrong_type, "envelopes/CommandEnvelope"))
 
     bad_enum = dict(good); bad_enum["priority"] = "URGENT"
-    check("an unknown enum value FAILS", not is_valid(bad_enum, "envelopes/CommandEnvelope.v1"))
+    check("an unknown enum value FAILS", not is_valid(bad_enum, "envelopes/CommandEnvelope"))
 
     extra = dict(good); extra["surprise"] = 1
-    check("an additional property FAILS (additionalProperties:false)", not is_valid(extra, "envelopes/CommandEnvelope.v1"))
+    check("an additional property FAILS (additionalProperties:false)", not is_valid(extra, "envelopes/CommandEnvelope"))
 
     # artifact payload schemas
     fact = {"text": "t", "field": "company", "claim_status": "fact", "promotion_eligible": True}
-    check("a valid AtomicFact payload passes", is_valid(fact, "artifacts/AtomicFact.v1"))
+    check("a valid AtomicFact payload passes", is_valid(fact, "artifacts/AtomicFact"))
     check("an AtomicFact with claim_status='unverified_allegation' FAILS the fact enum",
-          not is_valid({**fact, "claim_status": "unverified_allegation"}, "artifacts/AtomicFact.v1"))
+          not is_valid({**fact, "claim_status": "unverified_allegation"}, "artifacts/AtomicFact"))
     from scripts.runtime.schema_validator import validate as _v
     check("the validator treats a boolean as NOT an integer",
           _v(True, {"type": "integer"}) != [] and _v(3, {"type": "integer"}) == [])
-    check("EventEnvelope requires specversion=1.0", not is_valid({"specversion": "0.3"}, "envelopes/EventEnvelope.v1"))
+    check("EventEnvelope requires specversion=1.0", not is_valid({"specversion": "0.3"}, "envelopes/EventEnvelope"))
 
     # a validation failure becomes an ErrorEnvelope
-    errs = validate_ref(missing, "envelopes/CommandEnvelope.v1")
-    e = ErrorEnvelope("schema_validation_failed", retryable=False, message=str(errs[:2]), failed_schema="CommandEnvelope.v1")
+    errs = validate_ref(missing, "envelopes/CommandEnvelope")
+    e = ErrorEnvelope("schema_validation_failed", retryable=False, message=str(errs[:2]), failed_schema="CommandEnvelope")
     check("a validation failure is expressible as a permanent ErrorEnvelope",
-          e.error_type == "schema_validation_failed" and e.retryable is False and is_valid(e.to_dict(), "envelopes/ErrorEnvelope.v1"))
+          e.error_type == "schema_validation_failed" and e.retryable is False and is_valid(e.to_dict(), "envelopes/ErrorEnvelope"))
 
     print(f"\n{'PASS — check_runtime_schema_validation: the schema gate accepts valid envelopes and rejects missing/wrong-type/unknown-enum/additional-property payloads; failures become ErrorEnvelopes.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
     return 0 if not fails else 1

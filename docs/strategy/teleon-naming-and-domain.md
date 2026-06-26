@@ -66,7 +66,7 @@ for *market confusion / trademark* — so:
 Master build prompt `prompts/teleon-runtime-master.md` · build kit `prompts/teleon-build-kit.md` · portfolio
 `docs/strategy/teleon-baltor-openharnesshub-portfolio.md` · dependency law
 `architecture/portfolio_dependency_law.json` · the `src/teleon/` + `src/openharnesshub/` package boundaries.
-Code identifiers (`PurposeTaskSpec.v1`, `architecture/capability_*.json`) do **not** churn on a brand decision.
+Code identifiers (`PurposeTaskSpec`, `architecture/capability_*.json`) do **not** churn on a brand decision.
 
 ## Verification log
 - 2026-06-06 — Owner LOCKED "Teleon" and **purchased `teleon.dev`.** Portfolio confirmed (HoldCo · Teleon ·

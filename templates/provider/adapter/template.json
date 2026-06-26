@@ -1,0 +1,24 @@
+{
+  "template_id": "provider.adapter",
+  "standard_id": "standard.provider_adapter",
+  "variables": [
+    {"name": "adapter_name", "required": true, "description": "lowercase adapter name; becomes scripts/adapters/<adapter_name>.py"},
+    {"name": "port_name", "required": true, "description": "the structural Port class from scripts/runtime/ports.py this adapter satisfies, e.g. ObjectStorePort"},
+    {"name": "capability", "required": true, "description": "capability registered in external_capability_catalog.json, e.g. object_store"},
+    {"name": "title", "required": true, "description": "human title for the adapter"},
+    {"name": "owner", "required": true, "description": "owning module/path or team"}
+  ],
+  "files": [
+    {"path_template": "scripts/adapters/{{adapter_name}}.py", "source": "files/scripts/adapters/adapter_name.py"},
+    {"path_template": "scripts/check_{{adapter_name}}_adapter.py", "source": "files/scripts/check_adapter_name_adapter.py"},
+    {"path_template": "docs/adapters/{{adapter_name}}.md", "source": "files/docs/adapters/adapter_name.md"}
+  ],
+  "required_commands_after_generation": [
+    "python3 scripts/check_{{adapter_name}}_adapter.py --self-test"
+  ],
+  "required_registry_updates": [
+    "architecture/external_capability_catalog.json += {{capability}} ({{adapter_name}})"
+  ],
+  "required_proofs": ["scripts/check_{{adapter_name}}_adapter.py"],
+  "required_docs": ["docs/adapters/{{adapter_name}}.md"]
+}

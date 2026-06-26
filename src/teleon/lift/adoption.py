@@ -11,7 +11,7 @@ from typing import Any
 
 from . import model
 
-_ADOPTION_PLAN_SCHEMA = "AdoptionPlan.v1"
+_ADOPTION_PLAN_SCHEMA = "AdoptionPlan"
 
 
 def _ladder_by_mode() -> dict[str, dict]:

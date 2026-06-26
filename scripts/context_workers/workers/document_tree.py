@@ -171,7 +171,7 @@ def _tree_from_payload(payload: dict[str, Any]) -> dict[str, Any]:
     capabilities=("file_set_normalization", "zip_manifest", "page_component_split", "hierarchy_tagging", "local_rules"),
     task_types=("document_tree.normalize", "file_set.normalize", "zip.normalize"),
     image="baltor-worker-cpu",
-    output_contract="document_tree.v1",
+    output_contract="document_tree",
 )
 def document_tree_normalize(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     tree = _tree_from_payload(payload)

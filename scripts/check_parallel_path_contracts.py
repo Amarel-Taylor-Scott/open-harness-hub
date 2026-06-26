@@ -6,20 +6,20 @@ and the NON-NEGOTIABLE parallel-path semantics are enforceable at the contract l
 
 The contract layer for "run a baseline path + candidate paths on the SAME input, compare, and promote a
 candidate ONLY through a passing decision — never serve a candidate as truth" — made checkable:
-  - PathDefinition.v1 REQUIRES a rollback_target (a candidate without it is not promotable/reversible) and
+  - PathDefinition REQUIRES a rollback_target (a candidate without it is not promotable/reversible) and
     its mode is enum-bounded to {baseline,candidate,shadow,canary,fallback,deprecated} — no ad-hoc 'champion'.
-  - ParallelPathRun.v1 REQUIRES input_snapshot_hash (proof baseline + candidates saw identical input),
+  - ParallelPathRun REQUIRES input_snapshot_hash (proof baseline + candidates saw identical input),
     pins candidate_served == [false] (a candidate's output is NEVER served as truth — a true value is
     structurally rejected), and the baseline_result.mode is bounded to {baseline,fallback} (the served
     result can never be a candidate/shadow/canary).
-  - PathComparisonReport.v1's per-candidate verdict REQUIRES all the gates (same_output_contract,
+  - PathComparisonReport's per-candidate verdict REQUIRES all the gates (same_output_contract,
     output_equivalent, source_handles_preserved, held_out_not_leaked, safety_ok, cost_delta) and a
     recommended_action enum-bounded so there is no 'serve_candidate' action.
-  - PathPromotionDecision.v1 REQUIRES all six gates + a rollback_target, and decision is enum-bounded to
+  - PathPromotionDecision REQUIRES all six gates + a rollback_target, and decision is enum-bounded to
     {promote,keep_baseline} — the only object that can authorize a promotion, never a 'serve_candidate'.
-  - PathRollbackPlan.v1 pins deletes_paths == [false] and deletes_prior_runs == [false] (rollback is a
+  - PathRollbackPlan pins deletes_paths == [false] and deletes_prior_runs == [false] (rollback is a
     pointer move, never a delete) and REQUIRES a rollback_target_path_id.
-  - PathCostReport.v1 carries the pricebook-derived relative cost with currency pinned to 'relative-unit'
+  - PathCostReport carries the pricebook-derived relative cost with currency pinned to 'relative-unit'
     and confidence enum-bounded to {high,low} (a 'low' placeholder never silently becomes high).
 
 Deterministic, stdlib-only, offline (no network, no RNG, no wall-clock).
@@ -109,10 +109,10 @@ def _self_test() -> int:
     schemas: dict[str, dict] = {}
     examples: dict[str, dict] = {}
     for stem in _SCHEMAS:
-        sp = _SCHEMA_DIR / f"{stem}.v1.schema.json"
-        ep = _EX_DIR / f"{stem}.v1.example.json"
-        check(f"{stem}.v1 schema file exists", sp.is_file(), str(sp))
-        check(f"{stem}.v1 example file exists", ep.is_file(), str(ep))
+        sp = _SCHEMA_DIR / f"{stem}.schema.json"
+        ep = _EX_DIR / f"{stem}.example.json"
+        check(f"{stem} schema file exists", sp.is_file(), str(sp))
+        check(f"{stem} example file exists", ep.is_file(), str(ep))
         if sp.is_file():
             schemas[stem] = json.loads(sp.read_text())
         if ep.is_file():
@@ -120,157 +120,157 @@ def _self_test() -> int:
 
     check("all 6 parallel-path contracts are present", len(schemas) == 6, f"got {len(schemas)}")
 
-    # ── every schema parses, declares $id experiments/<Stem>.v1, is an object with additionalProperties:false,
+    # ── every schema parses, declares $id experiments/<Stem>, is an object with additionalProperties:false,
     #    declares required+properties, uses ONLY stdlib-validator keywords, defines a property for every
     #    required field, and requires an injected time field. ──
     for stem, sc in schemas.items():
-        check(f"{stem}.v1 $id is experiments/{stem}.v1",
-              sc.get("$id") == f"experiments/{stem}.v1", str(sc.get("$id")))
-        check(f"{stem}.v1 is an object with additionalProperties:false",
+        check(f"{stem} $id is experiments/{stem}",
+              sc.get("$id") == f"experiments/{stem}", str(sc.get("$id")))
+        check(f"{stem} is an object with additionalProperties:false",
               sc.get("type") == "object" and sc.get("additionalProperties") is False)
-        check(f"{stem}.v1 declares required + properties", bool(sc.get("required")) and bool(sc.get("properties")))
-        check(f"{stem}.v1 uses only stdlib-validator keywords", _keys_ok(sc))
+        check(f"{stem} declares required + properties", bool(sc.get("required")) and bool(sc.get("properties")))
+        check(f"{stem} uses only stdlib-validator keywords", _keys_ok(sc))
         props = set(sc.get("properties", {}))
         missing_props = [r for r in sc.get("required", []) if r not in props]
-        check(f"{stem}.v1 declares a property for every required field", missing_props == [], str(missing_props))
+        check(f"{stem} declares a property for every required field", missing_props == [], str(missing_props))
         time_fields = [k for k in sc.get("required", []) if k.endswith("_at")]
-        check(f"{stem}.v1 requires an injected time field (deterministic, no wall-clock)", len(time_fields) >= 1)
-        check(f"{stem}.v1 schema_version enum pins {stem}.v1",
-              _enum_of(sc, "schema_version") == [f"{stem}.v1"], str(_enum_of(sc, "schema_version")))
+        check(f"{stem} requires an injected time field (deterministic, no wall-clock)", len(time_fields) >= 1)
+        check(f"{stem} schema_version enum pins {stem}",
+              _enum_of(sc, "schema_version") == [f"{stem}"], str(_enum_of(sc, "schema_version")))
 
     # ── valid example(s) PASS; every invalid_* example FAILS schema validation. ──
     for stem, ex in examples.items():
         sc = schemas[stem]
         valids = {k: v for k, v in ex.items() if k == "valid" or k.startswith("valid_")}
-        check(f"{stem}.v1 has a 'valid' example", "valid" in valids)
+        check(f"{stem} has a 'valid' example", "valid" in valids)
         for k, v in valids.items():
             errs = _validate(v, sc)
-            check(f"{stem}.v1 {k} example validates clean", errs == [], str(errs[:4]))
+            check(f"{stem} {k} example validates clean", errs == [], str(errs[:4]))
         invalids = {k: v for k, v in ex.items() if k.startswith("invalid")}
-        check(f"{stem}.v1 ships at least one invalid example", len(invalids) >= 1)
+        check(f"{stem} ships at least one invalid example", len(invalids) >= 1)
         for k, v in invalids.items():
             errs = _validate(v, sc)
-            check(f"{stem}.v1 {k} is correctly REJECTED by the schema", errs != [])
+            check(f"{stem} {k} is correctly REJECTED by the schema", errs != [])
 
-    # ── PathDefinition.v1: rollback_target REQUIRED (reversible/promotable); mode enum-bounded. ──
+    # ── PathDefinition: rollback_target REQUIRED (reversible/promotable); mode enum-bounded. ──
     pd_sc = schemas.get("PathDefinition", {})
-    check("PathDefinition.v1 REQUIRES rollback_target (no reversible promotion without it)",
+    check("PathDefinition REQUIRES rollback_target (no reversible promotion without it)",
           "rollback_target" in set(pd_sc.get("required", [])))
-    check("PathDefinition.v1 mode enum is exactly {baseline,candidate,shadow,canary,fallback,deprecated}",
+    check("PathDefinition mode enum is exactly {baseline,candidate,shadow,canary,fallback,deprecated}",
           set(_enum_of(pd_sc, "mode")) == {"baseline", "candidate", "shadow", "canary", "fallback", "deprecated"},
           str(_enum_of(pd_sc, "mode")))
-    check("PathDefinition.v1 REQUIRES input_contract + output_contract (apples-to-apples paths)",
+    check("PathDefinition REQUIRES input_contract + output_contract (apples-to-apples paths)",
           {"input_contract", "output_contract"} <= set(pd_sc.get("required", [])))
     pd_valid = examples.get("PathDefinition", {}).get("valid", {})
     if pd_valid and pd_sc:
         no_rb = {k: v for k, v in pd_valid.items() if k != "rollback_target"}
-        check("PathDefinition.v1 rejects a path missing rollback_target", _validate(no_rb, pd_sc) != [])
+        check("PathDefinition rejects a path missing rollback_target", _validate(no_rb, pd_sc) != [])
         bad_mode = dict(pd_valid); bad_mode["mode"] = "champion"
-        check("PathDefinition.v1 rejects an out-of-enum mode ('champion')", _validate(bad_mode, pd_sc) != [])
+        check("PathDefinition rejects an out-of-enum mode ('champion')", _validate(bad_mode, pd_sc) != [])
 
-    # ── ParallelPathRun.v1: SAME input (snapshot hash), candidate NEVER served. ──
+    # ── ParallelPathRun: SAME input (snapshot hash), candidate NEVER served. ──
     ppr_sc = schemas.get("ParallelPathRun", {})
     ppr_req = set(ppr_sc.get("required", []))
-    check("ParallelPathRun.v1 REQUIRES input_snapshot_hash (baseline + candidates saw identical input)",
+    check("ParallelPathRun REQUIRES input_snapshot_hash (baseline + candidates saw identical input)",
           "input_snapshot_hash" in ppr_req)
-    check("ParallelPathRun.v1 pins candidate_served == [false] (a candidate output is NEVER served as truth)",
+    check("ParallelPathRun pins candidate_served == [false] (a candidate output is NEVER served as truth)",
           _enum_of(ppr_sc, "candidate_served") == [False])
-    check("ParallelPathRun.v1 REQUIRES baseline_result + candidate_results + served_path_id + candidate_served",
+    check("ParallelPathRun REQUIRES baseline_result + candidate_results + served_path_id + candidate_served",
           {"baseline_result", "candidate_results", "served_path_id", "candidate_served"} <= ppr_req)
     base_mode_enum = set(ppr_sc.get("properties", {}).get("baseline_result", {})
                          .get("properties", {}).get("mode", {}).get("enum", []))
-    check("ParallelPathRun.v1 baseline_result.mode is bounded to {baseline,fallback} (served result is never a candidate)",
+    check("ParallelPathRun baseline_result.mode is bounded to {baseline,fallback} (served result is never a candidate)",
           base_mode_enum == {"baseline", "fallback"}, str(base_mode_enum))
     ppr_valid = examples.get("ParallelPathRun", {}).get("valid", {})
     if ppr_valid and ppr_sc:
         served = dict(ppr_valid); served["candidate_served"] = True
-        check("ParallelPathRun.v1 rejects candidate_served=true (cannot smuggle a candidate to the consumer)",
+        check("ParallelPathRun rejects candidate_served=true (cannot smuggle a candidate to the consumer)",
               _validate(served, ppr_sc) != [])
         no_hash = {k: v for k, v in ppr_valid.items() if k != "input_snapshot_hash"}
-        check("ParallelPathRun.v1 rejects a run missing input_snapshot_hash", _validate(no_hash, ppr_sc) != [])
-        check("ParallelPathRun.v1 valid example served the BASELINE path (served_path_id == baseline_result.path_id)",
+        check("ParallelPathRun rejects a run missing input_snapshot_hash", _validate(no_hash, ppr_sc) != [])
+        check("ParallelPathRun valid example served the BASELINE path (served_path_id == baseline_result.path_id)",
               ppr_valid.get("served_path_id") == ppr_valid.get("baseline_result", {}).get("path_id"))
 
-    # ── PathComparisonReport.v1: every gate present per verdict; no 'serve_candidate' action. ──
+    # ── PathComparisonReport: every gate present per verdict; no 'serve_candidate' action. ──
     pcr_sc = schemas.get("PathComparisonReport", {})
     verdict_item = _verdict_item_schema(pcr_sc)
     verdict_req = set(verdict_item.get("required", []))
-    check("PathComparisonReport.v1 verdict REQUIRES every gate (same_output_contract/output_equivalent/handles/held_out/safety/cost_delta/action)",
+    check("PathComparisonReport verdict REQUIRES every gate (same_output_contract/output_equivalent/handles/held_out/safety/cost_delta/action)",
           _VERDICT_GATES <= verdict_req, str(sorted(_VERDICT_GATES - verdict_req)))
     action_enum = verdict_item.get("properties", {}).get("recommended_action", {}).get("enum", [])
-    check("PathComparisonReport.v1 recommended_action enum is exactly {promote,keep_baseline,investigate} (no 'serve_candidate')",
+    check("PathComparisonReport recommended_action enum is exactly {promote,keep_baseline,investigate} (no 'serve_candidate')",
           set(action_enum) == {"promote", "keep_baseline", "investigate"}, str(action_enum))
     leak_keep = examples.get("PathComparisonReport", {}).get("valid_keep_baseline_on_leak", {})
     if leak_keep:
         v0 = (leak_keep.get("candidate_verdicts") or [{}])[0]
-        check("PathComparisonReport.v1 a held-out LEAK verdict (held_out_not_leaked=false) recommends keep_baseline, not promote",
+        check("PathComparisonReport a held-out LEAK verdict (held_out_not_leaked=false) recommends keep_baseline, not promote",
               v0.get("held_out_not_leaked") is False and v0.get("recommended_action") == "keep_baseline")
 
-    # ── PathPromotionDecision.v1: ALL gates + rollback_target REQUIRED; only object that promotes. ──
+    # ── PathPromotionDecision: ALL gates + rollback_target REQUIRED; only object that promotes. ──
     ppd_sc = schemas.get("PathPromotionDecision", {})
     ppd_req = set(ppd_sc.get("required", []))
-    check("PathPromotionDecision.v1 REQUIRES all six gates",
+    check("PathPromotionDecision REQUIRES all six gates",
           _DECISION_GATES <= ppd_req, str(sorted(_DECISION_GATES - ppd_req)))
-    check("PathPromotionDecision.v1 REQUIRES rollback_target (a promotion is always reversible)",
+    check("PathPromotionDecision REQUIRES rollback_target (a promotion is always reversible)",
           "rollback_target" in ppd_req)
-    check("PathPromotionDecision.v1 decision enum is exactly {promote,keep_baseline} (no 'serve_candidate')",
+    check("PathPromotionDecision decision enum is exactly {promote,keep_baseline} (no 'serve_candidate')",
           set(_enum_of(ppd_sc, "decision")) == {"promote", "keep_baseline"}, str(_enum_of(ppd_sc, "decision")))
     ppd_valid = examples.get("PathPromotionDecision", {}).get("valid", {})
     if ppd_valid and ppd_sc:
         no_rb = {k: v for k, v in ppd_valid.items() if k != "rollback_target"}
-        check("PathPromotionDecision.v1 rejects a decision missing rollback_target", _validate(no_rb, ppd_sc) != [])
+        check("PathPromotionDecision rejects a decision missing rollback_target", _validate(no_rb, ppd_sc) != [])
         for g in sorted(_DECISION_GATES):
             broken = {k: v for k, v in ppd_valid.items() if k != g}
-            check(f"PathPromotionDecision.v1 rejects a decision missing gate '{g}'", _validate(broken, ppd_sc) != [])
-        check("PathPromotionDecision.v1 valid 'promote' example has all six gates true and rollback_target == baseline_path_id",
+            check(f"PathPromotionDecision rejects a decision missing gate '{g}'", _validate(broken, ppd_sc) != [])
+        check("PathPromotionDecision valid 'promote' example has all six gates true and rollback_target == baseline_path_id",
               all(ppd_valid.get(g) is True for g in _DECISION_GATES)
               and ppd_valid.get("rollback_target") == ppd_valid.get("baseline_path_id"))
     ppd_keep = examples.get("PathPromotionDecision", {}).get("valid_keep_baseline", {})
     if ppd_keep:
-        check("PathPromotionDecision.v1 a failing-gate decision is keep_baseline with promoted_path_id == null",
+        check("PathPromotionDecision a failing-gate decision is keep_baseline with promoted_path_id == null",
               ppd_keep.get("decision") == "keep_baseline" and ppd_keep.get("promoted_path_id") is None
               and ppd_keep.get("rollback_target") == ppd_keep.get("baseline_path_id"))
 
-    # ── PathRollbackPlan.v1: pointer move only (deletes pinned false), target required. ──
+    # ── PathRollbackPlan: pointer move only (deletes pinned false), target required. ──
     prp_sc = schemas.get("PathRollbackPlan", {})
-    check("PathRollbackPlan.v1 pins deletes_paths == [false] (rollback never deletes a path definition)",
+    check("PathRollbackPlan pins deletes_paths == [false] (rollback never deletes a path definition)",
           _enum_of(prp_sc, "deletes_paths") == [False])
-    check("PathRollbackPlan.v1 pins deletes_prior_runs == [false] (prior ParallelPathRuns stay readable)",
+    check("PathRollbackPlan pins deletes_prior_runs == [false] (prior ParallelPathRuns stay readable)",
           _enum_of(prp_sc, "deletes_prior_runs") == [False])
-    check("PathRollbackPlan.v1 REQUIRES rollback_target_path_id + from_path_id + promotion_decision_id",
+    check("PathRollbackPlan REQUIRES rollback_target_path_id + from_path_id + promotion_decision_id",
           {"rollback_target_path_id", "from_path_id", "promotion_decision_id"} <= set(prp_sc.get("required", [])))
     prp_valid = examples.get("PathRollbackPlan", {}).get("valid", {})
     if prp_valid and prp_sc:
         del_true = dict(prp_valid); del_true["deletes_paths"] = True
-        check("PathRollbackPlan.v1 rejects deletes_paths=true", _validate(del_true, prp_sc) != [])
+        check("PathRollbackPlan rejects deletes_paths=true", _validate(del_true, prp_sc) != [])
         no_tgt = {k: v for k, v in prp_valid.items() if k != "rollback_target_path_id"}
-        check("PathRollbackPlan.v1 rejects a plan missing rollback_target_path_id", _validate(no_tgt, prp_sc) != [])
+        check("PathRollbackPlan rejects a plan missing rollback_target_path_id", _validate(no_tgt, prp_sc) != [])
 
-    # ── PathCostReport.v1: pricebook-relative cost; currency + confidence enum-pinned. ──
+    # ── PathCostReport: pricebook-relative cost; currency + confidence enum-pinned. ──
     pcost_sc = schemas.get("PathCostReport", {})
-    check("PathCostReport.v1 currency enum is exactly {relative-unit} (offline ranking units, not real money)",
+    check("PathCostReport currency enum is exactly {relative-unit} (offline ranking units, not real money)",
           _enum_of(pcost_sc, "currency") == ["relative-unit"], str(_enum_of(pcost_sc, "currency")))
-    check("PathCostReport.v1 confidence enum is exactly {high,low} (a 'low' placeholder never becomes 'medium'/'high' silently)",
+    check("PathCostReport confidence enum is exactly {high,low} (a 'low' placeholder never becomes 'medium'/'high' silently)",
           set(_enum_of(pcost_sc, "confidence")) == {"high", "low"}, str(_enum_of(pcost_sc, "confidence")))
-    check("PathCostReport.v1 REQUIRES backend_id + pricebook_version + estimated_cost + confidence",
+    check("PathCostReport REQUIRES backend_id + pricebook_version + estimated_cost + confidence",
           {"backend_id", "pricebook_version", "estimated_cost", "confidence"} <= set(pcost_sc.get("required", [])))
     pcost_valid = examples.get("PathCostReport", {}).get("valid", {})
     if pcost_valid and pcost_sc:
         bad_conf = dict(pcost_valid); bad_conf["confidence"] = "medium"
-        check("PathCostReport.v1 rejects confidence='medium'", _validate(bad_conf, pcost_sc) != [])
+        check("PathCostReport rejects confidence='medium'", _validate(bad_conf, pcost_sc) != [])
         bad_cur = dict(pcost_valid); bad_cur["currency"] = "USD"
-        check("PathCostReport.v1 rejects currency='USD'", _validate(bad_cur, pcost_sc) != [])
+        check("PathCostReport rejects currency='USD'", _validate(bad_cur, pcost_sc) != [])
         # the valid example's estimated_cost equals request + duration*dur_s + idle*idle_s (the documented formula).
         expected = (pcost_valid["request_cost"]
                     + pcost_valid["duration_cost_per_s"] * pcost_valid["estimated_duration_s"]
                     + pcost_valid["idle_cost_per_s"] * pcost_valid["estimated_idle_s"])
-        check("PathCostReport.v1 valid example estimated_cost matches request + duration*s + idle*s",
+        check("PathCostReport valid example estimated_cost matches request + duration*s + idle*s",
               abs(pcost_valid["estimated_cost"] - expected) < 1e-9, f"{pcost_valid['estimated_cost']} vs {expected}")
         # the backend_id names a real pricebook entry (config is the single source of cost).
         pb = json.loads((_REPO / "architecture" / "execution_backend_pricebook.json").read_text())
-        check("PathCostReport.v1 valid example backend_id exists in the execution-backend pricebook",
+        check("PathCostReport valid example backend_id exists in the execution-backend pricebook",
               pcost_valid["backend_id"] in pb.get("backends", {}), pcost_valid["backend_id"])
-        check("PathCostReport.v1 valid example pricebook_version matches the pricebook version",
+        check("PathCostReport valid example pricebook_version matches the pricebook version",
               pcost_valid["pricebook_version"] == pb.get("version"))
 
     # ── contract registry covers each schema (no contract sprawl). ──
@@ -278,8 +278,8 @@ def _self_test() -> int:
     reg_schemas = {item.get("schema") for item in reg.get("artifact_types", [])}
     reg_names = {item.get("name") for item in reg.get("artifact_types", [])}
     for stem in _SCHEMAS:
-        rel = f"schemas/experiments/{stem}.v1.schema.json"
-        check(f"contract registry covers {stem}.v1 (schema path registered)", rel in reg_schemas, rel)
+        rel = f"schemas/experiments/{stem}.schema.json"
+        check(f"contract registry covers {stem} (schema path registered)", rel in reg_schemas, rel)
         check(f"contract registry has a {stem} entry by name", stem in reg_names)
     # every registered experiments schema points at a file that exists.
     missing = [item["schema"] for item in reg.get("artifact_types", [])

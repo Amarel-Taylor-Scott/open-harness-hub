@@ -60,7 +60,7 @@ a truth authority — Baltor governs truth, Teleon runs capabilities.
 1. **Shared I/O spine — finish:** OpenAPI + AsyncAPI generation ✅ DONE (`scripts/build_contract_specs.py` +
    `scripts/check_shared_openapi_asyncapi_specs.py`); standalone I/O redteam ✅ DONE
    (`scripts/check_shared_io_resource_redteam.py`). REMAINING: migrate object families to explicitly conform to
-   `ObjectShell.v1` (one family per cycle) + a single I/O full-stack roll-up proof.
+   `ObjectShell` (one family per cycle) + a single I/O full-stack roll-up proof.
 2. **Design rollout:** the shared Oh\* kit account pages (auth/billing/usage/settings/dashboard) via `oh-site.jsx`;
    `makeHub` registry sites; MARKETING.md canonical copy; sites for the 3 new hubs.
 3. **Hub build-out:** OpenBenchmarkHub contracts/website/API remainder; OpenMCP + OpenCompression contracts +

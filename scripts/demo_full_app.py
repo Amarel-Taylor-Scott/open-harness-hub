@@ -86,7 +86,7 @@ def _source_locator(graph: ContextGraph, oid: str) -> dict:
     file_path = _handle_to_path(handle)
     anchor = handle.split("#", 1)[1] if "#" in handle else ""
     return {
-        "kind": "baltor.source-locator.v1",
+        "kind": "baltor.source-locator",
         "source_locator_id": "loc-" + sha256((oid + handle).encode("utf-8")).hexdigest()[:12],
         "source_handle": handle,
         "source_type": obj.get("object_type", "source_excerpt"),
@@ -143,7 +143,7 @@ def run_demo(*, corpus: str = DEFAULT_CORPUS, live: bool = False) -> dict[str, A
     locators = [_source_locator(g, oid) for oid in consulted]
     pack_id = "ctxpack-" + sha256((cfg["task_id"] + question).encode("utf-8")).hexdigest()[:12]
     lineage = {
-        "kind": "baltor.lineage-manifest.v1",
+        "kind": "baltor.lineage-manifest",
         "lineage_manifest_id": "lin-" + sha256(pack_id.encode("utf-8")).hexdigest()[:12],
         "object_ref": pack_id,
         "compact_summary": f"Pack for {cfg['task_id']} built from {len(consulted)} objects; authority "
@@ -174,7 +174,7 @@ def run_demo(*, corpus: str = DEFAULT_CORPUS, live: bool = False) -> dict[str, A
     }
     route = _route_seam(live)
     receipt = {
-        "kind": "baltor.context-receipt.v1",
+        "kind": "baltor.context-receipt",
         "receipt_id": "rcpt-" + sha256(pack_id.encode("utf-8")).hexdigest()[:12],
         "pack_id": pack_id, "question": question, "answer_value": interro["answer_value"],
         "source_handles": pack["source_handles"],

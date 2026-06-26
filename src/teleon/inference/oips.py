@@ -67,7 +67,7 @@ def resolve_preference(layers: list[dict], *, preference_id: str = "") -> dict:
                 effective[k] = v
     pid = preference_id or effective.get("preference_id") or _stable("pref", json.dumps(effective, sort_keys=True))
     h = "sha256:" + hashlib.sha256(json.dumps(effective, sort_keys=True).encode()).hexdigest()
-    return {"schema_version": "ResolvedInferencePreference.v1", "preference_id": pid, "effective": effective,
+    return {"schema_version": "ResolvedInferencePreference", "preference_id": pid, "effective": effective,
             "resolved_from": resolved_from, "effective_policy_hash": h, "conflict_notes": []}
 
 
@@ -173,7 +173,7 @@ def build_receipt(*, object_id: str, preference_id: str, requested_model_class: 
                   base_host: str | None = None) -> dict:
     h = lambda s: "sha256:" + hashlib.sha256(s.encode()).hexdigest()
     receipt = {
-        "schema_version": "ModelInvocationReceipt.v1",
+        "schema_version": "ModelInvocationReceipt",
         "receipt_id": _stable("llmrcpt", object_id, preference_id, now, output_text[:64]),
         "request_id": _stable("llmreq", object_id, preference_id, now, input_text[:64]),
         "object_id": object_id, "preference_id": preference_id,

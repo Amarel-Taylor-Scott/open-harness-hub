@@ -978,7 +978,7 @@ def gateway_receipt(operation: str, *, run: dict | None, ok: bool, handle: str =
     run_id = str((run or {}).get("run_id") or "")
     tenant = normalize_tenant(tenant_id or run_tenant(run))  # explicit caller tenant wins; else the run's owner
     receipt = {
-        "kind": "baltor.gateway-receipt.v1",
+        "kind": "baltor.gateway-receipt",
         "receipt_id": f"gwr-{uuid.uuid4().hex[:12]}",
         "ts": int(time.time()),
         "operation": operation,             # "context.search" | "context.fetch"
@@ -1081,7 +1081,7 @@ def heartbeat_payload(run_id: str = "") -> dict:
     latest_event = EVENTS[-1] if EVENTS else None
     return {
         "ok": True,
-        "kind": "baltor.debug_heartbeat.v1",
+        "kind": "baltor.debug_heartbeat",
         "ts": now,
         "server": {
             "pid": os.getpid(),
@@ -1497,7 +1497,7 @@ def glossary_resolution_packets(run_id: str, concerns: list[dict], source_name: 
         }
         packets.append({
             "packet_id": packet_id,
-            "kind": "baltor.glossary-resolution-packet.v1",
+            "kind": "baltor.glossary-resolution-packet",
             "run_id": run_id,
             "term": term,
             "concern_id": concern.get("concern_id"),
@@ -2584,7 +2584,7 @@ def context_object_graph_records(run: dict) -> dict:
     ]
     for dimension_id, namespace, name, description, higher_is, aggregation in built_in_dimensions:
         dimension_definitions.append({
-            "kind": "baltor.context-dimension-definition.v1",
+            "kind": "baltor.context-dimension-definition",
             "dimension_id": dimension_id,
             "namespace": namespace,
             "name": name,
@@ -2621,7 +2621,7 @@ def context_object_graph_records(run: dict) -> dict:
     def add_dimension_value(subject_id: str, dimension_id: str, value: float, *, subject_kind: str = "context_object", confidence: float = 0.75, scope: dict | None = None, evidence: list[str] | None = None, method: dict | None = None) -> None:
         score = bounded_score(value)
         dimension_values.append({
-            "kind": "baltor.context-dimension-value.v1",
+            "kind": "baltor.context-dimension-value",
             "dimension_value_id": f"dimv://baltor/{compact_id(run_id)}/{compact_id(subject_id)}/{compact_id(dimension_id)}",
             "dimension_id": dimension_id,
             "subject_id": subject_id,
@@ -2640,7 +2640,7 @@ def context_object_graph_records(run: dict) -> dict:
 
     def add_assertion(subject_id: str, predicate: str, value: object, *, object_id: str = "", value_type: str = "object", confidence: float = 0.75, evidence: list[str] | None = None, attributes: dict | None = None) -> None:
         assertions.append({
-            "kind": "baltor.context-assertion.v1",
+            "kind": "baltor.context-assertion",
             "context_assertion_id": f"assert://baltor/{compact_id(run_id)}/{len(assertions) + 1}",
             "subject_id": subject_id,
             "predicate": predicate,
@@ -2752,7 +2752,7 @@ def context_object_graph_records(run: dict) -> dict:
             "risk.operational": operational_risk,
         }
         objects.append({
-            "kind": "baltor.context-object.v1",
+            "kind": "baltor.context-object",
             "context_object_id": object_id,
             "current_version_id": version_id,
             "object_type": object_type,
@@ -2807,7 +2807,7 @@ def context_object_graph_records(run: dict) -> dict:
         add_dimension_value(object_id, "dim://baltor/safety/prompt-injection-risk", 0.62 if object_type in {"comment", "source_excerpt", "claim"} else 0.3, evidence=source_handles or [object_id])
         add_dimension_value(object_id, "dim://baltor/retrieval/actionability", 0.72 if not body.get("requires_refresh") else 0.4, evidence=source_handles or [object_id])
         versions.append({
-            "kind": "baltor.context-version.v1",
+            "kind": "baltor.context-version",
             "context_version_id": version_id,
             "context_object_id": object_id,
             "content_hash": stable_hash(body),
@@ -2824,7 +2824,7 @@ def context_object_graph_records(run: dict) -> dict:
             "created_at": generated_at,
         })
         events.append({
-            "kind": "baltor.context-event.v1",
+            "kind": "baltor.context-event",
             "context_event_id": f"ctxevent://baltor/{compact_id(run_id)}/observed/{len(events) + 1}",
             "event_type": "NORMALIZED",
             "object_id": object_id,
@@ -2880,7 +2880,7 @@ def context_object_graph_records(run: dict) -> dict:
         )
         artifact_id = f"ctxa://baltor/{compact_id(run_id)}/claim/{compact_id(claim.get('id'))}"
         artifacts.append({
-            "kind": "baltor.context-artifact.v1",
+            "kind": "baltor.context-artifact",
             "context_artifact_id": artifact_id,
             "artifact_type": "claim",
             "derived_from": [claim_handle],
@@ -2910,7 +2910,7 @@ def context_object_graph_records(run: dict) -> dict:
             native_id=record_id,
         )
         artifacts.append({
-            "kind": "baltor.context-artifact.v1",
+            "kind": "baltor.context-artifact",
             "context_artifact_id": f"ctxa://baltor/{compact_id(run_id)}/rag/{compact_id(record_id)}",
             "artifact_type": "chunk",
             "derived_from": [handle],
@@ -2956,7 +2956,7 @@ def context_object_graph_records(run: dict) -> dict:
         if not isinstance(edge, dict):
             continue
         relationships.append({
-            "kind": "baltor.context-relationship.v1",
+            "kind": "baltor.context-relationship",
             "context_relationship_id": f"ctxrel://baltor/{compact_id(run_id)}/{idx}",
             "from_id": str(edge.get("source") or ""),
             "to_id": str(edge.get("target") or ""),
@@ -2992,7 +2992,7 @@ def context_object_graph_records(run: dict) -> dict:
 
     pack_id = f"ctxpack://baltor/{compact_id(run_id)}/implementation/latest"
     packs.append({
-        "kind": "baltor.context-pack.v1",
+        "kind": "baltor.context-pack",
         "context_pack_id": pack_id,
         "pack_type": str(pack.get("pack_type") or "implementation_pack"),
         "task": str(pack.get("task_type") or "local_context_run"),
@@ -3026,7 +3026,7 @@ def context_object_graph_records(run: dict) -> dict:
         attributes={"pack_type": packs[0]["pack_type"]},
     )
     events.append({
-        "kind": "baltor.context-event.v1",
+        "kind": "baltor.context-event",
         "context_event_id": f"ctxevent://baltor/{compact_id(run_id)}/served/context-pack",
         "event_type": "SERVED",
         "object_id": pack_id,
@@ -3041,17 +3041,17 @@ def context_object_graph_records(run: dict) -> dict:
         "metadata": {"pack_type": packs[0]["pack_type"]},
     })
     return {
-        "kind": "baltor.context-object-graph-records.v1",
+        "kind": "baltor.context-object-graph-records",
         "schema_kinds": [
-            "baltor.context-object.v1",
-            "baltor.context-version.v1",
-            "baltor.context-artifact.v1",
-            "baltor.context-relationship.v1",
-            "baltor.context-assertion.v1",
-            "baltor.context-dimension-definition.v1",
-            "baltor.context-dimension-value.v1",
-            "baltor.context-event.v1",
-            "baltor.context-pack.v1",
+            "baltor.context-object",
+            "baltor.context-version",
+            "baltor.context-artifact",
+            "baltor.context-relationship",
+            "baltor.context-assertion",
+            "baltor.context-dimension-definition",
+            "baltor.context-dimension-value",
+            "baltor.context-event",
+            "baltor.context-pack",
         ],
         "objects": objects,
         "versions": versions,
@@ -3247,7 +3247,7 @@ def sync_contracts_payload() -> dict:
     })
     return {
         "ok": True,
-        "kind": "baltor.context-sync-contracts.v1",
+        "kind": "baltor.context-sync-contracts",
         "sync_modes": ["push", "pull", "push_then_pull"],
         "trigger_types": trigger_types,
         "check_gates": [
@@ -3263,8 +3263,8 @@ def sync_contracts_payload() -> dict:
             "staleness_policy",
         ],
         "artifact_manifest_kinds": [
-            "baltor.repo-wiki-artifact-manifest.v1",
-            "baltor.local-context-cache-manifest.v1",
+            "baltor.repo-wiki-artifact-manifest",
+            "baltor.local-context-cache-manifest",
         ],
         "worker_routing": {
             "push_webhook": {"task": "repo.diff.plan", "lane": "sync"},
@@ -3303,13 +3303,13 @@ def context_object_schema_payload() -> dict:
     except (OSError, json.JSONDecodeError) as exc:
         return {
             "ok": False,
-            "kind": "baltor.context-object-schema.v1",
+            "kind": "baltor.context-object-schema",
             "error": str(exc),
             "schema_path": str(schema_path.relative_to(REPO_ROOT)),
         }
     return {
         "ok": True,
-        "kind": "baltor.context-object-schema.v1",
+        "kind": "baltor.context-object-schema",
         "schema_path": str(schema_path.relative_to(REPO_ROOT)),
         "profile_doc": "docs/architecture/baltor-context-object-standards.md",
         "schema_id": schema.get("$id"),
@@ -3384,7 +3384,7 @@ def context_schema_catalog_payload() -> dict:
         })
     return {
         "ok": all(item.get("ok") for item in schemas),
-        "kind": "baltor.context-schema-catalog.v1",
+        "kind": "baltor.context-schema-catalog",
         "profile_doc": "docs/architecture/baltor-context-object-graph-profile.md",
         "standards_doc": "docs/architecture/baltor-context-object-standards.md",
         "schema_count": len(schemas),
@@ -3411,7 +3411,7 @@ def context_schema_catalog_payload() -> dict:
 def context_product_surface_payload() -> dict:
     return {
         "ok": True,
-        "kind": "baltor.context-product-surface.v1",
+        "kind": "baltor.context-product-surface",
         "product_id": "baltor-context-fabric",
         "name": "Baltor Context Fabric",
         "positioning": "Governed context object platform for humans, agents, and enterprise systems.",
@@ -3526,7 +3526,7 @@ def context_model_routing_payload(*, run: dict | None = None, task_type: str = "
     ]
     model_profiles = [
         {
-            "kind": "baltor.context-model-profile.v1",
+            "kind": "baltor.context-model-profile",
             "model_profile_id": f"model-profile://baltor/{profile_id}",
             "tier": tier,
             "slot": slot,
@@ -3546,7 +3546,7 @@ def context_model_routing_payload(*, run: dict | None = None, task_type: str = "
         for profile_id, tier, slot, families, default_tasks, max_risk, cost_profile, deployment_modes in slots
     ]
     routing_policy = {
-        "kind": "baltor.context-model-routing-policy.v1",
+        "kind": "baltor.context-model-routing-policy",
         "routing_policy_id": "model-routing://baltor/risk-ladder/v1",
         "score_formula": score_formula,
         "thresholds": [
@@ -3596,7 +3596,7 @@ def context_model_routing_payload(*, run: dict | None = None, task_type: str = "
     selected = next(item for item in routing_policy["thresholds"] if escalation_score >= item["min"] and escalation_score <= item["max"])
     return {
         "ok": True,
-        "kind": "baltor.context-model-routing.v1",
+        "kind": "baltor.context-model-routing",
         "run_id": (run or {}).get("run_id"),
         "task_type": task_type,
         "model_profiles": model_profiles,
@@ -3636,7 +3636,7 @@ def context_reranking_payload(*, run: dict | None = None, query: str = "", task_
     ]
     reranker_profiles = [
         {
-            "kind": "baltor.context-reranker-profile.v1",
+            "kind": "baltor.context-reranker-profile",
             "reranker_profile_id": f"reranker-profile://baltor/{profile_id}",
             "stage": stage,
             "slot": slot,
@@ -3657,7 +3657,7 @@ def context_reranking_payload(*, run: dict | None = None, query: str = "", task_
         for profile_id, stage, slot, families, default_tasks, candidate_pool, latency_profile, training, deployment_modes in profile_rows
     ]
     reranking_policy = {
-        "kind": "baltor.context-reranking-policy.v1",
+        "kind": "baltor.context-reranking-policy",
         "reranking_policy_id": "reranking://baltor/source-aware-ladder/v1",
         "score_formula": score_formula,
         "pipeline": [
@@ -3718,7 +3718,7 @@ def context_reranking_payload(*, run: dict | None = None, query: str = "", task_
         selected_stage = "hybrid_vector_then_cross_encoder"
     return {
         "ok": True,
-        "kind": "baltor.context-reranking.v1",
+        "kind": "baltor.context-reranking",
         "run_id": (run or {}).get("run_id"),
         "query": query,
         "task_type": task_type,
@@ -3738,7 +3738,7 @@ def context_local_memory_payload(*, run: dict | None = None, scope: str = "perso
     generated_at = iso_now()
     profiles = [
         {
-            "kind": "baltor.context-local-memory-profile.v1",
+            "kind": "baltor.context-local-memory-profile",
             "local_memory_profile_id": "local-memory://baltor/private-local/v1",
             "memory_class": "private_local",
             "scope": {"default_scope": "personal", "decryptors": ["user_devices"]},
@@ -3750,7 +3750,7 @@ def context_local_memory_payload(*, run: dict | None = None, scope: str = "perso
             "created_at": generated_at,
         },
         {
-            "kind": "baltor.context-local-memory-profile.v1",
+            "kind": "baltor.context-local-memory-profile",
             "local_memory_profile_id": "local-memory://baltor/team-encrypted/v1",
             "memory_class": "team_encrypted",
             "scope": {"default_scope": "team", "decryptors": ["team_members", "approved_devices"]},
@@ -3762,7 +3762,7 @@ def context_local_memory_payload(*, run: dict | None = None, scope: str = "perso
             "created_at": generated_at,
         },
         {
-            "kind": "baltor.context-local-memory-profile.v1",
+            "kind": "baltor.context-local-memory-profile",
             "local_memory_profile_id": "local-memory://baltor/org-approved-cache/v1",
             "memory_class": "org_approved_cache",
             "scope": {"default_scope": "repo_or_ticket", "decryptors": ["user_device"], "source": "company_context_gateway"},
@@ -3774,7 +3774,7 @@ def context_local_memory_payload(*, run: dict | None = None, scope: str = "perso
             "created_at": generated_at,
         },
         {
-            "kind": "baltor.context-local-memory-profile.v1",
+            "kind": "baltor.context-local-memory-profile",
             "local_memory_profile_id": "local-memory://baltor/company-context/v1",
             "memory_class": "company_context",
             "scope": {"default_scope": "org", "decryptors": ["company_context_service"]},
@@ -3787,7 +3787,7 @@ def context_local_memory_payload(*, run: dict | None = None, scope: str = "perso
         },
     ]
     sync_policy = {
-        "kind": "baltor.context-local-sync-policy.v1",
+        "kind": "baltor.context-local-sync-policy",
         "local_sync_policy_id": "local-sync://baltor/hybrid-local-memory/v1",
         "sync_modes": ["local_only", "encrypted_event_log", "encrypted_blob_relay", "git_encrypted", "company_context_cache"],
         "offline_policy": {
@@ -3831,7 +3831,7 @@ def context_local_memory_payload(*, run: dict | None = None, scope: str = "perso
     }
     return {
         "ok": True,
-        "kind": "baltor.context-local-memory.v1",
+        "kind": "baltor.context-local-memory",
         "profile_doc": "docs/architecture/baltor-local-encrypted-memory-sync.md",
         "run_id": (run or {}).get("run_id"),
         "memory_profiles": profiles,
@@ -4043,7 +4043,7 @@ def context_glossary_payload(*, run: dict | None = None, term: str = "", max_pac
     if not run:
         return {
             "ok": True,
-            "kind": "baltor.context-glossary.v1",
+            "kind": "baltor.context-glossary",
             "run_id": None,
             "packet_count": 0,
             "packets": [],
@@ -4057,7 +4057,7 @@ def context_glossary_payload(*, run: dict | None = None, term: str = "", max_pac
     packets = packets[:max(1, min(50, max_packets))]
     return {
         "ok": True,
-        "kind": "baltor.context-glossary.v1",
+        "kind": "baltor.context-glossary",
         "run_id": run.get("run_id"),
         "packet_count": len(packets),
         "packets": packets,
@@ -4075,7 +4075,7 @@ def context_dimensions_payload(*, run: dict | None = None, dimension_id: str = "
     if not run:
         return {
             "ok": True,
-            "kind": "baltor.context-dimensions.v1",
+            "kind": "baltor.context-dimensions",
             "status": "no run available",
             "dimension_definitions": [],
             "dimension_values": [],
@@ -4098,7 +4098,7 @@ def context_dimensions_payload(*, run: dict | None = None, dimension_id: str = "
     values = values[:max(1, min(500, max_values))]
     return {
         "ok": True,
-        "kind": "baltor.context-dimensions.v1",
+        "kind": "baltor.context-dimensions",
         "run_id": run.get("run_id"),
         "dimension_definitions": definitions,
         "dimension_values": values,
@@ -4146,7 +4146,7 @@ def export_payload(run: dict, kind: str) -> dict:
         if isinstance(source, dict) and isinstance(source.get("connector_envelope"), dict)
     ]
     base = {
-        "package_type": f"baltor.{kind}.v1",
+        "package_type": f"baltor.{kind}",
         "generated_at": int(time.time()),
         "run_id": run.get("run_id"),
         "status": run.get("status"),
@@ -4312,7 +4312,7 @@ def queue_health_payload() -> dict:
     queue = queue_stats()
     return {
         "ok": True,
-        "package_type": "baltor.queue-health.v1",
+        "package_type": "baltor.queue-health",
         "ts": int(time.time()),
         "queue": {
             "name": queue.get("queue"),
@@ -4468,7 +4468,7 @@ def _catalog_manifest_import_visibility() -> dict:
                 "flags": row.get("rotted_context_flags") or [],
             })
     return {
-        "kind": "baltor.catalog-manifest-import-visibility.v1",
+        "kind": "baltor.catalog-manifest-import-visibility",
         "bridge_dir": _relative_repo_path(bridge_dir),
         "plan_exists": plan_path.exists(),
         "records_exists": records_path.exists(),
@@ -4509,7 +4509,7 @@ def _object_governance_visibility(sql_text: str) -> dict:
     rubric_path = OBJECT_GOVERNANCE_REVIEW_RUBRIC_PATH
     concrete_rows = len(_iter_jsonl(concrete_profile_seed))
     return {
-        "kind": "baltor.object-governance-visibility.v1",
+        "kind": "baltor.object-governance-visibility",
         "tables": [
             {"name": table, "present": _schema_contains(sql_text, table)}
             for table in required_tables
@@ -4565,7 +4565,7 @@ def _archive_candidate_visibility() -> dict:
         pass
     states = ["candidate", "keep_active", "supersede", "archive_ready", "archived"]
     return {
-        "kind": "baltor.archive-candidate-visibility.v1",
+        "kind": "baltor.archive-candidate-visibility",
         "ledger": {
             "path": _relative_repo_path(ledger_path),
             "exists": ledger_path.exists(),
@@ -4588,12 +4588,12 @@ def _setting_drift_visibility(sql_text: str) -> dict:
         from scripts import _config as config
     except Exception as exc:  # pragma: no cover - defensive demo status path.
         return {
-            "kind": "baltor.setting-drift-visibility.v1",
+            "kind": "baltor.setting-drift-visibility",
             "ok": False,
             "error": str(exc),
         }
     return {
-        "kind": "baltor.setting-drift-visibility.v1",
+        "kind": "baltor.setting-drift-visibility",
         "ok": True,
         "setting_tables": [
             {"name": "setting_profile", "present": _schema_contains(sql_text, "setting_profile")},
@@ -4638,7 +4638,7 @@ def operational_readiness_payload() -> dict:
     }
     return {
         "ok": True,
-        "package_type": "baltor.operational-readiness.v1",
+        "package_type": "baltor.operational-readiness",
         "ts": int(time.time()),
         "summary": {
             "ready_checks": sum(1 for value in checks.values() if value),
@@ -5661,7 +5661,7 @@ class Handler(BaseHTTPRequestHandler):
             qs = parse_qs(parsed.query)
             limit = max(1, min(500, int((qs.get("limit") or ["50"])[0])))
             receipts = latest_gateway_receipts(limit)
-            self.send_bytes(200, json.dumps({"ok": True, "kind": "baltor.gateway-receipts.v1",
+            self.send_bytes(200, json.dumps({"ok": True, "kind": "baltor.gateway-receipts",
                                              "durable": RUN_STORE is not None, "count": len(receipts),
                                              "receipts": receipts}, indent=2).encode(), "application/json")
         elif path == "/api/context-gateway/glossary":
@@ -5812,7 +5812,7 @@ class Handler(BaseHTTPRequestHandler):
                             "application/json")
             return
         if parsed.path.rstrip("/") == "/api/context/serve":
-            # C-CONSUME-1: serve a ContextResponse.v1 through ConsumptionService (projection; no truth fabricated here).
+            # C-CONSUME-1: serve a ContextResponse through ConsumptionService (projection; no truth fabricated here).
             from scripts.api_context_handler import handle as _ctx_handle
             code, payload = _ctx_handle("POST", "/api/context/serve", self._read_json())
             log_event("context.serve", "Served a ContextResponse via the consumption API", source="api/context/serve")

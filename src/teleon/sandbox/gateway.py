@@ -45,7 +45,7 @@ def _sanitized_env() -> dict:
 
 def _receipt(run_id: str, provider_id: str, now: str, **extra) -> dict:
     rid = "sbxrcpt_" + hashlib.blake2b(f"{run_id}|{provider_id}|{now}".encode(), digest_size=10).hexdigest()
-    return {"schema_version": "SandboxReceipt.v1", "receipt_id": rid, "run_id": run_id, "provider_id": provider_id,
+    return {"schema_version": "SandboxReceipt", "receipt_id": rid, "run_id": run_id, "provider_id": provider_id,
             "created_at": now, "is_truth": False, **extra}
 
 
@@ -97,7 +97,7 @@ class LocalTempdirProvider:
         contract_ok = (code == 0) and all(e in out for e in expected)
         status = "ok" if (code == 0 and not violations) else ("policy_violation" if violations else "failed")
         substituted = self.requested_provider_id != self.provider_id  # asked for a different local kind
-        return {"schema_version": "SandboxRunResult.v1", "run_id": request["run_id"], "provider_id": self.provider_id,
+        return {"schema_version": "SandboxRunResult", "run_id": request["run_id"], "provider_id": self.provider_id,
                 "requested_provider_id": self.requested_provider_id, "provider_substituted": substituted,
                 "status": status, "exit_code": code, "output_contract_valid": contract_ok,
                 "policy_violations": violations, "secrets_leaked": secrets_leaked, "network_events": [],
@@ -121,7 +121,7 @@ class _CandidateSeam:
         return {"provider_id": self.provider_id, "available": False, "reason": "candidate — needs creds/host/infra"}
 
     def run(self, request: dict, *, now: str) -> dict:
-        return {"schema_version": "SandboxRunResult.v1", "run_id": request["run_id"], "provider_id": self.provider_id,
+        return {"schema_version": "SandboxRunResult", "run_id": request["run_id"], "provider_id": self.provider_id,
                 "status": "provider_unavailable", "exit_code": None, "output_contract_valid": False,
                 "policy_violations": [], "secrets_leaked": False,
                 "receipt_id": _receipt(request["run_id"], self.provider_id, now, unavailable=True)["receipt_id"], "is_truth": False}

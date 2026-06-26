@@ -13,7 +13,7 @@ snippet's unit test as a proof, and only then returns ``approved``. THE GATE'S I
 
 The "sandbox" is deterministic + offline: we evaluate the snippet against an in-process safe namespace inside a
 temp dir (created + cleaned up), with NO real network/secret access available. Static scanning is the primary
-defense; the temp-dir run confirms the unit test passes. Produces a result shaped like VerifierProofResult.v1.
+defense; the temp-dir run confirms the unit test passes. Produces a result shaped like VerifierProofResult.
 No clock (time INJECTED), no RNG. stdlib only.
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
-#: gate decisions (single source — matches VerifierProofResult.v1.gate_decision enum).
+#: gate decisions (single source — matches VerifierProofResult.gate_decision enum).
 GATE_DECISIONS = ("approved", "rejected", "needs_human_approval")
 
 #: import/name patterns that mean a snippet is reaching for the NETWORK — statically forbidden in the sandbox.
@@ -70,7 +70,7 @@ class SandboxReport:
 
 @dataclass(frozen=True)
 class GateResult:
-    """The proof-gate outcome for one snippet, shaped like VerifierProofResult.v1."""
+    """The proof-gate outcome for one snippet, shaped like VerifierProofResult."""
 
     snippet_id: str
     sandbox_passed: bool
@@ -83,7 +83,7 @@ class GateResult:
     gated_at: int                     # injected epoch seconds — never wall-clock
 
     def to_dict(self) -> dict:
-        return {"schema_version": "VerifierProofResult.v1", "snippet_id": self.snippet_id,
+        return {"schema_version": "VerifierProofResult", "snippet_id": self.snippet_id,
                 "sandbox_passed": self.sandbox_passed, "proof_passed": self.proof_passed,
                 "gate_decision": self.gate_decision, "can_register": self.can_register,
                 "high_risk": self.high_risk, "reason": self.reason,

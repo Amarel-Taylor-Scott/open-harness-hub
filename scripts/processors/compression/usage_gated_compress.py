@@ -109,7 +109,7 @@ SCORE_DECIMALS = 6
 
 def empty_prior() -> dict[str, Any]:
     """A fresh usage prior — the learned generative model before any turns."""
-    return {"schema": "usage-prior.v1", "items": {}}
+    return {"schema": "usage-prior", "items": {}}
 
 
 def _count_tokens(text: str) -> int:
@@ -260,7 +260,7 @@ def observe(prior: dict[str, Any], *, served_ids: list[str],
     """
     cited = set(cited_ids or [])
     changed = set(changed_ids or [])
-    out = {"schema": prior.get("schema", "usage-prior.v1"),
+    out = {"schema": prior.get("schema", "usage-prior"),
            "items": {k: dict(v) for k, v in prior.get("items", {}).items()}}
     for sid in served_ids:
         st = out["items"].setdefault(sid, {"served": 0, "cited": 0, "changed": 0,

@@ -18,7 +18,7 @@ customer adopt Baltor WITHOUT replacing their data model, UI, tables, or APIs.
 - `schema_preserving` — same schema/keys/columns; only VERIFIED value changes (e.g. `"30 days"`→`"10 business days"`).
 - `schema_preserving_with_sidecar` — same schema + receipts/conflicts/warnings/diff sidecar.
 - `annotated_native` — same doc format (MD/HTML/DOCX) + annotations/comments/footnotes/frontmatter.
-- `baltor_native` — `ContextResponse.v1` / `ContextPack.v1` (the advanced surface).
+- `baltor_native` — `ContextResponse` / `ContextPack` (the advanced surface).
 - `dual` — both native output AND baltor-native.
 - `compare` — original + updated + diff + sidecar.
 
@@ -28,10 +28,10 @@ equivalent/cleaned (yes) · annotated-native (yes) · visually-identical PDF (ha
 API-compatible request/response (very feasible).
 
 ## Contracts (schemas/native/*.v1; register in contract_registry)
-NativeShapeContract.v1 (format, schema_hash, field_order, encoding, delimiter, newline, mime_type) ·
-NativeProjection.v1 · SidecarOverlay.v1 (field_facts, held_out_claims, conflicts, reconciliations,
-verification_receipts, warnings, source_hash, artifact_ids) · NativeDiff.v1 (changed_fields: path/old/
-new/decision/receipt_id) · NativeExportReceipt.v1.
+NativeShapeContract (format, schema_hash, field_order, encoding, delimiter, newline, mime_type) ·
+NativeProjection · SidecarOverlay (field_facts, held_out_claims, conflicts, reconciliations,
+verification_receipts, warnings, source_hash, artifact_ids) · NativeDiff (changed_fields: path/old/
+new/decision/receipt_id) · NativeExportReceipt.
 
 ## Runtime (behind ports; NO 2nd ledger / NO 2nd export framework — rides existing runtime)
 NativeFormatPreserver · NativeProjectionBuilder · SidecarWriter · NativeExportService. Pipeline:

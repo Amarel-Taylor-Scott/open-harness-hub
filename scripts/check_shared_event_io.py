@@ -3,9 +3,9 @@
 1.0 envelopes, honestly and deterministically, with the spine's tracing + secret guarantees.
 
 Drives a LIVE EventBus (scripts/context_events) and asserts:
-  A. CONTRACTS: CloudEventProjection.v1 registered; EventEnvelope.v1 exists and is CloudEvents 1.0.
-  B. PROJECTION: a published bus event projects to an envelope conforming to BOTH EventEnvelope.v1 (CloudEvents
-     required) and CloudEventProjection.v1 (which additionally requires correlation_id + causation_id).
+  A. CONTRACTS: CloudEventProjection registered; EventEnvelope exists and is CloudEvents 1.0.
+  B. PROJECTION: a published bus event projects to an envelope conforming to BOTH EventEnvelope (CloudEvents
+     required) and CloudEventProjection (which additionally requires correlation_id + causation_id).
   C. CLOUDEVENTS: specversion 1.0, type == kind, datacontenttype application/json, subject == object_ref.
   D. SINGLE SOURCE: type is in EVENT_KINDS; an unknown kind raises (the projector validates against the set).
   E. TRACING: correlation_id present; a root event (no causation) defaults causation_id := correlation_id;
@@ -51,16 +51,16 @@ def _self_test() -> int:
         return all(k in rec for k in _required(rel))
 
     contracts = json.dumps(json.loads((_REPO / "architecture" / "contract_registry.json").read_text()))
-    check("A: CloudEventProjection.v1 registered", "io/CloudEventProjection.v1.schema.json" in contracts)
-    ee = json.loads((_REPO / "schemas" / "envelopes" / "EventEnvelope.v1.schema.json").read_text())
-    check("A: EventEnvelope.v1 is CloudEvents 1.0", "1.0" in ee["properties"]["specversion"].get("enum", []))
+    check("A: CloudEventProjection registered", "io/CloudEventProjection.schema.json" in contracts)
+    ee = json.loads((_REPO / "schemas" / "envelopes" / "EventEnvelope.schema.json").read_text())
+    check("A: EventEnvelope is CloudEvents 1.0", "1.0" in ee["properties"]["specversion"].get("enum", []))
 
     bus = EventBus()
     ev = bus.publish("pipeline.started", stage="Source Systems", component="demo",
                      correlation_id="corr-1", object_ref="obj-1", payload={"x": 1})
     env = project_event_envelope(ev, source=_SRC, now=_NOW, tenant_id="t1")
-    check("B: projects to a valid EventEnvelope.v1 (CloudEvents)", conforms(env, "envelopes/EventEnvelope.v1.schema.json"), json.dumps(env))
-    check("B: projects to a valid CloudEventProjection.v1 (correlation+causation required)", conforms(env, "io/CloudEventProjection.v1.schema.json"))
+    check("B: projects to a valid EventEnvelope (CloudEvents)", conforms(env, "envelopes/EventEnvelope.schema.json"), json.dumps(env))
+    check("B: projects to a valid CloudEventProjection (correlation+causation required)", conforms(env, "io/CloudEventProjection.schema.json"))
 
     check("C: CloudEvents fields (specversion 1.0, type==kind, json, subject)",
           env["specversion"] == "1.0" and env["type"] == "pipeline.started"
@@ -107,7 +107,7 @@ def _self_test() -> int:
           not any(l.strip().startswith(("import src.baltor", "from src.baltor")) for l in src.splitlines()))
 
     print("\n" + ("PASS — check_shared_event_io: internal bus events project to CloudEvents 1.0 envelopes "
-                  "(EventEnvelope.v1 / CloudEventProjection.v1) — type in EVENT_KINDS (single source), "
+                  "(EventEnvelope / CloudEventProjection) — type in EVENT_KINDS (single source), "
                   "correlation_id required + causation defaulting, deterministic (source,type,seq) id, raw secrets "
                   "redacted from data; pure projector; Teleon-side." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1

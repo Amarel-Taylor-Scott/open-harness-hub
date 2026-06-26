@@ -6,8 +6,8 @@ Asserts:
   A. SPINE MAP: every eval/promotion contract resolves to a real schema file (no dangling).
   B. ENGINE PRESENT (ratify by reference): src/baltor/experiments/{parallel_paths,path_comparator,path_promotion,
      path_rollback}.py exist and the parallel-path promotion-gate proof is registered in the flywheel.
-  C. REVERSIBLE BY CONTRACT: PathPromotionDecision.v1 REQUIRES rollback_target (a promotion is always reversible).
-  D. NEW CONTRACT: HumanApprovalReceipt.v1 registered; mint produces all required fields.
+  C. REVERSIBLE BY CONTRACT: PathPromotionDecision REQUIRES rollback_target (a promotion is always reversible).
+  D. NEW CONTRACT: HumanApprovalReceipt registered; mint produces all required fields.
   E. BOUNDARY GATE: a boundary-expanding promotion WITHOUT an approved receipt is blocked; WITH an approved
      receipt it passes; a PENDING receipt is blocked; a non-boundary-expanding promotion needs no approval.
   F. SUBJECT MATCH: an approval for a different subject_ref is rejected.
@@ -50,12 +50,12 @@ def _self_test() -> int:
     fly = (_REPO / "scripts" / "flywheel_proof_modules.py").read_text()
     check("B: parallel-path promotion-gate proof registered in flywheel", "check_parallel_path_promotion_gate" in fly)
 
-    ppd = json.loads((_REPO / "schemas" / "experiments" / "PathPromotionDecision.v1.schema.json").read_text())
-    check("C: PathPromotionDecision.v1 requires rollback_target (always reversible)", "rollback_target" in ppd["required"])
+    ppd = json.loads((_REPO / "schemas" / "experiments" / "PathPromotionDecision.schema.json").read_text())
+    check("C: PathPromotionDecision requires rollback_target (always reversible)", "rollback_target" in ppd["required"])
 
     contracts = json.dumps(json.loads((_REPO / "architecture" / "contract_registry.json").read_text()))
-    check("D: HumanApprovalReceipt.v1 registered", "governance/HumanApprovalReceipt.v1.schema.json" in contracts)
-    req_fields = json.loads((_REPO / "schemas" / "governance" / "HumanApprovalReceipt.v1.schema.json").read_text())["required"]
+    check("D: HumanApprovalReceipt registered", "governance/HumanApprovalReceipt.schema.json" in contracts)
+    req_fields = json.loads((_REPO / "schemas" / "governance" / "HumanApprovalReceipt.schema.json").read_text())["required"]
     receipt = BA.mint_human_approval_receipt(subject_ref="decision-1", boundary_kind="tool_added",
                                              approver_role="owner", status="approved", now=_NOW)
     check("D: minted receipt carries all required fields", all(k in receipt for k in req_fields), str([k for k in req_fields if k not in receipt]))

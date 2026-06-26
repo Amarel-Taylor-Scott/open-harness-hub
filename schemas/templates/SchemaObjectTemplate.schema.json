@@ -1,0 +1,76 @@
+{
+  "$id": "templates/SchemaObjectTemplate",
+  "title": "SchemaObjectTemplate",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "A template that generates a SCHEMA OBJECT by composing the canonical object shell from standardized mixins. Generated schema links to a contract_registry entry; generated instances are candidate until validated.",
+  "required": [
+    "schema_template_id",
+    "display_name",
+    "object_family",
+    "required_mixins",
+    "required_fields",
+    "valid_examples",
+    "invalid_examples",
+    "compatibility_policy",
+    "registry_entry",
+    "proof_script",
+    "docs_path"
+  ],
+  "properties": {
+    "schema_template_id": {
+      "type": "string"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "object_family": {
+      "type": "string"
+    },
+    "generated_schema_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "required_mixins": {
+      "type": "array"
+    },
+    "optional_mixins": {
+      "type": "array"
+    },
+    "required_fields": {
+      "type": "array"
+    },
+    "forbidden_fields": {
+      "type": "array"
+    },
+    "valid_examples": {
+      "type": "array"
+    },
+    "invalid_examples": {
+      "type": "array"
+    },
+    "compatibility_policy": {
+      "type": "string"
+    },
+    "migration_policy": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "registry_entry": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proof_script": {
+      "type": "string"
+    },
+    "docs_path": {
+      "type": "string"
+    }
+  }
+}

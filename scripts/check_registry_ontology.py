@@ -4,7 +4,7 @@ The registry ontology is the registry-of-registries. Two load-bearing invariants
   1. GROUNDING — a live/partial registry must name backing paths that actually exist on disk (an architecture
      map can never claim a module we don't have). A gap names NO backing.
   2. ANTI-FRAGMENTATION (owner's #1 risk) — with 55+ registries, the shapes must NOT drift apart. So:
-       - every entry conforms to ONE rigid schema (schemas/registry/RegistryOntologyEntry.v1.schema.json),
+       - every entry conforms to ONE rigid schema (schemas/registry/RegistryOntologyEntry.schema.json),
          which is the SINGLE SOURCE for the entry shape — this check reads its `required`/`enum`/`pattern`
          and enforces them (add a field/value = edit the schema, not this check);
        - the universal object shape is a real JSON Schema file (single source for the cross-registry object);

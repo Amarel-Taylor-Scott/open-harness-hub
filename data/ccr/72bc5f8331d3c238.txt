@@ -19,12 +19,12 @@ class LocalSqliteBlackboard:
     def status(self) -> dict
         # Always available — it needs nothing external (the honest local-first golden path).
     def create_blackboard(self, task: str, tenant_scope: str, *, now: str) -> dict
-        # Open a new tenant-scoped Blackboard.v1 workspace (status=open, entry_count=0). REQUIRES a tenant_scope
+        # Open a new tenant-scoped Blackboard workspace (status=open, entry_count=0). REQUIRES a tenant_scope
     def _blackboard_row(self, blackboard_id: str) -> dict
     def append_entry(self, blackboard_id: str, entry: dict, *, worker_receipt: dict, now: str) -> dict
         # APPEND one typed BlackboardEntry under a MANDATORY ``worker_receipt``; return the stored row dict.
     def _record_receipt(self, blackboard_id: str, worker_receipt: dict, *, entry_ids: list[str], now: str) -> str
-        # Persist a BlackboardWorkerReceipt.v1-shaped row and return its content-addressed receipt_id.
+        # Persist a BlackboardWorkerReceipt-shaped row and return its content-addressed receipt_id.
     def _entry_row(self, entry_id: str) -> dict
     def _row_to_entry(row: sqlite3.Row) -> dict
     def query(self, blackboard_id: str, *, kind: str | None=None, author_worker_id: str | None=None, iteration: int | None=None, limit: int | None=None) -> list[dict]

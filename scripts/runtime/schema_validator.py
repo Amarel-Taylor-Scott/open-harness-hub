@@ -23,7 +23,7 @@ _cache: dict[str, dict] = {}
 
 
 def load_schema(ref: str) -> dict:
-    """ref like 'envelopes/CommandEnvelope.v1' or 'artifacts/AtomicFact.v1'."""
+    """ref like 'envelopes/CommandEnvelope' or 'artifacts/AtomicFact'."""
     if ref in _cache:
         return _cache[ref]
     path = SCHEMA_DIR / f"{ref}.schema.json"

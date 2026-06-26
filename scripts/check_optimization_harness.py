@@ -91,7 +91,7 @@ def _self_test() -> int:
     # 4) it PROMOTES only with lift + zero regressions, and writes a schema-valid deterministic receipt
     check("a safe, improving optimization is PROMOTED", out["promoted"] is True and out["decision"] == "promote", str(out["decision"]))
     rec = out["receipt"].to_dict()
-    check("OptimizationReceipt validates against OptimizationReceipt.v1", validate_ref(rec, "artifacts/OptimizationReceipt.v1") == [], str(validate_ref(rec, "artifacts/OptimizationReceipt.v1")[:3]))
+    check("OptimizationReceipt validates against OptimizationReceipt", validate_ref(rec, "artifacts/OptimizationReceipt") == [], str(validate_ref(rec, "artifacts/OptimizationReceipt")[:3]))
     out2 = h.run(_pack(), pipe, answer_fact_ids=["fact-rege-10"], signals=signals, now=NOW)
     check("receipt id is deterministic (content-addressed, no clock/rng)", out["receipt"].receipt_id == out2["receipt"].receipt_id)
 

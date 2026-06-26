@@ -1,0 +1,19 @@
+{
+  "$id": "agents/AgentSkillPolicy",
+  "title": "AgentSkillPolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The skill-governance contract for an agent run on the shared plane. Deny-by-default: a skill must appear in allowlist to be loadable. progressive_disclosure controls whether skills are revealed/loaded on demand rather than all at once. agent_created_skills_status is pinned const 'candidate' — a skill an agent creates is ALWAYS a candidate, never auto-active; requires_eval_before_active forces it through evaluation/promotion before it can be served or reused as active. The agent PROPOSES skills; Baltor DISPOSES (gates promotion).",
+  "required": [
+    "allowlist",
+    "progressive_disclosure",
+    "agent_created_skills_status",
+    "requires_eval_before_active"
+  ],
+  "properties": {
+    "allowlist": {"type": "array", "items": {"type": "string"}, "description": "skill ids the agent MAY load; anything not listed is denied (deny-by-default)"},
+    "progressive_disclosure": {"type": "boolean", "description": "when true, skills are disclosed/loaded on demand rather than all up front"},
+    "agent_created_skills_status": {"type": "string", "const": "candidate", "description": "ALWAYS 'candidate' — a skill created by an agent is never born active; it enters the candidate ladder"},
+    "requires_eval_before_active": {"type": "boolean", "description": "when true, an agent-created/loaded skill must pass evaluation/promotion before it can become active or be served"}
+  }
+}

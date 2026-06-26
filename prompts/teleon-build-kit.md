@@ -137,7 +137,7 @@ Guarantees the code must hold: all mutations via handlers; events immutable + re
 
 ## 3. Data model (events versioned `.v1`; add fields freely, never remove stable-contract fields without approval)
 ```yaml
-PurposeTaskSpec.v1:        # STABLE (ends)
+PurposeTaskSpec:        # STABLE (ends)
   id; name; owner; tenantId; riskClass[low|medium|high|critical]
   purpose{summary,businessValue,nonGoals[]}
   input{schema:jsonschema}; output{schema:jsonschema}
@@ -145,38 +145,38 @@ PurposeTaskSpec.v1:        # STABLE (ends)
   connectedSystems{reads[],writes[],neverAllowed[]}   # never: PII extraction, payments, credential harvest, unapproved domains, destructive writes
   successCriteria{schemaValid,minFieldAccuracy,maxP95LatencyMs,maxCostPerRunUsd,forbiddenToolCalls,sourceHandleCoverageMin}
   runtimePolicy{allowedRuntimeClasses[],routingObjectives[correctness,cost,latency,reliability]}; specVersion
-PurposeTaskImplementation.v1:   # VARIABLE (means)
+PurposeTaskImplementation:   # VARIABLE (means)
   id; taskId; version; type[deterministic-parser|browser-script|http-fetch|api-connector|llm-extraction|ocr|agentic|hybrid-cascade]
   status[draft|shadow|canary|active|rejected|retired]; artifacts{codeRef?,promptRef?,parserRules?,selectors?,modelConfig?,toolSequence?}
   provenance{generatedBy,templateUsed?,skillsUsed?[],slsaRef?}
-PurposeTaskRuntimeBinding.v1: id; implementationId; runtimeClass; config{timeoutMs?,memoryMb?,concurrency?,batchSize?,cacheTtlS?}
-PurposeTaskRun.v1: id; taskId; implementationId; runtimeClass; inputHash; outputHash; outcome[success|failure|partial|held_for_review]
+PurposeTaskRuntimeBinding: id; implementationId; runtimeClass; config{timeoutMs?,memoryMb?,concurrency?,batchSize?,cacheTtlS?}
+PurposeTaskRun: id; taskId; implementationId; runtimeClass; inputHash; outputHash; outcome[success|failure|partial|held_for_review]
   schemaValid; latencyMs; costUsd; fieldConfidence; sourceHandleCoverage; forbiddenToolCalls
   cascadePath[cache|deterministic|browser|ocr|llm|agentic|human]; traceRef; receiptId?
-PurposeTaskScorecard.v1: id; taskId; implementationId; regressionPassed; shadowRuns; canaryRuns
+PurposeTaskScorecard: id; taskId; implementationId; regressionPassed; shadowRuns; canaryRuns
   dimensions{correctness,sourceHandleCoverage,lineage,receiptCompleteness,heldOutPreservation,
              tenantSafety[pass|fail],latencyMs,costUsd,reliability,observability[pass|fail],maintainability,uxClarity,redteamStatus[pass|fail|missing]}
-PurposeTaskRuntimeDecision.v1: id; runId; selectedRuntime; reasons[]; rejectedRuntimes[{runtimeClass,reason}]
-PurposeTaskPromotion.v1: id; taskId; from; to; reason; policyResultId; rollbackPlanId; approvalId?
+PurposeTaskRuntimeDecision: id; runId; selectedRuntime; reasons[]; rejectedRuntimes[{runtimeClass,reason}]
+PurposeTaskPromotion: id; taskId; from; to; reason; policyResultId; rollbackPlanId; approvalId?
   evidence{goldenBefore,goldenAfter,p95Before,p95After,costBefore,costAfter,shadowRuns,canaryRuns}
   decision[eligible|blocked|approved|rejected|promoted|rolled_back]
-PurposeTaskRollback.v1: id; taskId; targetImplementationId; reason; result[ready|executed|failed]
-PurposeTaskPolicyResult.v1: id; subjectId; eligible; blockers[]; gates{outputContractPassed,regressionPassed,
+PurposeTaskRollback: id; taskId; targetImplementationId; reason; result[ready|executed|failed]
+PurposeTaskPolicyResult: id; subjectId; eligible; blockers[]; gates{outputContractPassed,regressionPassed,
   noPermissionExpansion,noSourceHandleLoss,noHeldOutLeak,noTenantLeak,rollbackAvailable,approvalSatisfied,
   redteamCovered,successCriteriaNotWeakened,observabilityEnabled}
-PurposeTaskBoundaryChange.v1: id; taskId; requestedBy; rationale; status[requested|approved|rejected]
+PurposeTaskBoundaryChange: id; taskId; requestedBy; rationale; status[requested|approved|rejected]
   changeType[new_external_domain|browser_login|new_output_sink|higher_cost_ceiling|external_model_provider|permission_expand|purpose_change|data_class_increase]
   impact{addsWrites,addsDataSinks,costDeltaPerRunUsd}
-PurposeTaskApproval.v1: id; boundaryChangeId; audience[staff|customer]; decidedBy; decision[approved|rejected]
-PurposeTaskRedteamResult.v1: id; taskId; lastRunAt; overall[pass|fail]
+PurposeTaskApproval: id; boundaryChangeId; audience[staff|customer]; decidedBy; decision[approved|rejected]
+PurposeTaskRedteamResult: id; taskId; lastRunAt; overall[pass|fail]
   coverage{selfPromotionBlocked,purposeMutationBlocked,permissionExpansionBlocked,successCriteriaWeakeningBlocked,
            truthWithoutGateBlocked,baselineDeletionBlocked,dashboardTruthWriteBlocked,sourceHandleLossBlocked,
            customerDataRedacted,runtimeAllowlistEnforced}   # each pass|fail|missing
-TaskOrientation.v1: taskId; knownFailureModes[{mode,evidenceRef}]; environmentFacts[]; preferredStrategies[]
+TaskOrientation: taskId; knownFailureModes[{mode,evidenceRef}]; environmentFacts[]; preferredStrategies[]
   rejectedStrategies[{strategy,reason}]; successfulMigrations[]; predictiveEvals[{fixtureSet,caughtRegressions}]
-PurposeTaskReceipt.v1: id; runId; taskId; implementationVersion; runtimeClass; producedAt; answer
+PurposeTaskReceipt: id; runId; taskId; implementationVersion; runtimeClass; producedAt; answer
   servedSources[]; heldOutSources[{source,reason}]; conflictsDetected[]; evalSuite; lifecycleStage[baseline|canary|promoted]; rehydratable
-CapabilityGraphEdge.v1: fromTaskId; toTaskId; relation[depends_on|produces_event|consumes_event|validates|fallback_for|shares_system]; detail?
+CapabilityGraphEdge: fromTaskId; toTaskId; relation[depends_on|produces_event|consumes_event|validates|fallback_for|shares_system]; detail?
 ```
 
 ## 4. API surface

@@ -19,7 +19,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, WorkerRegi
 from scripts.context_workers.runtime_io import HeartbeatStore, runtime_health
 from scripts.db.runtime_settings import runtime_setting
 
-LIFECYCLE_VERSION = "context-worker-lifecycle.v1"
+LIFECYCLE_VERSION = "context-worker-lifecycle"
 CONTEXT_WORKER_RUNTIME_NAMESPACE = "baltor.context_worker.runtime"
 
 

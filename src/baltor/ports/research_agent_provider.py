@@ -77,8 +77,8 @@ class ResearchAgentProviderPort(Protocol):
         ...
 
     def research(self, task: dict[str, Any], *, now: str) -> dict[str, Any]:
-        """Run the bounded research loop for ``task`` (a ResearchTask.v1 dict) inside task.bounds and return a
-        SourceDiscoveryReport.v1 dict whose ``serves_truth`` is False, whose every candidate carries a
+        """Run the bounded research loop for ``task`` (a ResearchTask dict) inside task.bounds and return a
+        SourceDiscoveryReport dict whose ``serves_truth`` is False, whose every candidate carries a
         ``source_handle``, and whose ``trace_ref`` points at the replayable run trace. ``now`` is injected
         (deterministic). MUST NOT serve/promote a fact, exceed task.bounds, or use secrets. A candidate
         provider raises :class:`ResearchAgentUnavailable`."""
@@ -103,8 +103,8 @@ class SourceDiscoveryProviderPort(Protocol):
 
     def discover(self, task: dict[str, Any], *, existing_handles: list[str], now: str) -> dict[str, Any]:
         """Search ``existing_handles`` FIRST, then rank candidates by authority_rank (a FAQ can never outrank a
-        regulation). Returns {report: SourceDiscoveryReport.v1, candidates: list[SourceCandidate.v1],
-        scores: list[SourceReliabilityScore.v1], proposed_recipe: SourceRecipe.v1, reused_existing: bool}.
+        regulation). Returns {report: SourceDiscoveryReport, candidates: list[SourceCandidate],
+        scores: list[SourceReliabilityScore], proposed_recipe: SourceRecipe, reused_existing: bool}.
         ``serves_truth`` on the report is pinned False; ``now`` injected. Proposes, never promotes."""
         ...
 
@@ -120,7 +120,7 @@ class CodegenAgentProviderPort(Protocol):
     provider_id: str
 
     def draft_extractor(self, recipe: dict[str, Any], *, now: str) -> dict[str, Any]:
-        """Draft an ExtractorSnippet.v1 dict for ``recipe`` (a SourceRecipe.v1). MUST set
+        """Draft an ExtractorSnippet dict for ``recipe`` (a SourceRecipe). MUST set
         produces='fact_assertion_candidate', claim_status='candidate', has_unit_test=True,
         sandbox_required=True, and a source_handle. MUST NOT mark the snippet served/canonical/active and MUST
         NOT execute the drafted code. ``now`` injected (deterministic)."""

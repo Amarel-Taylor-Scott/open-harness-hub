@@ -1,0 +1,95 @@
+{
+  "$id": "contextops/SourceDiscoveryReport",
+  "title": "SourceDiscoveryReport",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "What a bounded research agent RETURNS \u2014 the candidate sources it discovered for a ResearchTask, plus the trace of what it did. This is the load-bearing point of the invariant: discovered_by names the agent, and serves_truth is pinned [false] \u2014 a discovery report is EVIDENCE about where truth might live, it is NEVER served as truth and NEVER promotes a canonical fact. Every candidate it carries must itself carry a source_handle. Baltor STORES this; reconciliation/verification decide what (if anything) becomes a fact. Deterministic when discovered_at is injected.",
+  "required": [
+    "schema_version",
+    "report_id",
+    "task_id",
+    "tenant_id",
+    "source_scope",
+    "discovered_by",
+    "candidates",
+    "serves_truth",
+    "trace_ref",
+    "discovered_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "SourceDiscoveryReport"
+      ]
+    },
+    "report_id": {
+      "type": "string",
+      "description": "content-addressed over (task_id, candidate handles); version in metadata, never in the id"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "the ResearchTask this report answers (lineage back-link)"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ],
+      "description": "tenant_private discovery stays tenant-scoped \u2014 it cannot seed a global_public fact"
+    },
+    "discovered_by": {
+      "type": "string",
+      "description": "the agent id that produced this report (e.g. research.local_stub@v1) \u2014 the invariant requires an attributable, non-serving discoverer"
+    },
+    "candidates": {
+      "type": "array",
+      "description": "the discovered SourceCandidate handles + brief authority notes; the full SourceCandidate objects are stored separately and referenced here",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "candidate_id",
+          "source_handle"
+        ],
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "source_handle": {
+            "type": "string",
+            "description": "every discovered candidate MUST carry a source handle \u2014 a candidate without a handle is not admissible"
+          },
+          "authority_note": {
+            "type": "string",
+            "description": "the agent's note on why this source is authoritative (a proposal, not a ruling)"
+          }
+        }
+      }
+    },
+    "serves_truth": {
+      "type": "boolean",
+      "enum": [
+        false
+      ],
+      "description": "PINNED false \u2014 a discovery report can NEVER be served as truth (red-team: serves_truth=true is rejected)"
+    },
+    "trace_ref": {
+      "type": "string",
+      "description": "opaque ref to the agent's run trace (steps/queries), stored, not inlined \u2014 replayability"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "discovered_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

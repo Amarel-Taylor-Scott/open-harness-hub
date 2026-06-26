@@ -8,7 +8,7 @@
 > records research/sandbox-and-skills/{cubesandbox,hermes-skills,openclaw-skills-sandbox,skill-tool-hubs}.md.
 > Sandbox output is NEVER truth — evidence for the promotion gate only. **QUEUED — the Skill/Tool DIGESTION
 > LAB** (the money loop: skill → cheaper deterministic runtime): skill-format adapters (OpenClaw/Hermes/Codex/
-> agentskills SKILL.md → SkillArtifact.v1); skill_digester + contract_inferencer + model_compatibility (via the
+> agentskills SKILL.md → SkillArtifact); skill_digester + contract_inferencer + model_compatibility (via the
 > Inference Gateway) + determinism_extractor (extract deterministic substeps → cheap runtime path, keep original
 > as fallback) + runtime_candidate_builder → Teleon PurposeTask candidate; digestion contracts
 > (SkillDigestRun/ToolDigestRun/CapabilityInferenceReport/ModelCompatibilityReport/DeterminismExtractionReport);

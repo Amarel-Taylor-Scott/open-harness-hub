@@ -31,7 +31,7 @@ def _self_test() -> int:
     etypes = {e["edge_type"] for e in r["edges"]}
 
     print("CAPABILITY | STATUS | INPUT | OUTPUT | POLICY | NOTES")
-    _row("contracts", "GREEN", "schemas/graph/*.v1", "10 schemas", "additionalProperties:false", "node/edge/observation/state")
+    _row("contracts", "GREEN", "schemas/graph/*", "10 schemas", "additionalProperties:false", "node/edge/observation/state")
     _row("local_store", "GREEN", "observations", "nodes+edges", "append-only+deterministic", "no external dep")
     _row("projection", "GREEN", "observations", "current_state", "authority_then_freshness", f"current={r['state']['current_value']}")
     _row("cfpb_reference", "GREEN", "RegE 10 vs FAQ 30", "10 current / 30 held_out", "source_of_law>faq", f"edges={sorted(etypes)}")

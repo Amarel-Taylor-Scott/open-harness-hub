@@ -173,7 +173,7 @@ def ingest(body: dict) -> tuple:
     # source_id is content+tenant addressed: same input -> same id (deterministic; dedupe-safe).
     source_id = "src-" + hashlib.sha256(f"{tenant_id}|{source_hash}".encode()).hexdigest()[:16]
     _SOURCES[source_id] = {
-        "schema_version": "NativeSourceRef.v1",
+        "schema_version": "NativeSourceRef",
         "source_id": source_id,
         "tenant_id": tenant_id,
         "source_hash": source_hash,
@@ -184,7 +184,7 @@ def ingest(body: dict) -> tuple:
     }
     receipt_id = "ingrcpt-" + hashlib.sha256(f"{source_id}|{source_hash}|{_NOW}".encode()).hexdigest()[:16]
     return 200, _scrub({
-        "schema_version": "NativeIngestResult.v1",
+        "schema_version": "NativeIngestResult",
         "stored": True,
         "mutated_canonical_truth": False,      # by design: ingest stores a source; it never mutates truth
         "served_fact": False,                  # by design: ingest serves no fact
@@ -193,7 +193,7 @@ def ingest(body: dict) -> tuple:
         "source_hash": source_hash,
         "byte_len": len(data),
         "format_hint": fmt,
-        "receipt": {"schema_version": "NativeExportReceipt.v1", "receipt_id": receipt_id,
+        "receipt": {"schema_version": "NativeExportReceipt", "receipt_id": receipt_id,
                     "op": "ingest", "source_id": source_id, "source_hash": source_hash, "created_at": _NOW},
         "refs": {
             "export": f"/api/native/export/{source_id}?mode=native_passthrough_with_sidecar",

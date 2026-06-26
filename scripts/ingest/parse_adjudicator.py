@@ -4,7 +4,7 @@
 For a high-value document you can run N parser engines (Docling / MinerU / Tika / MarkItDown / GROBID / ...),
 score each with ``parse_quality``, and SELECT the best — but keep EVERY engine's output as evidence (the
 lossless-distillation law: the losers are preserved in ``engine_runs``, never discarded, so a later reviewer can
-see what each engine produced and why one won). Emits a ``ParsedDocument.v1`` carrying the WINNER's pages +
+see what each engine produced and why one won). Emits a ``ParsedDocument`` carrying the WINNER's pages +
 quality + the full engine_runs ledger. ``serves_truth`` pinned false (a parse is evidence, never a served fact).
 Pure + deterministic: the same candidates always select the same winner. stdlib only.
 
@@ -23,7 +23,7 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
 
 from scripts.ingest.parse_quality import score_parse
 
-PARSED_DOCUMENT_SCHEMA_VERSION = "ParsedDocument.v1"
+PARSED_DOCUMENT_SCHEMA_VERSION = "ParsedDocument"
 
 
 class AdjudicationError(ValueError):
@@ -34,7 +34,7 @@ def adjudicate(candidates: list[dict]) -> dict:
     """Adjudicate ``candidates`` = ``[{"engine", "engine_version"?, "parsed": {"pages":[...]}}, ...]``.
 
     Score each candidate with ``parse_quality``, select the highest ``overall`` (ties → lowest index, stable +
-    deterministic), and return a ``ParsedDocument.v1`` with the WINNER's pages + quality + an ``engine_runs``
+    deterministic), and return a ``ParsedDocument`` with the WINNER's pages + quality + an ``engine_runs``
     ledger that PRESERVES every engine (lossless — losers carry their own quality + a reason, never dropped)."""
     if not candidates:
         raise AdjudicationError("adjudicate() needs at least one candidate parse")
@@ -75,8 +75,8 @@ def _self_test() -> int:
     out = adjudicate([{"engine": "docling", "parsed": good},
                       {"engine": "mineru", "parsed": scrambled},
                       {"engine": "tika", "parsed": blank}])
-    ck("emits a ParsedDocument.v1 that never serves truth",
-       out["schema_version"] == "ParsedDocument.v1" and out["serves_truth"] is False)
+    ck("emits a ParsedDocument that never serves truth",
+       out["schema_version"] == "ParsedDocument" and out["serves_truth"] is False)
     ck("the HIGHEST-quality engine (docling) is selected", out["quality"] == score_parse(good)
        and out["pages"] == good["pages"])
     selected = [r for r in out["engine_runs"] if r["selected"]]
@@ -102,7 +102,7 @@ def _self_test() -> int:
 
     print("\n" + ("PASS — parse_adjudicator: N engines are scored, the highest-quality parse is SELECTED, and "
                   "every engine's output is PRESERVED in engine_runs (lossless — losers kept as evidence with a "
-                  "reason); deterministic; emits ParsedDocument.v1 that never serves truth."
+                  "reason); deterministic; emits ParsedDocument that never serves truth."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

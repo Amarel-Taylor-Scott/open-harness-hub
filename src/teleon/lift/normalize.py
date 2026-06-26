@@ -1,6 +1,6 @@
 """src.teleon.lift.normalize — normalize provider-native workloads into a canonical ImportedWorkload.
 
-Provider-specific shapes (a Kubernetes object, an AWS Lambda config) → ONE ImportedWorkload.v1. SAFETY: env-var
+Provider-specific shapes (a Kubernetes object, an AWS Lambda config) → ONE ImportedWorkload. SAFETY: env-var
 VALUES are never carried through — only key names (env_redacted_keys). Pure + deterministic; imported_at is
 injected (no wall-clock). The LIVE connectors map the real provider API into the simplified native shapes these
 functions accept (the offline canned connectors already emit that shape).
@@ -11,7 +11,7 @@ from typing import Any
 
 from . import model
 
-_IMPORTED_WORKLOAD_SCHEMA = "ImportedWorkload.v1"
+_IMPORTED_WORKLOAD_SCHEMA = "ImportedWorkload"
 
 
 def _redact_env_list(env: list[dict] | None) -> list[str]:

@@ -115,7 +115,7 @@ def _self_test() -> int:
     # 8) receipt: schema-valid, deterministic, explanatory
     r1 = ev(_fact()); r2 = ev(_fact())
     rec = r1["receipt"].to_dict()
-    check("receipt validates against VerificationReceipt.v1", validate_ref(rec, "artifacts/VerificationReceipt.v1") == [], str(validate_ref(rec, "artifacts/VerificationReceipt.v1")[:3]))
+    check("receipt validates against VerificationReceipt", validate_ref(rec, "artifacts/VerificationReceipt") == [], str(validate_ref(rec, "artifacts/VerificationReceipt")[:3]))
     check("receipt id is deterministic for identical input (content-addressed, no clock/rng)", r1["receipt"].receipt_id == r2["receipt"].receipt_id)
     check("a hold-out receipt explains WHY (non-empty reasons)", len(ev(no_handle)["receipt"].reasons) >= 1)
     check("receipt records the per-check results", len(rec["checks"]) >= 8)

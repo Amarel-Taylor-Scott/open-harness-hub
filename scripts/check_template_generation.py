@@ -51,7 +51,7 @@ def _self_test() -> int:
     try:
         # 1) refuses a missing required variable
         try:
-            generate("proof.self_test.v1", {"proof_name": "x"}, repo=tmp, write_receipt=False)
+            generate("proof.self_test", {"proof_name": "x"}, repo=tmp, write_receipt=False)
             check("refuses missing required variable", False, "did not raise")
         except GenerationError as e:
             check("refuses missing required variable", "missing required" in str(e))
@@ -59,7 +59,7 @@ def _self_test() -> int:
         # 2) renders the proof template; the generated proof contains --self-test
         proof_vars = {"proof_name": "demo_proof", "title": "Demo proof", "owner": "scripts/demo.py",
                       "subject_module": "scripts.demo"}
-        rec = generate("proof.self_test.v1", proof_vars, repo=tmp)
+        rec = generate("proof.self_test", proof_vars, repo=tmp)
         gen_proof = tmp / "scripts" / "check_demo_proof.py"
         check("renders the proof template", gen_proof.exists())
         proof_body = gen_proof.read_text() if gen_proof.exists() else ""
@@ -67,21 +67,21 @@ def _self_test() -> int:
         check("generated proof is fully rendered (no {{var}})", "{{" not in proof_body)
 
         # 3) writes a content-addressed generation receipt
-        receipt_file = tmp / ".agent" / "template-generation" / f"{rec['receipt_id']}-proof.self_test.v1.json"
+        receipt_file = tmp / ".agent" / "template-generation" / f"{rec['receipt_id']}-proof.self_test.json"
         check("writes a generation receipt", receipt_file.exists(), str(receipt_file))
         check("receipt id is content-addressed (gen- prefix)", rec["receipt_id"].startswith("gen-"))
 
         # 4) refuses overwrite without --force; allows with --force
         try:
-            generate("proof.self_test.v1", proof_vars, repo=tmp, write_receipt=False)
+            generate("proof.self_test", proof_vars, repo=tmp, write_receipt=False)
             check("refuses overwrite without --force", False, "did not raise")
         except GenerationError as e:
             check("refuses overwrite without --force", "without --force" in str(e))
-        rec_force = generate("proof.self_test.v1", proof_vars, repo=tmp, force=True, write_receipt=False)
+        rec_force = generate("proof.self_test", proof_vars, repo=tmp, force=True, write_receipt=False)
         check("--force allows overwrite (same deterministic id)", rec_force["receipt_id"] == rec["receipt_id"])
 
         # 5) renders the docs template with the required headings
-        generate("docs.section_page.v1",
+        generate("docs.section_page",
                  {"area": "runtime", "section": "demo-section", "title": "Demo Section", "owner": "scripts/x.py"},
                  repo=tmp)
         page = tmp / "docs" / "runtime" / "demo-section.md"

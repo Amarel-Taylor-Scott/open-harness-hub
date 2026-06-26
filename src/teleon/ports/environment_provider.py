@@ -1,7 +1,7 @@
 """src.teleon.ports.environment_provider — the SHARED ENVIRONMENT-PROVIDER port (canonical TELEON home).
 
 An environment provider RUNS an agent/runtime inside a governed, local-first evaluation environment and
-returns an :data:`EnvironmentRunResult`-shaped dict (see ``schemas/environments/EnvironmentRunResult.v1``).
+returns an :data:`EnvironmentRunResult`-shaped dict (see ``schemas/environments/EnvironmentRunResult``).
 Repo2RLEnv / Harbor / OpenEnv-style environments are CANDIDATES behind this port; the deterministic OFFLINE
 :class:`~src.teleon.environments.local_environment_provider.LocalEnvironmentProvider` is the correctness
 invariant and the fallback used whenever an external (docker/network) environment is unavailable.

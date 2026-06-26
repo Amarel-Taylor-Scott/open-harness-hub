@@ -12,7 +12,7 @@ boundary.
 
 ## Contracts
 
-`RehydrationReport.v1` — a successful rehydration carries `rehydrated=true`, ≥1 `source_artifact_ids`, and
+`RehydrationReport` — a successful rehydration carries `rehydrated=true`, ≥1 `source_artifact_ids`, and
 `crossed_tenant_boundary=false`; a failed one carries `rehydrated=false`, empty source ids, and a
 `failure_reason`.
 
@@ -58,5 +58,5 @@ no raw layer (e.g. a synthetic seed) raises `RehydrationError` rather than fabri
 
 ## Next
 
-A projection endpoint (deferred) `POST /api/distillation/rehydrate` returning a `RehydrationReport.v1` so
+A projection endpoint (deferred) `POST /api/distillation/rehydrate` returning a `RehydrationReport` so
 auditors can rehydrate any served artifact without shell access.

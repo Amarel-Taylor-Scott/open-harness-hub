@@ -1,0 +1,89 @@
+{
+  "$id": "workers/CapabilityWorker",
+  "title": "CapabilityWorker",
+  "description": "A stateless capability executor row. Heartbeats; reclaimed if stale.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "worker_id": {
+      "type": "string"
+    },
+    "capability_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "worker_bucket": {
+      "type": "string"
+    },
+    "provider_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "starting",
+        "warm",
+        "polling",
+        "busy",
+        "draining",
+        "cooldown",
+        "stopping",
+        "stopped",
+        "failed"
+      ]
+    },
+    "queue_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "resource_class": {
+      "type": "string"
+    },
+    "current_task_id": {
+      "type": "string"
+    },
+    "active_task_count": {
+      "type": "number"
+    },
+    "max_concurrency": {
+      "type": "number"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "heartbeat_at": {
+      "type": "string"
+    },
+    "last_claim_at": {
+      "type": "string"
+    },
+    "cooldown_until": {
+      "type": "string"
+    },
+    "shutdown_after_idle_seconds": {
+      "type": "number"
+    },
+    "total_tasks_processed": {
+      "type": "number"
+    },
+    "total_failures": {
+      "type": "number"
+    },
+    "startup_ms": {
+      "type": "number"
+    },
+    "metadata_json": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "worker_id",
+    "capability_ids",
+    "status",
+    "started_at"
+  ]
+}

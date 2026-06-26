@@ -37,7 +37,7 @@ from scripts.runtime.processor import Processor, ProcessorSpec
 #: Catalog outputs are candidates — the verification gate promotes, not the adapter.
 _CANDIDATE_CLAIM = "candidate"
 _OUTPUT_ARTIFACT_TYPE = "processor_output"
-_OUTPUT_SCHEMA = "ProcessorOutput.v1"
+_OUTPUT_SCHEMA = "ProcessorOutput"
 _ADAPTER_VERSION = "v1"
 _DEMO_SECURITY = {"classification": "demo_public", "kms_key_ref": "local://demo", "retention_policy_id": "demo"}
 

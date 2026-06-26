@@ -1,0 +1,25 @@
+{
+  "$id": "environments/EnvironmentRunResult",
+  "title": "EnvironmentRunResult",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The outcome of one EnvironmentRunRequest. EVIDENCE only: serves_truth is always false — an environment run produces a measurement (a RewardResult by reference) and an agent output, never served/promotable truth. status is one of succeeded|failed|unavailable (unavailable = environment could not run, e.g. requires Docker/network not available locally). The agent output is carried by value (small) or by reference; it is the thing being MEASURED, not a fact the spine vouches for.",
+  "required": [
+    "run_id",
+    "environment_id",
+    "status",
+    "steps_taken",
+    "serves_truth"
+  ],
+  "properties": {
+    "run_id": {"type": "string", "description": "echoes the request run_id"},
+    "environment_id": {"type": "string", "description": "environment the run executed in"},
+    "status": {"type": "string", "enum": ["succeeded", "failed", "unavailable"], "description": "succeeded = environment ran to a verdict; failed = ran but errored; unavailable = could not run (missing local capability/Docker/network)"},
+    "output": {"type": ["object", "string", "null"], "description": "inline agent output when small + non-sensitive; the measured artifact, never auto-served"},
+    "output_ref": {"type": ["string", "null"], "description": "ResourceRef-style handle to the agent output when large or sensitive"},
+    "steps_taken": {"type": "integer", "minimum": 0, "description": "number of agent steps actually consumed (<= request.max_steps)"},
+    "reward_result_id": {"type": ["string", "null"], "description": "id of the RewardResult produced for this run (the measurement); null when status=unavailable"},
+    "receipt_id": {"type": ["string", "null"], "description": "id of the EnvironmentRunReceipt emitted for this run"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — an environment run is evidence/measurement, never served or promotable truth"}
+  }
+}

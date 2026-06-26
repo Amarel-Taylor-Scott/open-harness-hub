@@ -15,14 +15,14 @@ from typing import Any, Protocol, runtime_checkable
 
 @runtime_checkable
 class SourceArtifactStorePort(Protocol):
-    """Append-only, tenant-scoped, idempotent store of SourceArtifact.v1 records."""
+    """Append-only, tenant-scoped, idempotent store of SourceArtifact records."""
 
     def write_source_artifacts(self, artifacts: list[dict[str, Any]], *, tenant_id: str,
                                run_id: str, now: str) -> dict[str, Any]:
         """Append governed SourceArtifacts for one run. Idempotent on (tenant_id, source_id, content_hash):
         identical content is skipped, not duplicated. Rejects any artifact missing the required governance
         fields or whose tenant_id != the call's tenant_id (no cross-tenant write). Returns an
-        IngestionReceipt.v1-shaped dict {written, duplicate, receipt_id, source_artifact_ids}. `now` injected."""
+        IngestionReceipt-shaped dict {written, duplicate, receipt_id, source_artifact_ids}. `now` injected."""
         ...
 
     def read_source_artifact(self, artifact_id: str, *, tenant_id: str) -> dict[str, Any] | None:

@@ -24,12 +24,12 @@ mutated; richer governance lives alongside it.
 
 ## Contracts
 
-- `NativeShapeContract.v1` — detected shape (format, schema_hash, field_order, encoding, delimiter, newline, mime_type).
-- `NativeProjection.v1` — the same-shape output for the requested `output_mode`.
-- `SidecarOverlay.v1` — `{source_hash, artifact_ids, field_facts, field_map, held_out_claims, conflicts,
+- `NativeShapeContract` — detected shape (format, schema_hash, field_order, encoding, delimiter, newline, mime_type).
+- `NativeProjection` — the same-shape output for the requested `output_mode`.
+- `SidecarOverlay` — `{source_hash, artifact_ids, field_facts, field_map, held_out_claims, conflicts,
   reconciliations, verification_receipts, warnings}`.
-- `NativeDiff.v1` — `changed_fields: [{path, old, new, decision, receipt_id}]` (every VERIFIED value change).
-- `NativeExportReceipt.v1` / `NativeIngestResult.v1` / `NativeSourceRef.v1` — export/ingest receipts + the stored source ref.
+- `NativeDiff` — `changed_fields: [{path, old, new, decision, receipt_id}]` (every VERIFIED value change).
+- `NativeExportReceipt` / `NativeIngestResult` / `NativeSourceRef` — export/ingest receipts + the stored source ref.
 
 These contract names are registered by MAIN in `architecture/contract_registry.json`; this lane only
 produces files and proofs (no shared-manifest edits).
@@ -44,7 +44,7 @@ produces files and proofs (no shared-manifest edits).
 - `native_output` — the same-shape projection (or the unchanged original in passthrough modes).
 - `sidecar` — the `SidecarOverlay` carrying receipts/conflicts/held-out/lineage (when the mode emits one).
 - `diff` — the `NativeDiff` of any VERIFIED value changes.
-- `context_response?` — the advanced `ContextResponse.v1` (in `baltor_native` / `dual`).
+- `context_response?` — the advanced `ContextResponse` (in `baltor_native` / `dual`).
 - `receipt` — a `NativeExportReceipt` tying the export back to the source hash.
 
 ## Proofs

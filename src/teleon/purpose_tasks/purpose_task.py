@@ -51,7 +51,7 @@ def provision(spec: dict[str, Any], registry: Registry) -> dict[str, Any]:
     out = dict(spec)
     out["current_impl_id"] = ordered[0]["impl_id"]
     out["alternatives"] = [i["impl_id"] for i in ordered[1:]]
-    out.setdefault("rollback_target", "")   # '' = no promotion yet (kept a string for PurposeTaskSpec.v1)
+    out.setdefault("rollback_target", "")   # '' = no promotion yet (kept a string for PurposeTaskSpec)
     return out
 
 

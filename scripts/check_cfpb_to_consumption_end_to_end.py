@@ -28,9 +28,9 @@ def _self_test() -> int:
     resp = r["response"]
 
     check("the pipeline reaches a SERVED ContextResponse", r["decision"] == "served", str(r.get("readiness")))
-    check("ContextResponse validates against ContextResponse.v1", validate_ref(resp, "consumption/ContextResponse.v1") == [],
-          str(validate_ref(resp, "consumption/ContextResponse.v1")[:3]))
-    check("ConsumptionReceipt validates against ConsumptionReceipt.v1", validate_ref(r["receipt"], "consumption/ConsumptionReceipt.v1") == [])
+    check("ContextResponse validates against ContextResponse", validate_ref(resp, "consumption/ContextResponse") == [],
+          str(validate_ref(resp, "consumption/ContextResponse")[:3]))
+    check("ConsumptionReceipt validates against ConsumptionReceipt", validate_ref(r["receipt"], "consumption/ConsumptionReceipt") == [])
 
     # reference answer
     check("answer contains '10 business days'", "10 business days" in resp["answer"], resp["answer"])

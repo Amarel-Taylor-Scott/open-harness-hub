@@ -11,7 +11,7 @@ THE INVARIANT, structurally: a triage is a routing signal, NEVER a served fact. 
 decides truth — it only routes. It maps a lane to a *recommended* ``contextops.*`` command; agents/MAIN
 decide whether to run it.
 
-The twelve lanes (single source — must equal ``ContextTriageResult.v1.schema.json``'s ``lane`` enum and
+The twelve lanes (single source — must equal ``ContextTriageResult.schema.json``'s ``lane`` enum and
 ``scripts/check_contextops_contracts.py``'s ``_TRIAGE_LANES``):
 
   needs_reconciliation · needs_verification · needs_enrichment · is_fragile · is_stale · is_low_authority ·
@@ -41,7 +41,7 @@ import json
 from dataclasses import dataclass
 
 # ── the schema version this result conforms to (single source — equals the contract $id stem) ──────────
-SCHEMA_VERSION = "ContextTriageResult.v1"
+SCHEMA_VERSION = "ContextTriageResult"
 
 # ── the twelve ContextTriage lanes (single source of the taxonomy). MUST match the contract enum. ──────
 NEEDS_RECONCILIATION = "needs_reconciliation"
@@ -152,7 +152,7 @@ _LANE_COMMAND = {
 class ContextTriageResult:
     """The output of one triage: which lanes fired, the single primary ``lane`` (the contract field), whether
     action is warranted, and the recommended downstream command. ``serves_truth`` is ALWAYS False — a triage
-    is a routing signal, never a served fact. ``to_dict()`` conforms to ``ContextTriageResult.v1``.
+    is a routing signal, never a served fact. ``to_dict()`` conforms to ``ContextTriageResult``.
 
     ``lanes`` is the full multi-label set (deterministic, sorted); ``lane`` is the single highest-priority
     fired lane carried in the v1 contract. ``triaged_at`` is INJECTED (no wall-clock)."""
@@ -180,7 +180,7 @@ class ContextTriageResult:
     def to_dict(self) -> dict:
         """The v1-contract-shaped dict (omits the multi-label ``lanes`` helper, which is not a v1 field).
 
-        Conforms to ``schemas/contextops/ContextTriageResult.v1.schema.json``: required keys present,
+        Conforms to ``schemas/contextops/ContextTriageResult.schema.json``: required keys present,
         ``serves_truth`` pinned False, ``lane`` one of the twelve, ``triaged_at`` the injected time."""
         d: dict = {
             "schema_version": self.schema_version,

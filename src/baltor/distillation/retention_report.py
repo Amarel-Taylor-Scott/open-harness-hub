@@ -99,7 +99,7 @@ class InformationRetentionReport:
     lossy_transform_allowed: bool
     safe_to_promote: bool
     notes: list = field(default_factory=list)
-    schema_version: str = "InformationRetentionReport.v1"
+    schema_version: str = "InformationRetentionReport"
 
     def to_dict(self) -> dict:
         return {

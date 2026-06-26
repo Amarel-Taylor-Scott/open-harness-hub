@@ -13,9 +13,9 @@ queues / browser workers / agents / workflows are interchangeable implementation
 
 > **Naming-layer reconciliation (avoid the collision in this repo):**
 > - CTS **`kind: CapabilityTask`** = the higher-level **governed purpose object** (purpose + evals + adaptation
->   + runtime policy). Baltor's reference implementation of it is **`PurposeTask`** (`PurposeTaskSpec.v1`,
+>   + runtime policy). Baltor's reference implementation of it is **`PurposeTask`** (`PurposeTaskSpec`,
 >   built — flywheel 316). *Also avoids Google Cloud Tasks; that's why Baltor's product noun is PurposeTask.*
-> - Baltor's existing **`CapabilityTask.v1`** (FleetLedger) = the **lower execution-level unit** a worker
+> - Baltor's existing **`CapabilityTask`** (FleetLedger) = the **lower execution-level unit** a worker
 >   atomically claims to run ONE invocation. It is the substrate a `PurposeTask`/CTS `CapabilityTask` dispatches
 >   onto — a different layer, not a rename. Both coexist; the docs/specs must always say which layer they mean.
 
@@ -121,9 +121,9 @@ remove tests · destructive actions · send data elsewhere. This single rule kee
 patch/impl) · **Governance** (promote/rollback/escalate/ask-human — mostly deterministic policy+metrics, not vibes).
 
 ## How Baltor implements it first (reference implementation = PurposeTask)
-Baltor already has the substrate: `PurposeTaskSpec.v1` + PoC (governed purpose object) · the cloud-agnostic
+Baltor already has the substrate: `PurposeTaskSpec` + PoC (governed purpose object) · the cloud-agnostic
 **execution-backend selector** (runtime binding) · the **Parallel-Path Engine** (side-by-side + eval-gated
-promotion + rollback) · the durable **CapabilityTask.v1**/FleetLedger (execution units) · numeric provider graph
+promotion + rollback) · the durable **CapabilityTask**/FleetLedger (execution units) · numeric provider graph
 · measured-lift eval gate. **Phases:** (1) publish the spec (JSON Schema + OpenAPI controller API + AsyncAPI/
 CloudEvents events + OTel attrs + OCI layout); (2) K8s CRDs (CapabilityTask/Implementation/Run/Evaluation/
 Promotion/RuntimeClass); (3) runtime adapters (K8s Job → KEDA → Knative → Cloud Run → Lambda → Temporal →

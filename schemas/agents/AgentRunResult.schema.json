@@ -1,0 +1,30 @@
+{
+  "$id": "agents/AgentRunResult",
+  "title": "AgentRunResult",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The outcome of one AgentRunRequest. PROPOSAL only: serves_truth is always false — an agent run produces a CANDIDATE output that returns to Baltor's governance rail (store/verify/reconcile), never served or promotable truth. status is one of succeeded|failed|unavailable (unavailable = the harness could not run, e.g. a candidate runtime like OpenClaw/Hermes is not imported/executed in this repo). tool_calls/skills_loaded/sandbox_events/policy_violations record WHAT THE AGENT DID for audit; output_contract_valid reports whether the proposed output matched its declared output contract (still a candidate even when valid). The output is the thing being PROPOSED, not a fact the spine vouches for.",
+  "required": [
+    "run_id",
+    "status",
+    "output_contract_valid",
+    "tool_calls",
+    "skills_loaded",
+    "sandbox_events",
+    "policy_violations",
+    "serves_truth"
+  ],
+  "properties": {
+    "run_id": {"type": "string", "description": "echoes the request run_id"},
+    "status": {"type": "string", "enum": ["succeeded", "failed", "unavailable"], "description": "succeeded = harness ran to a result; failed = ran but errored; unavailable = could not run (candidate runtime not imported/executed; missing local capability)"},
+    "output": {"type": ["object", "string", "null"], "description": "inline agent output when small + non-sensitive; the PROPOSED candidate artifact, never auto-served"},
+    "output_ref": {"type": ["string", "null"], "description": "ResourceRef-style handle to the agent output when large or sensitive"},
+    "output_contract_valid": {"type": "boolean", "description": "true if the proposed output validated against its declared output contract; a valid output is still a candidate, never truth"},
+    "tool_calls": {"type": "array", "items": {"type": "object"}, "description": "ordered record of tool invocations the agent made (for audit; each constrained to the request allowlist)"},
+    "skills_loaded": {"type": "array", "items": {"type": "string"}, "description": "ids of skills loaded during the run (progressive disclosure; agent-created skills remain candidate)"},
+    "sandbox_events": {"type": "array", "items": {"type": "object"}, "description": "sandbox lifecycle/violation events (e.g. network_blocked, host_exec_blocked) recorded during the run"},
+    "policy_violations": {"type": "array", "items": {"type": "object"}, "description": "any policy violations detected (denied tool attempted, secret-value attempted, cross-tenant memory attempted); a non-empty list blocks promotion"},
+    "receipt_id": {"type": ["string", "null"], "description": "id of the AgentRunReceipt emitted for this run; null when status=unavailable and no receipt was produced"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — an agent run is a proposal/candidate, never served or promotable truth"}
+  }
+}

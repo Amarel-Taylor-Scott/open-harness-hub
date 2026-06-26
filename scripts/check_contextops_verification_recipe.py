@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """scripts.check_contextops_verification_recipe — proof (CONTEXTOPS VERIFICATION-RECIPE MODE): the M3 rung
-builder emits a VerificationRecipe.v1 that carries — REQUIRED — the fact_key + input SourceRecipe ids + the
+builder emits a VerificationRecipe that carries — REQUIRED — the fact_key + input SourceRecipe ids + the
 extractor id + deterministic validators + success criteria + an authority policy + a cross-source confirmation
 policy + a freshness policy + a tenant scope, and that produces a fact_verification_run (a candidate result +
 receipt), NEVER a served/canonical fact.
@@ -11,7 +11,7 @@ freshness policy is DERIVED: a current/moving value (deadline/rate/fee/…) gets
 requires_fresh_for_current_values; a settled value tolerates a 30-day window.
 
 Concretely:
-  - a recipe whose winner is a regulation builds + validates against VerificationRecipe.v1, produces a
+  - a recipe whose winner is a regulation builds + validates against VerificationRecipe, produces a
     fact_verification_run (never a canonical fact), and carries an authority + cross_source + freshness +
     tenant_scope block;
   - building with winning_source_type=agency_faq RAISES ValueError (a FAQ can never win);
@@ -40,7 +40,7 @@ from src.baltor.contextops.verification_recipe import (  # noqa: E402
     freshness_policy,
 )
 
-_SCHEMA = _REPO / "schemas" / "contextops" / "VerificationRecipe.v1.schema.json"
+_SCHEMA = _REPO / "schemas" / "contextops" / "VerificationRecipe.schema.json"
 _NOW = "2026-06-05T00:00:00Z"
 
 
@@ -66,7 +66,7 @@ def _self_test() -> int:
 
     # ── a regulation-winning recipe builds + validates. ──
     vr = _build_reg()
-    check("verification recipe validates against VerificationRecipe.v1", _validate(vr, schema) == [], str(_validate(vr, schema)[:4]))
+    check("verification recipe validates against VerificationRecipe", _validate(vr, schema) == [], str(_validate(vr, schema)[:4]))
 
     # ── REQUIRED blocks present + correctly populated. ──
     check("recipe carries fact_key + input source recipe ids + extractor id",
@@ -118,7 +118,7 @@ def _self_test() -> int:
     ok = not fails
     print(
         "\n" + ("PASS — check_contextops_verification_recipe: the M3 builder emits a schema-valid "
-                "VerificationRecipe.v1 carrying the fact_key + input source recipe ids + extractor id + "
+                "VerificationRecipe carrying the fact_key + input source recipe ids + extractor id + "
                 "deterministic validators + success criteria + an authority policy + a cross_source policy + a "
                 "freshness policy + a tenant scope; it produces a fact_verification_run (candidate + receipt), "
                 "NEVER a canonical/served fact; it ENFORCES the authority invariant at build time — a "

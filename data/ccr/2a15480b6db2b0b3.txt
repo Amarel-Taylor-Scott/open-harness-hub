@@ -25,7 +25,7 @@ def bind(runtime_class: str, *, available_creds: set | None=None, provider_healt
 def bind_allowed(allowed_runtime_classes: list[str] | None, *, available_creds: set | None=None, provider_health: dict | None=None, policy_override: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> dict[str, Any]
     # Bind a task that allows SEVERAL runtime classes (declared in priority order). Returns the first class
 def resolve_for_spec(spec: dict[str, Any], *, available_creds: set | None=None, provider_health: dict | None=None, policy_override: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> dict[str, Any]
-    # Bind a PurposeTask SPEC by its declared `allowed_runtime_classes` (CTS-1 connection to PurposeTaskSpec.v1).
+    # Bind a PurposeTask SPEC by its declared `allowed_runtime_classes` (CTS-1 connection to PurposeTaskSpec).
 def eligible_backends_for_classes(allowed_runtime_classes: list[str] | None, *, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> list[str]
     # The union of concrete backends the allowed classes may bind to (cloud vendors + each class's local
 ```

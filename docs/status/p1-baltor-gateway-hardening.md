@@ -40,7 +40,7 @@ Net: **+367 / −7** lines, one file. Admin server is allowlisted in `architectu
 ### 2. Issue a receipt on every gateway search + fetch — DONE
 - **Why:** the gateway claims "agents propose, Baltor disposes" but minted no receipt on read — the claim was
   aspirational, not auditable. (A `receipt_issued` bus kind already existed.)
-- **How:** `gateway_receipt()` **785–824** mints a `baltor.gateway-receipt.v1` (id, ts, operation, run_id,
+- **How:** `gateway_receipt()` **785–824** mints a `baltor.gateway-receipt` (id, ts, operation, run_id,
   handle/query, ok, **content_hash**, `is_truth:false`, served-under-policy), persists it to a durable
   `gateway_receipts` table, AND publishes the existing `receipt_issued` bus event (which auto-persists via the
   bus→durable subscription). Called at the **payload-function layer** so BOTH GET and POST routes (and any
@@ -159,7 +159,7 @@ id + body hash) and let the receipt's `content_hash` (now recorded) be the verif
 should reference the immutable version, and a re-fetch of the same `ctxv://` must be byte-identical or 409. The
 hash plumbing I added is the precondition for this; the versioned-fetch route is the next step.
 
-**Receipts schema.** `baltor.gateway-receipt.v1` is intentionally minimal (operation, handle, hash, is_truth,
+**Receipts schema.** `baltor.gateway-receipt` is intentionally minimal (operation, handle, hash, is_truth,
 policy). The deep-dive's P1 backbone wants **one** receipt envelope with **OTel-compatible `trace_id`/`span_id`**
 and persistence behind the registered `:9426 local_receipt_service`. Today this is a fourth receipt shape (the
 review counts four). The right move is to make `gateway_receipt` emit the shared `ModelInvocationReceipt`-style

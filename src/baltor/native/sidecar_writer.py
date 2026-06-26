@@ -49,7 +49,7 @@ class SidecarOverlay:
     field_map: list = field(default_factory=list)            # native_path <-> source_handle <-> artifact <-> status
     created_at: str = ""
     sidecar_id: str = ""
-    schema_version: str = "SidecarOverlay.v1"
+    schema_version: str = "SidecarOverlay"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "sidecar_id": self.sidecar_id, "source_hash": self.source_hash,

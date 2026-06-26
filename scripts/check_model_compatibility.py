@@ -3,7 +3,7 @@
 skill works with (and which it does NOT), and on what inputs/outputs — via the Inference Gateway, honestly.
 
 Asserts:
-  A. CONTRACT: ModelCompatibilityReport.v1 registered.
+  A. CONTRACT: ModelCompatibilityReport registered.
   B. RUN: a digested skill yields a per-node report list + works_with / not_compatible_with summary.
   C. SPECIALIZATION MISMATCH → not_compatible: an embeddings-only node for a reasoning skill is not_compatible.
   D. LOCAL STUB → draft_only (plumbing proven, not production).
@@ -41,7 +41,7 @@ def _self_test() -> int:
             fails.append(n)
 
     contracts = json.dumps(json.loads((_REPO / "architecture" / "contract_registry.json").read_text()))
-    check("A: ModelCompatibilityReport.v1 registered", "digestion/ModelCompatibilityReport.v1.schema.json" in contracts)
+    check("A: ModelCompatibilityReport registered", "digestion/ModelCompatibilityReport.schema.json" in contracts)
 
     dg = D.digest_skill(D.parse_skill_md((_FX / "deterministic_skill_sample" / "SKILL.md").read_text()),
                         source_ref="x", now=_NOW)

@@ -80,8 +80,8 @@ def _self_test() -> int:
 
     ck("the feed cites the O*NET/WORKBank occupation spine (rigorous 'scour professions')",
        "O*NET" in feed["occupation_spine"] and "WORKBank" in feed["occupation_spine"])
-    ck("feed conforms to DiscoveredCapabilityFeed.v1 with provenance + governance",
-       feed["feed_version"] == "DiscoveredCapabilityFeed.v1" and bool(feed.get("provenance")) and bool(feed.get("governance")))
+    ck("feed conforms to DiscoveredCapabilityFeed with provenance + governance",
+       feed["feed_version"] == "DiscoveredCapabilityFeed" and bool(feed.get("provenance")) and bool(feed.get("governance")))
     if _FEED.exists():
         ck("on-disk feed is fresh vs the seeder (regenerate with --build)", json.loads(_FEED.read_text()) == feed)
     ck("deterministic", build_feed() == feed)

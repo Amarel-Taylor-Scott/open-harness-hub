@@ -1,5 +1,5 @@
 {
-  "version": "CapabilityEndpointRegistry.v1",
+  "version": "CapabilityEndpointRegistry",
   "purpose": "Many providers can serve the SAME capability (e.g. WHOIS via RDAP, a paid API, or a library). This registry maps a capability_slot to its interchangeable PROVIDER ENDPOINTS, each with the signals Teleon selects on — cost, latency, reliability, license, and egress domain. The objective layer picks the best endpoint per the tenant's priority (fastest / cheapest / most reliable); the org guardrail policy filters disallowed endpoints (license/domain/egress) BEFORE selection (safety beats objective). Declared figures are typical-case priors; the RunLedger refines them from observed calls. Data only — read by src/teleon/endpoints; never names a src.baltor symbol; nothing here serves truth.",
   "cost_units": "relative per-call units (0.0 = free tier / no marginal cost)",
   "endpoints": {

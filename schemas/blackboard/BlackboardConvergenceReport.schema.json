@@ -1,0 +1,23 @@
+{
+  "$id": "blackboard/BlackboardConvergenceReport",
+  "title": "BlackboardConvergenceReport",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The convergence accounting for one blackboard: how many iterations the swarm ran and how many gaps were open vs closed at the stopping point. converged is true when the swarm reached its stopping condition (typically open_gaps == 0); reason records why it stopped (converged | budget_exhausted | max_iterations | blocked). Convergence is an operational/benchmark verdict over working state — it is NOT a promotion authority; benchmark != promotion. Reaching convergence never makes the synthesis served truth.",
+  "required": [
+    "blackboard_id",
+    "iterations",
+    "open_gaps",
+    "closed_gaps",
+    "converged",
+    "reason"
+  ],
+  "properties": {
+    "blackboard_id": {"type": "string", "description": "the blackboard this report accounts for"},
+    "iterations": {"type": "integer", "minimum": 0, "description": "number of iterations/rounds the swarm ran"},
+    "open_gaps": {"type": "integer", "minimum": 0, "description": "gaps still open at the stopping point"},
+    "closed_gaps": {"type": "integer", "minimum": 0, "description": "gaps closed during the run"},
+    "converged": {"type": "boolean", "description": "true if the swarm reached its stopping condition (typically open_gaps == 0)"},
+    "reason": {"type": "string", "enum": ["converged", "budget_exhausted", "max_iterations", "blocked"], "description": "why the run stopped; an operational/benchmark verdict, never a promotion authority"}
+  }
+}

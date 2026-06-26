@@ -2,7 +2,7 @@
 
 ``decide(report, criteria, *, candidate_path_id, now, cost_acceptable=..., ...) -> PathPromotionDecision``
 turns one candidate's verdict from a :func:`path_comparator.compare` report into a
-``PathPromotionDecision.v1``. A candidate is promoted ONLY when ALL gates pass:
+``PathPromotionDecision``. A candidate is promoted ONLY when ALL gates pass:
 
     same_input AND same_output_contract AND output_equivalent AND source_handles_preserved
     AND held_out_not_leaked AND safety_ok AND cost_acceptable
@@ -32,11 +32,11 @@ from scripts.runtime import schema_validator as _sv
 
 from .ids import canonical_id
 
-SCHEMA_VERSION = "PathPromotionDecision.v1"
+SCHEMA_VERSION = "PathPromotionDecision"
 DECISION_PROMOTE = "promote"
 DECISION_KEEP = "keep_baseline"
 
-#: the gates that ALL must be true to promote (mirrors PathPromotionDecision.v1 required gates).
+#: the gates that ALL must be true to promote (mirrors PathPromotionDecision required gates).
 #: same_input is FIRST: a candidate that did not provably run on the baseline's input is never promotable.
 GATES = (
     "same_input",
@@ -82,7 +82,7 @@ def decide(
     cost_acceptable: bool | None = None,
     validate: bool = True,
 ) -> dict[str, Any]:
-    """Authorize (or refuse) promoting ``candidate_path_id`` to baseline; return a ``PathPromotionDecision.v1``.
+    """Authorize (or refuse) promoting ``candidate_path_id`` to baseline; return a ``PathPromotionDecision``.
 
     Promote ONLY if every gate is true. ``rollback_target`` is ALWAYS set to the report's baseline_path_id.
     The five comparator gates are mirrored from the verdict (auditable warrant); the sixth, cost_acceptable,
@@ -156,7 +156,7 @@ def is_promote_authorized(decision: dict[str, Any]) -> bool:
       - rollback_target is present (a promotion is always reversible).
 
     This is the barrier that closes the "schema-valid forgery" hole: a hand-built dict can pass the
-    PathPromotionDecision.v1 contract while claiming decision=='promote' with FALSE gates (or a mismatched
+    PathPromotionDecision contract while claiming decision=='promote' with FALSE gates (or a mismatched
     promoted_path_id). Any code that would SERVE a candidate must gate on this function — never on
     ``decision.get('decision') == 'promote'`` alone. The schema's own if/then constraint enforces the same
     consistency at the contract layer; this is the defence-in-depth runtime check.

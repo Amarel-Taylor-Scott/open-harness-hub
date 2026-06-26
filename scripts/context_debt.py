@@ -57,8 +57,8 @@ def _self_test() -> int:
 
     items = [
         fixture,
-        {"kind": "baltor.context-debt-item.v1", "id": "d2", "debt_type": "stale_pack", "severity": "critical", "subject": "pack:x", "detected_at": "t"},
-        {"kind": "baltor.context-debt-item.v1", "id": "d3", "debt_type": "unbenchmarked_tool", "severity": "low", "subject": "tool:y", "detected_at": "t"},
+        {"kind": "baltor.context-debt-item", "id": "d2", "debt_type": "stale_pack", "severity": "critical", "subject": "pack:x", "detected_at": "t"},
+        {"kind": "baltor.context-debt-item", "id": "d3", "debt_type": "unbenchmarked_tool", "severity": "low", "subject": "tool:y", "detected_at": "t"},
     ]
     for it in items:
         check(f"item {it['id']} valid", not list(v.iter_errors(it)))

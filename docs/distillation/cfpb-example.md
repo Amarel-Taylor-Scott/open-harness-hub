@@ -14,8 +14,8 @@ Flow: `scripts/runtime/consumption.py` + `scripts/runtime/optimization.py` +
 
 ## Contracts
 
-`InformationRetentionReport.v1` (the verdict the proof feeds the real transform into),
-`DistillationRun.v1` / `LineageBundle.v1` (the shapes the store-level proofs use for the same graph).
+`InformationRetentionReport` (the verdict the proof feeds the real transform into),
+`DistillationRun` / `LineageBundle` (the shapes the store-level proofs use for the same graph).
 
 ## Inputs
 

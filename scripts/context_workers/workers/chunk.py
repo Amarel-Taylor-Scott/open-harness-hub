@@ -15,7 +15,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("text_chunking", "stable_ids"),
     task_types=("document.chunk",),
     image="baltor-worker-cpu",
-    output_contract="chunks.v1",
+    output_contract="chunks",
 )
 def chunk_context(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     text = str(payload.get("text") or "")

@@ -35,7 +35,7 @@ from scripts.runtime import schema_validator as _sv
 
 from .ids import canonical_id
 
-SCHEMA_VERSION = "PathComparisonReport.v1"
+SCHEMA_VERSION = "PathComparisonReport"
 ACTION_PROMOTE = "promote"
 ACTION_KEEP = "keep_baseline"
 ACTION_INVESTIGATE = "investigate"
@@ -178,7 +178,7 @@ def compare(
     unsafe_strings: Iterable[str] | None = None,
     validate: bool = True,
 ) -> dict[str, Any]:
-    """Compare every candidate in ``run`` against its baseline; return a ``PathComparisonReport.v1`` dict.
+    """Compare every candidate in ``run`` against its baseline; return a ``PathComparisonReport`` dict.
 
     ``held_out_strings`` are values the baseline deliberately held out (e.g. the CFPB FAQ "30 days") that
     must not leak into a candidate output. ``unsafe_strings`` are additional content that, if present,

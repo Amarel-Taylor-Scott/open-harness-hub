@@ -36,9 +36,9 @@ def _self_test() -> int:
                                    authority="official", now=NOW)
     check("generic_json is consumable + served", gj["consumable"] and gj["decision"] == "served", str(gj["summary"]))
     resp = gj["response"]
-    check("generic_json response validates against ContextResponse.v1",
-          validate_ref(resp, "consumption/ContextResponse.v1") == [],
-          str(validate_ref(resp, "consumption/ContextResponse.v1")[:3]))
+    check("generic_json response validates against ContextResponse",
+          validate_ref(resp, "consumption/ContextResponse") == [],
+          str(validate_ref(resp, "consumption/ContextResponse")[:3]))
     check("generic_json served facts carry source handles", bool(resp["served_facts"]) and all(f.get("source_handle") for f in resp["served_facts"]))
     check("generic_json narrative allegation is held out, NEVER served",
           any(h["artifact_id"].startswith("narrative-") for h in resp["held_out_warnings"])
@@ -52,8 +52,8 @@ def _self_test() -> int:
                                    authority="customer_private", now=NOW)
     check("csv_table is consumable + served", cv["consumable"] and cv["decision"] == "served", str(cv["summary"]))
     cresp = cv["response"]
-    check("csv_table response validates against ContextResponse.v1",
-          validate_ref(cresp, "consumption/ContextResponse.v1") == [])
+    check("csv_table response validates against ContextResponse",
+          validate_ref(cresp, "consumption/ContextResponse") == [])
     check("csv_table response stays tenant-scoped (tenant_id=acme)", cresp["tenant_id"] == "acme")
     leaked = [f["source_handle"] for f in cresp["served_facts"] if "ctx://tenant/acme/" not in f["source_handle"]]
     check("csv_table served facts NEVER leak to a global/public handle (all tenant-scoped)", leaked == [], str(leaked))

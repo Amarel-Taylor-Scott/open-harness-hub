@@ -67,7 +67,7 @@ class FragilityMetadata:
     def to_dict(self) -> dict:
         # NOTE: this dict IS the ``fragility`` shape the C40 gate's _stale() reads (no_refresh / volatility_class
         # / next_verify_at / last_verified_at / ttl_seconds). Keep keys aligned with verification_gate._stale.
-        return {"schema_version": "FragilityMetadata.v1", "fragility_id": self.fragility_id,
+        return {"schema_version": "FragilityMetadata", "fragility_id": self.fragility_id,
                 "fact_id": self.fact_id, "volatility_class": self.volatility_class,
                 "last_verified_at": self.last_verified_at, "next_verify_at": self.next_verify_at,
                 "ttl_seconds": self.ttl_seconds, "no_refresh": self.no_refresh,

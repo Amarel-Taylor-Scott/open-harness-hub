@@ -1,0 +1,16 @@
+{
+  "$id": "sales/ReviewApproval",
+  "title": "ReviewApproval",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A human review decision gating an evidence pack / outreach before it can be made public or sent. Regulated-category packs and named-real-company public claims require this with status=approved.",
+  "required": ["approval_id", "subject_ref", "reviewer_role", "status", "created_at"],
+  "properties": {
+    "approval_id": {"type": "string"},
+    "subject_ref": {"type": "string", "description": "evidence_pack_id or outreach id under review"},
+    "reviewer_role": {"type": "string", "enum": ["legal", "compliance", "trust", "exec", "owner"]},
+    "status": {"type": "string", "enum": ["pending", "approved", "rejected"]},
+    "notes": {"type": "string"},
+    "created_at": {"type": "string"}
+  }
+}

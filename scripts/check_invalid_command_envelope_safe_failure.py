@@ -56,12 +56,12 @@ def _self_test() -> int:
             crashed.append(f"{label}:not-failed"); continue
         err = out["error"]
         if not (err["error_type"] == "schema_validation_failed" and err["retryable"] is False
-                and err["failed_schema"] == "CommandEnvelope.v1"):
+                and err["failed_schema"] == "CommandEnvelope"):
             crashed.append(f"{label}:bad-error-fields")
-        if validate_ref(err, "envelopes/ErrorEnvelope.v1") != []:
+        if validate_ref(err, "envelopes/ErrorEnvelope") != []:
             all_schema_valid = False
     check("malformed payloads (None/str/list/int/empty) never crash the harness", crashed == [], str(crashed))
-    check("each failure is a NON-retryable schema_validation_failed on CommandEnvelope.v1", crashed == [])
+    check("each failure is a NON-retryable schema_validation_failed on CommandEnvelope", crashed == [])
     check("the emitted ErrorEnvelope is itself schema-valid (command_id field accepted)", all_schema_valid)
 
     # 2) identifiers are salvaged from the raw payload when present (traceable even though cmd was never built)

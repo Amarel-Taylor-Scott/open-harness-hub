@@ -63,7 +63,7 @@ from src.baltor.experiments import (  # noqa: E402
 _NOW = "2026-06-06T00:00:00Z"
 _NOW_EPOCH = 1_780_000_000  # injected epoch seconds (never a clock read)
 _SLOT = RECONCILIATION_CAPABILITY_SLOT  # "reconciliation.answer"
-_OUTPUT_CONTRACT = "consumption/ContextResponse.v1"
+_OUTPUT_CONTRACT = "consumption/ContextResponse"
 _TENANT = "acme"
 _FACT_KEY = "reg_e.error_resolution.deadline"
 _REG_HANDLE = "ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i"
@@ -93,10 +93,10 @@ _INPUT_SNAPSHOT = {
 
 def _path(path_id: str, mode: str, *, output_contract: str = _OUTPUT_CONTRACT) -> dict[str, Any]:
     return {
-        "schema_version": "PathDefinition.v1",
+        "schema_version": "PathDefinition",
         "path_id": path_id,
         "capability_slot": _SLOT,
-        "input_contract": "consumption/ConsumptionRequest.v1",
+        "input_contract": "consumption/ConsumptionRequest",
         "output_contract": output_contract,
         "mode": mode,
         "promotion_criteria": "criteria/recon-equivalence-cost-ceiling",
@@ -277,24 +277,24 @@ def _self_test() -> int:
 
     # ── 6 · a real PathRollbackPlan reverts the promotion by a POINTER MOVE — deletes nothing. ──
     plan = path_rollback.build_rollback_plan(good_dec, now=_NOW)
-    check("ROLLBACK-PLAN: a PathRollbackPlan.v1 reverts the GOOD promotion to the baseline pointer",
+    check("ROLLBACK-PLAN: a PathRollbackPlan reverts the GOOD promotion to the baseline pointer",
           plan["rollback_target_path_id"] == _BASELINE["path_id"]
           and plan["from_path_id"] == _CAND_GOOD["path_id"])
     check("ROLLBACK-PLAN: rollback is a POINTER MOVE — deletes_paths=false, deletes_prior_runs=false (lossless)",
           plan["deletes_paths"] is False and plan["deletes_prior_runs"] is False)
-    check("ROLLBACK-PLAN: the plan validates against experiments/PathRollbackPlan.v1",
-          _sv.validate_ref(plan, "experiments/PathRollbackPlan.v1") == [])
+    check("ROLLBACK-PLAN: the plan validates against experiments/PathRollbackPlan",
+          _sv.validate_ref(plan, "experiments/PathRollbackPlan") == [])
     check("ROLLBACK-PLAN: the plan references the promotion decision it reverses",
           plan["promotion_decision_id"] == good_dec["decision_id"])
 
     # ── 7 · every emitted engine object validates against its Stage-1 schema. ──
-    check("(+) ParallelPathRun validates against experiments/ParallelPathRun.v1",
-          _sv.validate_ref(run, "experiments/ParallelPathRun.v1") == [])
-    check("(+) PathComparisonReport validates against experiments/PathComparisonReport.v1",
-          _sv.validate_ref(report, "experiments/PathComparisonReport.v1") == [])
+    check("(+) ParallelPathRun validates against experiments/ParallelPathRun",
+          _sv.validate_ref(run, "experiments/ParallelPathRun") == [])
+    check("(+) PathComparisonReport validates against experiments/PathComparisonReport",
+          _sv.validate_ref(report, "experiments/PathComparisonReport") == [])
     for cpid, dec in decisions.items():
-        check(f"(+) PathPromotionDecision for {cpid} validates against experiments/PathPromotionDecision.v1",
-              _sv.validate_ref(dec, "experiments/PathPromotionDecision.v1") == [])
+        check(f"(+) PathPromotionDecision for {cpid} validates against experiments/PathPromotionDecision",
+              _sv.validate_ref(dec, "experiments/PathPromotionDecision") == [])
 
     # ── 8 · deterministic: a second full run is byte-identical. ──
     runner2 = _make_runner(_run_real_reconciliation())

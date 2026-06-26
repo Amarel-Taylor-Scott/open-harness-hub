@@ -33,8 +33,8 @@ def _spec_with_secrets():
         "task_id": "purpose_task.sample_extract@v1",
         "purpose": "Pull X from sample.com.",
         "capability_slot": "source_research",
-        "input_contract": "SampleResearchRequest.v1",
-        "output_contract": "SampleResearchResult.v1",
+        "input_contract": "SampleResearchRequest",
+        "output_contract": "SampleResearchResult",
         "connected_to": ["source-artifact-ledger"],
         "capabilities": {"required": ["http.fetch"], "forbidden": ["purchase", "personal_data.extract"]},
         "success_criteria": {"max_cost": 0.02},
@@ -52,7 +52,7 @@ def _spec_with_secrets():
 def _runs_with_traces():
     return [{
         "run_id": "run-1", "status": "success", "output": {"answer": "10 business days"},
-        "output_contract": "SampleResearchResult.v1", "source_handles": ["ctx://sample#x"],
+        "output_contract": "SampleResearchResult", "source_handles": ["ctx://sample#x"],
         "receipt_id": "rcpt-1", "eval_score": 0.99, "cost": 0.011, "latency_ms": 8400,
         "runtime_class": "browser-worker", "ran_at": "t",
         # ── staff-only ──

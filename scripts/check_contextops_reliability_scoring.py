@@ -10,7 +10,7 @@ What it proves:
   * the factors block is closed: a missing factor or an unknown factor or an out-of-range value is REJECTED;
   * served_as_truth is pinned False (a reliability score ranks; it is never itself a served fact);
   * tenant_scope_ok is computed — a tenant_private source can't back a global fact;
-  * the score serializes to the SourceReliabilityScore.v1 shape (closed factors block, all eight signals).
+  * the score serializes to the SourceReliabilityScore shape (closed factors block, all eight signals).
 
 Deterministic, stdlib-only, offline (time injected). CLI: PYTHONPATH=. python3 scripts/check_contextops_reliability_scoring.py --self-test
 """
@@ -136,17 +136,17 @@ def _self_test() -> int:
     check("a tenant_private source backing a GLOBAL fact → tenant_scope_ok False", priv_global.tenant_scope_ok is False)
     check("a tenant_private source backing a tenant_private fact → tenant_scope_ok True", priv_priv.tenant_scope_ok is True)
 
-    # ── 8) the score serializes to the SourceReliabilityScore.v1 shape (all eight factors, composite, pinned flag). ──
+    # ── 8) the score serializes to the SourceReliabilityScore shape (all eight factors, composite, pinned flag). ──
     d = reg.to_dict()
-    check("serialized score declares schema_version SourceReliabilityScore.v1",
-          d.get("schema_version") == "SourceReliabilityScore.v1")
+    check("serialized score declares schema_version SourceReliabilityScore",
+          d.get("schema_version") == "SourceReliabilityScore")
     check("serialized factors carry exactly the eight signals", set(d.get("factors", {})) == set(FACTOR_NAMES))
     check("serialized score carries composite_score + served_as_truth=false",
           "composite_score" in d and d.get("served_as_truth") is False)
 
     ok = not fails
     print(
-        f"\n{'PASS — check_contextops_reliability_scoring: the scorer produces a deterministic SourceReliabilityScore reconciliation can read; a Reg-E regulation OUTRANKS a CFPB FAQ and a FAQ with maxed factors STILL cannot outrank a regulation (authority is decisive); scores are content-addressed + deterministic; the factors block is closed (missing/unknown/out-of-range REJECTED); served_as_truth is pinned False; a tenant_private source can not back a global fact (tenant_scope_ok); the score serializes to the .v1 shape with all eight factors.' if ok else f'{len(fails)} FAILURES: {fails}'}"
+        f"\n{'PASS — check_contextops_reliability_scoring: the scorer produces a deterministic SourceReliabilityScore reconciliation can read; a Reg-E regulation OUTRANKS a CFPB FAQ and a FAQ with maxed factors STILL cannot outrank a regulation (authority is decisive); scores are content-addressed + deterministic; the factors block is closed (missing/unknown/out-of-range REJECTED); served_as_truth is pinned False; a tenant_private source can not back a global fact (tenant_scope_ok); the score serializes to the  shape with all eight factors.' if ok else f'{len(fails)} FAILURES: {fails}'}"
     )
     return 0 if ok else 1
 

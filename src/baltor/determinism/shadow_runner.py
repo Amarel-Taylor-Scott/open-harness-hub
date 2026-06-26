@@ -78,7 +78,7 @@ class ShadowRunReport:
     live_authoritative: bool        # invariant — the live path stayed authoritative throughout
     ticks: list
     created_at: str = EPOCH
-    schema_version: str = "ShadowRunReport.v1"
+    schema_version: str = "ShadowRunReport"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "report_id": self.report_id,

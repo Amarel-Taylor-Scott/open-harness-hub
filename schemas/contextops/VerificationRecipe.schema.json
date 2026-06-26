@@ -1,0 +1,187 @@
+{
+  "$id": "contextops/VerificationRecipe",
+  "title": "VerificationRecipe",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The recipe that turns one or more SourceRecipes + an ExtractorSnippet into a repeatable VERIFICATION for a fact_key \u2014 the heart of the M3 rung. It pins the fact_key, the input SourceRecipe ids, the extractor that reads them, the validators + success criteria the extracted value must pass, and (REQUIRED) an authority policy + a cross_source confirmation policy + a freshness policy. Running it produces a FactVerificationRun (a candidate result + receipt), NEVER a served fact: a recipe verifies, it does not promote. tenant_scope keeps tenant_private verification from leaking. Deterministic when created_at is injected.",
+  "required": [
+    "schema_version",
+    "recipe_id",
+    "tenant_id",
+    "source_scope",
+    "fact_key",
+    "input_source_recipe_ids",
+    "extractor_id",
+    "validators",
+    "success_criteria",
+    "authority",
+    "cross_source",
+    "freshness",
+    "tenant_scope",
+    "produces",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "VerificationRecipe"
+      ]
+    },
+    "recipe_id": {
+      "type": "string",
+      "description": "content-addressed over (fact_key, extractor_id, source recipe ids); version in metadata, never in the id"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "fact_key": {
+      "type": "string",
+      "description": "the fact this recipe verifies"
+    },
+    "input_source_recipe_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "the SourceRecipe(s) feeding this verification (the inputs to cross-source confirmation)"
+    },
+    "extractor_id": {
+      "type": "string",
+      "description": "the ExtractorSnippet that reads the source(s) into a candidate value"
+    },
+    "validators": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "non_empty",
+          "type_check",
+          "unit_check",
+          "range_check",
+          "regex_match",
+          "enum_member",
+          "source_hash_match",
+          "cross_source_agreement"
+        ]
+      },
+      "description": "the deterministic validators the extracted value must pass"
+    },
+    "success_criteria": {
+      "type": "string",
+      "description": "what counts as a successful verification (e.g. 'value parses as a business-day duration AND matches the official source hash')"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "REQUIRED \u2014 the authority policy: which source_type wins, the minimum authority rank to accept",
+      "required": [
+        "min_authority_rank",
+        "winning_source_type"
+      ],
+      "properties": {
+        "min_authority_rank": {
+          "type": "integer"
+        },
+        "winning_source_type": {
+          "type": "string",
+          "enum": [
+            "source_of_law",
+            "regulation",
+            "statute",
+            "official_agency",
+            "primary_dataset"
+          ],
+          "description": "only high-authority types may win a verification \u2014 a FAQ cannot be the winning source"
+        }
+      }
+    },
+    "cross_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "REQUIRED \u2014 the cross-source confirmation policy this verification enforces",
+      "required": [
+        "policy",
+        "min_independent_sources"
+      ],
+      "properties": {
+        "policy": {
+          "type": "string",
+          "enum": [
+            "single_official_source_ok",
+            "two_independent_sources_required",
+            "official_source_plus_secondary_confirmation",
+            "tenant_private_requires_human_signoff",
+            "current_value_requires_fresh_source"
+          ]
+        },
+        "min_independent_sources": {
+          "type": "integer"
+        }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "REQUIRED \u2014 how fresh a source read must be for the verification to count",
+      "required": [
+        "max_staleness_seconds",
+        "requires_fresh_for_current_values"
+      ],
+      "properties": {
+        "max_staleness_seconds": {
+          "type": "integer"
+        },
+        "requires_fresh_for_current_values": {
+          "type": "boolean",
+          "description": "current/rate/fee/deadline facts require a fresh source read, not a cached one"
+        }
+      }
+    },
+    "watch_triggers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "on_demand",
+          "scheduled",
+          "source_change",
+          "conflict_triggered",
+          "high_value_periodic",
+          "tenant_policy_change",
+          "provider_health"
+        ]
+      }
+    },
+    "tenant_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ],
+      "description": "REQUIRED \u2014 the scope this verification's result is valid in; a tenant_private verification can never publish a global fact"
+    },
+    "produces": {
+      "type": "string",
+      "enum": [
+        "fact_verification_run"
+      ],
+      "description": "pinned \u2014 running this recipe yields a FactVerificationRun (candidate + receipt), NEVER a served/canonical fact"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

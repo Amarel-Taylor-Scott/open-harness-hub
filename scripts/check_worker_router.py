@@ -57,13 +57,13 @@ def _self_test() -> int:
 
     # RED-TEAM: forbidden outputs fail safely
     attacks = [
-        ("agent.research", "ContextResponse.v1", "open-ended emits ContextResponse"),
-        ("agent.codegen", "CanonicalFact.v1", "open-ended emits CanonicalFact"),
-        ("browser.capture_source", "CanonicalFact.v1", "browser emits CanonicalFact"),
-        ("browser.extract", "ContextResponse.v1", "browser emits ContextResponse"),
-        ("utility.http_download", "CanonicalFact.v1", "utility emits CanonicalFact"),
-        ("model.embedding", "CanonicalFact.v1", "model emits CanonicalFact"),
-        ("model.llm", "ReconciliationDecision.v1", "model emits ReconciliationDecision"),
+        ("agent.research", "ContextResponse", "open-ended emits ContextResponse"),
+        ("agent.codegen", "CanonicalFact", "open-ended emits CanonicalFact"),
+        ("browser.capture_source", "CanonicalFact", "browser emits CanonicalFact"),
+        ("browser.extract", "ContextResponse", "browser emits ContextResponse"),
+        ("utility.http_download", "CanonicalFact", "utility emits CanonicalFact"),
+        ("model.embedding", "CanonicalFact", "model emits CanonicalFact"),
+        ("model.llm", "ReconciliationDecision", "model emits ReconciliationDecision"),
     ]
     for cmd, out, label in attacks:
         r = check_command(cmd, out)
@@ -72,11 +72,11 @@ def _self_test() -> int:
     # allowed paths succeed
     ok_native = check_command("native.export_json", "context_response")
     chk("native_export MAY emit context_response", ok_native.get("allowed") is True and ok_native.get("can_publish_truth") is True)
-    ok_recon = check_command("reconcile.write_decision", "ReconciliationDecision.v1")
+    ok_recon = check_command("reconcile.write_decision", "ReconciliationDecision")
     chk("reconciliation MAY emit ReconciliationDecision", ok_recon.get("allowed") is True)
-    ok_agent = check_command("agent.source_discovery", "SourceDiscoveryReport.v1")
+    ok_agent = check_command("agent.source_discovery", "SourceDiscoveryReport")
     chk("open-ended MAY emit SourceDiscoveryReport (candidate)", ok_agent.get("allowed") is True and ok_agent.get("can_publish_truth") is False)
-    chk("validate_output: model forbids ContextResponse", validate_output(route("model.embedding"), "ContextResponse.v1") is False)
+    chk("validate_output: model forbids ContextResponse", validate_output(route("model.embedding"), "ContextResponse") is False)
 
     print(f"\n{'PASS — check_worker_router: every command prefix routes to its bucket; unknown prefixes + forbidden outputs (open-ended/browser/model → truth) fail safely; gated buckets may emit truth.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
     return 0 if not fails else 1

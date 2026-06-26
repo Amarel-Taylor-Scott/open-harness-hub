@@ -39,7 +39,7 @@ _PRICES = {"p1": "PRICE:42", "p2": "PRICE:99"}
 
 
 def _result(output: str, cost: float = 1.0, handles=("ctx://site-x",)):
-    return {"output": output, "output_contract": "Price.v1", "cost": cost, "latency_ms": 5,
+    return {"output": output, "output_contract": "Price", "cost": cost, "latency_ms": 5,
             "error": None, "source_handles": list(handles)}
 
 
@@ -52,27 +52,27 @@ def _scraper_new_parser(inp):            # adapted to the new HTML → correct
 
 
 def _fc_old(_inp):                       # the Reg-E source API moved → can no longer ground the fact
-    return {"output": "", "output_contract": "Fact.v1", "cost": 1.0, "latency_ms": 5,
+    return {"output": "", "output_contract": "Fact", "cost": 1.0, "latency_ms": 5,
             "error": None, "source_handles": []}
 
 
 def _fc_candidate_also_broken(_inp):     # the only candidate also cannot re-ground the moved source
-    return {"output": "UNKNOWN", "output_contract": "Fact.v1", "cost": 1.0, "latency_ms": 5,
+    return {"output": "UNKNOWN", "output_contract": "Fact", "cost": 1.0, "latency_ms": 5,
             "error": None, "source_handles": []}
 
 
 def _registry():
     return {
         "scrape_prices": [
-            {"impl_id": "parser.v1_oldsite", "priority": 30, "handler": _scraper_old_parser},
-            {"impl_id": "parser.v2_newsite", "priority": 20, "handler": _scraper_new_parser},
+            {"impl_id": "parser_oldsite", "priority": 30, "handler": _scraper_old_parser},
+            {"impl_id": "parser_newsite", "priority": 20, "handler": _scraper_new_parser},
         ],
         "factcheck_rege": [
-            {"impl_id": "factcheck.v1", "priority": 30, "handler": _fc_old},
-            {"impl_id": "factcheck.v2", "priority": 20, "handler": _fc_candidate_also_broken},
+            {"impl_id": "factcheck", "priority": 30, "handler": _fc_old},
+            {"impl_id": "factcheck", "priority": 20, "handler": _fc_candidate_also_broken},
         ],
-        "weather": [{"impl_id": "weather.v1", "priority": 30, "handler": lambda _i: _result("sunny")}],
-        "no_suite_cap": [{"impl_id": "x.v1", "priority": 30, "handler": lambda _i: _result("anything")}],
+        "weather": [{"impl_id": "weather", "priority": 30, "handler": lambda _i: _result("sunny")}],
+        "no_suite_cap": [{"impl_id": "x", "priority": 30, "handler": lambda _i: _result("anything")}],
     }
 
 
@@ -82,26 +82,26 @@ def _suite(sid, pairs):
 
 def _scraper_spec():
     return {"capability_id": "scrape-prices", "capability_slot": "scrape_prices",
-            "output_contract": "Price.v1", "success_criteria": {"max_cost": 5.0},
+            "output_contract": "Price", "success_criteria": {"max_cost": 5.0},
             "eval_suite": _suite("scrape", [({"page": "p1"}, "PRICE:42"), ({"page": "p2"}, "PRICE:99")]),
-            "source_dependencies": ["site-x"], "alternatives": ["parser.v2_newsite"]}
+            "source_dependencies": ["site-x"], "alternatives": ["parser_newsite"]}
 
 
 def _fc_spec():
     return {"capability_id": "factcheck-rege", "capability_slot": "factcheck_rege",
-            "output_contract": "Fact.v1", "success_criteria": {"max_cost": 5.0},
+            "output_contract": "Fact", "success_criteria": {"max_cost": 5.0},
             "eval_suite": _suite("rege", [({"q": "deadline"}, "10 business days")]),
-            "source_dependencies": ["reg-e-source"], "alternatives": ["factcheck.v2"]}
+            "source_dependencies": ["reg-e-source"], "alternatives": ["factcheck"]}
 
 
 def _unrelated_spec():
-    return {"capability_id": "weather", "capability_slot": "weather", "output_contract": "W.v1",
+    return {"capability_id": "weather", "capability_slot": "weather", "output_contract": "W",
             "success_criteria": {}, "eval_suite": _suite("w", [({}, "sunny")]),
             "source_dependencies": ["weather-api"], "alternatives": []}
 
 
 def _no_suite_spec():
-    return {"capability_id": "no-suite", "capability_slot": "no_suite_cap", "output_contract": "X.v1",
+    return {"capability_id": "no-suite", "capability_slot": "no_suite_cap", "output_contract": "X",
             "success_criteria": {}, "source_dependencies": ["site-x"], "alternatives": []}
 
 
@@ -132,9 +132,9 @@ def _self_test() -> int:
           s is not None and s.drifted is True)
     check("2: the scraper HEALED — a candidate that re-passes the benchmark was promoted",
           s and s.status == rh.HEAL_STATUS_HEALED and s.promoted is True
-          and s.served_impl_id == "parser.v2_newsite", s and s.status)
+          and s.served_impl_id == "parser_newsite", s and s.status)
     check("3: the prior impl is kept as a reversible rollback target (lossless)",
-          s and s.rollback_target == "parser.v1_oldsite")
+          s and s.rollback_target == "parser_oldsite")
 
     check("4: the UNRELATED capability (weather-api) is UNTOUCHED by the site-x change",
           "weather" not in outs)

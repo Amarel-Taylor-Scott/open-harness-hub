@@ -68,7 +68,7 @@ class VerificationReceipt:
     reasons: list
     checks: list
     created_at: str
-    schema_version: str = "VerificationReceipt.v1"
+    schema_version: str = "VerificationReceipt"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "receipt_id": self.receipt_id,

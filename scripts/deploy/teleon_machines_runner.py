@@ -11,7 +11,7 @@ tear it down". This file is the compiled-capability launcher on that substrate.
 What it does, given a CompiledRuntimeUnit (exec_target=fly_machine):
   1. LOAD the unit (a ``--launch <unit.json>`` path, or by ``unit_id`` from the compiled-unit registry under
      ``dist/local-services-state/teleon-compiler/`` when present) and VALIDATE it against
-     ``schemas/runtime/CompiledRuntimeUnit.v1.schema.json`` (the compiler's own ``validate_unit``).
+     ``schemas/runtime/CompiledRuntimeUnit.schema.json`` (the compiler's own ``validate_unit``).
   2. ENFORCE the launch laws: only a PROMOTED, schema-VALID, ``fly_machine`` unit launches. A non-promoted /
      invalid / wrong-target unit is REFUSED with a clear reason (the only-promoted law holds at launch too).
   3. CREATE a Fly machine from the unit's image + command + env-REF names + resources + budgets (the create
@@ -173,7 +173,7 @@ def load_unit(source: str) -> dict:
 
 def assert_launchable(unit: dict) -> None:
     """Enforce the launch laws. Raises ``LaunchRefused`` with a precise reason unless the unit is:
-      * the right schema version + structurally schema-VALID (CompiledRuntimeUnit.v1),
+      * the right schema version + structurally schema-VALID (CompiledRuntimeUnit),
       * PROMOTED (gate_evidence.status == 'promoted' — the only-promoted law, re-checked at launch),
       * targeted at ``fly_machine`` (this runner's substrate),
       * structurally non-truth (is_truth is false — a unit is a plan, never served truth).
@@ -187,7 +187,7 @@ def assert_launchable(unit: dict) -> None:
     errors = validate_unit(unit)
     if errors:
         head = "; ".join(errors[:4]) + (f" (+{len(errors) - 4} more)" if len(errors) > 4 else "")
-        raise LaunchRefused(f"unit fails CompiledRuntimeUnit.v1 schema validation — REFUSED: {head}")
+        raise LaunchRefused(f"unit fails CompiledRuntimeUnit schema validation — REFUSED: {head}")
     status = (unit.get("gate_evidence") or {}).get("status")
     if status != PROMOTED_STATUS:
         raise LaunchRefused(
@@ -336,7 +336,7 @@ class Runner:
         """The lineage spine every run receipt carries — the unit it deployed + that unit's OWN lineage (lossless:
         a run is never decoupled from the compiled unit or the capability/receipts behind it)."""
         return RunReceipt({
-            "schema": "TeleonRunReceipt.v1",
+            "schema": "TeleonRunReceipt",
             "role": MANAGED_BY_VALUE,
             "exec_target": LAUNCH_EXEC_TARGET,
             "fly_app": self.cfg["app"],
@@ -752,7 +752,7 @@ def self_test() -> int:  # noqa: C901 — a flat checklist reads clearer than he
     missing_field = {k: v for k, v in unit.items() if k != "budgets"}
     checks.append(("launch-law: a unit missing a required field (budgets) is REFUSED (schema)",
                    _refused(missing_field)))
-    wrong_schema = {**unit, "schema_version": "CompiledRuntimeUnit.v0"}
+    wrong_schema = {**unit, "schema_version": "CompiledRuntimeUnit"}
     checks.append(("launch-law: a wrong schema_version is REFUSED", _refused(wrong_schema)))
 
     # 2. create-config is built from the UNIT, with a valid integer guest + budget-bound restart, no secrets ---
@@ -859,7 +859,7 @@ def self_test() -> int:  # noqa: C901 — a flat checklist reads clearer than he
     written = [json.loads(line) for line in tmp.read_text(encoding="utf-8").splitlines() if line.strip()]
     checks.append(("persistence: a receipt line is appended to the JSONL sink with the unit_id",
                    len(written) == 1 and written[0]["unit_id"] == unit["unit_id"]
-                   and written[0]["schema"] == "TeleonRunReceipt.v1"))
+                   and written[0]["schema"] == "TeleonRunReceipt"))
 
     # 11. REUSE PROOF: the Machines client is the controller's, only extended (not duplicated) ----------------
     checks.append(("reuse: RunnerMachinesAPI subclasses the controller's MachinesAPI (HTTP/RESP not duplicated)",

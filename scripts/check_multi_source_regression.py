@@ -66,7 +66,7 @@ def _self_test() -> int:
             if not check(f"{rid}: produced a response", resp is not None):
                 row_ok = False
             else:
-                if not check(f"{rid}: ContextResponse.v1 valid", validate_ref(resp, "consumption/ContextResponse.v1") == []):
+                if not check(f"{rid}: ContextResponse valid", validate_ref(resp, "consumption/ContextResponse") == []):
                     row_ok = False
                 served = resp["served_facts"]
                 if not check(f"{rid}: served ≥ {row['expect_min_served_facts']} facts", len(served) >= row["expect_min_served_facts"]):

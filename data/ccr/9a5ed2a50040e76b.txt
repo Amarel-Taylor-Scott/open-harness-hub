@@ -45,9 +45,9 @@ def _gate_evidence(capability: dict, *, gate_basis_default: str) -> dict
 def compile_capability(capability: dict, task_spec: dict, *, exec_target: str, policy: dict | None=None, now: str | None=None, rollback_target: str='', receipt_refs: list[str] | None=None, resolved_preference: dict | None=None, gate_basis_default: str='train+holdout', resource_classes: dict | None=None, sla_policies: dict | None=None, topology: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None, env_refs: list[str] | None=None) -> dict[str, Any]
     # Compile ONE promoted capability + its CapabilityTask spec into a CompiledRuntimeUnit dict.
 def _unit_schema() -> dict
-    # The CompiledRuntimeUnit.v1 schema document (single source: schemas/runtime/CompiledRuntimeUnit.v1).
+    # The CompiledRuntimeUnit schema document (single source: schemas/runtime/CompiledRuntimeUnit).
 def validate_unit(unit: dict) -> list[str]
-    # Schema-validate a compiled unit against runtime/CompiledRuntimeUnit.v1. Uses the full ``jsonschema``
+    # Schema-validate a compiled unit against runtime/CompiledRuntimeUnit. Uses the full ``jsonschema``
 ```
 ## intra-module call edges
 src.teleon.compiler.compile.memory_to_mb -> src.teleon.compiler.compile.CompilerError

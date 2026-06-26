@@ -60,7 +60,7 @@ class CanonicalFact:
         return self.status in SERVABLE_STATUSES
 
     def to_dict(self) -> dict:
-        return {"schema_version": "CanonicalFact.v1", "fact_id": self.fact_id, "subject": self.subject,
+        return {"schema_version": "CanonicalFact", "fact_id": self.fact_id, "subject": self.subject,
                 "predicate": self.predicate, "object": self.object, "scope": self.scope, "status": self.status,
                 "source_handle": self.source_handle, "content_hash": self.content_hash,
                 "authority_rank": self.authority_rank, "fragility_id": self.fragility_id,

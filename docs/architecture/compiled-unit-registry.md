@@ -30,7 +30,7 @@ Current state — which unit is active per capability, the full history, the rol
 fold** over the log (the latest-line-wins idiom `runs.jsonl` already uses), recomputed on construction
 (rebuild-on-start) and kept in sync as events append.
 
-### Record shape (`CompiledUnitRegistryRecord.v1`)
+### Record shape (`CompiledUnitRegistryRecord`)
 
 A `register` record: `{kind:"register", record_version, unit:<full CompiledRuntimeUnit>, active, registered_at,
 rollback_target, supersedes}`. `registered_at` is the unit's own `provenance.compiled_at` (caller-supplied — the

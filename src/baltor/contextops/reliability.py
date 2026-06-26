@@ -8,7 +8,7 @@ machine_readability, contradiction_rate, availability, parse_stability, historic
 ``overall`` composite. tenant_scope is recorded so a tenant_private source can never silently back a global
 fact. A reliability score RANKS sources; it is NEVER itself a served fact (``served_as_truth`` pinned False).
 
-Conforms to ``schemas/contextops/SourceReliabilityScore.v1.schema.json``. Deterministic: the same candidate +
+Conforms to ``schemas/contextops/SourceReliabilityScore.schema.json``. Deterministic: the same candidate +
 the same factors → the same ``score_id`` and the same ``overall``, every run. Time is INJECTED (``scored_at``);
 no clock, no RNG, no network. stdlib only.
 """
@@ -26,7 +26,7 @@ from src.baltor.contextops.authority_rank import (  # noqa: E402  (intra-Baltor 
     AUTHORITY_RANK, default_authority_rank, scope_adjusted_rank)
 
 #: the eight per-factor signals the composite is derived from (single source — matches the closed factors block
-#: in SourceReliabilityScore.v1). contradiction_rate is "lower is better", so it is INVERTED in the composite.
+#: in SourceReliabilityScore). contradiction_rate is "lower is better", so it is INVERTED in the composite.
 FACTOR_NAMES = (
     "officialness", "freshness", "stability", "machine_readability",
     "contradiction_rate", "availability", "parse_stability", "historical_accuracy",
@@ -98,7 +98,7 @@ class SourceReliabilityScore:
         return "srs-" + hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]
 
     def to_dict(self) -> dict:
-        return {"schema_version": "SourceReliabilityScore.v1", "score_id": self.score_id,
+        return {"schema_version": "SourceReliabilityScore", "score_id": self.score_id,
                 "candidate_id": self.candidate_id, "tenant_id": self.tenant_id,
                 "source_scope": self.source_scope, "authority_rank": self.authority_rank,
                 "factors": {f: float(self.factors[f]) for f in FACTOR_NAMES},

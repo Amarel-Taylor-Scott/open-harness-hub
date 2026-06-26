@@ -1,0 +1,17 @@
+{
+  "$id": "io/WorkerClaim",
+  "title": "WorkerClaim",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "The record of an ATOMIC claim of a work item (CapabilityTask) by exactly one worker — projected from the FleetLedger task after claim_task: who holds the lease, until when, at what attempt. A worker does not own a task until this exists.",
+  "required": ["task_id", "worker_id", "lease_until", "claimed_at", "status", "attempt"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "task_id": {"type": "string"},
+    "worker_id": {"type": "string", "description": "the lease owner"},
+    "lease_until": {"type": "string"},
+    "claimed_at": {"type": "string"},
+    "status": {"type": "string", "enum": ["claimed", "running"]},
+    "attempt": {"type": "integer"}
+  }
+}

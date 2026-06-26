@@ -38,13 +38,13 @@ def run_command(registry: ProcessorRegistry, command, ctx) -> dict:
     # 1) validate the RAW command envelope FIRST (before normalization, so a missing/invalid field is caught
     #    and never masked by dataclass defaults). _raw_of never raises, so a malformed payload fails safely.
     raw = _raw_of(command)
-    cerrs = validate_ref(raw, "envelopes/CommandEnvelope.v1")
+    cerrs = validate_ref(raw, "envelopes/CommandEnvelope")
     if cerrs:
         ctx.logger.error("schema.validation.failed", message="invalid CommandEnvelope", fields={"errors": cerrs})
         # copy every identifier we can salvage from the raw payload so the ErrorEnvelope is traceable even
         # though `cmd` was never safely constructed.
         return _fail(ErrorEnvelope("schema_validation_failed", False, f"invalid CommandEnvelope: {cerrs[:3]}",
-                                   failed_schema="CommandEnvelope.v1",
+                                   failed_schema="CommandEnvelope",
                                    command_id=str(raw.get("command_id", "")), run_id=str(raw.get("run_id", "")),
                                    step_id=str(raw.get("step_id", "")), processor_id=str(raw.get("processor_id", "")),
                                    processor_version=str(raw.get("processor_version", ""))), ctx)
@@ -70,10 +70,10 @@ def run_command(registry: ProcessorRegistry, command, ctx) -> dict:
 
     # 4) validate the ProcessorResult
     rdict = result.to_dict()
-    rerrs = validate_ref(rdict, "envelopes/ProcessorResult.v1")
+    rerrs = validate_ref(rdict, "envelopes/ProcessorResult")
     if rerrs:
         return _fail(ErrorEnvelope("validation_failed", False, f"invalid ProcessorResult: {rerrs[:3]}",
-                                   failed_schema="ProcessorResult.v1", run_id=cmd.run_id, step_id=cmd.step_id), ctx)
+                                   failed_schema="ProcessorResult", run_id=cmd.run_id, step_id=cmd.step_id), ctx)
     if not result.ok:
         errs = result.errors or [{"message": "processor returned ok=false"}]
         first = errs[0] if isinstance(errs[0], dict) else errs[0].to_dict()
@@ -83,13 +83,13 @@ def run_command(registry: ProcessorRegistry, command, ctx) -> dict:
     # 5) validate every emitted artifact (envelope + its declared artifact schema if one exists)
     for art in result.artifacts:
         ad = art.to_dict() if hasattr(art, "to_dict") else art
-        aerrs = validate_ref(ad, "envelopes/ArtifactEnvelope.v1")
+        aerrs = validate_ref(ad, "envelopes/ArtifactEnvelope")
         asv = ad.get("artifact_schema_version", "")
         if asv and (SCHEMA_DIR / "artifacts" / f"{asv}.schema.json").exists():
             aerrs += validate_ref(ad.get("payload", {}), f"artifacts/{asv}")
         if aerrs:
             return _fail(ErrorEnvelope("schema_validation_failed", False, f"invalid artifact {ad.get('artifact_id')}: {aerrs[:3]}",
-                                       failed_schema=asv or "ArtifactEnvelope.v1", run_id=cmd.run_id, step_id=cmd.step_id), ctx)
+                                       failed_schema=asv or "ArtifactEnvelope", run_id=cmd.run_id, step_id=cmd.step_id), ctx)
 
     # 6) side effects through ports only
     for art in result.artifacts:

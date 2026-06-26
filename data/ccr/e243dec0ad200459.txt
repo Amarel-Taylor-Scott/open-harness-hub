@@ -15,7 +15,7 @@ def _facts_equivalent(baseline_output: Any, candidate_output: Any) -> bool
 def _verdict(*, baseline: dict[str, Any], cand: dict[str, Any], run_input_snapshot_hash: str, held_out_strings: list[str], unsafe_strings: list[str]) -> dict[str, Any]
     # One per-candidate verdict with the gates + a recommended_action.
 def compare(run: dict[str, Any], *, now: str, held_out_strings: Iterable[str] | None=None, unsafe_strings: Iterable[str] | None=None, validate: bool=True) -> dict[str, Any]
-    # Compare every candidate in ``run`` against its baseline; return a ``PathComparisonReport.v1`` dict.
+    # Compare every candidate in ``run`` against its baseline; return a ``PathComparisonReport`` dict.
 ```
 ## intra-module call edges
 src.teleon.experiments.path_comparator._leaks_any -> src.teleon.experiments.path_comparator._output_text

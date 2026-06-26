@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scripts.check_octs_conformance — PROOF: Baltor's PurposeTaskSpec.v1 is a CTS-0-conformant OCTS CapabilityTask,
+"""scripts.check_octs_conformance — PROOF: Baltor's PurposeTaskSpec is a CTS-0-conformant OCTS CapabilityTask,
 and the abstract runtime-class vocabulary is well-formed + cloud-defer-safe.
 
 Open Capability Task Specification (OCTS) — docs/standards/open-capability-task-specification.md. CTS-0 =
@@ -8,7 +8,7 @@ Open Capability Task Specification (OCTS) — docs/standards/open-capability-tas
      a `class` id + a `local_equivalent` (cloud-defer-only-after-local-equivalent), and the standard's core
      classes are present.
   B. A CTS-0-conformant PurposeTask (purpose + interface + capabilities{required/forbidden} + successCriteria +
-     allowed_runtime_classes + observability) VALIDATES against PurposeTaskSpec.v1.
+     allowed_runtime_classes + observability) VALIDATES against PurposeTaskSpec.
   C. allowed_runtime_classes ⊆ the vocabulary (non-fragile: checked against config, not a hard-coded list).
   D. The OCTS CTS-0 minimal required field set maps onto PurposeTaskSpec fields (purpose · input/output ·
      successCriteria · capabilities.required/forbidden · allowed_runtime_classes · observability).
@@ -29,7 +29,7 @@ if _REPO not in sys.path:
 
 from scripts.runtime import schema_validator as sv
 
-_REF = "purpose_tasks/PurposeTaskSpec.v1"
+_REF = "purpose_tasks/PurposeTaskSpec"
 _NOW = "2026-06-06T00:00:00Z"
 _CORE_CLASSES = {"cloud-function", "serverless-container", "kubernetes-job", "kubernetes-worker",
                  "queue-worker", "durable-workflow", "browser-worker", "gpu-worker"}
@@ -40,12 +40,12 @@ _OCTS_REQUIRED = {"purpose", "input", "output", "capabilities.required", "capabi
 
 def _conformant_spec(runtime_classes):
     return {
-        "schema_version": "PurposeTaskSpec.v1",
+        "schema_version": "PurposeTaskSpec",
         "task_id": "purpose_task.octs_demo@v1",
         "purpose": "Visit sample.com and extract X information.",
         "capability_slot": "source_research",
-        "input_contract": "SourceResearchRequest.v1",
-        "output_contract": "SourceEvidenceBundle.v1",
+        "input_contract": "SourceResearchRequest",
+        "output_contract": "SourceEvidenceBundle",
         "success_criteria": {"max_cost": 0.02, "min_source_handles": 1, "max_p95_latency_ms": 30000},
         "promotion_criteria": {"cost_tolerance": 0.0},
         "connected_to": ["contextops.source_discovery"],
@@ -76,7 +76,7 @@ def _self_test() -> int:
     # B. a CTS-0-conformant PurposeTask validates
     spec = _conformant_spec(["cloud-function", "kubernetes-job", "browser-worker", "local-subprocess"])
     errs = sv.validate_ref(spec, _REF)
-    check("B: a CTS-0-conformant PurposeTask validates against PurposeTaskSpec.v1", errs == [], str(errs[:3]))
+    check("B: a CTS-0-conformant PurposeTask validates against PurposeTaskSpec", errs == [], str(errs[:3]))
 
     # C. allowed_runtime_classes ⊆ vocabulary (non-fragile)
     declared = set(spec["allowed_runtime_classes"])
@@ -101,7 +101,7 @@ def _self_test() -> int:
     # E. governance: a forbidden-capability boundary is expressible + populated
     check("E: forbidden-capability governance boundary expressible", len(caps.get("forbidden", [])) >= 1, str(caps.get("forbidden")))
 
-    print("\n" + ("PASS — check_octs_conformance: PurposeTaskSpec.v1 is a CTS-0-conformant OCTS CapabilityTask "
+    print("\n" + ("PASS — check_octs_conformance: PurposeTaskSpec is a CTS-0-conformant OCTS CapabilityTask "
                   "(purpose · interface · capabilities{required/forbidden} · successCriteria · allowed_runtime_"
                   "classes ⊆ vocabulary · observability); the runtime-class vocabulary is well-formed and every "
                   "class has a local equivalent." if not fails else f"{len(fails)} FAILURES: {fails}"))

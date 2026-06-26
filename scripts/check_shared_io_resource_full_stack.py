@@ -11,7 +11,7 @@ Scenario (one correlation_id throughout):
   EVENT     -> a bus event with a secret in its payload is projected to a CloudEvents envelope — secret REDACTED.
   INFERENCE -> an InferenceRequest stores the input HASH (not the raw prompt); select_provider -> ModelRouteDecision;
                infer_local executes the LOCAL STUB offline with a ModelInvocationReceipt (is_truth=false).
-  OBJECTSHELL-> the resulting ContextArtifact is wrapped in ObjectShell.v1 LOSSLESSLY (rehydrate == original).
+  OBJECTSHELL-> the resulting ContextArtifact is wrapped in ObjectShell LOSSLESSLY (rehydrate == original).
 
 Asserts:
   A. RESOURCE layer: both specs validate; provision receipt is well-formed (cleanup_required reflects ownership).
@@ -99,10 +99,10 @@ def _self_test() -> int:
     okP, _ = R.validate_resource_spec(s["persist"])
     okT, _ = R.validate_resource_spec(s["temp"])
     check("A: resource layer — persistent + temp specs validate; provision receipt well-formed",
-          okP and okT and s["receipt"]["schema_version"] == "ResourceProvisionReceipt.v1" and s["receipt"]["cleanup_required"] is False)
+          okP and okT and s["receipt"]["schema_version"] == "ResourceProvisionReceipt" and s["receipt"]["cleanup_required"] is False)
 
     check("B: work layer — WorkerClaim holds the lease + ack is succeeded with the explicit worker",
-          s["claim"]["schema_version"] == "WorkerClaim.v1" and s["claim"]["worker_id"] == "w-1"
+          s["claim"]["schema_version"] == "WorkerClaim" and s["claim"]["worker_id"] == "w-1"
           and s["ack"]["resulting_status"] == "succeeded" and s["ack"]["worker_id"] == "w-1")
 
     check("C: event layer — envelope carries the correlation_id + the secret is REDACTED",

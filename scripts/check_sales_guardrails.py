@@ -4,7 +4,7 @@ dangerous behaviors before any outward-facing tool is built. Diagnostics describ
 become legal conclusions or public accusations against named real companies without review.
 
 Asserts (all dangerous patterns FAIL SAFELY):
-  A. CONTRACTS: EvidencePack/TargetCompany/DiagnosticRun/ReviewApproval.v1 registered.
+  A. CONTRACTS: EvidencePack/TargetCompany/DiagnosticRun/ReviewApproval registered.
   B. CLAIM LANGUAGE: 'illegal'/'breaking the law' -> legal_conclusion; 'appears unsafe, requires review' -> safe.
   C. SAFE REWRITE: a legal-conclusion sentence rewrites to non-legal-conclusion ('appears'/'requires review').
   D. NAMED REAL COMPANY: a public_claim_safe pack about a named real company WITHOUT approval -> NOT publishable.
@@ -45,7 +45,7 @@ def _self_test() -> int:
             fails.append(n)
 
     contracts = json.dumps(json.loads((_REPO / "architecture" / "contract_registry.json").read_text()))
-    check("A: 4 sales contracts registered", all(f"sales/{s}.v1.schema.json" in contracts for s in
+    check("A: 4 sales contracts registered", all(f"sales/{s}.schema.json" in contracts for s in
           ("EvidencePack", "TargetCompany", "DiagnosticRun", "ReviewApproval")))
 
     check("B: 'illegal' -> legal_conclusion", G.classify_claim_language("their chatbot is illegal")["class"] == "legal_conclusion")

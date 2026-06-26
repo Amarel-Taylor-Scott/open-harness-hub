@@ -29,7 +29,7 @@ review · Baltor≠legal advice, Teleon≠replaces K8s. Enforced by `src/baltor/
 
 ## The 17 parts — status
 1. Discovery → `.agent/sales-lead-funnel-discovery.json` — *(greenfield confirmed inline)*
-2. Sales contracts — **BUILT (4 of 10):** EvidencePack/TargetCompany/DiagnosticRun/ReviewApproval.v1. QUEUED:
+2. Sales contracts — **BUILT (4 of 10):** EvidencePack/TargetCompany/DiagnosticRun/ReviewApproval. QUEUED:
    ProductPainHypothesis/PublicAISurface/LeadScore/OutreachSequence/PilotProposal/SalesLead.
 3. Sales registries — **BUILT:** `sales_public_claim_policy`, `sales_engagement_policy`, `sales_pain_hypothesis_catalog`.
    QUEUED: target_registry, diagnostic_tool_catalog, lead_funnel_policy, outreach_policy(folded).

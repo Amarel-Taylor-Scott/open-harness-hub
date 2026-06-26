@@ -20,7 +20,7 @@ Asserts:
   I. bind_allowed: priority order — first class with a runnable cloud wins; none → local of the FIRST class;
      empty list → offline default.
   J. SINGLE SOURCE: injecting a custom vocabulary changes the binding (the module reads the vocab, not a literal).
-  K. SCHEMA: every produced decision conforms to RuntimeClassBinding.v1 (required keys + action enum).
+  K. SCHEMA: every produced decision conforms to RuntimeClassBinding (required keys + action enum).
   L. COMPOSES with the execution selector: eligible_backends_for_classes feeds select_backend, which (offline)
      picks a LOCAL backend that is within the contract's allowed shapes.
 
@@ -55,7 +55,7 @@ def _self_test() -> int:
 
     classes_doc = json.loads((Path(_REPO) / "architecture" / "capability_runtime_classes.json").read_text())
     matrix = json.loads((Path(_REPO) / "architecture" / "execution_backend_policy_matrix.json").read_text())
-    schema = json.loads((Path(_REPO) / "schemas" / "purpose_tasks" / "RuntimeClassBinding.v1.schema.json").read_text())
+    schema = json.loads((Path(_REPO) / "schemas" / "purpose_tasks" / "RuntimeClassBinding.schema.json").read_text())
     backends_enum = set(matrix["backends_enum"])
     built = set(matrix["local_equivalents_built"])
     all_classes = [c["class"] for c in classes_doc["classes"]]
@@ -66,7 +66,7 @@ def _self_test() -> int:
             return False
         if d["action"] not in schema["properties"]["action"]["enum"]:
             return False
-        return d["schema_version"] == "RuntimeClassBinding.v1"
+        return d["schema_version"] == "RuntimeClassBinding"
 
     # A. vocabulary well-formed
     for c in classes_doc["classes"]:
@@ -146,7 +146,7 @@ def _self_test() -> int:
               rb.bind("local-subprocess", available_creds=set(), provider_health={}),
               rb.bind("gpu-worker", available_creds=set(), provider_health={}),
               rb.bind_allowed(["cloud-function"], available_creds=set(), provider_health={})]
-    check("K: all decisions conform to RuntimeClassBinding.v1", all(validate_schema(x) for x in spread))
+    check("K: all decisions conform to RuntimeClassBinding", all(validate_schema(x) for x in spread))
 
     # L. composes with the execution selector (eligible set constrains the ranking; offline → a local backend)
     elig = rb.eligible_backends_for_classes(["cloud-function"])
@@ -158,7 +158,7 @@ def _self_test() -> int:
           sd["backend"] in elig and sd["backend"] in _FUNCTION_FAMILY, json.dumps(sd))
 
     # M. resolve_for_spec wires PurposeTaskSpec.allowed_runtime_classes through the binding
-    spec = {"schema_version": "PurposeTaskSpec.v1", "allowed_runtime_classes": ["cloud-function", "local-subprocess"]}
+    spec = {"schema_version": "PurposeTaskSpec", "allowed_runtime_classes": ["cloud-function", "local-subprocess"]}
     dm = rb.resolve_for_spec(spec, available_creds=set(), provider_health={})
     check("M: resolve_for_spec offline → local fallback of the first allowed class",
           dm["is_local_fallback"] and dm["backend"] == rb.local_fallback_backend("cloud-function"), json.dumps(dm))
@@ -166,7 +166,7 @@ def _self_test() -> int:
     print("\n" + ("PASS — check_runtime_class_binding: CTS-1 binds an OCTS runtime class to a concrete backend by "
                   "policy/creds/health; cloud is deferred until a credentialed+healthy class vendor exists, else the "
                   "class's BUILT local equivalent runs; class scoping enforces the browser/GPU guard; unknown class "
-                  "denies by default; vocabulary is the single source; decisions conform to RuntimeClassBinding.v1; "
+                  "denies by default; vocabulary is the single source; decisions conform to RuntimeClassBinding; "
                   "composes with the execution selector." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 

@@ -59,7 +59,7 @@ def _luhn_ok(value: str) -> bool:
     capabilities=("text_normalization", "local_rules", "stable_ids"),
     task_types=("text.normalize", "document.normalize"),
     image="baltor-worker-cpu",
-    output_contract="normalized_text.v1",
+    output_contract="normalized_text",
 )
 def text_normalize(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     original = str(payload.get("text") or "")
@@ -89,7 +89,7 @@ def text_normalize(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("pii_detection", "regex_extraction", "privacy_filter"),
     task_types=("pii.detect", "privacy.scan"),
     image="baltor-worker-audit",
-    output_contract="pii_findings.v1",
+    output_contract="pii_findings",
 )
 def pii_detect(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = _source_chunks(payload)
@@ -161,7 +161,7 @@ def _simhash(tokens: list[str], bits: int = 64) -> str:
     capabilities=("deduplication", "stable_ids", "text_fingerprinting"),
     task_types=("dedupe.fingerprint", "document.fingerprint"),
     image="baltor-worker-cpu",
-    output_contract="fingerprints.v1",
+    output_contract="fingerprints",
 )
 def dedupe_fingerprint(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = _source_chunks(payload)
@@ -204,7 +204,7 @@ def dedupe_fingerprint(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("graph_metrics", "lineage_edges", "local_rules"),
     task_types=("graph.metrics", "graph.rank"),
     image="baltor-worker-cpu",
-    output_contract="graph_metrics.v1",
+    output_contract="graph_metrics",
 )
 def graph_metrics(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     nodes = payload.get("nodes") or payload.get("document_nodes") or []

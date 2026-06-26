@@ -7,11 +7,11 @@ fragile (version-in-the-name, no payload split):
   - schemas/shared/ObjectShell        — every major object composes from it (object_type + schema_version + payload).
   - schemas/registry/RegistryObject   — every registry record (type + version + flexible component; de-versioned name).
 
-It does NOT police the 530 DOMAIN record types (CanonicalFact.v1, …): those already inherit thin-ness via
-`src/teleon/io/governed_record.mint_record` (a governed envelope + a flexible payload, with the version in the
-`schema_version` METADATA field). Mass-renaming that deliberate, governed versioning convention across ~190 schema
-files + thousands of call sites would CREATE fragility (regressions), not remove it — so it is out of scope by design.
-serves_truth=false.
+It does NOT separately police the 500+ DOMAIN record types (CanonicalFact, …): those inherit thin-ness via
+`src/teleon/io/governed_record.mint_record` (a governed envelope + a flexible payload, with the version carried in
+the `schema_version` METADATA field — never in the name). The portfolio-wide `.vN`-suffix elimination (owner
+2026-06-25) removed every version-in-the-name from schema files, object ids, and call sites; this guard pins the two
+base wrappers so that hygiene can never regress to fragile (version-in-the-name, no payload split). serves_truth=false.
 
   --self-test
 """
@@ -26,7 +26,7 @@ if str(REPO) not in sys.path:
 
 def self_test() -> int:
     # 1) ObjectShell — the portfolio-wide shell: stable shell + version in metadata + FLEXIBLE payload
-    shell = json.loads((REPO / "schemas/shared/ObjectShell.v1.schema.json").read_text(encoding="utf-8"))
+    shell = json.loads((REPO / "schemas/shared/ObjectShell.schema.json").read_text(encoding="utf-8"))
     sp = shell["properties"]
     assert {"object_type", "schema_version", "payload"} <= set(sp), "ObjectShell = type + version-metadata + flexible payload"
     assert "object_type" in shell["required"], "ObjectShell keeps a stable object_type"
@@ -40,12 +40,13 @@ def self_test() -> int:
 
     # 3) mint_record — the DOMAIN-record wrapper: a governed envelope + a flexible payload (version in schema_version metadata)
     from src.teleon.io.governed_record import mint_record
-    r = mint_record("Foo.v1", {"x": 1, "body": "free"}, produced_by="t", created_at="2026-06-25T00:00:00Z")
+    r = mint_record("Foo", {"x": 1, "body": "free"}, produced_by="t", created_at="2026-06-25T00:00:00Z")
     assert "envelope" in r and "schema_version" in r and r["x"] == 1, "mint_record = governed envelope + flexible payload"
-    assert r["schema_version"] == "Foo.v1", "version lives in the schema_version METADATA field, not the object id/name"
+    assert r["schema_version"] == "Foo", "version lives in the schema_version METADATA field, not the object id/name"
 
     print("check_object_wrapper_hygiene: OK (ObjectShell + RegistryObject are thin wrappers, version in metadata; "
-          "mint_record envelope stays flexible; the 530 governed domain .vN tags are intentionally untouched)")
+          "mint_record envelope stays flexible; all object/schema names are version-free — the version lives in "
+          "the schema_version metadata field)")
     return 0
 
 

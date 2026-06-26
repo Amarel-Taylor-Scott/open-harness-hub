@@ -2,7 +2,7 @@
 """scripts.track_user_journey — GOVERNED, REPLAYABLE user-journey tracking.
 
 The recorded videos (`e2e/record_user_journeys.mjs`) SHOW a journey; this tracks it as a structured,
-deterministic `UserJourneyTrace.v1` that PROVES + replays it — the same thesis as the product itself
+deterministic `UserJourneyTrace` that PROVES + replays it — the same thesis as the product itself
 (receipts + lineage for everything, including the demo journeys). A journey runs against the REAL demo
 backend (`demo_full_app.run_demo` — not a mock), maps each real outcome to an ordered step, and emits a
 content-hashed trace that re-runs to the SAME hash. serves_truth=false (a journey trace is evidence).
@@ -27,7 +27,7 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
     if _R not in sys.path:
         sys.path.insert(0, _R)
 
-SCHEMA_VERSION = "UserJourneyTrace.v1"
+SCHEMA_VERSION = "UserJourneyTrace"
 
 
 def _baltor_context_assurance(corpus: str = "cfpb") -> dict:
@@ -205,7 +205,7 @@ _SECRET_MARKERS = ("bearer ", "sk-", "api_key=", "password", "secret:")  # redac
 
 
 def track(journey_id: str) -> dict:
-    """Run a registered journey against the real backend and return a UserJourneyTrace.v1 (deterministic)."""
+    """Run a registered journey against the real backend and return a UserJourneyTrace (deterministic)."""
     registry = all_journeys()
     if journey_id not in registry:
         raise KeyError(f"unknown journey {journey_id!r}; known: {sorted(registry)}")
@@ -304,7 +304,7 @@ def _self_test() -> int:
        track("teleon-capability-descent-cost-startup")["trace_hash"] == desc["trace_hash"] and desc["serves_truth"] is False)
 
     print("\n" + ("PASS — track_user_journey: a user journey is tracked against the REAL demo backend as an ordered, "
-                  "deterministic, REPLAYABLE UserJourneyTrace.v1 (same journey -> same trace_hash); the moat step "
+                  "deterministic, REPLAYABLE UserJourneyTrace (same journey -> same trace_hash); the moat step "
                   "(reconcile-by-authority, hold out the loser) is on the trace; served answer + receipt carry "
                   "lineage refs; secrets are redacted; serves_truth=false."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))

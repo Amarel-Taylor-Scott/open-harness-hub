@@ -124,7 +124,7 @@ def build_feed() -> dict:
     cands = seed_professions()
     sectors = sorted({p.sector for p in PROFESSIONS})
     return {
-        "feed_version": "DiscoveredCapabilityFeed.v1",
+        "feed_version": "DiscoveredCapabilityFeed",
         "discovered_at": "2026-06-20",
         "discovery_method": f"profession-scale derivation from the DueCare template across the {OCCUPATION_SPINE}",
         "provenance": "DueCare (gemma4_comp) generalized beyond migrant-worker protection; occupation spine = O*NET + Stanford WORKBank.",

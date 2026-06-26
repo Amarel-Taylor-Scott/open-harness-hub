@@ -16,15 +16,15 @@ The core records are:
 
 | Record | Purpose |
 | --- | --- |
-| `baltor.context-object.v1` | Stable identity for a context object. |
-| `baltor.context-version.v1` | Immutable observed state of a context object. |
-| `baltor.context-artifact.v1` | Immutable derived representation such as chunk, claim, summary, embedding, repo wiki page, or pack. |
-| `baltor.context-relationship.v1` | Typed directional edge between objects, versions, or artifacts. |
-| `baltor.context-assertion.v1` | Source-linked statement about an object, relationship, dimension, or flexible attribute. |
-| `baltor.context-dimension-definition.v1` | Registry entry for scored or classified dimensions such as risk, verifiability, freshness, and actionability. |
-| `baltor.context-dimension-value.v1` | Versioned dimension assessment for an object, artifact, relationship, assertion, or pack. |
-| `baltor.context-event.v1` | Append-only lineage, history, audit, retrieval, and feedback event. |
-| `baltor.context-pack.v1` | Task-specific delivery bundle for an agent or application. |
+| `baltor.context-object` | Stable identity for a context object. |
+| `baltor.context-version` | Immutable observed state of a context object. |
+| `baltor.context-artifact` | Immutable derived representation such as chunk, claim, summary, embedding, repo wiki page, or pack. |
+| `baltor.context-relationship` | Typed directional edge between objects, versions, or artifacts. |
+| `baltor.context-assertion` | Source-linked statement about an object, relationship, dimension, or flexible attribute. |
+| `baltor.context-dimension-definition` | Registry entry for scored or classified dimensions such as risk, verifiability, freshness, and actionability. |
+| `baltor.context-dimension-value` | Versioned dimension assessment for an object, artifact, relationship, assertion, or pack. |
+| `baltor.context-event` | Append-only lineage, history, audit, retrieval, and feedback event. |
+| `baltor.context-pack` | Task-specific delivery bundle for an agent or application. |
 
 Current schema files:
 
@@ -60,11 +60,11 @@ how    methods, processes, and tools
 ```
 
 Risk, verifiability, authority, freshness, sensitivity, prompt-injection risk,
-and actionability are modeled as `baltor.context-dimension-value.v1` records.
+and actionability are modeled as `baltor.context-dimension-value` records.
 Scores are assessments, not source facts. They carry scope, evidence, method,
 confidence, and validity windows. Flexible attributes that need evidence,
 confidence, or conflict handling should be represented as
-`baltor.context-assertion.v1` records rather than fragile inline fields.
+`baltor.context-assertion` records rather than fragile inline fields.
 
 ## Layering
 
@@ -190,7 +190,7 @@ The same profile should work across:
 ## Lifecycle
 
 Every important context state transition should be represented by a
-`baltor.context-event.v1` record:
+`baltor.context-event` record:
 
 ```text
 DISCOVERED

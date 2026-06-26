@@ -16,7 +16,7 @@ Asserts:
   E. HEALTH IS OFFLINE-HONEST: no node is reported live_checked=True (we make no network probe); external nodes
      report a non-live status, the local stub reports healthy_local.
   F. RESOLVE WORKS OFFLINE: resolve_preference returns a ResolvedInferencePreference with numeric model_class codes.
-  G. ERROR ENVELOPE: error_envelope conforms to ErrorEnvelope.v1 (all required fields) and is retryable-typed.
+  G. ERROR ENVELOPE: error_envelope conforms to ErrorEnvelope (all required fields) and is retryable-typed.
   H. PROJECTION-ONLY + DETERMINISM: all_projections() is byte-identical across two calls (pure read; no mutation).
 
 Deterministic + offline. Exit 0/1.
@@ -92,9 +92,9 @@ def _self_test() -> int:
     check("F: resolve_preference works offline → numeric model_class codes",
           isinstance(mc.get("tier_code"), int) and isinstance(mc.get("specialization_codes"), list), json.dumps(resolved)[:120])
 
-    req = json.loads((_REPO / "schemas" / "envelopes" / "ErrorEnvelope.v1.schema.json").read_text())["required"]
+    req = json.loads((_REPO / "schemas" / "envelopes" / "ErrorEnvelope.schema.json").read_text())["required"]
     ee = ap.error_envelope("provider_unavailable", "model.fireworks@candidate has no secret_ref", retryable=True)
-    check("G: error_envelope conforms to ErrorEnvelope.v1 + retryable-typed",
+    check("G: error_envelope conforms to ErrorEnvelope + retryable-typed",
           all(k in ee for k in req) and isinstance(ee["retryable"], bool), str([k for k in req if k not in ee]))
 
     check("H: projection-only + deterministic (two builds byte-identical)", json.dumps(ap.all_projections()) == blob)
@@ -102,7 +102,7 @@ def _self_test() -> int:
     print("\n" + ("PASS — check_inference_api: the /api/inference projection is projection-only — provider graph, "
                   "free-endpoint due-diligence, preference coverage, health and local resolve are exposed with numeric "
                   "codes and NO raw key/secret value; every declared route binds to a real callable; health is "
-                  "offline-honest; errors are ErrorEnvelope.v1." if not fails else f"{len(fails)} FAILURES: {fails}"))
+                  "offline-honest; errors are ErrorEnvelope." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
 

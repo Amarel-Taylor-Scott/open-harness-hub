@@ -52,7 +52,7 @@ templates/<category>/<template_id>/
 - Do not embed a constant's value as a literal in two places (No-Magic-Values). If a value must appear in
   both the impl and the proof, drive it from a single `{{variable}}` or a named constant.
 
-## Required doc headings (for `docs.section_page.v1` and any docs source)
+## Required doc headings (for `docs.section_page` and any docs source)
 
 A generated doc page MUST contain, as `##` headings, in this order:
 
@@ -61,7 +61,7 @@ A generated doc page MUST contain, as `##` headings, in this order:
 
 `scripts/check_template_generation.py` asserts all of them are present in the rendered docs page.
 
-## Proof scaffold rules (for `proof.self_test.v1` and any generated proof)
+## Proof scaffold rules (for `proof.self_test` and any generated proof)
 
 A generated proof MUST:
 
@@ -80,7 +80,7 @@ Model new proofs on the existing repo proofs (`scripts/check_event_envelope.py`,
 - Implementation sources (`.py`, `.html`) should ship as **stubs that fail loudly** — `raise
   NotImplementedError(...)` with a `TODO(stub)` and a proof that FAILS until the component is implemented. A
   generated-but-unbuilt component must never read as green.
-- The proof scaffold itself (`proof.self_test.v1`) ships **passing** (its harness mechanics are real) with a
+- The proof scaffold itself (`proof.self_test`) ships **passing** (its harness mechanics are real) with a
   clearly-marked placeholder for the subject assertions.
 
 ## Checklist to promote a `candidate` template to `active`

@@ -18,7 +18,7 @@ Asserts:
   H. TIER DOWNGRADE → ALLOWED-USE DOWNGRADE: a lower-tier fallback yields allowed_use in {draft,candidate},
      never 'promotable'; a clean preferred call is 'promotable'; nothing is ever 'served' (Baltor governs serving).
   I. PROVENANCE: a receipt records the ACTUAL executed node/model, fallback trail, input/output hashes,
-     policy_checks, allowed_use; it conforms to ModelInvocationReceipt.v1.
+     policy_checks, allowed_use; it conforms to ModelInvocationReceipt.
   J. SECRET HYGIENE: no raw key appears in the graph/route/receipt (secret_refs only).
   K. LLM-OUTPUT-NOT-TRUTH: receipt.policy_checks.llm_output_is_truth is False; allowed_use is never 'served'.
   L. DETERMINISM + OFFLINE: infer_local runs offline with no secrets and is deterministic for a fixed `now`.
@@ -64,9 +64,9 @@ def _self_test() -> int:
             fails.append(n)
 
     # A. contracts
-    schemas = {p.name.split(".v1")[0]: json.loads(p.read_text()) for p in _S.glob("*.schema.json")}
+    schemas = {p.name.split(".")[0]: json.loads(p.read_text()) for p in _S.glob("*.schema.json")}
     for s in ("InferencePreference", "ResolvedInferencePreference", "ModelInvocationReceipt"):
-        check(f"A: {s}.v1 schema present", s in schemas)
+        check(f"A: {s} schema present", s in schemas)
     receipt_req = set(schemas["ModelInvocationReceipt"]["required"])
 
     # B. numeric graph
@@ -131,7 +131,7 @@ def _self_test() -> int:
     # I. provenance / receipt conformance
     rcpt = out_fb["receipt"]
     missing = [k for k in receipt_req if k not in rcpt]
-    check("I: receipt conforms to ModelInvocationReceipt.v1 (required fields)", not missing, str(missing))
+    check("I: receipt conforms to ModelInvocationReceipt (required fields)", not missing, str(missing))
     check("I: receipt records ACTUAL executed node + fallback trail + hashes",
           rcpt["selected_provider_node_id"] and rcpt["fallback_used"] and rcpt["input_hash"].startswith("sha256:")
           and rcpt["output_hash"].startswith("sha256:"))

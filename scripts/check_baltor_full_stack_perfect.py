@@ -35,7 +35,7 @@ def _self_test() -> int:
     r = run_cfpb_to_consumption("demo", require_optimized=True, now=NOW)
     resp = r["response"]
     check("correctness invariant reaches a SERVED ContextResponse", r["decision"] == "served")
-    check("ContextResponse is schema-valid", validate_ref(resp, "consumption/ContextResponse.v1") == [])
+    check("ContextResponse is schema-valid", validate_ref(resp, "consumption/ContextResponse") == [])
     check("answer contains '10 business days'", "10 business days" in resp["answer"], resp["answer"])
     served_ids = [f["artifact_id"] for f in resp["served_facts"]]
     held_ids = [h["artifact_id"] for h in resp["held_out_warnings"]]

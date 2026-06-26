@@ -76,23 +76,23 @@ def _p_source_fixture(inputs: dict, *, config: dict, run: dict) -> dict:
     norm = []
     for i, r in enumerate(records):
         norm.append({"native_id": str(r.get("complaint_id") or r.get("native_id") or f"demo-{i}"), "record": r})
-    return {"SourceRecordBatch.v1": {"records": norm, "count": len(norm)}}
+    return {"SourceRecordBatch": {"records": norm, "count": len(norm)}}
 
 
 def _p_decompose_atomic(inputs: dict, *, config: dict, run: dict) -> dict:
-    batch = inputs["SourceRecordBatch.v1"]["records"]
+    batch = inputs["SourceRecordBatch"]["records"]
     facts, allegations = [], []
     for item in batch:
         d = decompose_cfpb_complaint(item["record"], native_id=item["native_id"])
         for c in d["components"]:
             (facts if c["claim_status"] == "fact" else allegations).append(c)
-    return {"AtomicFactSet.v1": {"facts": facts, "count": len(facts)},
-            "HeldOutAllegationSet.v1": {"allegations": allegations, "count": len(allegations)}}
+    return {"AtomicFactSet": {"facts": facts, "count": len(facts)},
+            "HeldOutAllegationSet": {"allegations": allegations, "count": len(allegations)}}
 
 
 def _p_decompose_multigrain(inputs: dict, *, config: dict, run: dict) -> dict:
     """v2 decomposer — same atomic facts/allegations PLUS extra grains (paragraphs/conclusion/sentiment)."""
-    batch = inputs["SourceRecordBatch.v1"]["records"]
+    batch = inputs["SourceRecordBatch"]["records"]
     facts, allegations, per_record = [], [], []
     for item in batch:
         mg = decompose_multigrain(item["record"], native_id=item["native_id"])
@@ -102,41 +102,41 @@ def _p_decompose_multigrain(inputs: dict, *, config: dict, run: dict) -> dict:
             elif c.get("grain") in ("sentence", "paragraph"):
                 allegations.append(c)
         per_record.append({"native_id": mg["native_id"], "grains": mg["grains"], "sentiment": mg["sentiment"]})
-    return {"AtomicFactSet.v1": {"facts": facts, "count": len(facts)},
-            "HeldOutAllegationSet.v1": {"allegations": allegations, "count": len(allegations)},
-            "MultiGrainSet.v1": {"per_record": per_record, "count": len(per_record)}}
+    return {"AtomicFactSet": {"facts": facts, "count": len(facts)},
+            "HeldOutAllegationSet": {"allegations": allegations, "count": len(allegations)},
+            "MultiGrainSet": {"per_record": per_record, "count": len(per_record)}}
 
 
 def _p_verify_governance(inputs: dict, *, config: dict, run: dict) -> dict:
-    facts = inputs["AtomicFactSet.v1"]["facts"]
+    facts = inputs["AtomicFactSet"]["facts"]
     all_handled = all("#" in f.get("source_handle", "") for f in facts)
-    return {"VerifiedFactSet.v1": {"facts": facts, "count": len(facts),
+    return {"VerifiedFactSet": {"facts": facts, "count": len(facts),
                                    "checks": {"all_facts_source_handled": all_handled,
                                               "all_facts_promotion_eligible": all(f.get("promotion_eligible") for f in facts)}}}
 
 
 def _p_package_v1(inputs: dict, *, config: dict, run: dict) -> dict:
-    facts = inputs["VerifiedFactSet.v1"]["facts"]
-    held = inputs.get("HeldOutAllegationSet.v1", {}).get("allegations", [])
+    facts = inputs["VerifiedFactSet"]["facts"]
+    held = inputs.get("HeldOutAllegationSet", {}).get("allegations", [])
     fact_ids = [f["fact_id"] for f in facts]
-    pack = {"kind": "baltor.context-pack.v1", "pipeline": run.get("pipeline_ref"),
+    pack = {"kind": "baltor.context-pack", "pipeline": run.get("pipeline_ref"),
             "grain": {"atomic_facts": len(facts), "held_out_allegations": len(held)},
             "fact_object_ids": fact_ids, "source_handles": sorted({f["source_handle"] for f in facts})}
     pack["context_pack_id"] = "context-pack/" + content_hash(json.dumps(pack, sort_keys=True))[:12]
-    receipt = {"kind": "baltor.context-receipt.v0", "pack_id": pack["context_pack_id"],
+    receipt = {"kind": "baltor.context-receipt", "pack_id": pack["context_pack_id"],
                "facts_served": len(facts), "facts_held_out": len(held)}
-    return {"ContextPack.v1": pack, "Receipt.v1": receipt}
+    return {"ContextPack": pack, "Receipt": receipt}
 
 
 def _p_package_v2(inputs: dict, *, config: dict, run: dict) -> dict:
     """v2 packager — same governed facts, adds a normalized fact_index (distinct output ⇒ distinct hash)."""
     out = _p_package_v1(inputs, config=config, run=run)
-    pack = out["ContextPack.v1"]
-    pack["kind"] = "baltor.context-pack.v2"
+    pack = out["ContextPack"]
+    pack["kind"] = "baltor.context-pack"
     pack["fact_index"] = {f.split("#")[-1]: f for f in pack["source_handles"]}  # the v2 addition
     pack["context_pack_id"] = "context-pack/" + content_hash(json.dumps(pack, sort_keys=True))[:12]
-    out["Receipt.v1"]["pack_id"] = pack["context_pack_id"]
-    out["Receipt.v1"]["packager"] = "v2"
+    out["Receipt"]["pack_id"] = pack["context_pack_id"]
+    out["Receipt"]["packager"] = "v2"
     return out
 
 
@@ -146,7 +146,7 @@ def _p_source_canned_document(inputs: dict, *, config: dict, run: dict) -> dict:
     from scripts.ingest.document_decompose import _fixture_v1
     doc_id = str(config.get("doc_id") or "policy-001")
     source = str(config.get("source") or "acme")
-    return {"RawDocument.v1": {"doc_id": doc_id, "source": source, "parsed": config.get("parsed") or _fixture_v1()}}
+    return {"RawDocument": {"doc_id": doc_id, "source": source, "parsed": config.get("parsed") or _fixture_v1()}}
 
 
 def _p_parser_document_tree(inputs: dict, *, config: dict, run: dict) -> dict:
@@ -154,10 +154,10 @@ def _p_parser_document_tree(inputs: dict, *, config: dict, run: dict) -> dict:
     (coordinate-precise `ctx://…#` leaf handles, per-node lineage, low-confidence flags). Offline via the
     CannedParser fixture; real Docling/PyMuPDF/Unstructured slot behind the SAME contract."""
     from scripts.ingest.document_decompose import decompose
-    raw = inputs["RawDocument.v1"]
+    raw = inputs["RawDocument"]
     tree = decompose(raw["source"], raw["doc_id"], raw["parsed"], parser="canned", parser_version="1")
     nodes = [tree.nodes[oid].as_dict() for oid in tree.order]
-    return {"DocumentTree.v1": {
+    return {"DocumentTree": {
         "doc_id": tree.doc_id, "source": tree.source, "root": tree.root, "page_count": tree.page_count,
         "node_count": len(nodes), "nodes": nodes,
         "leaf_handles": [n.source_handle for n in tree.leaves()],
@@ -171,15 +171,15 @@ def _p_docling_unavailable(inputs: dict, *, config: dict, run: dict) -> dict:
 
 def default_registry() -> ProcessorRegistry:
     r = ProcessorRegistry()
-    r.register(ProcessorSpec("source.cfpb_fixture", "v1", "source", "SourceBatch.v1", "SourceRecordBatch.v1"), _p_source_fixture)
-    r.register(ProcessorSpec("decompose.structured_atomic", "v1", "decomposer", "SourceRecordBatch.v1", "AtomicFactSet.v1"), _p_decompose_atomic)
-    r.register(ProcessorSpec("decompose.multigrain", "v2", "decomposer", "SourceRecordBatch.v1", "MultiGrainSet.v1"), _p_decompose_multigrain)
-    r.register(ProcessorSpec("verify.governance", "v1", "verifier", "AtomicFactSet.v1", "VerifiedFactSet.v1"), _p_verify_governance)
-    r.register(ProcessorSpec("package.context_pack", "v1", "packager", "VerifiedFactSet.v1", "ContextPack.v1"), _p_package_v1)
-    r.register(ProcessorSpec("package.context_pack", "v2", "packager", "VerifiedFactSet.v1", "ContextPack.v1"), _p_package_v2)
-    r.register(ProcessorSpec("source.canned_document", "v1", "source", "RawDocument.v1", "RawDocument.v1"), _p_source_canned_document)
-    r.register(ProcessorSpec("parser.document_tree", "v1", "parser", "RawDocument.v1", "DocumentTree.v1"), _p_parser_document_tree)
+    r.register(ProcessorSpec("source.cfpb_fixture", "v1", "source", "SourceBatch", "SourceRecordBatch"), _p_source_fixture)
+    r.register(ProcessorSpec("decompose.structured_atomic", "v1", "decomposer", "SourceRecordBatch", "AtomicFactSet"), _p_decompose_atomic)
+    r.register(ProcessorSpec("decompose.multigrain", "v2", "decomposer", "SourceRecordBatch", "MultiGrainSet"), _p_decompose_multigrain)
+    r.register(ProcessorSpec("verify.governance", "v1", "verifier", "AtomicFactSet", "VerifiedFactSet"), _p_verify_governance)
+    r.register(ProcessorSpec("package.context_pack", "v1", "packager", "VerifiedFactSet", "ContextPack"), _p_package_v1)
+    r.register(ProcessorSpec("package.context_pack", "v2", "packager", "VerifiedFactSet", "ContextPack"), _p_package_v2)
+    r.register(ProcessorSpec("source.canned_document", "v1", "source", "RawDocument", "RawDocument"), _p_source_canned_document)
+    r.register(ProcessorSpec("parser.document_tree", "v1", "parser", "RawDocument", "DocumentTree"), _p_parser_document_tree)
     # experimental, unavailable (no dep) — registered so it's DISCOVERABLE but flagged + fails clearly if run
-    r.register(ProcessorSpec("parser.docling", "v0", "parser", "RawDocument.v1", "DocumentTree.v1",
+    r.register(ProcessorSpec("parser.docling", "v0", "parser", "RawDocument", "DocumentTree",
                              available=False, unavailable_reason="Docling not vendored (no-pip env)"), _p_docling_unavailable)
     return r

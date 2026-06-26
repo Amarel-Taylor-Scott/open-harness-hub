@@ -25,12 +25,12 @@ Six v1 schemas under `schemas/distillation/` (each with a passing `valid` exampl
 
 | Contract | Enforces |
 |---|---|
-| `DistillationRun.v1` | every transform records input+output ids/hashes, lineage (with source handles), all three preservation lists (omitted/held-out/rejected) present **even when empty**, `config_hash` **or** `rule_version`, and a `rollback_target`. |
-| `LineageBundle.v1` | the backward lineage of an artifact: raw/source ids, handles, transform runs, receipts, held-out/rejected ids, prior versions, rollback targets. |
-| `RehydrationReport.v1` | a rehydration reaches ≥1 source artifact and never crosses a tenant boundary. |
-| `InformationRetentionReport.v1` | per-transform verdict: handle coverage, dropped handles, orphaned in/out, `safe_to_promote`. |
-| `PromotionRecord.v1` | a promotion requires a `rollback_target_id` and keeps the prior version + rejected list. |
-| `RollbackPlan.v1` | a pointer-only move (`deletes_artifacts=false`, `deletes_prior_responses=false`). |
+| `DistillationRun` | every transform records input+output ids/hashes, lineage (with source handles), all three preservation lists (omitted/held-out/rejected) present **even when empty**, `config_hash` **or** `rule_version`, and a `rollback_target`. |
+| `LineageBundle` | the backward lineage of an artifact: raw/source ids, handles, transform runs, receipts, held-out/rejected ids, prior versions, rollback targets. |
+| `RehydrationReport` | a rehydration reaches ≥1 source artifact and never crosses a tenant boundary. |
+| `InformationRetentionReport` | per-transform verdict: handle coverage, dropped handles, orphaned in/out, `safe_to_promote`. |
+| `PromotionRecord` | a promotion requires a `rollback_target_id` and keeps the prior version + rejected list. |
+| `RollbackPlan` | a pointer-only move (`deletes_artifacts=false`, `deletes_prior_responses=false`). |
 
 ## Inputs
 

@@ -42,7 +42,7 @@ class NativeDiff:
     output_mode: str
     changed_fields: list = field(default_factory=list)   # {path, old, new, decision, receipt_id}
     diff_id: str = ""
-    schema_version: str = "NativeDiff.v1"
+    schema_version: str = "NativeDiff"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "diff_id": self.diff_id, "source_hash": self.source_hash,
@@ -59,7 +59,7 @@ class NativeProjection:
     diff: NativeDiff
     byte_identical_to_source: bool
     annotations_added: int = 0
-    schema_version: str = "NativeProjection.v1"
+    schema_version: str = "NativeProjection"
 
     def output_text(self) -> str:
         return self.output_bytes.decode("utf-8", "replace")

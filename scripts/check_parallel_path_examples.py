@@ -55,7 +55,7 @@ import scripts.check_parallel_path_promotion_gate as example_c  # noqa: E402
 
 _NOW = "2026-06-06T00:00:00Z"
 _SLOT_BACKEND = "execution.backend.drain"
-_OUTPUT_CONTRACT = "execution/DrainResult.v1"
+_OUTPUT_CONTRACT = "execution/DrainResult"
 _BACKEND_BASELINE = "local_subprocess@v1"
 _BACKEND_CANDIDATE = "local_function_emulator@v1"
 _CAPABILITY = "demo.normalize"
@@ -71,10 +71,10 @@ _ENQUEUE_PLAN = {
 
 def _backend_path(path_id: str, mode: str, backend_id: str) -> dict[str, Any]:
     return {
-        "schema_version": "PathDefinition.v1",
+        "schema_version": "PathDefinition",
         "path_id": path_id,
         "capability_slot": _SLOT_BACKEND,
-        "input_contract": "execution/EnqueuePlan.v1",
+        "input_contract": "execution/EnqueuePlan",
         "output_contract": _OUTPUT_CONTRACT,
         "mode": mode,
         "promotion_criteria": "criteria/same-drain-count-and-not-more-expensive",
@@ -189,17 +189,17 @@ def _run_example_a(tmp: Path, check) -> None:
     check("A: a PathRollbackPlan reverts to the baseline by a POINTER MOVE (deletes nothing)",
           plan["rollback_target_path_id"] == _BASELINE_A["path_id"]
           and plan["deletes_paths"] is False and plan["deletes_prior_runs"] is False
-          and _sv.validate_ref(plan, "experiments/PathRollbackPlan.v1") == [])
+          and _sv.validate_ref(plan, "experiments/PathRollbackPlan") == [])
 
     # never served a candidate; every emitted object validates against its Stage-1 schema.
     check("A: a candidate is NEVER served (served_path_id == baseline, candidate_served=false)",
           run["served_path_id"] == _BASELINE_A["path_id"] and run["candidate_served"] is False)
     check("A: ParallelPathRun validates against its Stage-1 schema",
-          _sv.validate_ref(run, "experiments/ParallelPathRun.v1") == [])
+          _sv.validate_ref(run, "experiments/ParallelPathRun") == [])
     check("A: PathComparisonReport validates against its Stage-1 schema",
-          _sv.validate_ref(report, "experiments/PathComparisonReport.v1") == [])
+          _sv.validate_ref(report, "experiments/PathComparisonReport") == [])
     check("A: PathPromotionDecision validates against its Stage-1 schema",
-          _sv.validate_ref(dec, "experiments/PathPromotionDecision.v1") == [])
+          _sv.validate_ref(dec, "experiments/PathPromotionDecision") == [])
 
     # deterministic: a second full run is byte-identical (fresh temp DBs, same plan).
     with tempfile.TemporaryDirectory() as d2:

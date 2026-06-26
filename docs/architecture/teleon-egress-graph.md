@@ -9,7 +9,7 @@ worker can use it downstream.
 - Every outbound action starts as an egress intent and receives a route broker
   decision before transport.
 - Every completed or blocked outbound action emits a
-  `TeleonEgressObservation.v1`.
+  `TeleonEgressObservation`.
 - Observations are append-only and tenant-scoped.
 - Secrets in URLs, headers, request summaries, and response summaries are
   redacted before storage.
@@ -46,8 +46,8 @@ when authorization is unclear.
 
 The local correctness implementation is split by responsibility:
 
-- `src/teleon/egress/policy.py` mints `EgressIntent.v1` and deterministic
-  `EgressRouteDecision.v1` records.
+- `src/teleon/egress/policy.py` mints `EgressIntent` and deterministic
+  `EgressRouteDecision` records.
 - `src/teleon/egress/client.py` is the worker-facing egress API.
 - `src/teleon/egress/transports.py` is the only scoped module allowed to own raw
   HTTP transport calls.

@@ -92,10 +92,10 @@ class ArtifactStore:
         for key in ("output", "warnings", "lifecycle", "runtime"):
             if key in record:
                 target = base / f"{key}.json"
-                atomic_write_json(target, {"kind": f"context_worker.{key}.v1", key: record[key]})
+                atomic_write_json(target, {"kind": f"context_worker.{key}", key: record[key]})
                 refs[key] = str(target)
         manifest = {
-            "kind": "context_worker.artifact_manifest.v1",
+            "kind": "context_worker.artifact_manifest",
             "job_id": job_id,
             "run_id": run_id,
             "task": record.get("task"),
@@ -119,7 +119,7 @@ class HeartbeatStore:
 
     def write(self, *, job: dict[str, Any], runtime: object, stage: str, status: str, detail: dict[str, Any] | None = None) -> None:
         payload = {
-            "kind": "context_worker.heartbeat.v1",
+            "kind": "context_worker.heartbeat",
             "ts": int(time.time()),
             "job_id": job.get("job_id"),
             "run_id": job.get("run_id"),
@@ -167,7 +167,7 @@ class IdempotencyStore:
         path = self.path_for_key(key)
         path.parent.mkdir(parents=True, exist_ok=True)
         marker = {
-            "kind": "context_worker.idempotency.v1",
+            "kind": "context_worker.idempotency",
             "key": key,
             "status": "processing",
             "job_id": job.get("job_id"),
@@ -183,7 +183,7 @@ class IdempotencyStore:
             try:
                 existing = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
-                existing = {"kind": "context_worker.idempotency.v1", "key": key, "status": "unknown"}
+                existing = {"kind": "context_worker.idempotency", "key": key, "status": "unknown"}
             if existing.get("status") != "complete":
                 marker["resumed_from"] = existing
                 atomic_write_json(path, marker)
@@ -196,7 +196,7 @@ class IdempotencyStore:
     def close(self, key: str, *, status: str, record: dict[str, Any]) -> None:
         path = self.path_for_key(key)
         payload = {
-            "kind": "context_worker.idempotency.v1",
+            "kind": "context_worker.idempotency",
             "key": key,
             "status": status,
             "job_id": record.get("job_id"),

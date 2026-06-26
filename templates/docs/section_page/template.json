@@ -1,0 +1,21 @@
+{
+  "template_id": "docs.section_page",
+  "standard_id": "standard.docs_page",
+  "variables": [
+    {"name": "area", "required": true, "description": "docs area folder, e.g. runtime or ingestion; becomes docs/<area>/<section>.md"},
+    {"name": "section", "required": true, "description": "lowercase section slug, e.g. source-consumption"},
+    {"name": "title", "required": true, "description": "human title for the section"},
+    {"name": "owner", "required": true, "description": "owning module/path or team"}
+  ],
+  "files": [
+    {"path_template": "docs/{{area}}/{{section}}.md", "source": "files/docs/area/section.md"}
+  ],
+  "required_commands_after_generation": [
+    "python3 scripts/check_documentation_coverage.py --self-test"
+  ],
+  "required_registry_updates": [
+    "architecture/section_maturity_matrix.json docs += docs/{{area}}/{{section}}.md"
+  ],
+  "required_proofs": [],
+  "required_docs": ["docs/{{area}}/{{section}}.md"]
+}

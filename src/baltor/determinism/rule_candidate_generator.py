@@ -128,7 +128,7 @@ class RuleCandidate:
     status: str = "proposed"                    # ALWAYS proposed at generation
     active: bool = False                        # NEVER active at generation
     created_at: str = EPOCH
-    schema_version: str = "RuleCandidate.v1"
+    schema_version: str = "RuleCandidate"
 
     def to_dict(self) -> dict:
         return {

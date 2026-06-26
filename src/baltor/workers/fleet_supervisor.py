@@ -25,7 +25,7 @@ def _caps() -> dict:
 
 def _decision(capability_id, case, action, reason, *, now, spawn_count=0, batch_size=0, task_ids=None, worker_ids=None):
     did = "fdec-" + case + "-" + capability_id
-    return {"schema_version": "WorkerFleetSupervisorDecision.v1", "decision_id": did, "capability_id": capability_id,
+    return {"schema_version": "WorkerFleetSupervisorDecision", "decision_id": did, "capability_id": capability_id,
             "case": case, "action": action, "reason": reason, "spawn_count": spawn_count, "batch_size": batch_size,
             "task_ids": list(task_ids or []), "worker_ids": list(worker_ids or []), "created_at": now}
 

@@ -81,7 +81,7 @@ def audit_transcript(*, mode: str | None = None, authorization_basis: str = "cus
     regulated = [f["risk_category"] for f in findings if f["regulated"]]
     pain = regulated[0] if regulated else ("chatbot_guardrail_failure" if findings else "no_finding")
     pack = {
-        "schema_version": "EvidencePack.v1",
+        "schema_version": "EvidencePack",
         "evidence_pack_id": "ep_" + hashlib.blake2b((run["run_id"] + now).encode(), digest_size=10).hexdigest(),
         "company_id": company_id, "company_is_synthetic": company_is_synthetic, "target_product": "Baltor",
         "pain_hypothesis": pain, "authorization_basis": authorization_basis,

@@ -47,7 +47,7 @@ class VerificationTask:
                                      "wp": self.watch_policy_id, "due": self.due_at})
 
     def to_dict(self) -> dict:
-        return {"schema_version": "VerificationTask.v1", "task_id": self.task_id, "fact_id": self.fact_id,
+        return {"schema_version": "VerificationTask", "task_id": self.task_id, "fact_id": self.fact_id,
                 "source_handle": self.source_handle, "scope": self.scope,
                 "watch_policy_id": self.watch_policy_id, "due_at": self.due_at, "created_at": self.created_at,
                 "status": self.status, "reason": self.reason}

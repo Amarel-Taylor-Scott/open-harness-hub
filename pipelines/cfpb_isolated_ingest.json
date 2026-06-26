@@ -1,0 +1,22 @@
+{
+  "pipeline_id": "cfpb_isolated_ingest",
+  "pipeline_version": "v1",
+  "status": "active",
+  "description": "Same CFPB structured ingest, but isolation=per_tenant_db — each tenant's runs + artifacts live in a SEPARATE db file (never share a table). For customers who require physical data separation.",
+  "input_schema": "SourceBatch",
+  "output_schema": "ContextPack",
+  "partition_key": "tenant_id",
+  "idempotency_key_template": "{tenant_id}:{source_id}:{document_version}:{pipeline_id}:{pipeline_version}",
+  "isolation": "per_tenant_db",
+  "steps": [
+    {"step_id": "source", "processor": "source.cfpb_fixture@v1", "queue": "pipeline.cfpb.source",
+     "outputs": ["SourceRecordBatch"]},
+    {"step_id": "decompose", "processor": "decompose.structured_atomic@v1", "queue": "pipeline.cfpb.decompose",
+     "inputs": ["SourceRecordBatch"], "outputs": ["AtomicFactSet", "HeldOutAllegationSet"], "depends_on": ["source"]},
+    {"step_id": "govern", "processor": "verify.governance@v1", "queue": "pipeline.cfpb.verify",
+     "inputs": ["AtomicFactSet"], "outputs": ["VerifiedFactSet"], "depends_on": ["decompose"]},
+    {"step_id": "package", "processor": "package.context_pack@v1", "queue": "pipeline.cfpb.package",
+     "inputs": ["VerifiedFactSet", "HeldOutAllegationSet"], "outputs": ["ContextPack", "Receipt"], "depends_on": ["govern"]}
+  ],
+  "gates": ["all_atomic_facts_have_source_handles", "narratives_are_not_promotion_eligible", "pack_receipt_counts_match_fact_counts"]
+}

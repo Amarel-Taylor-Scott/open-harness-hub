@@ -11,11 +11,11 @@ from scripts.llm_gateway.types import LLMRequest, ValidationResult
 
 #: minimal declared output schemas (required keys) — provider output must adhere.
 SCHEMAS: dict[str, tuple] = {
-    "ConflictExplanation.v1": ("conflict_type", "explanation", "evidence_artifact_ids", "recommended_resolution"),
-    "RelationExtraction.v1": ("explanation", "evidence_artifact_ids"),
-    "Generic.v1": ("explanation",),
+    "ConflictExplanation": ("conflict_type", "explanation", "evidence_artifact_ids", "recommended_resolution"),
+    "RelationExtraction": ("explanation", "evidence_artifact_ids"),
+    "Generic": ("explanation",),
     # a schema the stub deliberately cannot satisfy (lacks severity_score) — used to prove invalid-output handling
-    "StrictConflict.v1": ("conflict_type", "explanation", "evidence_artifact_ids", "recommended_resolution", "severity_score"),
+    "StrictConflict": ("conflict_type", "explanation", "evidence_artifact_ids", "recommended_resolution", "severity_score"),
 }
 
 
@@ -26,7 +26,7 @@ def validate(output_json: dict, req: LLMRequest, *, transport_ok: bool, policy_o
     if not r.transport_valid:
         r.reasons.append("transport_failed"); return r
 
-    required = SCHEMAS.get(req.schema_id, SCHEMAS["Generic.v1"])
+    required = SCHEMAS.get(req.schema_id, SCHEMAS["Generic"])
     r.schema_valid = isinstance(output_json, dict) and all(k in output_json for k in required)
     if not r.schema_valid:
         r.reasons.append(f"schema_missing:{[k for k in required if k not in (output_json or {})]}")

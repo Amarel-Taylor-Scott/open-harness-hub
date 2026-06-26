@@ -6,7 +6,7 @@ admin server just delegates to it. It is a PROJECTION over src/teleon/inference 
 GET routes expose the provider graph, free-endpoint due-diligence, preference coverage, health and recorded receipts;
 POST resolve-preference is a pure derivation; POST structured-local executes the deterministic LOCAL STUB and returns
 a ModelInvocationReceipt — its model output is a CANDIDATE, never served truth. No raw key/secret is ever emitted;
-errors are ErrorEnvelope.v1. UI/dashboard consume THIS projection — they do not compute truth.
+errors are ErrorEnvelope. UI/dashboard consume THIS projection — they do not compute truth.
 """
 from __future__ import annotations
 

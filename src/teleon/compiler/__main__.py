@@ -51,6 +51,11 @@ EXAMPLES_DIR = _PKG_DIR / "examples"
 FIXED_NOW = "2026-06-11T00:00:00Z"
 #: the three committed example units (one per exec_target) prove portability AND anchor the drift gate.
 EXAMPLE_TARGETS = _c.EXEC_TARGETS
+#: the canonical fixture capability id (the self-test / committed-example capability). Single source so the
+#: CLI, the self-test assertions, and the fixtures stay in lockstep without a hand-typed parallel literal.
+_FIXTURE_CAPABILITY_ID = _f.fixture_promoted_capability()["id"]
+#: the canonical fixture receipt ref for lineage assertions.
+_FIXTURE_RECEIPT_REF = "llmrcpt_fixture_0001"
 
 
 # ── compile helpers ──────────────────────────────────────────────────────────────────────────────────────────
@@ -60,7 +65,7 @@ def _compile_fixture(exec_target: str, *, now: str = FIXED_NOW) -> dict:
         _f.fixture_promoted_capability(), _f.fixture_task_spec(),
         exec_target=exec_target, now=now,
         resolved_preference=_f.fixture_resolved_preference(),
-        receipt_refs=["llmrcpt_fixture_0001"],
+        receipt_refs=[_FIXTURE_RECEIPT_REF],
     )
 
 
@@ -94,7 +99,7 @@ def _compile_for_cli(capability_id: str, exec_target: str, *, now: str | None) -
             print(f"  no live state and the fixture is {cap['id']!r}, not {capability_id!r} — "
                   f"compiling the fixture capability instead", file=sys.stderr)
         task_spec = _f.fixture_task_spec()
-        receipt_refs = ["llmrcpt_fixture_0001"]
+        receipt_refs = [_FIXTURE_RECEIPT_REF]
     unit = _c.compile_capability(cap, task_spec, exec_target=exec_target, now=used_now,
                                  resolved_preference=_f.fixture_resolved_preference(), receipt_refs=receipt_refs)
     errors = _c.validate_unit(unit)
@@ -266,7 +271,7 @@ def _registry_checks(checks: list[tuple[str, bool]]) -> None:  # noqa: C901 — 
     import shutil
     import tempfile
 
-    # two real versions of one capability (v2 then v3 of cap-redact) → two distinct unit_ids.
+    # two real versions of the fixture capability → two distinct unit_ids.
     u2 = _compile_version(2, now="2026-06-11T00:00:00Z")
     u3 = _compile_version(3, now="2026-06-12T00:00:00Z")
     checks.append(("registry: a version bump produces a distinct unit_id (the timeline has >1 unit)",
@@ -494,10 +499,10 @@ def self_test() -> int:  # noqa: C901 — a flat checklist is clearer here than 
                    ge["status"] == "promoted" and ge["train_pass_rate"] == 1.0
                    and ge["holdout_pass_rate"] == 1.0 and ge["gate_basis"] == "train+holdout"))
     checks.append(("provenance: receipt_refs attached (lineage to the model-call receipts)",
-                   units["k8s_job"]["receipt_refs"] == ["llmrcpt_fixture_0001"]))
+                   units["k8s_job"]["receipt_refs"] == [_FIXTURE_RECEIPT_REF]))
     checks.append(("lossless: unit carries capability_id + version + a rollback_target field",
-                   units["k8s_job"]["capability_id"] == "cap-redact"
-                   and units["k8s_job"]["capability_version"] == 2
+                   units["k8s_job"]["capability_id"] == _FIXTURE_CAPABILITY_ID
+                   and units["k8s_job"]["capability_version"] == _f.fixture_promoted_capability()["version"]
                    and "rollback_target" in units["k8s_job"]))
     checks.append(("honest: is_truth is structurally false", units["k8s_job"]["is_truth"] is False))
 
@@ -530,7 +535,7 @@ def self_test() -> int:  # noqa: C901 — a flat checklist is clearer here than 
     checks.append(("binding: runtime_class→backend via runtime_binding (cloud-function bound to a backend)",
                    units["k8s_job"]["runtime_class"] == "cloud-function"
                    and isinstance(units["k8s_job"]["backend"], str) and units["k8s_job"]["backend"]
-                   and units["k8s_job"]["binding"]["schema_version"] == "RuntimeClassBinding.v1"))
+                   and units["k8s_job"]["binding"]["schema_version"] == "RuntimeClassBinding"))
     # with creds + health for a cloud vendor, the binding picks the cloud backend (policy actually flows through)
     cloud_unit = _c.compile_capability(
         _f.fixture_promoted_capability(), _f.fixture_task_spec(), exec_target="k8s_job", now=FIXED_NOW,
@@ -557,10 +562,10 @@ def self_test() -> int:  # noqa: C901 — a flat checklist is clearer here than 
                    traced["logging"]["otel_attrs"].get("trace_id") == "abc123"
                    and traced["logging"]["otel_attrs"].get("span_id") == "def456"))
 
-    # 9. schema validation: every emitted unit validates against runtime/CompiledRuntimeUnit.v1
+    # 9. schema validation: every emitted unit validates against runtime/CompiledRuntimeUnit
     for t, u in units.items():
         errs = _c.validate_unit(u)
-        checks.append((f"schema: the {t} unit validates against CompiledRuntimeUnit.v1", not errs))
+        checks.append((f"schema: the {t} unit validates against CompiledRuntimeUnit", not errs))
     # a tampered unit (is_truth flipped true) is REJECTED by the schema (the const:false pin bites)
     bad = {**units["k8s_job"], "is_truth": True}
     checks.append(("schema: a unit with is_truth=true is REJECTED (is_truth const:false enforced)",

@@ -80,7 +80,7 @@ def _response(handle: str, *, allowed: bool, reason: str, raw_excerpt: str | Non
               tokens: int = 0) -> dict:
     seed = json.dumps({"h": handle, "a": allowed, "r": reason}, sort_keys=True)
     return {
-        "kind": "baltor.source-expansion-response.v1",
+        "kind": "baltor.source-expansion-response",
         "expansion_response_id": "xpr-" + sha256(seed.encode("utf-8")).hexdigest()[:16],
         "source_handle": handle,
         "allowed": allowed,

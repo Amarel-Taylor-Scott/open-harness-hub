@@ -2,7 +2,7 @@
 
 A promotion is always reversible because every :func:`path_promotion.decide` result carries a
 ``rollback_target`` = the prior baseline's path_id. This module turns that guarantee into an executable
-``PathRollbackPlan.v1``: move the active-path pointer for a ``capability_slot`` from the currently-promoted
+``PathRollbackPlan``: move the active-path pointer for a ``capability_slot`` from the currently-promoted
 candidate (``from_path_id``) back to the prior baseline (``rollback_target_path_id``) — and ONLY the pointer.
 
 LOSSLESS DISTILLATION CLAUSE: rollback NEVER deletes. ``deletes_paths`` and ``deletes_prior_runs`` are pinned
@@ -19,7 +19,7 @@ from scripts.runtime import schema_validator as _sv
 
 from .ids import canonical_id
 
-SCHEMA_VERSION = "PathRollbackPlan.v1"
+SCHEMA_VERSION = "PathRollbackPlan"
 
 
 def build_rollback_plan(
@@ -29,7 +29,7 @@ def build_rollback_plan(
     reason: str = "rollback to baseline (pointer move; nothing deleted)",
     validate: bool = True,
 ) -> dict[str, Any]:
-    """Build a ``PathRollbackPlan.v1`` that reverts a promotion described by ``decision``.
+    """Build a ``PathRollbackPlan`` that reverts a promotion described by ``decision``.
 
     ``decision`` is a :func:`path_promotion.decide` result. The pointer moves AWAY from the decision's
     ``promoted_path_id`` (the candidate that was promoted) and BACK to its ``rollback_target`` (the prior

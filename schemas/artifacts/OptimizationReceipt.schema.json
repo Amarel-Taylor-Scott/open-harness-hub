@@ -1,0 +1,18 @@
+{
+  "$id": "OptimizationReceipt", "title": "OptimizationReceipt", "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "receipt_id", "pack_id", "optimizer", "decision", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["OptimizationReceipt"]},
+    "receipt_id": {"type": "string"},
+    "pack_id": {"type": "string"},
+    "optimizer": {"type": "string"},
+    "baseline": {"type": "object"},
+    "candidate": {"type": "object"},
+    "lift": {"type": "object"},
+    "regressions": {"type": "array", "items": {"type": "object", "additionalProperties": true,
+      "required": ["name", "ok"],
+      "properties": {"name": {"type": "string"}, "ok": {"type": "boolean"}, "detail": {"type": "string"}}}},
+    "decision": {"type": "string", "enum": ["promote", "reject"]},
+    "created_at": {"type": "string"}
+  }
+}

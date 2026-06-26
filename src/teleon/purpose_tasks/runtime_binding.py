@@ -95,7 +95,7 @@ def local_fallback_backend(runtime_class: str, *, runtime_classes: dict | None =
 
 def _decision(action: str, runtime_class: str, backend: str, *, is_local_fallback: bool, known_class: bool,
               reason: str, considered: list[str]) -> dict[str, Any]:
-    return {"schema_version": "RuntimeClassBinding.v1", "action": action, "runtime_class": runtime_class,
+    return {"schema_version": "RuntimeClassBinding", "action": action, "runtime_class": runtime_class,
             "backend": backend, "is_local_fallback": is_local_fallback, "known_class": known_class,
             "reason": reason, "considered": considered}
 
@@ -169,7 +169,7 @@ def bind_allowed(allowed_runtime_classes: list[str] | None, *, available_creds: 
 def resolve_for_spec(spec: dict[str, Any], *, available_creds: set | None = None,
                      provider_health: dict | None = None, policy_override: dict | None = None,
                      runtime_classes: dict | None = None, policy_matrix: dict | None = None) -> dict[str, Any]:
-    """Bind a PurposeTask SPEC by its declared `allowed_runtime_classes` (CTS-1 connection to PurposeTaskSpec.v1)."""
+    """Bind a PurposeTask SPEC by its declared `allowed_runtime_classes` (CTS-1 connection to PurposeTaskSpec)."""
     return bind_allowed(spec.get("allowed_runtime_classes"), available_creds=available_creds,
                         provider_health=provider_health, policy_override=policy_override,
                         runtime_classes=runtime_classes, policy_matrix=policy_matrix)

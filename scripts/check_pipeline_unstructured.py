@@ -46,13 +46,13 @@ def _self_test() -> int:
                      ledger=ledger, registry=reg)
     check("unstructured run reaches done", r["status"] == "done", str(r))
     check("gate document_tree_has_addressable_leaves passed", r["failed_gates"] == [], str(r.get("gates")))
-    tree = ledger.get_artifact(r["artifact_ids"]["DocumentTree.v1"])["payload"]
+    tree = ledger.get_artifact(r["artifact_ids"]["DocumentTree"])["payload"]
     check("tree has the recursive nodes (doc→pages→blocks→cells, >=10)", tree["node_count"] >= 10, str(tree["node_count"]))
     check("tree has 3 pages", tree["page_count"] == 3, str(tree["page_count"]))
     check("every leaf is addressable by a ctx:// fragment handle",
           tree["leaf_handles"] and all(h.startswith("ctx://") and "#" in h for h in tree["leaf_handles"]))
     check("low-confidence OCR span flagged for review", len(tree["low_confidence_handles"]) >= 1, str(tree["low_confidence_handles"]))
-    check("tree artifact is content-addressed", ledger.get_artifact(r["artifact_ids"]["DocumentTree.v1"])["content_hash"])
+    check("tree artifact is content-addressed", ledger.get_artifact(r["artifact_ids"]["DocumentTree"])["content_hash"])
 
     # the REAL-Docling variant stays a clean unavailable seam (vendored-dep swap)
     seam = specs.get("unstructured_pdf_docling@v0")

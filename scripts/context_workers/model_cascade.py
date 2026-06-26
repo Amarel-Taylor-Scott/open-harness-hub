@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_CASCADE_POLICY: dict[str, Any] = {
-    "version": "model-cascade-policy.v1",
+    "version": "model-cascade-policy",
     "tiers": [
         {
             "tier": 0,

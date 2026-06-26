@@ -1,0 +1,23 @@
+{
+  "$id": "ingestion/IngestionReceipt", "title": "IngestionReceipt", "type": "object", "additionalProperties": false,
+  "description": "Idempotent proof that one ingest happened: which connector ran, against which source/tenant/scope, what it produced, and the idempotency key that makes a re-run a no-op. Every ingest emits exactly one IngestionReceipt; a repeat ingest with the same idempotency_key + content_hash MUST return decision 'duplicate' and write no new served facts.",
+  "required": ["schema_version", "receipt_id", "tenant_id", "source_id", "adapter_id", "idempotency_key", "decision", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["IngestionReceipt"]},
+    "receipt_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "source_version": {"type": "string"},
+    "adapter_id": {"type": "string"},
+    "ingestion_run_id": {"type": "string"},
+    "idempotency_key": {"type": "string"},
+    "decision": {"type": "string", "enum": ["ingested", "duplicate", "non_consumable", "rejected"]},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "authority": {"type": "string", "enum": ["official", "regulated", "customer_private", "third_party", "community", "unknown"]},
+    "source_artifact_ids": {"type": "array", "items": {"type": "string"}},
+    "source_artifact_count": {"type": "integer"},
+    "content_hash": {"type": "string"},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "created_at": {"type": "string"}
+  }
+}

@@ -4,9 +4,9 @@
   "status_enum": ["candidate", "active", "deprecated"],
   "templates": [
     {
-      "template_id": "ingestion.source_adapter.v1",
-      "standard_id": "standard.source_adapter.v1",
-      "template_path": "templates/ingestion/source_adapter.v1/template.json",
+      "template_id": "ingestion.source_adapter",
+      "standard_id": "standard.source_adapter",
+      "template_path": "templates/ingestion/source_adapter/template.json",
       "output_paths": ["scripts/ingest/{{source_family}}.py", "scripts/check_{{source_family}}_adapter.py", "docs/ingestion/{{source_family}}.md"],
       "variables": ["source_family", "source_type", "parser_provider", "title", "owner"],
       "required_commands_after_generation": [
@@ -22,9 +22,9 @@
       "status": "active"
     },
     {
-      "template_id": "worker.command_handler.v1",
-      "standard_id": "standard.durable_command.v1",
-      "template_path": "templates/worker/command_handler.v1/template.json",
+      "template_id": "worker.command_handler",
+      "standard_id": "standard.durable_command",
+      "template_path": "templates/worker/command_handler/template.json",
       "output_paths": ["scripts/handlers/{{handler_name}}.py", "scripts/check_{{handler_name}}_handler.py", "docs/runtime/{{handler_name}}.md"],
       "variables": ["handler_name", "command_type", "queue_name", "title", "owner"],
       "required_commands_after_generation": [
@@ -39,9 +39,9 @@
       "status": "active"
     },
     {
-      "template_id": "api.projection_route.v1",
-      "standard_id": "standard.api_projection.v1",
-      "template_path": "templates/api/projection_route.v1/template.json",
+      "template_id": "api.projection_route",
+      "standard_id": "standard.api_projection",
+      "template_path": "templates/api/projection_route/template.json",
       "output_paths": ["scripts/api_{{area}}_handler.py", "scripts/check_{{area}}_api.py", "docs/api/{{area}}.md"],
       "variables": ["area", "route_path", "returns_contract", "title", "owner"],
       "required_commands_after_generation": [
@@ -55,9 +55,9 @@
       "status": "active"
     },
     {
-      "template_id": "ui.projection_page.v1",
-      "standard_id": "standard.ui_projection.v1",
-      "template_path": "templates/ui/projection_page.v1/template.json",
+      "template_id": "ui.projection_page",
+      "standard_id": "standard.ui_projection",
+      "template_path": "templates/ui/projection_page/template.json",
       "output_paths": ["web/baltor/{{page}}.html", "scripts/check_{{page}}_ui.py", "docs/ui/{{page}}.md"],
       "variables": ["page", "api_endpoint", "title", "owner"],
       "required_commands_after_generation": [
@@ -71,9 +71,9 @@
       "status": "active"
     },
     {
-      "template_id": "provider.adapter.v1",
-      "standard_id": "standard.provider_adapter.v1",
-      "template_path": "templates/provider/adapter.v1/template.json",
+      "template_id": "provider.adapter",
+      "standard_id": "standard.provider_adapter",
+      "template_path": "templates/provider/adapter/template.json",
       "output_paths": ["scripts/adapters/{{adapter_name}}.py", "scripts/check_{{adapter_name}}_adapter.py", "docs/adapters/{{adapter_name}}.md"],
       "variables": ["adapter_name", "port_name", "capability", "title", "owner"],
       "required_commands_after_generation": [
@@ -87,9 +87,9 @@
       "status": "active"
     },
     {
-      "template_id": "proof.self_test.v1",
-      "standard_id": "standard.proof_script.v1",
-      "template_path": "templates/proof/self_test.v1/template.json",
+      "template_id": "proof.self_test",
+      "standard_id": "standard.proof_script",
+      "template_path": "templates/proof/self_test/template.json",
       "output_paths": ["scripts/check_{{proof_name}}.py"],
       "variables": ["proof_name", "title", "owner", "subject_module"],
       "required_commands_after_generation": [
@@ -103,9 +103,9 @@
       "status": "active"
     },
     {
-      "template_id": "docs.section_page.v1",
-      "standard_id": "standard.docs_page.v1",
-      "template_path": "templates/docs/section_page.v1/template.json",
+      "template_id": "docs.section_page",
+      "standard_id": "standard.docs_page",
+      "template_path": "templates/docs/section_page/template.json",
       "output_paths": ["docs/{{area}}/{{section}}.md"],
       "variables": ["area", "section", "title", "owner"],
       "required_commands_after_generation": [
@@ -119,9 +119,9 @@
       "status": "active"
     },
     {
-      "template_id": "ingestion.sync_loop.v1",
-      "standard_id": "standard.ingestion_sync.v1",
-      "template_path": "templates/ingestion/sync_loop.v1/template.json",
+      "template_id": "ingestion.sync_loop",
+      "standard_id": "standard.ingestion_sync",
+      "template_path": "templates/ingestion/sync_loop/template.json",
       "output_paths": ["scripts/ingest/{{source_family}}_feed.py", "scripts/check_{{source_family}}_sync.py", "docs/ingestion/{{source_family}}-sync.md"],
       "variables": ["source_family", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{source_family}}_sync.py --self-test"],
@@ -131,9 +131,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "worker.claim_loop.v1",
-      "standard_id": "standard.worker_claim_loop.v1",
-      "template_path": "templates/worker/claim_loop.v1/template.json",
+      "template_id": "worker.claim_loop",
+      "standard_id": "standard.worker_claim_loop",
+      "template_path": "templates/worker/claim_loop/template.json",
       "output_paths": ["scripts/{{worker_name}}_worker.py", "scripts/check_{{worker_name}}_worker.py", "docs/runtime/{{worker_name}}-worker.md"],
       "variables": ["worker_name", "queue_name", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{worker_name}}_worker.py --self-test"],
@@ -143,9 +143,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "runtime.processor.v1",
-      "standard_id": "standard.processor.v1",
-      "template_path": "templates/runtime/processor.v1/template.json",
+      "template_id": "runtime.processor",
+      "standard_id": "standard.processor",
+      "template_path": "templates/runtime/processor/template.json",
       "output_paths": ["scripts/runtime/processors/{{processor_name}}.py", "scripts/check_{{processor_name}}_processor.py", "docs/runtime/{{processor_name}}-processor.md"],
       "variables": ["processor_name", "processor_id", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{processor_name}}_processor.py --self-test"],
@@ -155,21 +155,21 @@
       "status": "candidate"
     },
     {
-      "template_id": "contract.schema.v1",
-      "standard_id": "standard.contract_schema.v1",
-      "template_path": "templates/contract/schema.v1/template.json",
-      "output_paths": ["schemas/{{area}}/{{contract_name}}.v1.json", "scripts/check_{{contract_name}}_schema.py", "docs/contracts/{{contract_name}}.md"],
+      "template_id": "contract.schema",
+      "standard_id": "standard.contract_schema",
+      "template_path": "templates/contract/schema/template.json",
+      "output_paths": ["schemas/{{area}}/{{contract_name}}.json", "scripts/check_{{contract_name}}_schema.py", "docs/contracts/{{contract_name}}.md"],
       "variables": ["area", "contract_name", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{contract_name}}_schema.py --self-test"],
-      "required_registry_updates": ["architecture/contract_registry.json#artifact_types += {{contract_name}}.v1"],
+      "required_registry_updates": ["architecture/contract_registry.json#artifact_types += {{contract_name}}"],
       "required_docs": ["docs/contracts/{{contract_name}}.md"],
       "required_proofs": ["scripts/check_{{contract_name}}_schema.py"],
       "status": "candidate"
     },
     {
-      "template_id": "artifact.object.v1",
-      "standard_id": "standard.artifact_object.v1",
-      "template_path": "templates/artifact/object.v1/template.json",
+      "template_id": "artifact.object",
+      "standard_id": "standard.artifact_object",
+      "template_path": "templates/artifact/object/template.json",
       "output_paths": ["scripts/artifacts/{{artifact_name}}.py", "scripts/check_{{artifact_name}}_artifact.py", "docs/artifacts/{{artifact_name}}.md"],
       "variables": ["artifact_name", "artifact_type", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{artifact_name}}_artifact.py --self-test"],
@@ -179,9 +179,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "optimization.candidate.v1",
-      "standard_id": "standard.optimization_candidate.v1",
-      "template_path": "templates/optimization/candidate.v1/template.json",
+      "template_id": "optimization.candidate",
+      "standard_id": "standard.optimization_candidate",
+      "template_path": "templates/optimization/candidate/template.json",
       "output_paths": ["scripts/runtime/optimizers/{{optimizer_name}}.py", "scripts/check_{{optimizer_name}}_optimizer.py", "docs/runtime/{{optimizer_name}}-optimizer.md"],
       "variables": ["optimizer_name", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{optimizer_name}}_optimizer.py --self-test"],
@@ -191,9 +191,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "reconciliation.decision.v1",
-      "standard_id": "standard.reconciliation_decision.v1",
-      "template_path": "templates/reconciliation/decision.v1/template.json",
+      "template_id": "reconciliation.decision",
+      "standard_id": "standard.reconciliation_decision",
+      "template_path": "templates/reconciliation/decision/template.json",
       "output_paths": ["scripts/artifact_graph/{{rule_name}}_reconciler.py", "scripts/check_{{rule_name}}_reconciliation.py", "docs/runtime/{{rule_name}}-reconciliation.md"],
       "variables": ["rule_name", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{rule_name}}_reconciliation.py --self-test"],
@@ -203,9 +203,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "watchtower.task.v1",
-      "standard_id": "standard.watchtower_task.v1",
-      "template_path": "templates/watchtower/task.v1/template.json",
+      "template_id": "watchtower.task",
+      "standard_id": "standard.watchtower_task",
+      "template_path": "templates/watchtower/task/template.json",
       "output_paths": ["scripts/context_workers/{{task_name}}_watchtower.py", "scripts/check_{{task_name}}_watchtower.py", "docs/runtime/{{task_name}}-watchtower.md"],
       "variables": ["task_name", "freshness_bound", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{task_name}}_watchtower.py --self-test"],
@@ -215,9 +215,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "tenant.isolation_guard.v1",
-      "standard_id": "standard.tenant_isolation.v1",
-      "template_path": "templates/tenant/isolation_guard.v1/template.json",
+      "template_id": "tenant.isolation_guard",
+      "standard_id": "standard.tenant_isolation",
+      "template_path": "templates/tenant/isolation_guard/template.json",
       "output_paths": ["scripts/check_{{guard_name}}_tenant_isolation.py", "docs/runtime/{{guard_name}}-tenant-isolation.md"],
       "variables": ["guard_name", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{guard_name}}_tenant_isolation.py --self-test"],
@@ -227,9 +227,9 @@
       "status": "candidate"
     },
     {
-      "template_id": "review.pack.v1",
-      "standard_id": "standard.review_pack.v1",
-      "template_path": "templates/review/pack.v1/template.json",
+      "template_id": "review.pack",
+      "standard_id": "standard.review_pack",
+      "template_path": "templates/review/pack/template.json",
       "output_paths": ["scripts/{{pack_name}}_review_pack.py", "scripts/check_{{pack_name}}_review_pack.py", "docs/runtime/{{pack_name}}-review-pack.md"],
       "variables": ["pack_name", "title", "owner"],
       "required_commands_after_generation": ["python3 scripts/check_{{pack_name}}_review_pack.py --self-test"],

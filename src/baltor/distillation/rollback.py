@@ -60,7 +60,7 @@ class RollbackReceipt:
     receipt_entry_id: str       # the lossless-store entry the receipt was written as
     candidate_preserved: bool   # ALWAYS true — rollback never deletes the candidate
     created_at: str
-    schema_version: str = "RollbackReceipt.v1"
+    schema_version: str = "RollbackReceipt"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "receipt_id": self.receipt_id, "key": self.key,

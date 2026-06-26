@@ -47,7 +47,7 @@ class WatchPolicy:
         return last_verified_at + self.refresh_interval_seconds
 
     def to_dict(self) -> dict:
-        return {"schema_version": "WatchPolicy.v1", "watch_policy_id": self.watch_policy_id, "name": self.name,
+        return {"schema_version": "WatchPolicy", "watch_policy_id": self.watch_policy_id, "name": self.name,
                 "volatility_class": self.volatility_class, "refresh_interval_seconds": self.refresh_interval_seconds,
                 "no_refresh": self.no_refresh, "escalate_on_conflict": self.escalate_on_conflict,
                 "max_staleness_seconds": self.max_staleness_seconds}

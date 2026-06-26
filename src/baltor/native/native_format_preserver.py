@@ -81,7 +81,7 @@ class NativeShapeContract:
     quoting: str = "minimal"
     has_header: bool = True
     row_count: int = 0
-    schema_version: str = "NativeShapeContract.v1"
+    schema_version: str = "NativeShapeContract"
 
     def shape_signature(self) -> dict:
         """The shape-only fingerprint (no values) used to compare input-schema == output-schema."""

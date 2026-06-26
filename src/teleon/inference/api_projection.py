@@ -57,7 +57,7 @@ def health() -> list[dict]:
     """ModelHealthSnapshot-ish — OFFLINE: local nodes healthy; external nodes report a non-live status (no probe)."""
     out = []
     for n in oips.load_graph()["nodes"]:
-        out.append({"schema_version": "ModelHealthSnapshot.v1", "provider_node_id": n["node_id"],
+        out.append({"schema_version": "ModelHealthSnapshot", "provider_node_id": n["node_id"],
                     "status": "requires_secret_ref" if n.get("external") else "healthy_local",
                     "live_checked": False})  # honest: no network probe offline
     return out
@@ -73,7 +73,7 @@ def resolve_preference(layers: list[dict]) -> dict:
 
 
 def error_envelope(error_type: str, message: str, *, retryable: bool = False, error_id: str = "inf_err") -> dict:
-    return {"schema_version": "ErrorEnvelope.v1", "error_id": error_id, "error_type": error_type,
+    return {"schema_version": "ErrorEnvelope", "error_id": error_id, "error_type": error_type,
             "retryable": retryable, "message": message}
 
 

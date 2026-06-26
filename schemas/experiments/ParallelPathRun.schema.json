@@ -1,0 +1,53 @@
+{
+  "$id": "experiments/ParallelPathRun", "title": "ParallelPathRun", "type": "object", "additionalProperties": false,
+  "description": "The record of running a baseline path AND each candidate path on the SAME input_snapshot for one capability_slot. input_snapshot_hash is the sha256 of the canonical bytes of the input the engine fed to every path — the proof that baseline and candidates saw identical input (apples to apples). baseline_result is the ONLY result that may serve truth; candidate_results are recorded for comparison and NEVER served. served_path_id pins which path was actually served (always the baseline's path_id) and candidate_served MUST be false — a true value is structurally rejected, so the engine cannot smuggle a candidate's output to the consumer. Each per-path result carries output (or null), the output_contract it claimed, cost, latency_ms, an error (or null), source_handle_coverage (fraction of baseline's source handles preserved), contract_validation (did the output validate against its declared output_contract), and the source_handles it grounded on.",
+  "required": ["schema_version", "run_id", "capability_slot", "input_snapshot_hash", "baseline_result", "candidate_results", "served_path_id", "candidate_served", "ran_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["ParallelPathRun"]},
+    "run_id": {"type": "string", "description": "stable id of this parallel run (hash of capability_slot + input_snapshot_hash + path ids)"},
+    "capability_slot": {"type": "string", "description": "the capability whose paths were run"},
+    "input_snapshot_hash": {"type": "string", "description": "sha256 of the canonical bytes of the SAME input_snapshot fed to baseline + every candidate"},
+    "baseline_result": {
+      "type": "object", "additionalProperties": false,
+      "description": "the baseline path's result — the ONLY result that may serve truth",
+      "required": ["path_id", "mode", "output_contract", "cost", "latency_ms", "error", "source_handle_coverage", "contract_validation", "source_handles", "input_snapshot_hash"],
+      "properties": {
+        "path_id": {"type": "string"},
+        "mode": {"type": "string", "enum": ["baseline", "fallback"], "description": "the served result must be a baseline (or executed fallback) — never a candidate/shadow/canary"},
+        "output": {"description": "the baseline output (any JSON shape per output_contract); null on error"},
+        "output_contract": {"type": "string", "description": "the schema ref the output claims to satisfy"},
+        "cost": {"type": "number", "description": "relative cost from the pricebook (>= 0)"},
+        "latency_ms": {"type": "number", "description": "injected/measured latency in ms (>= 0); no wall-clock"},
+        "error": {"description": "error string, or null when the path succeeded"},
+        "source_handle_coverage": {"type": "number", "description": "fraction in [0,1] of grounding source handles present (baseline defines the reference set)"},
+        "contract_validation": {"type": "string", "enum": ["pass", "fail", "skipped"], "description": "did the output validate against output_contract"},
+        "source_handles": {"type": "array", "items": {"type": "string"}, "description": "the source handles this path grounded its output on"},
+        "input_snapshot_hash": {"type": "string", "description": "per-path ATTESTATION of the input this path executed on — MUST equal the run-level input_snapshot_hash (every path saw the same input). The comparator rejects any path whose attestation diverges from the baseline's / run's."}
+      }
+    },
+    "candidate_results": {
+      "type": "array",
+      "description": "one result per candidate path, run on the identical input_snapshot; recorded for comparison, NEVER served",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path_id", "mode", "output_contract", "cost", "latency_ms", "error", "source_handle_coverage", "contract_validation", "source_handles", "input_snapshot_hash"],
+        "properties": {
+          "path_id": {"type": "string"},
+          "mode": {"type": "string", "enum": ["candidate", "shadow", "canary", "fallback"], "description": "a challenger mode; its output is recorded but not served as truth"},
+          "output": {"description": "the candidate output (any JSON shape per output_contract); null on error"},
+          "output_contract": {"type": "string"},
+          "cost": {"type": "number"},
+          "latency_ms": {"type": "number"},
+          "error": {"description": "error string, or null when the path succeeded"},
+          "source_handle_coverage": {"type": "number"},
+          "contract_validation": {"type": "string", "enum": ["pass", "fail", "skipped"]},
+          "source_handles": {"type": "array", "items": {"type": "string"}},
+          "input_snapshot_hash": {"type": "string", "description": "per-candidate ATTESTATION of the input this candidate executed on — MUST equal the run-level input_snapshot_hash (the proof the candidate ran on the SAME input as the baseline). A candidate whose attestation != the baseline's is a DIFFERENT-input comparison: the comparator sets same_input=false and recommends 'investigate'; promotion is impossible."}
+        }
+      }
+    },
+    "served_path_id": {"type": "string", "description": "the path_id whose output was actually served — ALWAYS the baseline's path_id"},
+    "candidate_served": {"type": "boolean", "enum": [false], "description": "pinned false — a candidate's output is NEVER served as truth; a true value is structurally rejected"},
+    "ran_at": {"type": "string", "description": "injected time"}
+  }
+}

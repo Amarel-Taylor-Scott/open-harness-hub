@@ -7,11 +7,11 @@ _TERMINAL_FAIL = ...
 def project_work_item(task: dict) -> dict
     # Identity projection of the work item (the CapabilityTask record). Validated against WORK_ITEM_CORE_FIELDS.
 def project_worker_claim(task: dict) -> dict
-    # WorkerClaim.v1 — who holds the lease, until when, at what attempt (after an atomic claim).
+    # WorkerClaim — who holds the lease, until when, at what attempt (after an atomic claim).
 def project_ack_nack_receipt(task: dict, *, outcome: str, worker_id: str, retryable: bool | None=None) -> dict
-    # AckNackReceipt.v1 — the completion/failure outcome. worker_id is passed explicitly (the acting worker): a
+    # AckNackReceipt — the completion/failure outcome. worker_id is passed explicitly (the acting worker): a
 def project_dead_letter(task: dict) -> dict
-    # DeadLetterEntry.v1 — a terminally-failed work item, preserved with its last error for inspect/replay.
+    # DeadLetterEntry — a terminally-failed work item, preserved with its last error for inspect/replay.
 def project_idempotency_key(task: dict) -> dict
-    # IdempotencyKey.v1 — the (key -> single live task) mapping that makes enqueue safe to retry.
+    # IdempotencyKey — the (key -> single live task) mapping that makes enqueue safe to retry.
 ```

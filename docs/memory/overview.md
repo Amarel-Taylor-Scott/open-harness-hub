@@ -54,7 +54,7 @@ non-candidate lane it surfaces (`profile.promoted`) comes from the governed Cons
 - Seven schemas under `schemas/memory/` (`MemoryArtifact`, `MemoryWriteRequest`, `MemorySearchRequest`,
   `MemorySearchResult`, `MemoryProfile`, `MemoryTrace`, `MemoryProviderStatus`) — each with a valid + an
   invalid example.
-- `MemoryArtifact.v1` requires `external_source_handle`, `tenant_id`, `scope`/`project`, `container`,
+- `MemoryArtifact` requires `external_source_handle`, `tenant_id`, `scope`/`project`, `container`,
   `claim_status`, `content`, `provider_id`, `lineage`, `created_at`. `claim_status ∈ {candidate, promoted,
   held_out}`; a provider output may only ever be `candidate`.
 - Every provider output carries `tenant_id` + project/container scope + a populated `external_source_handle`

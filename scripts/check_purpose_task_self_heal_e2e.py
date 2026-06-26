@@ -36,7 +36,7 @@ if str(_REPO) not in sys.path:
 from src.baltor.purpose_tasks import purpose_task as ct
 
 _SLOT = "reconcile_dates"
-_OC = "ReconcileResult.v1"
+_OC = "ReconcileResult"
 _INPUT = {"query": "Reg E error-resolution deadline"}
 _NOW = "2026-06-06T00:00:00Z"
 _HANDLE = "ctx://acme/source/REG-E"
@@ -56,8 +56,8 @@ def _crashes(_):
 
 def _registry() -> dict:
     return {_SLOT: [
-        {"impl_id": "impl.v1_baseline", "priority": 30, "handler": _healthy(10.0)},   # healthy but OVER the cost ceiling
-        {"impl_id": "impl.v2_cheap", "priority": 20, "handler": _healthy(2.0)},        # healthy + cheaper (promotable)
+        {"impl_id": "impl_baseline", "priority": 30, "handler": _healthy(10.0)},   # healthy but OVER the cost ceiling
+        {"impl_id": "impl_cheap", "priority": 20, "handler": _healthy(2.0)},        # healthy + cheaper (promotable)
         {"impl_id": "impl.crashes", "priority": 10, "handler": _crashes, "error_cost": 0.0},
     ]}
 
@@ -75,29 +75,29 @@ def _self_test() -> int:
     # ── Scenario A — COST drift → adapt promotes a cheaper equivalent ────────────────────────────────────────
     spec = ct.provision({"capability_slot": _SLOT, "output_contract": _OC, "success_criteria": _SUCCESS}, reg)
     check("A: provisioned by capability → highest-priority impl bound (no per-task code)",
-          spec["current_impl_id"] == "impl.v1_baseline")
+          spec["current_impl_id"] == "impl_baseline")
     hot = ct.run_current_guarded(spec, reg, _INPUT)
     health = ct.evaluate_health(hot, _SUCCESS)
     check("A: guarded hot path runs the bound impl; self-monitor detects COST drift",
           hot["cost"] == 10.0 and health["meets"] is False and "cost" in health["drift"], str(health))
     outA = ct.adapt(spec, reg, _INPUT, now=_NOW, promotion_criteria={"cost_tolerance": 0.0},
-                    candidate_impl_id="impl.v2_cheap")
+                    candidate_impl_id="impl_cheap")
     check("A: adapt PROMOTES the cheaper equivalent candidate (gate authorized)", outA["promoted"] is True,
           str(outA.get("decision", {}).get("reason")))
     check("A: candidate NEVER served before promotion (served = the baseline during the side-by-side run)",
-          outA["served_path_id"] == "impl.v1_baseline", outA["served_path_id"])
+          outA["served_path_id"] == "impl_baseline", outA["served_path_id"])
     healed = outA["spec"]
     check("A: post-promotion the candidate is current; prior impl kept as rollback_target (LOSSLESS, reversible)",
-          healed["current_impl_id"] == "impl.v2_cheap" and healed["rollback_target"] == "impl.v1_baseline"
-          and "impl.v1_baseline" in healed["alternatives"], str(healed))
+          healed["current_impl_id"] == "impl_cheap" and healed["rollback_target"] == "impl_baseline"
+          and "impl_baseline" in healed["alternatives"], str(healed))
     hot2 = ct.run_current_guarded(healed, reg, _INPUT)
     check("A: post-heal the hot path meets success_criteria again (cheap + healthy)",
           ct.evaluate_health(hot2, _SUCCESS)["meets"] is True and hot2["cost"] == 2.0, str(hot2.get("cost")))
 
     # ── Scenario B — CRASH → contained as drift → adapt no-crash → rollback recovery ─────────────────────────
     spec_b = {"task_id": "pt_e2e_b", "capability_slot": _SLOT, "output_contract": _OC,
-              "current_impl_id": "impl.crashes", "alternatives": ["impl.v2_cheap"],
-              "rollback_target": "impl.v2_cheap", "success_criteria": _SUCCESS}
+              "current_impl_id": "impl.crashes", "alternatives": ["impl_cheap"],
+              "rollback_target": "impl_cheap", "success_criteria": _SUCCESS}
     hot_b = ct.run_current_guarded(spec_b, reg, _INPUT)
     health_b = ct.evaluate_health(hot_b, _SUCCESS)
     check("B: a crashing bound impl is CONTAINED as drift (output '', error set) — never a crash, never a served answer",
@@ -105,7 +105,7 @@ def _self_test() -> int:
           str(hot_b)[:140])
     try:
         outB = ct.adapt(spec_b, reg, _INPUT, now=_NOW, promotion_criteria={"cost_tolerance": 0.0},
-                        candidate_impl_id="impl.v2_cheap")
+                        candidate_impl_id="impl_cheap")
         b_crashed = False
     except Exception:
         outB, b_crashed = {}, True
@@ -114,7 +114,7 @@ def _self_test() -> int:
     rb = ct.rollback(spec_b, reg, to=None)   # uses the preserved rollback_target
     recovered = rb["spec"]
     check("B: rollback RECOVERS to the preserved healthy impl; the crashed impl is kept (LOSSLESS, re-promotable)",
-          rb["rolled_back"] is True and recovered["current_impl_id"] == "impl.v2_cheap"
+          rb["rolled_back"] is True and recovered["current_impl_id"] == "impl_cheap"
           and "impl.crashes" in recovered["alternatives"], str(recovered))
     hot_b2 = ct.run_current_guarded(recovered, reg, _INPUT)
     check("B: post-recovery the hot path is healthy again (meets success_criteria)",
@@ -122,7 +122,7 @@ def _self_test() -> int:
 
     # ── Cross-cutting invariant: registry is never mutated (impls are never deleted — lossless across the motion)
     check("X: the implementation registry is intact after both heals (no impl deleted — winner never without the loser)",
-          {i["impl_id"] for i in reg[_SLOT]} == {"impl.v1_baseline", "impl.v2_cheap", "impl.crashes"})
+          {i["impl_id"] for i in reg[_SLOT]} == {"impl_baseline", "impl_cheap", "impl.crashes"})
 
     print("\n" + ("PASS — check_purpose_task_self_heal_e2e: the PurposeTask runtime self-heals end-to-end — provision → "
                   "guarded hot path → drift → (cost) promote a cheaper equivalent OR (crash) contain + rollback-recover — "

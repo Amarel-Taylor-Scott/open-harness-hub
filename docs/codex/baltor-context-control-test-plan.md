@@ -126,7 +126,7 @@ assert:
   policy.
 - local cache writer can save the typed context pack and glossary packets to a
   temporary Markdown cache, retain `ctx://baltor/...` source handles, write a
-  `baltor.local-context-cache-manifest.v1` manifest plus JSONL audit event,
+  `baltor.local-context-cache-manifest` manifest plus JSONL audit event,
   and preserve the no-raw-source-dumps policy.
 - context sync contracts expose push, pull, and push-then-pull modes; trigger
   types for commits, pushes, MR updates, artifacts, watchers, and schedules;
@@ -158,7 +158,7 @@ Suggested browser assertions:
   sample, plus worker throughput and drain ETA when recent completion events
   are available. It should also show whether persisted queue-health history has
   been loaded.
-- `/api/admin-dashboard/queue-health` returns `baltor.queue-health.v1` with
+- `/api/admin-dashboard/queue-health` returns `baltor.queue-health` with
   active jobs, pending sample, recent worker events, thresholds, warnings,
   `trend`, `throughput`, `history`, and `recent_samples`.
 - queue throughput includes `throughput.by_family`, `pending_family_counts`,
@@ -227,18 +227,18 @@ Expected exports:
   `term_clarity_concerns` and include term-specific risks so poorly defined or
   multi-meaning terms are not flattened into stable context.
 - `context-objects`: standardized context object graph projection with
-  `baltor.context-object.v1`, `baltor.context-version.v1`,
-  `baltor.context-artifact.v1`, `baltor.context-relationship.v1`,
-  `baltor.context-assertion.v1`,
-  `baltor.context-dimension-definition.v1`,
-  `baltor.context-dimension-value.v1`, `baltor.context-event.v1`, and
-  `baltor.context-pack.v1` records. It should prove immutable versions,
+  `baltor.context-object`, `baltor.context-version`,
+  `baltor.context-artifact`, `baltor.context-relationship`,
+  `baltor.context-assertion`,
+  `baltor.context-dimension-definition`,
+  `baltor.context-dimension-value`, `baltor.context-event`, and
+  `baltor.context-pack` records. It should prove immutable versions,
   derived artifacts with lineage, typed relationships, source-linked
   assertions, flexible facets, 5W1H projections, first-class dimensions,
   append-only events, and one pack projection.
 - `context-dimensions`: bounded gateway view of
-  `baltor.context-dimension-definition.v1` and
-  `baltor.context-dimension-value.v1` records, filterable by run, dimension, or
+  `baltor.context-dimension-definition` and
+  `baltor.context-dimension-value` records, filterable by run, dimension, or
   subject without requiring clients to download the full `context-objects`
   export.
 - UI dimension panel: after a run, `/admin-demo/explore` and
@@ -251,7 +251,7 @@ Expected exports:
   `context_pack` tables. In environments with `psql`, run the schema against a
   disposable database to validate DDL compatibility.
 - Model routing: `/api/context-gateway/model-routing` should return
-  `baltor.context-model-routing.v1`, at least seven provider-neutral model
+  `baltor.context-model-routing`, at least seven provider-neutral model
   profiles, a routing policy with `provider_neutral: true`, and a sample route
   decision. MCP self-test should include `context_model_routing`.
 - `glossary`: source-scoped glossary resolution packets, term concerns, and
@@ -284,28 +284,28 @@ Assertions:
 - fetch accepts a returned `ctx://baltor/...` handle and returns one bounded
   component or claim;
 - trace says raw source access is fallback, not default retrieval.
-- glossary returns `baltor.context-glossary.v1` packets, can filter by `term`,
+- glossary returns `baltor.context-glossary` packets, can filter by `term`,
   and blocks global memory and canonical graph promotion by default.
-- context object schema returns `baltor.context-object-schema.v1`, the durable
-  `baltor.context-object.v1` kind, the `ctx://` source-handle pattern, and the
+- context object schema returns `baltor.context-object-schema`, the durable
+  `baltor.context-object` kind, the `ctx://` source-handle pattern, and the
   standards profile used for MCP delivery, JSON Schema validation,
   JSON-LD/schema.org semantics, PROV provenance, Web Annotation evidence
   selectors, RO-Crate packaging, SPDX/CycloneDX artifacts, OpenLineage
   lineage, and OpenTelemetry traces.
-- context schema catalog returns `baltor.context-schema-catalog.v1` and exposes
+- context schema catalog returns `baltor.context-schema-catalog` and exposes
   schema kinds for objects, immutable versions, derived artifacts, typed
   relationships, append-only events, and task-specific context packs.
-- product surface returns `baltor.context-product-surface.v1` and exposes
+- product surface returns `baltor.context-product-surface` and exposes
   Context Fabric modules, interfaces, deployment models, standards mappings,
   MVP phases, and product invariants.
-- model routing returns `baltor.context-model-routing.v1`, at least seven
+- model routing returns `baltor.context-model-routing`, at least seven
   provider-neutral model profiles, and a risk-based sample route decision.
-- reranking returns `baltor.context-reranking.v1`, at least seven source-aware
+- reranking returns `baltor.context-reranking`, at least seven source-aware
   reranker profiles, and a policy that treats LoRA/domain rerankers as
   eval-gated adapters with lineage rather than global truth.
 - connectors returns Jira, Confluence, GitLab, website, FTP/SFTP, drive, and
   object-store style connector envelopes with ACL-before-model policy.
-- heartbeat returns `kind: baltor.debug_heartbeat.v1`, server uptime, run
+- heartbeat returns `kind: baltor.debug_heartbeat`, server uptime, run
   heartbeat, latest per-run worker event, recent per-run worker events, queue
   stats, oldest pending job age, pending job sample, latest worker event ID,
   pending-sample missing timestamp count, recent worker stream events, and
@@ -334,15 +334,15 @@ Assertions:
 - trace returns policy steps.
 - connectors returns governed connector definitions.
 - heartbeat returns the debug heartbeat contract.
-- queue health returns the `baltor.queue-health.v1` contract.
-- glossary returns the `baltor.context-glossary.v1` contract.
+- queue health returns the `baltor.queue-health` contract.
+- glossary returns the `baltor.context-glossary` contract.
 - context object schema returns `context_object_kind:
-  baltor.context-object.v1`.
-- context schema catalog returns `baltor.context-schema-catalog.v1` and at
+  baltor.context-object`.
+- context schema catalog returns `baltor.context-schema-catalog` and at
   least sixteen schema kinds.
-- product surface returns `baltor.context-product-surface.v1`.
-- model routing returns `baltor.context-model-routing.v1`.
-- reranking returns `baltor.context-reranking.v1`.
+- product surface returns `baltor.context-product-surface`.
+- model routing returns `baltor.context-model-routing`.
+- reranking returns `baltor.context-reranking`.
 
 ## Closeout Proof
 

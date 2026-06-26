@@ -57,7 +57,7 @@ _KEY_PATTERNS = [
     for p in (r"sk-[A-Za-z0-9]{16,}", r"AKIA[0-9A-Z]{12,}", r"AIza[0-9A-Za-z_\-]{20,}", r"gsk_[A-Za-z0-9]{16,}")
 ]
 _BALTOR_IMPORT = re.compile(r"^\s*(from|import)\s+.*\bbaltor\b", re.MULTILINE)
-# a source handle is a ctx:// resource handle or a doc# locator (mirrors BlackboardSourceRef.v1's pattern).
+# a source handle is a ctx:// resource handle or a doc# locator (mirrors BlackboardSourceRef's pattern).
 _SOURCE_HANDLE = re.compile(r"(ctx://|doc#)\S+")
 
 

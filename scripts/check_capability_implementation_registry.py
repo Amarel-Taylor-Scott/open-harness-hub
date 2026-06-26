@@ -78,8 +78,8 @@ def _self_test() -> int:
     feed = json.loads(_FEED.read_text())
     fcands = feed["candidates"]
     reg_caps = {c["capability"] for c in caps}
-    ck("workspace inventory feed conforms (DiscoveredCapabilityFeed.v1) + >= 12 owner products staged",
-       feed["feed_version"] == "DiscoveredCapabilityFeed.v1" and len(fcands) >= 12)
+    ck("workspace inventory feed conforms (DiscoveredCapabilityFeed) + >= 12 owner products staged",
+       feed["feed_version"] == "DiscoveredCapabilityFeed" and len(fcands) >= 12)
     ck("every staged product maps to a real registry capability + is propose-only",
        all(c["maps_to_capability"] in reg_caps and c["serves_truth"] is False for c in fcands),
        str([c["capability_slot"] for c in fcands if c["maps_to_capability"] not in reg_caps]))

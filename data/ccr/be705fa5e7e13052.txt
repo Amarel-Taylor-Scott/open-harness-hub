@@ -5,9 +5,9 @@ MODULE src/teleon/io/inference_io.py
 _ROUTE_FIELDS = ...
 def _sha(s: str) -> str
 def make_inference_request(*, object_id: str, requested_model_class: str, input_text: str, now: str, preference_id: str='', task_intent: str='', tenant_id: str='') -> dict
-    # Build an InferenceRequest.v1. The raw prompt is NOT stored — only its hash.
+    # Build an InferenceRequest. The raw prompt is NOT stored — only its hash.
 def project_route_decision(route: dict) -> dict
-    # Name oips.select_provider's output as a ModelRouteDecision.v1 (carrying the recorded fallback trail).
+    # Name oips.select_provider's output as a ModelRouteDecision (carrying the recorded fallback trail).
 ```
 ## intra-module call edges
 src.teleon.io.inference_io.make_inference_request -> src.teleon.io.inference_io._sha

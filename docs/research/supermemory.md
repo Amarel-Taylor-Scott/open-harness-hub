@@ -92,10 +92,10 @@ guard: never import or execute it; `_reference/` + catalog candidate only.
   BAA) · Enterprise custom (air-gapped). Usage ~ $0.005/1K SM tokens (text) memory, SuperRAG $0.001/1K, search
   $0.005/1K. Self-host infra rough: dev ~$10–50/mo; small prod ~$50–300+/mo; enterprise custom.
 - **API surface → Baltor contract mapping** (for the supermemory_api@candidate adapter, behind MemoryProviderPort):
-  POST /v3/documents (+ /batch) → MemoryWriteRequest.v1 · /v3/search → MemorySearchRequest.v1 ·
-  POST /v3/documents/list → MemoryDocumentList.v1 · GET /v3/documents/{id}/chunks → MemoryChunkSet.v1 ·
-  profile endpoint → MemoryProfile.v1 · /v3/connections/* (list/create/sync/fetch) → ConnectorSyncRequest.v1 ·
-  mcp.supermemory.ai/mcp (OAuth or Bearer header; x-sm-project scope) → MCPToolRequest.v1.
+  POST /v3/documents (+ /batch) → MemoryWriteRequest · /v3/search → MemorySearchRequest ·
+  POST /v3/documents/list → MemoryDocumentList · GET /v3/documents/{id}/chunks → MemoryChunkSet ·
+  profile endpoint → MemoryProfile · /v3/connections/* (list/create/sync/fetch) → ConnectorSyncRequest ·
+  mcp.supermemory.ai/mcp (OAuth or Bearer header; x-sm-project scope) → MCPToolRequest.
 - **Integration modes:** A no-dep local-only (current/strict gov) · B hosted candidate provider · C MCP for
   coding-agent memory · D enterprise self-host · E Baltor-native memory w/ supermemory-compatible adapter.
 - **Memory Router** (api.supermemory.ai/v3/<provider-base-url>): do NOT make it the default model path — it

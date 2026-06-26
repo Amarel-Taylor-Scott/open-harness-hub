@@ -92,7 +92,7 @@ def _self_test() -> int:
     try:
         bad = tmp / "bad_provider.json"
         bad.write_text(json.dumps({
-            "schema": "schemas/config/provider_config.v1.schema.json", "version": "v1",
+            "schema": "schemas/config/provider_config.schema.json", "version": "v1",
             "owner": "x", "environment_scope": "production", "config_type": "provider_config",
             "provider_id": "openai", ("api" + "_key"): "RAW-INLINE-NOT-A-REF",
             "emulator": "stub", "fallback": "local",

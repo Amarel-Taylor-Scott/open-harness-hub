@@ -3,7 +3,7 @@ MODULE src/baltor/ports/source_artifact_store.py
 ```python
 """src.baltor.ports.source_artifact_store — the SourceArtifactStorePort capability interface."""
 class SourceArtifactStorePort:
-    # Append-only, tenant-scoped, idempotent store of SourceArtifact.v1 records.
+    # Append-only, tenant-scoped, idempotent store of SourceArtifact records.
     def write_source_artifacts(self, artifacts: list[dict[str, Any]], *, tenant_id: str, run_id: str, now: str) -> dict[str, Any]
         # Append governed SourceArtifacts for one run. Idempotent on (tenant_id, source_id, content_hash):
     def read_source_artifact(self, artifact_id: str, *, tenant_id: str) -> dict[str, Any] | None

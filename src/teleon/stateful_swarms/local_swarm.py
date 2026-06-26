@@ -413,7 +413,7 @@ class LocalStatefulSwarm:
         receipts = self.blackboard.get_receipts(blackboard_id)
         receipt_refs = sorted({r["receipt_id"] for r in receipts})
 
-        # GovernedBlackboardEntry.v1-shaped verdict (Baltor's governance seam — never makes the entry truth).
+        # GovernedBlackboardEntry-shaped verdict (Baltor's governance seam — never makes the entry truth).
         governed_entry = {
             "entry_id": synthesis_entry_id,
             "blackboard_id": blackboard_id,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """scripts.check_contextops_source_recipe — proof (CONTEXTOPS SOURCE-RECIPE MODE): the M2 rung builder emits a
-SourceRecipe.v1 that carries — REQUIRED — the source's authority + the access method (with retry + rate-limit)
+SourceRecipe that carries — REQUIRED — the source's authority + the access method (with retry + rate-limit)
 + selectors/parser hints + a cross-source policy + watch triggers + the parser provider + the expected output
 schema + a reliability score back-link, and that the cross-source policy + watch triggers are DERIVED
 deterministically from the source's authority/type + whether the fact is a current/moving value.
@@ -37,7 +37,7 @@ from src.baltor.contextops.source_recipe import (  # noqa: E402
     cross_source_policy,
 )
 
-_SCHEMA = _REPO / "schemas" / "contextops" / "SourceRecipe.v1.schema.json"
+_SCHEMA = _REPO / "schemas" / "contextops" / "SourceRecipe.schema.json"
 _NOW = "2026-06-05T00:00:00Z"
 
 
@@ -60,7 +60,7 @@ def _self_test() -> int:
         source_type="regulation", authority_rank=90, officialness="official",
         locator="fixtures/cfpb/ecfr-1005-11.html", reliability_score_id="srs-ecfr-1005-11",
         derived_from_report_id="sdr-cfpb-deadline", now=_NOW)
-    check("regulation recipe validates against SourceRecipe.v1", _validate(reg_recipe, schema) == [], str(_validate(reg_recipe, schema)[:4]))
+    check("regulation recipe validates against SourceRecipe", _validate(reg_recipe, schema) == [], str(_validate(reg_recipe, schema)[:4]))
 
     # ── REQUIRED blocks present + correctly populated. ──
     check("recipe carries the source authority block (authority_rank + source_type + officialness)",
@@ -96,7 +96,7 @@ def _self_test() -> int:
         source_handle="ctx://public/source/cfpb-faq/error-resolution#q12",
         source_type="agency_faq", authority_rank=20, officialness="semi_official",
         locator="fixtures/cfpb/faq.html", now=_NOW)
-    check("FAQ recipe validates against SourceRecipe.v1", _validate(faq_recipe, schema) == [])
+    check("FAQ recipe validates against SourceRecipe", _validate(faq_recipe, schema) == [])
     check("a FAQ/restatement source NEVER stands alone — two_independent_sources_required (red-team: FAQ cannot be a single trusted source)",
           faq_recipe["cross_source"]["policy"] == "two_independent_sources_required"
           and faq_recipe["cross_source"]["min_independent_sources"] >= 2)
@@ -127,7 +127,7 @@ def _self_test() -> int:
 
     ok = not fails
     print(
-        "\n" + ("PASS — check_contextops_source_recipe: the M2 builder emits a schema-valid SourceRecipe.v1 "
+        "\n" + ("PASS — check_contextops_source_recipe: the M2 builder emits a schema-valid SourceRecipe "
                 "carrying the source authority + access method (retry + rate-limit, no secret) + parser "
                 "provider + expected_output_schema pinned to fact_assertion_candidate + reliability back-link + "
                 "watch triggers; the cross-source policy + watch triggers are DERIVED from authority + "

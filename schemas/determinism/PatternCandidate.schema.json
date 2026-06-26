@@ -1,0 +1,21 @@
+{
+  "$id": "determinism/PatternCandidate", "title": "PatternCandidate", "type": "object", "additionalProperties": false,
+  "description": "A repeated VERIFIED decision shape discovered by the pattern miner across many WorkflowTraces (e.g. 'whenever conflict_type=deadline_mismatch AND source_a.authority>source_b.authority on the same fact_key, the verified winner was always the higher-authority source'). It is an OBSERVATION, not a rule and not truth: it records the decision signature, how many distinct VERIFIED traces support it, the supporting trace ids (lossless link back to evidence), and any counter-observations. supported_by_trace_ids MUST all reference verified traces; a pattern mined from any unverified/reversed/stale/tenant-private-as-global trace is rejected upstream. Deterministic when created_at is injected.",
+  "required": ["schema_version", "pattern_id", "tenant_id", "source_scope", "workflow_id", "decision_signature", "input_feature_keys", "observed_decision", "support_count", "supported_by_trace_ids", "counterexample_trace_ids", "all_traces_verified", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PatternCandidate"]},
+    "pattern_id": {"type": "string", "description": "content-addressed id over (decision_signature + sorted supporting trace ids); deterministic"},
+    "tenant_id": {"type": "string"},
+    "source_scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"], "description": "a tenant_private pattern can only become a global rule after anonymization + approval"},
+    "workflow_id": {"type": "string"},
+    "pattern_type": {"type": "string", "enum": ["reconciliation_outcome", "conflict_classification", "authority_classification", "source_classification", "routing", "held_out_reason", "optimization_rejection", "entity_normalization", "freshness"], "description": "the category of repeated decision observed"},
+    "decision_signature": {"type": "string", "description": "a canonical, hashable signature of the decision shape (the IF→THEN skeleton observed across traces)"},
+    "input_feature_keys": {"type": "array", "items": {"type": "string"}, "description": "the input fields the decision keyed on (e.g. conflict_type, source_a.authority, fact_key, scope)"},
+    "observed_decision": {"type": "string", "description": "the VERIFIED outcome that recurred (e.g. 'winner=higher_authority_source, loser=held_out')"},
+    "support_count": {"type": "integer", "description": "number of distinct verified traces exhibiting this pattern; higher = stronger candidate"},
+    "supported_by_trace_ids": {"type": "array", "items": {"type": "string"}, "description": "the WorkflowTrace ids that support this pattern (lossless link to evidence); ALL must be verified"},
+    "counterexample_trace_ids": {"type": "array", "items": {"type": "string"}, "description": "verified traces with the same inputs but a DIFFERENT outcome; present even if empty — non-empty weakens the candidate"},
+    "all_traces_verified": {"type": "boolean", "enum": [true], "description": "structurally pinned true: the miner only emits a pattern when every supporting trace is verified"},
+    "created_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

@@ -22,12 +22,12 @@ watchtower reuses the existing C40 gate seam and the governed artifact-type regi
 
 | Artifact | Module | Schema | Key fields |
 |---|---|---|---|
-| FactAssertion | `src/baltor/contracts/artifacts/fact_assertion.py` | `schemas/artifacts/FactAssertion.v1.schema.json` | `claim_type` ∈ CLAIM_SHAPED, `scope`, `asserted_at` |
-| CanonicalFact | `src/baltor/contracts/artifacts/canonical_fact.py` | `schemas/artifacts/CanonicalFact.v1.schema.json` | `status` (9-value lifecycle), `scope`, `fragility_id` |
-| FragilityMetadata | `src/baltor/contracts/artifacts/fragility_metadata.py` | `schemas/artifacts/FragilityMetadata.v1.schema.json` | `volatility_class`, `last_verified_at` + (`next_verify_at` OR `ttl_seconds`) + `watch_policy_id` |
-| WatchPolicy | `src/baltor/contracts/artifacts/watch_policy.py` | `schemas/artifacts/WatchPolicy.v1.schema.json` | `refresh_interval_seconds`, `no_refresh`, `escalate_on_conflict` |
-| VerificationTask | `src/baltor/contracts/artifacts/verification_task.py` | `schemas/artifacts/VerificationTask.v1.schema.json` | `due_at` (missed horizon), `scope`, `watch_policy_id`, `status` |
-| VerificationResult | `src/baltor/contracts/artifacts/verification_result.py` | `schemas/artifacts/VerificationResult.v1.schema.json` | `new_status`, `applied`, `evidence`, `next_verify_at` |
+| FactAssertion | `src/baltor/contracts/artifacts/fact_assertion.py` | `schemas/artifacts/FactAssertion.schema.json` | `claim_type` ∈ CLAIM_SHAPED, `scope`, `asserted_at` |
+| CanonicalFact | `src/baltor/contracts/artifacts/canonical_fact.py` | `schemas/artifacts/CanonicalFact.schema.json` | `status` (9-value lifecycle), `scope`, `fragility_id` |
+| FragilityMetadata | `src/baltor/contracts/artifacts/fragility_metadata.py` | `schemas/artifacts/FragilityMetadata.schema.json` | `volatility_class`, `last_verified_at` + (`next_verify_at` OR `ttl_seconds`) + `watch_policy_id` |
+| WatchPolicy | `src/baltor/contracts/artifacts/watch_policy.py` | `schemas/artifacts/WatchPolicy.schema.json` | `refresh_interval_seconds`, `no_refresh`, `escalate_on_conflict` |
+| VerificationTask | `src/baltor/contracts/artifacts/verification_task.py` | `schemas/artifacts/VerificationTask.schema.json` | `due_at` (missed horizon), `scope`, `watch_policy_id`, `status` |
+| VerificationResult | `src/baltor/contracts/artifacts/verification_result.py` | `schemas/artifacts/VerificationResult.schema.json` | `new_status`, `applied`, `evidence`, `next_verify_at` |
 
 Reused single sources of truth (NOT duplicated): `FactAssertion.claim_type` references
 `scripts.pipeline_runtime.artifact_types.CLAIM_SHAPED`; `CanonicalFact.status` /

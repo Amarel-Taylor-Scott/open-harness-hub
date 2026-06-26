@@ -55,7 +55,7 @@ class WorkerSpec:
     capabilities: tuple[str, ...] = ()
     task_types: tuple[str, ...] = ()
     image: str = "baltor-worker-cpu"
-    output_contract: str = "task_result.v1"
+    output_contract: str = "task_result"
     max_retries: int = 2
     idempotent: bool = True
 
@@ -74,7 +74,7 @@ class WorkerRegistry:
         capabilities: tuple[str, ...] = (),
         task_types: tuple[str, ...] = (),
         image: str = "baltor-worker-cpu",
-        output_contract: str = "task_result.v1",
+        output_contract: str = "task_result",
         max_retries: int = 2,
         idempotent: bool = True,
     ) -> Callable[[TaskHandler], TaskHandler]:

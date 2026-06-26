@@ -22,7 +22,7 @@ def mint_human_approval_receipt(*, subject_ref: str, boundary_kind: str, approve
     if approver_role not in _APPROVER_ROLES:
         raise ValueError(f"unknown approver_role {approver_role!r}")
     aid = "appr_" + hashlib.blake2b(f"{subject_ref}|{boundary_kind}|{approver_role}|{now}".encode(), digest_size=10).hexdigest()
-    return {"schema_version": "HumanApprovalReceipt.v1", "approval_id": aid, "subject_ref": subject_ref,
+    return {"schema_version": "HumanApprovalReceipt", "approval_id": aid, "subject_ref": subject_ref,
             "boundary_kind": boundary_kind, "approver_role": approver_role, "status": status,
             "requested_by": requested_by, "justification": justification, "created_at": now}
 

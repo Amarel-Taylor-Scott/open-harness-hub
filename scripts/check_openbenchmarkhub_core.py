@@ -5,8 +5,8 @@ competitive-intelligence-derived benchmark opportunities are registered as candi
 "a benchmark result is evidence, not authority" is enforced by the actual promotion gate.
 
 Asserts:
-  A. CONTRACTS: BenchmarkArtifact/BenchmarkResult/BenchmarkSuitabilityReport.v1 registered.
-  B. CFPB benchmark conforms to BenchmarkArtifact.v1 (all required fields) + family in the taxonomy.
+  A. CONTRACTS: BenchmarkArtifact/BenchmarkResult/BenchmarkSuitabilityReport registered.
+  B. CFPB benchmark conforms to BenchmarkArtifact (all required fields) + family in the taxonomy.
   C. REAL ANCHOR: its expected_results match the demo facts — served "10 business days", held-out "30 days",
      source handles + receipts required, allegations NOT served as fact.
   D. EVIDENCE-NOT-AUTHORITY: bridge-graph law benchmark_result_cannot_promote is True AND the real promotion gate
@@ -40,14 +40,14 @@ def _self_test() -> int:
 
     A = _REPO / "architecture"
     contracts = json.dumps(json.loads((A / "contract_registry.json").read_text()))
-    check("A: 3 benchmark contracts registered", all(f"benchmarks/{s}.v1.schema.json" in contracts for s in
+    check("A: 3 benchmark contracts registered", all(f"benchmarks/{s}.schema.json" in contracts for s in
           ("BenchmarkArtifact", "BenchmarkResult", "BenchmarkSuitabilityReport")))
 
     fam = json.loads((A / "benchmark_family_codes.json").read_text())["families"]
     reg = json.loads((A / "open_benchmark_registry.json").read_text())
     cfpb = json.loads((_REPO / "fixtures" / "benchmarks" / "cfpb_context_governance.benchmark.json").read_text())
-    req = json.loads((_REPO / "schemas" / "benchmarks" / "BenchmarkArtifact.v1.schema.json").read_text())["required"]
-    check("B: CFPB benchmark conforms to BenchmarkArtifact.v1 + family known",
+    req = json.loads((_REPO / "schemas" / "benchmarks" / "BenchmarkArtifact.schema.json").read_text())["required"]
+    check("B: CFPB benchmark conforms to BenchmarkArtifact + family known",
           all(k in cfpb for k in req) and cfpb["benchmark_family"] in fam, str([k for k in req if k not in cfpb]))
 
     er = cfpb["expected_results"]
@@ -61,8 +61,8 @@ def _self_test() -> int:
     check("D: evidence-not-authority — law True AND no benchmark gate in the real promotion gate",
           bridge["boundary_laws"]["benchmark_result_cannot_promote"] is True
           and not any("benchmark" in g.lower() for g in GATES), str(GATES))
-    res_schema = json.loads((_REPO / "schemas" / "benchmarks" / "BenchmarkResult.v1.schema.json").read_text())
-    check("D: BenchmarkResult.v1 pins is_truth=false + promotion_authority=false",
+    res_schema = json.loads((_REPO / "schemas" / "benchmarks" / "BenchmarkResult.schema.json").read_text())
+    check("D: BenchmarkResult pins is_truth=false + promotion_authority=false",
           res_schema["properties"]["is_truth"].get("const") is False and res_schema["properties"]["promotion_authority"].get("const") is False)
 
     check("E: external benchmarks are owner_provided_unverified",

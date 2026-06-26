@@ -6,12 +6,12 @@
 ## 1. Executive summary
 Baltor's local runtime correctness invariant runs ingestion → consumption end-to-end through the approved runtime, proven
 by `check_baltor_full_stack_perfect` and `check_cfpb_to_consumption_end_to_end`. **31/31**
-critical-path sections are M10-complete with a registered proof. **709** proofs are green in the flywheel.
+critical-path sections are M10-complete with a registered proof. **713** proofs are green in the flywheel.
 Non-reference surfaces (unstructured_document_decomposition) are honestly flagged candidate/pending.
 
 ## 2. Correctness invariant status
 INGEST(CFPB decompose) → Verify (gate) → Optimize (bake-off) → Consumption-readiness → ConsumptionService →
-served `ContextResponse.v1`. Reference result: answer **"10 business days"**, FAQ-30 held out as a warning, every
+served `ContextResponse`. Reference result: answer **"10 business days"**, FAQ-30 held out as a warning, every
 served fact source-handled + receipt-lineaged, deterministic. Total sections inventoried: **62**.
 
 ## 3. What works now
@@ -146,7 +146,7 @@ served fact source-handled + receipt-lineaged, deterministic. Total sections inv
 | workers | ✅ M10 | yes | `check_durable_worker_parallel.py` | docs/workers/durable-worker-runtime.md |
 
 ## 19. Top P0 opportunities
-- **OPP-api-serve** (api_runtime, M, risk medium) — Expose POST /api/context/serve returning ContextResponse.v1. Done when: POST /api/context/serve returns schema-valid ContextResponse.v1
+- **OPP-api-serve** (api_runtime, M, risk medium) — Expose POST /api/context/serve returning ContextResponse. Done when: POST /api/context/serve returns schema-valid ContextResponse
 - **OPP-worker-consume** (workers, M, risk medium) — Durable context.consume command through ConsumptionService. Done when: enqueue context.consume → worker drains → ContextResponse written
 - **OPP-teleon-agent-capability-gateway** (teleon_agent_gateway, L, risk low) — Teleon Agent Capability Gateway — serve AI agents as customers: stable deterministic receipt-backed CapabilityTasks instead of token-burning re-reasoning. Done when: AgentCapabilityCard + run contracts exist + proven
 
@@ -232,6 +232,6 @@ served fact source-handled + receipt-lineaged, deterministic. Total sections inv
 - The admin server is the single allowlisted monolith (split target tracked).
 
 ## 25. Definition of done for next pass
-api_runtime reaches M10: POST /api/context/serve returns a schema-valid ContextResponse.v1 (projection-only, no
+api_runtime reaches M10: POST /api/context/serve returns a schema-valid ContextResponse (projection-only, no
 secrets), GET responses/<id> + receipts/<id> work, check_consumption_api is registered + green, and the matrix
 status flips to m10_complete.

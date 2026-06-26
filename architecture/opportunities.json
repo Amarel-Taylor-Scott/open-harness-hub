@@ -9,7 +9,7 @@
   "opportunities": [
     {
       "opportunity_id": "OPP-api-serve",
-      "title": "Expose POST /api/context/serve returning ContextResponse.v1",
+      "title": "Expose POST /api/context/serve returning ContextResponse",
       "category": "runtime",
       "why_it_matters": "the served ContextResponse is the product's output; today it is runtime-callable only",
       "current_state": "api_runtime m6_proof; run_cfpb_to_consumption proven; no HTTP route",
@@ -30,7 +30,7 @@
       "estimated_complexity": "M",
       "owner_section": "api_runtime",
       "done_when": [
-        "POST /api/context/serve returns schema-valid ContextResponse.v1",
+        "POST /api/context/serve returns schema-valid ContextResponse",
         "GET responses/<id> + receipts/<id> work",
         "no secrets/private memory in response",
         "api_runtime flips to M10 with registered proof"
@@ -433,8 +433,8 @@
       "target_state": "promote each candidate to active: author templates/<category>/<id>/template.json + files/, status active, passing the 3 catalog/generation proofs",
       "files_to_touch": [
         "architecture/template_catalog.json",
-        "templates/worker/claim_loop.v1",
-        "templates/reconciliation/decision.v1"
+        "templates/worker/claim_loop",
+        "templates/reconciliation/decision"
       ],
       "proofs_to_add": [
         "scripts/check_template_catalog.py",
@@ -1028,7 +1028,7 @@
         "src/teleon/agents/agent_runtime_provider.py",
         "architecture/agent_runtime_catalog.json",
         "scripts/check_agent_runtime_layer_redteam.py",
-        "schemas/agents/AgentRunReceipt.v1.schema.json"
+        "schemas/agents/AgentRunReceipt.schema.json"
       ],
       "proofs_to_add": [
         "scripts/check_agent_runtime_layer_redteam.py",
@@ -1096,7 +1096,7 @@
       "current_state": "foundations exist: capability_binding_provider (local_function active, cloud/K8s by policy), agent_runtime_provider, inference plane (token ladder), Baltor CFPB governed env (the compact-receipt shape). No agent-facing gateway/API/MCP-projection yet.",
       "target_state": "AgentCapabilityCard/RunRequest/RunResult/Receipt/BoundaryExpansionRequest contracts + local gateway (/api/agent/*) running deterministic local capabilities + an MCP projection (5 stable tools) + redteam (no secret/forbidden-tool/boundary-self-expand/LLM-fallback-without-policy/agent-output-as-truth) + Baltor truth boundary.",
       "files_to_touch": [
-        "schemas/agents/AgentCapabilityCard.v1.schema.json",
+        "schemas/agents/AgentCapabilityCard.schema.json",
         "src/teleon/agent_gateway/",
         "scripts/check_teleon_agent_gateway_contracts.py",
         "scripts/check_teleon_agent_gateway_redteam.py"

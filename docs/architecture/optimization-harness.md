@@ -35,7 +35,7 @@ compression seam is governed by the capability catalog (slot `compression`: `com
 ## The harness: baseline → candidate → regression → promotion
 
 `OptimizationHarness.run(baseline_pack, optimizer, *, answer_fact_ids, signals, now)` returns a decision +
-`OptimizationReceipt` (content-addressed, injected time, schema `OptimizationReceipt.v1`). It **promotes only
+`OptimizationReceipt` (content-addressed, injected time, schema `OptimizationReceipt`). It **promotes only
 when** there is measured lift (fewer tokens or fewer artifacts) **and zero regressions**:
 
 | Regression check | Fails when the candidate… |

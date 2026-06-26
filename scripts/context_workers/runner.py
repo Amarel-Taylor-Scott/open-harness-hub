@@ -525,7 +525,7 @@ def _self_test() -> int:
         n = drain(q, max_jobs=1, ledger_path=Path(tmp) / "ledger.jsonl")
         assert n == 1, "job was not processed"
         ledger_record = json.loads((Path(tmp) / "ledger.jsonl").read_text(encoding="utf-8").splitlines()[0])
-        assert ledger_record["lifecycle"]["version"] == "context-worker-lifecycle.v1", "lifecycle metadata missing"
+        assert ledger_record["lifecycle"]["version"] == "context-worker-lifecycle", "lifecycle metadata missing"
         assert ledger_record["runtime"]["queue_key"], "runtime metadata missing queue key"
         assert q.depth() >= 1, "refresh child jobs were not queued"
         assert preflight_job(job)["ok"], "preflight did not accept valid job"

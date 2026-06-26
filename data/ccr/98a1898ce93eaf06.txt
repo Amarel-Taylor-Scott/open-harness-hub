@@ -15,7 +15,7 @@ class ResearchAgentProviderPort:
     def describe(self) -> dict[str, Any]
         # Return the static capability card WITHOUT running anything: provider_id, role (stub|candidate),
     def research(self, task: dict[str, Any], *, now: str) -> dict[str, Any]
-        # Run the bounded research loop for ``task`` (a ResearchTask.v1 dict) inside task.bounds and return a
+        # Run the bounded research loop for ``task`` (a ResearchTask dict) inside task.bounds and return a
     def status(self) -> dict[str, Any]
         # Report provider liveness WITHOUT raising: {provider_id, status: active|candidate|unavailable,
 class SourceDiscoveryProviderPort:
@@ -25,7 +25,7 @@ class SourceDiscoveryProviderPort:
 class CodegenAgentProviderPort:
     # A provider that drafts a DETERMINISTIC extractor snippet (+ unit tests) for a SourceRecipe. Its output
     def draft_extractor(self, recipe: dict[str, Any], *, now: str) -> dict[str, Any]
-        # Draft an ExtractorSnippet.v1 dict for ``recipe`` (a SourceRecipe.v1). MUST set
+        # Draft an ExtractorSnippet dict for ``recipe`` (a SourceRecipe). MUST set
     def status(self) -> dict[str, Any]
         # Report liveness WITHOUT raising, same shape as ResearchAgentProviderPort.status.
 class ResearchAgentUnavailable:

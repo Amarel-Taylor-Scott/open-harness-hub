@@ -2,7 +2,7 @@
 """scripts.render_receipt — build a render receipt (rename-safe audit of how a concept was shown).
 
 Composes the alias_resolver: given a canonical concept id + an audience, it resolves the display
-label and emits a `baltor.render-receipt.v1` that stores BOTH the stable canonical_id AND the
+label and emits a `baltor.render-receipt` that stores BOTH the stable canonical_id AND the
 rendered_label + alias profile/version. Because the receipt anchors on canonical_id, a customer can
 rename "Context Hardening" later without breaking this audit record (docs/standards/presentation-layer.md §17).
 
@@ -44,7 +44,7 @@ def build_render_receipt(
     profile = pack.get("id", "alias_pack.default")
     version = pack.get("version", "0.0.0")
     return {
-        "kind": "baltor.render-receipt.v1",
+        "kind": "baltor.render-receipt",
         "render_receipt_id": f"rrcpt.{canonical_id}.{audience}.{version}",
         "canonical_id": canonical_id,
         "rendered_label": resolved["value"],

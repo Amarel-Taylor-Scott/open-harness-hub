@@ -3,7 +3,7 @@
 **Date:** 2026-06-11. **Status:** BUILT (inline suites end-to-end real; named-suite registry is the documented
 follow-up). **Warrant:** synthesis gap #2 / vision gap **D-2** in
 `docs/strategy/teleon-self-improving-runtime-vision.md` — *"There is no `eval_suite` / `benchmark_ref` /
-acceptance_criteria field on `PurposeTaskSpec.v1` / `CapabilityTask.v1.schema.json`. Until that exists, a user
+acceptance_criteria field on `PurposeTaskSpec` / `CapabilityTask.schema.json`. Until that exists, a user
 cannot actually 'hand it the evaluation system' — they get a fixed capability set."* This change closes that
 gap: the **evaluation system that defines DONE is now a declared, validated input on the contract**, not a
 suite hardcoded in the runtime.
@@ -13,8 +13,8 @@ suite hardcoded in the runtime.
 `eval_suite` (a.k.a. the benchmark) is now an **optional but, when present, fully-constrained** field of both
 contracts:
 
-- `schemas/purpose_tasks/PurposeTaskSpec.v1.schema.json`
-- `schemas/workers/CapabilityTask.v1.schema.json`
+- `schemas/purpose_tasks/PurposeTaskSpec.schema.json`
+- `schemas/workers/CapabilityTask.schema.json`
 
 A user hands Teleon the benchmark in one of two ways (**exactly one** — XOR):
 
@@ -41,7 +41,7 @@ normalization-stamped `source` / `example_count`. A model-built capability's **i
 ≥1 example (a model can never be gated on an empty suite — that would read as a cleared gate with nothing
 measured); a `benchmark_ref` is allowed for a model-built capability because the registry carries the rows.
 
-`PurposeTaskSpec.v1` also gained `build_mode` (`auto | model | deterministic`, mirroring the runtime's run
+`PurposeTaskSpec` also gained `build_mode` (`auto | model | deterministic`, mirroring the runtime's run
 mode) and `model_built` (boolean) so a task can **declare** it is model-built — which is what makes the
 non-empty-examples rule fire. Both are optional and backward compatible.
 
@@ -136,7 +136,7 @@ customer-view redaction (answer key never leaks). The inline-suite path is end-t
 **Follow-up (named, not faked):**
 1. **The registry-of-named-suites.** `resolve_benchmark_ref` is the real, honest seam (hand it a registry and
    it resolves; hand it nothing and it raises). A persistent suite registry (likely keyed off
-   `schemas/benchmarks/BenchmarkArtifact.v1` / `BenchmarkResult.v1` and the `benchmark.schema.json` manifest)
+   `schemas/benchmarks/BenchmarkArtifact` / `BenchmarkResult` and the `benchmark.schema.json` manifest)
    is the next increment so `benchmark_ref` resolves from a store, not just an in-memory dict.
 2. **Flipping the live runtime gate** (`scripts/teleon_local_runtime.py`, other-owned) to read
    `eval_suite_for(spec)` instead of `CAPABILITIES[...]["examples"]` per the one-line swap above — the seam is

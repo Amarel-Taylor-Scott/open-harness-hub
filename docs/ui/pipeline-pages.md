@@ -58,7 +58,7 @@ index aggregates per-stage in/out/held-out/rejected counts into a totals strip a
 | `verification.html` | `GET /api/pipeline/verification` (+ overview) |
 | `consumption.html` | `GET /api/pipeline/consumption` (+ overview) |
 
-Endpoint shapes are the `standard.ui_projection.v1` contract (see the lane brief and
+Endpoint shapes are the `standard.ui_projection` contract (see the lane brief and
 `scripts/check_pipeline_api.py`). Pages **degrade gracefully** when a key is absent.
 
 ### Cohesion guarantees (every page)

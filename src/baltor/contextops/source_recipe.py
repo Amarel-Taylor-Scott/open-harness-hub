@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """src.baltor.contextops.source_recipe — the M2 rung: distill a discovered source into a REUSABLE recipe.
 
-A :class:`SourceRecipe` (contract: ``schemas/contextops/SourceRecipe.v1``) is the deterministic, reusable
+A :class:`SourceRecipe` (contract: ``schemas/contextops/SourceRecipe``) is the deterministic, reusable
 "how to reach + read this authoritative source" distilled from an M1 ``SourceDiscoveryReport`` so the same
 source never has to be re-researched by an LLM. It encodes — REQUIRED — the source's authority (so
 reconciliation precedence is checkable, source-of-law > FAQ), the access method (http_get/api/file/fixture)
@@ -13,7 +13,7 @@ a ``fact_assertion_candidate``. The watch triggers + cross-source policy are DER
 source's authority/officialness + the fact's volatility — current/rate/fee/deadline facts demand a fresh read.
 
 Determinism: ids are ``hashlib`` content hashes; ``created_at`` is an INJECTED ``now`` (never a clock read);
-no RNG. Stdlib only, offline. The drafted recipe validates against SourceRecipe.v1.
+no RNG. Stdlib only, offline. The drafted recipe validates against SourceRecipe.
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from typing import Any
 _ID_PREFIX = "srecipe-"
 
 #: the SourceRecipe contract version this builder emits (single source — never literal'd elsewhere).
-SCHEMA_VERSION = "SourceRecipe.v1"
+SCHEMA_VERSION = "SourceRecipe"
 
 #: REQUIRED — the recipe ALWAYS targets a candidate fact, read into a candidate (never a served/canonical) value.
 EXPECTED_OUTPUT_SCHEMA = "fact_assertion_candidate"
@@ -86,7 +86,7 @@ def build_source_recipe(*, tenant_id: str, source_scope: str, fact_key: str, que
                         access_method: str = DEFAULT_ACCESS_METHOD, locator: str,
                         parser_provider: str = "parser.stub@v1", reliability_score_id: str = "",
                         derived_from_report_id: str = "", rate_limit_per_min: int = 30, now: str) -> dict:
-    """Distil one discovered, authority-ranked source into a SourceRecipe.v1 dict (the M2 rung).
+    """Distil one discovered, authority-ranked source into a SourceRecipe dict (the M2 rung).
 
     The cross_source policy + watch triggers + retry policy are DERIVED from the source's authority/type +
     whether the fact is a current/moving value — they are encoded, not hand-typed per recipe. Deterministic:

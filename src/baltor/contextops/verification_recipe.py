@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """src.baltor.contextops.verification_recipe — the M3 rung: a repeatable VERIFICATION for a fact_key.
 
-A :class:`VerificationRecipe` (contract: ``schemas/contextops/VerificationRecipe.v1``) turns one or more
+A :class:`VerificationRecipe` (contract: ``schemas/contextops/VerificationRecipe``) turns one or more
 ``SourceRecipe`` ids + an ``ExtractorSnippet`` id into a deterministic, re-runnable verification. It pins —
 REQUIRED — the fact_key, the input source-recipe ids, the extractor id, the deterministic validators + the
 success criteria the extracted value must pass, an authority policy (which source_type may WIN; a FAQ never
@@ -13,7 +13,7 @@ anything) becomes a fact. The authority / cross-source / freshness policies are 
 the winning source recipe + whether the fact is a current/moving value — encoded, not hand-typed per recipe.
 
 Determinism: ids are ``hashlib`` content hashes; ``created_at`` is an INJECTED ``now`` (never a clock read);
-no RNG. Stdlib only, offline. The drafted recipe validates against VerificationRecipe.v1.
+no RNG. Stdlib only, offline. The drafted recipe validates against VerificationRecipe.
 """
 from __future__ import annotations
 
@@ -25,13 +25,13 @@ from typing import Any
 _ID_PREFIX = "vrecipe-"
 
 #: the VerificationRecipe contract version this builder emits (single source).
-SCHEMA_VERSION = "VerificationRecipe.v1"
+SCHEMA_VERSION = "VerificationRecipe"
 
 #: REQUIRED — running a recipe ALWAYS yields a candidate run + receipt, never a served/canonical fact.
 PRODUCES = "fact_verification_run"
 
 #: only these high-authority source types may WIN a verification — a FAQ/secondary can never be the winner.
-#: Single source of the "who can win" set (mirrors VerificationRecipe.v1 authority.winning_source_type.enum).
+#: Single source of the "who can win" set (mirrors VerificationRecipe authority.winning_source_type.enum).
 WINNING_SOURCE_TYPES = ("source_of_law", "regulation", "statute", "official_agency", "primary_dataset")
 
 #: default freshness horizon (seconds) — a settled value may be 30 days stale; a current value demands fresh.
@@ -73,7 +73,7 @@ def build_verification_recipe(*, tenant_id: str, source_scope: str, fact_key: st
                               validators: list[str] | None = None, success_criteria: str = "",
                               tenant_scope: str = "", watch_triggers: list[str] | None = None,
                               now: str) -> dict:
-    """Build a VerificationRecipe.v1 dict (the M3 rung) for a fact_key.
+    """Build a VerificationRecipe dict (the M3 rung) for a fact_key.
 
     Raises ``ValueError`` if ``winning_source_type`` is not a high-authority type — a FAQ/secondary can NEVER
     be allowed to win a verification (the load-bearing authority invariant, enforced at build time, not only by

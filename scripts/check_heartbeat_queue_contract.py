@@ -51,7 +51,7 @@ def _self_test() -> int:
 
     # the full heartbeat payload must also carry the queue contract offline
     hb = srv.heartbeat_payload()
-    chk("heartbeat kind correct", hb.get("kind") == "baltor.debug_heartbeat.v1")
+    chk("heartbeat kind correct", hb.get("kind") == "baltor.debug_heartbeat")
     chk("heartbeat.queue.pending_sample is a list", isinstance(hb.get("queue", {}).get("pending_sample"), list))
     chk("heartbeat.queue.active_worker_jobs is a list", isinstance(hb.get("queue", {}).get("active_worker_jobs"), list))
 

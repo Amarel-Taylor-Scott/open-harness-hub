@@ -16,7 +16,7 @@ from scripts.api_context_handler import handle
 
 _REPO = Path(__file__).resolve().parents[1]
 _PAGE = _REPO / "web" / "baltor" / "consume.html"
-_REQUIRED_PANELS = ("Answer", "Atomic facts", "Held-out", "Receipts", "Freshness", "ContextResponse.v1",
+_REQUIRED_PANELS = ("Answer", "Atomic facts", "Held-out", "Receipts", "Freshness", "ContextResponse",
                     "Section maturity", "Provider status", "Conflicts", "Ingestion")
 #: a projection-only page must never write durable truth or embed private memory/intel.
 _FORBIDDEN = ("durable.db", "INSERT INTO", "UPDATE ", "DELETE FROM", "import sqlite3", "sqlite3.connect",
@@ -43,7 +43,7 @@ def _self_test() -> int:
 
     # the page's data source actually returns the reference ContextResponse (GET = ungated projection)
     code, resp = handle("GET", "/api/context/serve", {"tenant_id": "demo", "corpus": "cfpb", "require_optimized": "true"})
-    check("GET /api/context/serve returns ContextResponse.v1", code == 200 and resp.get("schema_version") == "ContextResponse.v1")
+    check("GET /api/context/serve returns ContextResponse", code == 200 and resp.get("schema_version") == "ContextResponse")
     check("the served answer is '10 business days'", "10 business days" in resp.get("answer", ""))
     served = [f["artifact_id"] for f in resp.get("served_facts", [])]
     held = [h["artifact_id"] for h in resp.get("held_out_warnings", [])]

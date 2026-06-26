@@ -4,7 +4,7 @@
 > registered): class taxonomy + policy + seeded registry + gateway-repo watchlist (single sources of truth);
 > the deterministic classifier + risk scorer + due-diligence engine
 > (`src/teleon/inference/free_endpoint_intel.py`, composing the Inference Gateway); 3 contracts
-> (`FreeLimitedEndpoint.v1`, `EndpointDueDiligenceReport.v1`, `GatewayRepoAssessment.v1`); OpenToolsHub metadata
+> (`FreeLimitedEndpoint`, `EndpointDueDiligenceReport`, `GatewayRepoAssessment`); OpenToolsHub metadata
 > projection; provider-node **proposals** (not graph writes); embedded redteam. Docs:
 > `docs/inference/free-limited-llm-endpoints.md` + `clawless-assessment.md`.
 >
@@ -32,8 +32,8 @@ Search the repo for: LLM gateway, provider graph, model preferences, OpenToolsHu
 endpoint notes, ClawLess/ClawContainer, provider adapters. Output `.agent/free-limited-llm-endpoint-discovery.json`.
 
 ## PART 2 — Contracts  *(3 of 7 built)*
-Built: `FreeLimitedEndpoint.v1`, `EndpointDueDiligenceReport.v1`, `GatewayRepoAssessment.v1`. Queued:
-`EndpointConformanceRun.v1`, `EndpointRiskReport.v1`, `EndpointQuotaSnapshot.v1`, `FreeEndpointPolicy.v1`.
+Built: `FreeLimitedEndpoint`, `EndpointDueDiligenceReport`, `GatewayRepoAssessment`. Queued:
+`EndpointConformanceRun`, `EndpointRiskReport`, `EndpointQuotaSnapshot`, `FreeEndpointPolicy`.
 Register all in `architecture/contract_registry.json`.
 
 ## PART 3 — Registry  *(built; extend rows)*

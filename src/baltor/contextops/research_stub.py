@@ -34,7 +34,7 @@ from src.baltor.ports.research_agent_provider import (
 LOCAL_STUB_PROVIDER_ID = "research.local_stub@v1"
 
 #: the SourceDiscoveryReport contract version this stub emits (single source).
-DISCOVERY_REPORT_SCHEMA_VERSION = "SourceDiscoveryReport.v1"
+DISCOVERY_REPORT_SCHEMA_VERSION = "SourceDiscoveryReport"
 
 #: id prefixes (content-addressed) — one definition each.
 _REPORT_PREFIX = "sdr-"
@@ -119,7 +119,7 @@ class LocalResearchStub:
 
     # ── the bounded discovery loop — DISCOVERS + PROPOSES, never serves a fact ───────────────────────
     def research(self, task: dict[str, Any], *, now: str) -> dict[str, Any]:
-        """Run the bounded discovery loop for ``task`` and return a SourceDiscoveryReport.v1 dict.
+        """Run the bounded discovery loop for ``task`` and return a SourceDiscoveryReport dict.
 
         Stays inside ``task['bounds']``: never exceeds max_steps, never uses a non-allowlisted access method,
         never requests secrets. ``serves_truth`` is pinned False; every candidate carries a source_handle; the

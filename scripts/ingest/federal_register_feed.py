@@ -46,7 +46,7 @@ FR_DOCS_URL = (
     "&fields[]=publication_date&fields[]=html_url&fields[]=agencies"
 )
 SOURCE_HANDLE_PREFIX = "ctx://federalregister/document"
-PARSER_ID = "federal_register_feed.documents_json.v1"
+PARSER_ID = "federal_register_feed.documents_json"
 _MATERIAL_FIELDS = ("document_number", "title", "type", "publication_date")
 
 

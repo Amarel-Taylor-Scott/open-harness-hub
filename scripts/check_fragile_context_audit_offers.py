@@ -41,8 +41,8 @@ _TAXONOMY = _REPO / "architecture" / "fragile_context_taxonomy.json"
 _ATLAS = _REPO / "architecture" / "fragile_context_atlas.json"
 _DOC = _REPO / "docs" / "sales" / "fragile-context-audit-offers.md"
 
-_SALES_CONTRACTS = ["TargetCompany.v1.schema.json", "DiagnosticRun.v1.schema.json",
-                    "EvidencePack.v1.schema.json", "ReviewApproval.v1.schema.json"]
+_SALES_CONTRACTS = ["TargetCompany.schema.json", "DiagnosticRun.schema.json",
+                    "EvidencePack.schema.json", "ReviewApproval.schema.json"]
 _POLICY = "docs/sales/public-claim-and-engagement-policy.md"
 #: The 10-field audit output (the deliverable shape). Single-defined here; the doc renders it.
 _TEN_FIELDS = [

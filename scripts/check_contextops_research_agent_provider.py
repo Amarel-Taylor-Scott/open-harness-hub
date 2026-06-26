@@ -6,7 +6,7 @@ catalog entries that are NEVER imported/executed and can NEVER serve a fact.
 THE INVARIANT made checkable: **Agents DISCOVER and PROPOSE; Baltor STORES, VERIFIES, RECONCILES, PROVES,
 CONSUMES.** Concretely:
   - research.local_stub@v1 is a ResearchAgentProviderPort whose research() returns a SCHEMA-VALID
-    SourceDiscoveryReport.v1 with serves_truth pinned False, an attributable discovered_by, a replayable
+    SourceDiscoveryReport with serves_truth pinned False, an attributable discovered_by, a replayable
     trace_ref, and every candidate carrying a source_handle — and it runs OFFLINE/deterministically (same
     task + same now -> byte-identical report).
   - each candidate provider (hermes/openclaw/claude_code/openhands/open_swe) is a catalog entry only: its
@@ -43,12 +43,12 @@ from src.baltor.ports.research_agent_provider import (  # noqa: E402
     ResearchAgentUnavailable,
 )
 
-_SCHEMA = _REPO / "schemas" / "contextops" / "SourceDiscoveryReport.v1.schema.json"
+_SCHEMA = _REPO / "schemas" / "contextops" / "SourceDiscoveryReport.schema.json"
 _NOW = "2026-06-05T00:00:00Z"
 
 #: the bounded task the proof runs (the CFPB verified fact_key); offline + no secrets.
 _TASK = {
-    "schema_version": "ResearchTask.v1",
+    "schema_version": "ResearchTask",
     "task_id": "rtask-cfpb-deadline-proof",
     "tenant_id": "acme",
     "source_scope": "global_public",
@@ -91,7 +91,7 @@ def _self_test() -> int:
     # ── research() returns a SCHEMA-VALID SourceDiscoveryReport with serves_truth pinned false. ──
     report = stub.research(_TASK, now=_NOW)
     errs = _validate(report, sdr_schema)
-    check("local stub research() output validates against SourceDiscoveryReport.v1", errs == [], str(errs[:4]))
+    check("local stub research() output validates against SourceDiscoveryReport", errs == [], str(errs[:4]))
     check("report serves_truth is pinned FALSE (a discovery report is NEVER served as truth)",
           report.get("serves_truth") is False)
     check("report discovered_by names the attributable agent (research.local_stub@v1)",

@@ -3,7 +3,7 @@
 **Date:** 2026-06-06. **Status:** doctrine (the architectural constitution behind CTS + PurposeTask).
 Companion to `docs/standards/open-capability-task-specification.md` (the standard) and
 `docs/architecture/purpose-task-self-adapting-execution.md` (Baltor's reference runtime). PoC + CTS CTS-0
-shipped (flywheel 317: `PurposeTaskSpec.v1` is a conformant CapabilityTask; runtime-class vocabulary +
+shipped (flywheel 317: `PurposeTaskSpec` is a conformant CapabilityTask; runtime-class vocabulary +
 parallel-path promotion gate).
 
 ## The thesis
@@ -80,7 +80,7 @@ every candidate is an artifact with provenance, every promotion has evidence, ev
 
 ## Naming (carry through)
 Standard = **Capability Task Specification (CTS)**, vendor-neutral (not named after Baltor). Baltor's
-reference runtime = **PurposeTask**. Baltor's existing `CapabilityTask.v1` (FleetLedger) = the LOWER execution
+reference runtime = **PurposeTask**. Baltor's existing `CapabilityTask` (FleetLedger) = the LOWER execution
 unit; CTS `CapabilityTask` = the higher purpose object ≡ PurposeTask. Product names sound powerful (Baltor
 Capability Plane / Intent Runtime / Adaptive Compute); the standard sounds neutral.
 

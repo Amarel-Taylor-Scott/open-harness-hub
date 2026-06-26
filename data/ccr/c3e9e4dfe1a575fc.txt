@@ -13,7 +13,7 @@ class SourceAdapterPort:
     def fetch(self, *, tenant_id: str, source_id: str, scope: str, locator: str, now: str) -> bytes | str | dict[str, Any]
         # Fetch ONE raw object by locator. May read from an upstream OR a deterministic local fixture when the
     def normalize(self, payload: Any, *, tenant_id: str, source_id: str, source_version: str, scope: str, authority: str, now: str) -> dict[str, Any]
-        # Turn one raw payload into governed SourceArtifact.v1 records + the per-type source handles. MUST set
+        # Turn one raw payload into governed SourceArtifact records + the per-type source handles. MUST set
     def health(self) -> dict[str, Any]
         # Return liveness/reachability for this connector: {'status': healthy|degraded|unavailable,
 ```

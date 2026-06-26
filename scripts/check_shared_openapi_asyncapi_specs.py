@@ -16,7 +16,7 @@ Asserts (against scripts.build_contract_specs + the on-disk generated docs):
   F. REFS RESOLVE: every $ref in both docs resolves to a real schema file on disk.
   G. NO RAW KEY: no raw-key / secret-value pattern anywhere in either generated doc.
   H. PROJECTION-ONLY + ERROR CONTRACT: every OpenAPI operation carries x-projection-only=true and declares an
-     ErrorEnvelope.v1 error response.
+     ErrorEnvelope error response.
 
 Deterministic + offline. Exit 0/1.
 """
@@ -86,11 +86,11 @@ def _self_test() -> int:
     cmd_ch = aa["channels"].get("runtime.commands") or aa["channels"].get("pipeline.commands")
     logs = aa["channels"]["runtime.logs"]["messages"]
     check("E: every event_type → an EventEnvelope (CloudEvents) message",
-          all(e["name"] in ev and ev[e["name"]]["payload"]["$ref"].endswith("EventEnvelope.v1.schema.json")
+          all(e["name"] in ev and ev[e["name"]]["payload"]["$ref"].endswith("EventEnvelope.schema.json")
               for e in reg["event_types"]))
     check("E: every command_type → a CommandEnvelope message",
           all(c["name"] in cmd_ch["messages"]
-              and cmd_ch["messages"][c["name"]]["payload"]["$ref"].endswith("CommandEnvelope.v1.schema.json")
+              and cmd_ch["messages"][c["name"]]["payload"]["$ref"].endswith("CommandEnvelope.schema.json")
               for c in reg["command_types"]))
     check("E: every log_event → a log channel message", all(l["name"] in logs for l in reg["log_events"]))
 
@@ -106,15 +106,15 @@ def _self_test() -> int:
     check("G: no raw-key / secret-value pattern in either generated doc", not leaks, str(leaks[:3]))
 
     ops = [op for p, ops in oa["paths"].items() for op in ops.values()]
-    check("H: every operation is x-projection-only + declares an ErrorEnvelope.v1 error response",
+    check("H: every operation is x-projection-only + declares an ErrorEnvelope error response",
           bool(ops) and all(op.get("x-projection-only") is True
-                            and any(r.get("content", {}).get("application/json", {}).get("schema", {}).get("$ref", "").endswith("ErrorEnvelope.v1.schema.json")
+                            and any(r.get("content", {}).get("application/json", {}).get("schema", {}).get("$ref", "").endswith("ErrorEnvelope.schema.json")
                                     for code, r in op["responses"].items() if code != "200") for op in ops))
 
     print("\n" + ("PASS — check_shared_openapi_asyncapi_specs: the generated OpenAPI + AsyncAPI specs faithfully + "
                   "drift-free cover every registered route and every command/event/log channel (incl. the "
                   "/api/inference plane); every $ref resolves; no raw key leaks; every operation is projection-only "
-                  "with an ErrorEnvelope.v1 error contract." if not fails else f"{len(fails)} FAILURES: {fails}"))
+                  "with an ErrorEnvelope error contract." if not fails else f"{len(fails)} FAILURES: {fails}"))
     return 0 if not fails else 1
 
 

@@ -4,7 +4,7 @@
 `document_decompose` proves the recursive object tree; `schemas/context-object.schema.json` is the
 canonical, standards-aligned context-object profile the rest of Baltor consumes. This module wires
 them together (no new schema — reuse the existing one): it maps each decomposed `Node` into a
-`baltor.context-object.v1` record and **validates every record against the real schema** with the
+`baltor.context-object` record and **validates every record against the real schema** with the
 same `Draft202012Validator` `scripts/validate.py` uses.
 
 Why this matters: it proves a decomposed paragraph / table-cell / figure is emittable as a
@@ -56,9 +56,9 @@ _DEFAULT_OBJECT_TYPE = "source_excerpt"  # paragraph/heading/table_cell/figure/d
 
 
 def node_to_context_object(node: Node, tree: DocumentTree, *, created_at: str) -> dict[str, Any]:
-    """Render one decomposed Node as a `baltor.context-object.v1` record (schema-valid)."""
+    """Render one decomposed Node as a `baltor.context-object` record (schema-valid)."""
     obj: dict[str, Any] = {
-        "kind": "baltor.context-object.v1",
+        "kind": "baltor.context-object",
         "context_object_id": node.object_id,
         "object_type": _OBJECT_TYPE_BY_KIND.get(node.kind, _DEFAULT_OBJECT_TYPE),
         "source_handles": [node.source_handle],

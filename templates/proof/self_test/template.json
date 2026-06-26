@@ -1,0 +1,21 @@
+{
+  "template_id": "proof.self_test",
+  "standard_id": "standard.proof_script",
+  "variables": [
+    {"name": "proof_name", "required": true, "description": "lowercase proof name; becomes scripts/check_<proof_name>.py and the flywheel label"},
+    {"name": "title", "required": true, "description": "human title of what is proven"},
+    {"name": "owner", "required": true, "description": "owning module/path or team"},
+    {"name": "subject_module", "required": true, "description": "the module/contract this proof asserts, e.g. scripts.runtime.consumption"}
+  ],
+  "files": [
+    {"path_template": "scripts/check_{{proof_name}}.py", "source": "files/scripts/check_proof_name.py"}
+  ],
+  "required_commands_after_generation": [
+    "python3 scripts/check_{{proof_name}}.py --self-test"
+  ],
+  "required_registry_updates": [
+    "scripts/baltor_flywheel.py PROOF_MODULES += (scripts/check_{{proof_name}}.py, {{proof_name}})"
+  ],
+  "required_proofs": ["scripts/check_{{proof_name}}.py"],
+  "required_docs": []
+}

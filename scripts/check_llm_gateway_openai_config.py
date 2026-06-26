@@ -40,7 +40,7 @@ def _self_test() -> int:
     # gateway with openai preferred + stub fallback → openai unavailable → stub serves → system GREEN
     gw = LLMGateway()
     req = LLMRequest(request_id="r", tenant_id="acme", task_type="conflict_explanation",
-                     prompt_id="p", prompt_version="v1", schema_id="ConflictExplanation.v1",
+                     prompt_id="p", prompt_version="v1", schema_id="ConflictExplanation",
                      input_artifact_ids=["art-a"],
                      routing_policy=RoutingPolicy(preferred_providers=["openai.default"], fallback_providers=["stub.local"]))
     resp = gw.complete(req, TenantPolicy("acme"), known_artifact_ids={"art-a"})

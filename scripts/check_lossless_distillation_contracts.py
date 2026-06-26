@@ -5,13 +5,13 @@ that PASSES and at least one invalid example that FAILS, and the lossless-law in
 contracts themselves.
 
 The law (docs/codex/lossless-distillation.md) made checkable at the contract layer:
-  - DistillationRun.v1 REQUIRES input+output artifact ids (a transform records what it consumed AND produced),
+  - DistillationRun REQUIRES input+output artifact ids (a transform records what it consumed AND produced),
     REQUIRES lineage, and REQUIRES all THREE preservation lists (omitted/held_out/rejected) to be present
     EVEN WHEN EMPTY — so 'omitted ≠ deleted' is structurally auditable. It also requires EITHER config_hash
     (deterministic transform) OR rule_version (LLM-to-rule conversion) — a disjunction the stdlib validator
     keyword set can't express, enforced here directly.
-  - PromotionRecord.v1 REQUIRES a rollback_target_id — no promotion is lossless without a reversible pointer.
-  - RehydrationReport.v1 REQUIRES reachable source artifact ids when rehydrated is true — a derived artifact
+  - PromotionRecord REQUIRES a rollback_target_id — no promotion is lossless without a reversible pointer.
+  - RehydrationReport REQUIRES reachable source artifact ids when rehydrated is true — a derived artifact
     that can't be walked back to its source is not lossless.
 
 Deterministic, stdlib-only, offline. CLI: python3 scripts/check_lossless_distillation_contracts.py --self-test
@@ -32,7 +32,7 @@ _EX_DIR = _SCHEMA_DIR / "examples"
 _SCHEMAS = ["DistillationRun", "LineageBundle", "RehydrationReport", "InformationRetentionReport",
             "PromotionRecord", "RollbackPlan"]
 
-#: DistillationRun.v1 MUST require these (lossless-law fields, lists present even if empty).
+#: DistillationRun MUST require these (lossless-law fields, lists present even if empty).
 _RUN_REQUIRED = {"input_artifact_ids", "output_artifact_ids", "input_hashes", "output_hashes", "lineage",
                  "omitted_artifact_ids", "held_out_artifact_ids", "rejected_candidate_ids", "rollback_target_id",
                  "receipts"}
@@ -72,82 +72,82 @@ def _self_test() -> int:
     schemas: dict[str, dict] = {}
     examples: dict[str, dict] = {}
     for stem in _SCHEMAS:
-        sp = _SCHEMA_DIR / f"{stem}.v1.schema.json"
-        ep = _EX_DIR / f"{stem}.v1.example.json"
-        check(f"{stem}.v1 schema file exists", sp.is_file(), str(sp))
-        check(f"{stem}.v1 example file exists", ep.is_file(), str(ep))
+        sp = _SCHEMA_DIR / f"{stem}.schema.json"
+        ep = _EX_DIR / f"{stem}.example.json"
+        check(f"{stem} schema file exists", sp.is_file(), str(sp))
+        check(f"{stem} example file exists", ep.is_file(), str(ep))
         if sp.is_file():
             schemas[stem] = json.loads(sp.read_text())
         if ep.is_file():
             examples[stem] = json.loads(ep.read_text())
 
-    # ── every schema parses, declares $id distillation/<Stem>.v1, is an object with additionalProperties:false,
+    # ── every schema parses, declares $id distillation/<Stem>, is an object with additionalProperties:false,
     #    and uses ONLY keywords the stdlib validator enforces (no silently-ignored pattern/minimum/anyOf). ──
     for stem, sc in schemas.items():
-        check(f"{stem}.v1 $id is distillation/{stem}.v1",
-              sc.get("$id") == f"distillation/{stem}.v1", str(sc.get("$id")))
-        check(f"{stem}.v1 is an object with additionalProperties:false",
+        check(f"{stem} $id is distillation/{stem}",
+              sc.get("$id") == f"distillation/{stem}", str(sc.get("$id")))
+        check(f"{stem} is an object with additionalProperties:false",
               sc.get("type") == "object" and sc.get("additionalProperties") is False)
-        check(f"{stem}.v1 declares required + properties", bool(sc.get("required")) and bool(sc.get("properties")))
-        check(f"{stem}.v1 uses only stdlib-validator keywords", _keys_ok(sc))
+        check(f"{stem} declares required + properties", bool(sc.get("required")) and bool(sc.get("properties")))
+        check(f"{stem} uses only stdlib-validator keywords", _keys_ok(sc))
         # every required field is actually declared in properties (no required-but-undefined field).
         props = set(sc.get("properties", {}))
         missing_props = [r for r in sc.get("required", []) if r not in props]
-        check(f"{stem}.v1 declares a property for every required field", missing_props == [], str(missing_props))
+        check(f"{stem} declares a property for every required field", missing_props == [], str(missing_props))
 
     # ── valid example PASSES; every invalid_* example FAILS validation. ──
     for stem, ex in examples.items():
         sc = schemas[stem]
         # there may be multiple valid_* examples; each must validate clean.
         valids = {k: v for k, v in ex.items() if k == "valid" or k.startswith("valid_")}
-        check(f"{stem}.v1 has a 'valid' example", "valid" in valids)
+        check(f"{stem} has a 'valid' example", "valid" in valids)
         for k, v in valids.items():
             errs = _validate(v, sc)
-            check(f"{stem}.v1 {k} example validates clean", errs == [], str(errs[:4]))
+            check(f"{stem} {k} example validates clean", errs == [], str(errs[:4]))
         invalids = {k: v for k, v in ex.items() if k.startswith("invalid")}
-        check(f"{stem}.v1 ships at least one invalid example", len(invalids) >= 1)
+        check(f"{stem} ships at least one invalid example", len(invalids) >= 1)
         for k, v in invalids.items():
             # invalid_no_config_or_rule is a SEMANTIC reject (disjunction), checked separately below — it is
             # structurally valid against the keyword set, so skip it in the schema-level reject loop.
             if k == "invalid_no_config_or_rule":
                 continue
             errs = _validate(v, sc)
-            check(f"{stem}.v1 {k} is correctly REJECTED by the schema", errs != [])
+            check(f"{stem} {k} is correctly REJECTED by the schema", errs != [])
 
-    # ── DistillationRun.v1 lossless invariants ──
+    # ── DistillationRun lossless invariants ──
     run_sc = schemas.get("DistillationRun", {})
     run_req = set(run_sc.get("required", []))
-    check("DistillationRun.v1 requires input+output ids+hashes, lineage, receipts, all 3 preservation lists, rollback_target",
+    check("DistillationRun requires input+output ids+hashes, lineage, receipts, all 3 preservation lists, rollback_target",
           _RUN_REQUIRED <= run_req, str(sorted(_RUN_REQUIRED - run_req)))
     # each required lossless field is INDIVIDUALLY load-bearing — drop it and the run is rejected.
     run_valid = examples.get("DistillationRun", {}).get("valid", {})
     if run_valid and run_sc:
         for f in sorted(_RUN_REQUIRED):
             broken = {k: v for k, v in run_valid.items() if k != f}
-            check(f"DistillationRun.v1 rejects a run missing '{f}'", _validate(broken, run_sc) != [])
+            check(f"DistillationRun rejects a run missing '{f}'", _validate(broken, run_sc) != [])
         # the three preservation lists must be PRESENT even when EMPTY (omitted ≠ deleted, auditable).
         for f in _PRESERVATION_LISTS:
             empty_list_run = dict(run_valid); empty_list_run[f] = []
-            check(f"DistillationRun.v1 ACCEPTS '{f}' present-but-empty (omitted ≠ deleted)",
+            check(f"DistillationRun ACCEPTS '{f}' present-but-empty (omitted ≠ deleted)",
                   _validate(empty_list_run, run_sc) == [])
             missing_list_run = {k: v for k, v in run_valid.items() if k != f}
-            check(f"DistillationRun.v1 REJECTS '{f}' absent entirely (must be present even if empty)",
+            check(f"DistillationRun REJECTS '{f}' absent entirely (must be present even if empty)",
                   _validate(missing_list_run, run_sc) != [])
         # lineage must carry source handles back to source — drop lineage.source_handles → rejected.
         no_handles = dict(run_valid)
         no_handles["lineage"] = {k: v for k, v in run_valid["lineage"].items() if k != "source_handles"}
-        check("DistillationRun.v1 rejects a lineage with no source_handles", _validate(no_handles, run_sc) != [])
+        check("DistillationRun rejects a lineage with no source_handles", _validate(no_handles, run_sc) != [])
         # transform_type is enum-bounded — a bogus transform is rejected.
         bad_tt = dict(run_valid); bad_tt["transform_type"] = "obliterate"
-        check("DistillationRun.v1 rejects an out-of-enum transform_type", _validate(bad_tt, run_sc) != [])
+        check("DistillationRun rejects an out-of-enum transform_type", _validate(bad_tt, run_sc) != [])
 
     # ── DistillationRun disjunction: config_hash OR rule_version (one must be present). ──
     def _has_config_or_rule(run: dict) -> bool:
         return bool(run.get("config_hash")) or bool(run.get("rule_version"))
     if run_valid:
-        check("DistillationRun.v1 valid (deterministic) carries config_hash", bool(run_valid.get("config_hash")))
+        check("DistillationRun valid (deterministic) carries config_hash", bool(run_valid.get("config_hash")))
         run_rule = examples.get("DistillationRun", {}).get("valid_llm_to_rule", {})
-        check("DistillationRun.v1 valid_llm_to_rule carries rule_version (no config_hash needed)",
+        check("DistillationRun valid_llm_to_rule carries rule_version (no config_hash needed)",
               bool(run_rule.get("rule_version")) and not run_rule.get("config_hash"))
         check("DistillationRun disjunction: deterministic run satisfies config_hash|rule_version",
               _has_config_or_rule(run_valid))
@@ -160,40 +160,40 @@ def _self_test() -> int:
         check("DistillationRun invalid_no_config_or_rule VIOLATES config_hash|rule_version (correctly rejected by check)",
               not _has_config_or_rule(no_cfg_no_rule))
 
-    # ── PromotionRecord.v1 REQUIRES a rollback_target_id (no lossless promotion without a reversible pointer). ──
+    # ── PromotionRecord REQUIRES a rollback_target_id (no lossless promotion without a reversible pointer). ──
     promo_sc = schemas.get("PromotionRecord", {})
-    check("PromotionRecord.v1 requires rollback_target_id", "rollback_target_id" in set(promo_sc.get("required", [])))
+    check("PromotionRecord requires rollback_target_id", "rollback_target_id" in set(promo_sc.get("required", [])))
     promo_valid = examples.get("PromotionRecord", {}).get("valid", {})
     if promo_valid and promo_sc:
         no_rb = {k: v for k, v in promo_valid.items() if k != "rollback_target_id"}
-        check("PromotionRecord.v1 rejects a promotion missing rollback_target_id", _validate(no_rb, promo_sc) != [])
+        check("PromotionRecord rejects a promotion missing rollback_target_id", _validate(no_rb, promo_sc) != [])
         # it must also keep the prior version and the rejected list (nothing deleted on promotion).
-        check("PromotionRecord.v1 requires prior_version_id + rejected_candidate_ids (promotion deletes nothing)",
+        check("PromotionRecord requires prior_version_id + rejected_candidate_ids (promotion deletes nothing)",
               {"prior_version_id", "rejected_candidate_ids"} <= set(promo_sc.get("required", [])))
 
-    # ── RollbackPlan.v1: pointer-only move, never a delete. ──
+    # ── RollbackPlan: pointer-only move, never a delete. ──
     rb_sc = schemas.get("RollbackPlan", {})
-    check("RollbackPlan.v1 requires rollback_target_id + from_artifact_id + the two delete flags",
+    check("RollbackPlan requires rollback_target_id + from_artifact_id + the two delete flags",
           {"rollback_target_id", "from_artifact_id", "deletes_artifacts", "deletes_prior_responses"}
           <= set(rb_sc.get("required", [])))
     rb_valid = examples.get("RollbackPlan", {}).get("valid", {})
     if rb_valid:
-        check("RollbackPlan.v1 valid plan deletes nothing (pointer-only move)",
+        check("RollbackPlan valid plan deletes nothing (pointer-only move)",
               rb_valid.get("deletes_artifacts") is False and rb_valid.get("deletes_prior_responses") is False)
 
-    # ── RehydrationReport.v1 REQUIRES reachable source artifact ids when rehydrated. ──
+    # ── RehydrationReport REQUIRES reachable source artifact ids when rehydrated. ──
     rh_sc = schemas.get("RehydrationReport", {})
-    check("RehydrationReport.v1 requires source_artifact_ids + rehydrated + crossed_tenant_boundary",
+    check("RehydrationReport requires source_artifact_ids + rehydrated + crossed_tenant_boundary",
           {"source_artifact_ids", "rehydrated", "crossed_tenant_boundary"} <= set(rh_sc.get("required", [])))
     rh_valid = examples.get("RehydrationReport", {}).get("valid", {})
     if rh_valid:
         # a successful rehydration must reach at least one source artifact (lossless: walk back to source).
-        check("RehydrationReport.v1 valid (rehydrated=true) reaches >=1 source artifact id",
+        check("RehydrationReport valid (rehydrated=true) reaches >=1 source artifact id",
               rh_valid.get("rehydrated") is True and len(rh_valid.get("source_artifact_ids", [])) >= 1)
-        check("RehydrationReport.v1 valid never crosses a tenant boundary",
+        check("RehydrationReport valid never crosses a tenant boundary",
               rh_valid.get("crossed_tenant_boundary") is False)
         rh_fail = examples.get("RehydrationReport", {}).get("valid_failed_rehydration", {})
-        check("RehydrationReport.v1 valid_failed_rehydration (rehydrated=false) carries a failure_reason + no source ids",
+        check("RehydrationReport valid_failed_rehydration (rehydrated=false) carries a failure_reason + no source ids",
               rh_fail.get("rehydrated") is False and rh_fail.get("source_artifact_ids") == []
               and bool(rh_fail.get("failure_reason")))
 

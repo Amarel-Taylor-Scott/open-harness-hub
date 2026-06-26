@@ -33,17 +33,17 @@ ROUTES = {
     "/admin-dashboard/monitor": "Live action monitor",
     "/api/context-gateway/status": "baltor-context-gateway",
     "/api/context-gateway/connectors": "indexed_mirror_first",
-    "/api/context-gateway/sync-contracts": "baltor.context-sync-contracts.v1",
-    "/api/context-gateway/context-object-schema": "baltor.context-object-schema.v1",
-    "/api/context-gateway/context-schema-catalog": "baltor.context-schema-catalog.v1",
-    "/api/context-gateway/product-surface": "baltor.context-product-surface.v1",
-    "/api/debug/heartbeat": "baltor.debug_heartbeat.v1",
-    "/api/context-gateway/glossary": "baltor.context-glossary.v1",
-    "/api/context-gateway/dimensions": "baltor.context-dimensions.v1",
-    "/api/context-gateway/model-routing": "baltor.context-model-routing.v1",
-    "/api/context-gateway/reranking": "baltor.context-reranking.v1",
-    "/api/context-gateway/local-memory": "baltor.context-local-memory.v1",
-    "/api/admin-dashboard/queue-health": "baltor.queue-health.v1",
+    "/api/context-gateway/sync-contracts": "baltor.context-sync-contracts",
+    "/api/context-gateway/context-object-schema": "baltor.context-object-schema",
+    "/api/context-gateway/context-schema-catalog": "baltor.context-schema-catalog",
+    "/api/context-gateway/product-surface": "baltor.context-product-surface",
+    "/api/debug/heartbeat": "baltor.debug_heartbeat",
+    "/api/context-gateway/glossary": "baltor.context-glossary",
+    "/api/context-gateway/dimensions": "baltor.context-dimensions",
+    "/api/context-gateway/model-routing": "baltor.context-model-routing",
+    "/api/context-gateway/reranking": "baltor.context-reranking",
+    "/api/context-gateway/local-memory": "baltor.context-local-memory",
+    "/api/admin-dashboard/queue-health": "baltor.queue-health",
 }
 
 EXPORTS = ["manifest", "text", "rag", "graph", "audit", "safe-context", "context-pack", "glossary", "context-objects"]
@@ -341,7 +341,7 @@ def assert_exports(base_url: str, run_id: str) -> dict[str, dict]:
         resp = request(base_url, f"/api/admin-demo/runs/{run_id}/exports/{kind}")
         assert resp.status == 200, f"export {kind} returned HTTP {resp.status}"
         payload = resp.json()
-        assert payload.get("package_type") == f"baltor.{kind}.v1", f"export {kind} had wrong package type"
+        assert payload.get("package_type") == f"baltor.{kind}", f"export {kind} had wrong package type"
         assert payload.get("run_id") == run_id, f"export {kind} had wrong run id"
         payloads[kind] = payload
     assert payloads["manifest"].get("document_tree_summary", {}).get("files", 0) >= 5
@@ -372,7 +372,7 @@ def assert_exports(base_url: str, run_id: str) -> dict[str, dict]:
     assert payloads["context-pack"].get("context_pack", {}).get("glossary_resolution_packets"), "context-pack export missing glossary_resolution_packets"
     assert payloads["context-pack"].get("gateway_policy", {}).get("retrieval_policy_owned_by_baltor") is True
     context_objects = payloads["context-objects"]
-    assert context_objects.get("kind") == "baltor.context-object-graph-records.v1", f"context-objects export wrong kind: {context_objects}"
+    assert context_objects.get("kind") == "baltor.context-object-graph-records", f"context-objects export wrong kind: {context_objects}"
     assert context_objects.get("counts", {}).get("objects", 0) >= 5, f"context-objects export missing objects: {context_objects.get('counts')}"
     assert context_objects.get("counts", {}).get("versions") == context_objects.get("counts", {}).get("objects"), f"context object versions should match objects: {context_objects.get('counts')}"
     assert context_objects.get("counts", {}).get("artifacts", 0) >= 5, f"context-objects export missing artifacts: {context_objects.get('counts')}"
@@ -382,15 +382,15 @@ def assert_exports(base_url: str, run_id: str) -> dict[str, dict]:
     assert context_objects.get("counts", {}).get("dimension_values", 0) >= 20, f"context-objects export missing dimension values: {context_objects.get('counts')}"
     assert context_objects.get("counts", {}).get("events", 0) >= 2, f"context-objects export missing events: {context_objects.get('counts')}"
     assert context_objects.get("counts", {}).get("packs", 0) == 1, f"context-objects export missing pack: {context_objects.get('counts')}"
-    assert all(item.get("kind") == "baltor.context-object.v1" for item in context_objects.get("objects", [])[:5]), "context object records missing kind"
-    assert all(item.get("kind") == "baltor.context-version.v1" for item in context_objects.get("versions", [])[:5]), "context version records missing kind"
+    assert all(item.get("kind") == "baltor.context-object" for item in context_objects.get("objects", [])[:5]), "context object records missing kind"
+    assert all(item.get("kind") == "baltor.context-version" for item in context_objects.get("versions", [])[:5]), "context version records missing kind"
     assert all(item.get("facets") for item in context_objects.get("objects", [])[:5]), "context object records missing flexible facets"
     assert all(item.get("five_w_one_h") for item in context_objects.get("objects", [])[:5]), "context object records missing 5W1H projection"
-    assert any(item.get("kind") == "baltor.context-relationship.v1" and item.get("relationship_type") == "MAY_SUPERSEDE" for item in context_objects.get("relationships", [])), "context relationships missing MAY_SUPERSEDE"
-    assert any(item.get("kind") == "baltor.context-assertion.v1" and item.get("predicate") == "states" for item in context_objects.get("assertions", [])), "context assertions missing source-linked claim statements"
-    assert any(item.get("kind") == "baltor.context-dimension-definition.v1" and item.get("dimension_id") == "dim://baltor/trust/verifiability" for item in context_objects.get("dimension_definitions", [])), "context dimension definitions missing verifiability"
-    assert any(item.get("kind") == "baltor.context-dimension-value.v1" and item.get("dimension_id") == "dim://baltor/risk/operational" for item in context_objects.get("dimension_values", [])), "context dimension values missing operational risk"
-    assert context_objects.get("packs", [{}])[0].get("kind") == "baltor.context-pack.v1", "context pack projection missing kind"
+    assert any(item.get("kind") == "baltor.context-relationship" and item.get("relationship_type") == "MAY_SUPERSEDE" for item in context_objects.get("relationships", [])), "context relationships missing MAY_SUPERSEDE"
+    assert any(item.get("kind") == "baltor.context-assertion" and item.get("predicate") == "states" for item in context_objects.get("assertions", [])), "context assertions missing source-linked claim statements"
+    assert any(item.get("kind") == "baltor.context-dimension-definition" and item.get("dimension_id") == "dim://baltor/trust/verifiability" for item in context_objects.get("dimension_definitions", [])), "context dimension definitions missing verifiability"
+    assert any(item.get("kind") == "baltor.context-dimension-value" and item.get("dimension_id") == "dim://baltor/risk/operational" for item in context_objects.get("dimension_values", [])), "context dimension values missing operational risk"
+    assert context_objects.get("packs", [{}])[0].get("kind") == "baltor.context-pack", "context pack projection missing kind"
     assert context_objects.get("policy", {}).get("versions_are_immutable") is True, f"context object policy incomplete: {context_objects.get('policy')}"
     assert context_objects.get("policy", {}).get("flexible_facets_are_namespaced") is True, f"context object policy missing facets rule: {context_objects.get('policy')}"
     assert context_objects.get("policy", {}).get("dimensions_are_first_class_records") is True, f"context object policy missing dimension rule: {context_objects.get('policy')}"
@@ -417,48 +417,48 @@ def assert_connector_run(base_url: str) -> dict:
     sync_resp = request(base_url, "/api/context-gateway/sync-contracts")
     assert sync_resp.status == 200, f"sync contracts returned HTTP {sync_resp.status}"
     sync = sync_resp.json()
-    assert sync.get("kind") == "baltor.context-sync-contracts.v1", f"wrong sync contract kind: {sync}"
+    assert sync.get("kind") == "baltor.context-sync-contracts", f"wrong sync contract kind: {sync}"
     assert {"push", "pull", "push_then_pull"}.issubset(set(sync.get("sync_modes") or [])), f"sync modes incomplete: {sync}"
     assert {"post_commit_hook", "push_webhook", "pipeline_artifact"}.issubset(set(sync.get("trigger_types") or [])), f"sync trigger types incomplete: {sync}"
-    assert "baltor.repo-wiki-artifact-manifest.v1" in (sync.get("artifact_manifest_kinds") or []), f"repo wiki artifact manifest not declared: {sync}"
+    assert "baltor.repo-wiki-artifact-manifest" in (sync.get("artifact_manifest_kinds") or []), f"repo wiki artifact manifest not declared: {sync}"
     assert sync.get("policies", {}).get("commit_scoped_outputs_required_for_repo_wiki") is True, f"sync policy missing commit-scoped requirement: {sync}"
     schema_resp = request(base_url, "/api/context-gateway/context-object-schema")
     assert schema_resp.status == 200, f"context object schema returned HTTP {schema_resp.status}"
     schema = schema_resp.json()
-    assert schema.get("kind") == "baltor.context-object-schema.v1", f"wrong context object schema kind: {schema}"
-    assert schema.get("context_object_kind") == "baltor.context-object.v1", f"wrong context object kind: {schema}"
+    assert schema.get("kind") == "baltor.context-object-schema", f"wrong context object schema kind: {schema}"
+    assert schema.get("context_object_kind") == "baltor.context-object", f"wrong context object kind: {schema}"
     assert schema.get("source_handle_pattern") == "^ctx://", f"context object source handle pattern missing: {schema}"
     assert schema.get("policy", {}).get("durable_claims_require_source_handles") is True, f"context object policy incomplete: {schema}"
     schema_catalog_resp = request(base_url, "/api/context-gateway/context-schema-catalog")
     assert schema_catalog_resp.status == 200, f"context schema catalog returned HTTP {schema_catalog_resp.status}"
     schema_catalog = schema_catalog_resp.json()
-    assert schema_catalog.get("kind") == "baltor.context-schema-catalog.v1", f"wrong context schema catalog kind: {schema_catalog}"
+    assert schema_catalog.get("kind") == "baltor.context-schema-catalog", f"wrong context schema catalog kind: {schema_catalog}"
     expected_schema_kinds = {
-        "baltor.context-object.v1",
-        "baltor.context-version.v1",
-        "baltor.context-artifact.v1",
-        "baltor.context-relationship.v1",
-        "baltor.context-assertion.v1",
-        "baltor.context-dimension-definition.v1",
-        "baltor.context-dimension-value.v1",
-        "baltor.context-model-profile.v1",
-        "baltor.context-model-routing-policy.v1",
-        "baltor.context-reranker-profile.v1",
-        "baltor.context-reranking-policy.v1",
-        "baltor.context-local-memory-profile.v1",
-        "baltor.context-local-sync-policy.v1",
-        "baltor.context-event.v1",
-        "baltor.context-pack.v1",
-        "baltor.context-provider.v1",
-        "baltor.context-pack-builder.v1",
-        "baltor.context-product-surface.v1",
+        "baltor.context-object",
+        "baltor.context-version",
+        "baltor.context-artifact",
+        "baltor.context-relationship",
+        "baltor.context-assertion",
+        "baltor.context-dimension-definition",
+        "baltor.context-dimension-value",
+        "baltor.context-model-profile",
+        "baltor.context-model-routing-policy",
+        "baltor.context-reranker-profile",
+        "baltor.context-reranking-policy",
+        "baltor.context-local-memory-profile",
+        "baltor.context-local-sync-policy",
+        "baltor.context-event",
+        "baltor.context-pack",
+        "baltor.context-provider",
+        "baltor.context-pack-builder",
+        "baltor.context-product-surface",
     }
     assert expected_schema_kinds.issubset(set(schema_catalog.get("schema_kinds") or [])), f"context schema catalog incomplete: {schema_catalog}"
     assert schema_catalog.get("storage_agnostic") is True, f"context schema catalog should be storage agnostic: {schema_catalog}"
     product_resp = request(base_url, "/api/context-gateway/product-surface")
     assert product_resp.status == 200, f"context product surface returned HTTP {product_resp.status}"
     product = product_resp.json()
-    assert product.get("kind") == "baltor.context-product-surface.v1", f"wrong context product surface kind: {product}"
+    assert product.get("kind") == "baltor.context-product-surface", f"wrong context product surface kind: {product}"
     assert "mcp" in (product.get("interfaces") or []), f"product surface missing MCP interface: {product}"
     assert "atlassian_rovo_team" in (product.get("deployment_models") or []), f"product surface missing Atlassian/Rovo deployment: {product}"
     assert product.get("product_invariants", {}).get("durable_claims_require_source_handles") is True, f"product surface invariants incomplete: {product}"
@@ -509,7 +509,7 @@ def assert_context_gateway(base_url: str, run_id: str) -> dict:
     assert glossary_resp.status == 200, f"context gateway glossary returned HTTP {glossary_resp.status}"
     glossary = glossary_resp.json()
     assert glossary.get("ok") is True, f"context gateway glossary failed: {glossary}"
-    assert glossary.get("kind") == "baltor.context-glossary.v1"
+    assert glossary.get("kind") == "baltor.context-glossary"
     assert glossary.get("packet_count", 0) >= 1, f"context gateway glossary returned no packets: {glossary}"
     assert (glossary.get("packets") or [{}])[0].get("term") == "agency", f"context gateway glossary did not filter agency: {glossary}"
     assert glossary.get("gateway_policy", {}).get("block_global_memory_promotion") is True
@@ -517,7 +517,7 @@ def assert_context_gateway(base_url: str, run_id: str) -> dict:
     assert dimensions_resp.status == 200, f"context gateway dimensions returned HTTP {dimensions_resp.status}"
     dimensions = dimensions_resp.json()
     assert dimensions.get("ok") is True, f"context gateway dimensions failed: {dimensions}"
-    assert dimensions.get("kind") == "baltor.context-dimensions.v1", f"wrong dimensions kind: {dimensions}"
+    assert dimensions.get("kind") == "baltor.context-dimensions", f"wrong dimensions kind: {dimensions}"
     assert dimensions.get("counts", {}).get("dimension_definitions", 0) >= 1, f"dimensions missing definitions: {dimensions}"
     assert dimensions.get("counts", {}).get("dimension_values", 0) >= 1, f"dimensions missing values: {dimensions}"
     assert dimensions.get("gateway_policy", {}).get("scores_are_assessments_not_source_facts") is True, f"dimensions policy incomplete: {dimensions}"
@@ -525,7 +525,7 @@ def assert_context_gateway(base_url: str, run_id: str) -> dict:
     assert model_routing_resp.status == 200, f"context gateway model routing returned HTTP {model_routing_resp.status}"
     model_routing = model_routing_resp.json()
     assert model_routing.get("ok") is True, f"context gateway model routing failed: {model_routing}"
-    assert model_routing.get("kind") == "baltor.context-model-routing.v1", f"wrong model routing kind: {model_routing}"
+    assert model_routing.get("kind") == "baltor.context-model-routing", f"wrong model routing kind: {model_routing}"
     assert len(model_routing.get("model_profiles") or []) >= 7, f"model routing missing ladder profiles: {model_routing}"
     assert model_routing.get("routing_policy", {}).get("policy", {}).get("provider_neutral") is True, f"model routing policy is not provider neutral: {model_routing}"
     assert model_routing.get("routing_policy", {}).get("policy", {}).get("do_not_escalate_by_brand_or_prestige") is True, f"model routing policy missing brand-neutral rule: {model_routing}"
@@ -534,7 +534,7 @@ def assert_context_gateway(base_url: str, run_id: str) -> dict:
     assert reranking_resp.status == 200, f"context gateway reranking returned HTTP {reranking_resp.status}"
     reranking = reranking_resp.json()
     assert reranking.get("ok") is True, f"context gateway reranking failed: {reranking}"
-    assert reranking.get("kind") == "baltor.context-reranking.v1", f"wrong reranking kind: {reranking}"
+    assert reranking.get("kind") == "baltor.context-reranking", f"wrong reranking kind: {reranking}"
     assert len(reranking.get("reranker_profiles") or []) >= 7, f"reranking missing ladder profiles: {reranking}"
     assert reranking.get("reranking_policy", {}).get("policy", {}).get("source_aware_not_embedding_only") is True, f"reranking policy is not source-aware: {reranking}"
     assert reranking.get("reranking_policy", {}).get("policy", {}).get("lora_adapters_require_eval_and_lineage") is True, f"reranking policy missing LoRA evaluation rule: {reranking}"
@@ -543,7 +543,7 @@ def assert_context_gateway(base_url: str, run_id: str) -> dict:
     assert local_memory_resp.status == 200, f"context gateway local memory returned HTTP {local_memory_resp.status}"
     local_memory = local_memory_resp.json()
     assert local_memory.get("ok") is True, f"context gateway local memory failed: {local_memory}"
-    assert local_memory.get("kind") == "baltor.context-local-memory.v1", f"wrong local memory kind: {local_memory}"
+    assert local_memory.get("kind") == "baltor.context-local-memory", f"wrong local memory kind: {local_memory}"
     assert len(local_memory.get("memory_profiles") or []) >= 4, f"local memory missing profiles: {local_memory}"
     assert local_memory.get("sync_policy", {}).get("cloud_visibility", {}).get("private_e2ee_memory_plaintext_visible_to_cloud") is False, f"local memory should keep private plaintext hidden from cloud: {local_memory}"
     assert local_memory.get("sync_policy", {}).get("cloud_visibility", {}).get("encrypted_sync_blobs_are_not_server_searchable") is True, f"encrypted sync blobs should not be server searchable: {local_memory}"
@@ -599,7 +599,7 @@ def assert_context_cache_writer(base_url: str, run_id: str) -> dict:
         assert "ctx://baltor/" in context_text, "context cache did not retain source handles"
         assert "Do not paste raw source-system dumps" in context_text, "context cache missing cache policy"
         assert "agency" in glossary_text and "source_local" in glossary_text, "glossary cache missing source-scoped agency packet"
-        assert manifest.get("kind") == "baltor.local-context-cache-manifest.v1", f"wrong cache manifest kind: {manifest}"
+        assert manifest.get("kind") == "baltor.local-context-cache-manifest", f"wrong cache manifest kind: {manifest}"
         assert manifest.get("latest_run_id") == run_id, f"cache manifest latest run mismatch: {manifest}"
         assert manifest.get("policy", {}).get("stores_raw_source_dump") is False, f"manifest policy allows raw dumps: {manifest}"
         assert manifest.get("policy", {}).get("stores_source_handles") is True, f"manifest policy missing source handles: {manifest}"
@@ -615,7 +615,7 @@ def assert_heartbeat(base_url: str, run_id: str) -> dict:
     resp = request(base_url, "/api/debug/heartbeat?" + urllib.parse.urlencode({"run_id": run_id}))
     assert resp.status == 200, f"heartbeat returned HTTP {resp.status}"
     payload = resp.json()
-    assert payload.get("kind") == "baltor.debug_heartbeat.v1", f"wrong heartbeat kind: {payload}"
+    assert payload.get("kind") == "baltor.debug_heartbeat", f"wrong heartbeat kind: {payload}"
     assert payload.get("server", {}).get("uptime_seconds", -1) >= 0
     assert payload.get("run", {}).get("run_id") == run_id
     assert "last_worker_event" in payload.get("run", {})

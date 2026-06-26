@@ -188,6 +188,47 @@ def _self_test() -> int:
         check("E: recorded receipts carry worker_id + entries_written lineage",
               all(r.get("worker_id") and "entries_written" in r for r in bb.get_receipts(bid)))
 
+        # ---- E+. atomic transaction: a simulated crash mid-write rolls back, no partial state ----
+        entry_before = bb.query(bid, kind=KIND_OBSERVATION)
+        receipt_count_before = len(bb.get_receipts(bid))
+        seq_before = bb._conn.execute("SELECT value FROM _seq WHERE name='entry'").fetchone()[0]
+
+        class _CrashAfterReceipt(Exception):
+            pass
+
+        original_record_receipt = bb._record_receipt
+
+        def _crash_after_receipt(*args, **kwargs):
+            original_record_receipt(*args, **kwargs)
+            raise _CrashAfterReceipt("simulated failure after receipt insert")
+
+        bb._record_receipt = _crash_after_receipt  # type: ignore[method-assign]
+        try:
+            bb.append_entry(
+                bid,
+                _observation(["src.atomic"], statement="atomic partial write test"),
+                worker_receipt=_receipt("worker.atomic"),
+                now=_NOW,
+            )
+        except _CrashAfterReceipt:
+            pass
+        finally:
+            bb._record_receipt = original_record_receipt  # type: ignore[method-assign]
+
+        seq_after = bb._conn.execute("SELECT value FROM _seq WHERE name='entry'").fetchone()[0]
+        check(
+            "E+: simulated crash after receipt insert leaves no entry (entry + receipt are atomic)",
+            len(bb.query(bid, kind=KIND_OBSERVATION)) == len(entry_before),
+        )
+        check(
+            "E+: simulated crash after receipt insert leaves no receipt (entry + receipt are atomic)",
+            len(bb.get_receipts(bid)) == receipt_count_before,
+        )
+        check(
+            "E+: simulated crash rolls back the monotonic sequence counter (no seq gap)",
+            seq_after == seq_before,
+        )
+
         # ---- F. deterministic query ------------------------------------------------------
         order_1 = [e["entry_id"] for e in bb.query(bid)]
         order_2 = [e["entry_id"] for e in bb.query(bid)]

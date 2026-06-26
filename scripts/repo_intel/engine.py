@@ -41,7 +41,7 @@ def _hash(d: dict) -> str:
 def append_snapshot(repo: dict, *, now: str, store: Path = DEFAULT_STORE, source_method: str = "fixture",
                     source_confidence: str = "owner_provided_unverified") -> dict:
     rid = repo_id(repo["full_name"])
-    snap = {"schema_version": "RepoSnapshot.v1", "repo_id": rid, "full_name": repo["full_name"],
+    snap = {"schema_version": "RepoSnapshot", "repo_id": rid, "full_name": repo["full_name"],
             "html_url": repo.get("html_url", f"https://github.com/{repo['full_name']}"),
             "description": repo.get("description", ""), "topics": repo.get("topics", []),
             "language_primary": repo.get("language_primary", ""), "license": repo.get("license", ""),
@@ -82,7 +82,7 @@ def compute_trend(repo: dict, *, store: Path = DEFAULT_STORE) -> dict:
         score = moved + (0.1 if moved > 0 and cur and not cur.get("archived") else 0.0)  # tiny recency bonus only WITH movement
     elif delta:
         score = (delta / 1000.0) * 0.4  # discount unverified owner-reported growth
-    return {"schema_version": "RepoTrendSignal.v1", "repo_id": rid,
+    return {"schema_version": "RepoTrendSignal", "repo_id": rid,
             "current_snapshot_id": cur["snapshot_id"] if cur else None,
             "previous_snapshot_id": prev["snapshot_id"] if prev else None,
             "stars_delta_7d": delta, "trend_score": round(score, 3), "confidence": conf,
@@ -103,7 +103,7 @@ def classify(repo: dict) -> dict:
                 low_priority = True
     primary = hubs[0] if hubs else "unclassified"
     artifact = _HUB_ARTIFACT.get(primary, "tool" if primary in ("teleon", "baltor") else "unknown")
-    return {"schema_version": "RepoClassification.v1", "repo_id": repo_id(repo["full_name"]),
+    return {"schema_version": "RepoClassification", "repo_id": repo_id(repo["full_name"]),
             "portfolio_hubs": hubs or ["unclassified"], "primary_hub": primary, "artifact_type": artifact,
             "low_priority": low_priority, "confidence": "medium" if hubs else "low", "requires_human_review": True}
 
@@ -128,7 +128,7 @@ def risk(repo: dict) -> dict:
         quarantine_reasons.append("license_unknown_or_restrictive")
     if repo.get("archived"):
         quarantine_reasons.append("archived")
-    return {"schema_version": "RepoRiskReport.v1", "repo_id": repo_id(repo["full_name"]), "license": lic,
+    return {"schema_version": "RepoRiskReport", "repo_id": repo_id(repo["full_name"]), "license": lic,
             "license_ok": lic in _OK_LICENSES, "archived": bool(repo.get("archived")),
             "quarantine": bool(quarantine_reasons), "quarantine_reasons": quarantine_reasons}
 
@@ -157,7 +157,7 @@ def intake_decision(repo: dict, classification: dict, trend: dict, risk_report: 
             reasons.append("low priority (media/voice) — watch unless prioritized")
     art = _HUB_ARTIFACT.get(classification["primary_hub"], "")
     proof = list(pol["proof_to_promote_default"]) + pol.get("candidate_requires", {}).get(art, [])
-    return {"schema_version": "RepoIntakeDecision.v1", "repo_id": rid, "decision": decision, "reasons": reasons,
+    return {"schema_version": "RepoIntakeDecision", "repo_id": rid, "decision": decision, "reasons": reasons,
             "hub_mappings": classification["portfolio_hubs"], "proof_to_promote": sorted(set(proof)),
             "local_eval_required": decision.startswith("intake_") or decision.startswith("propose_"),
             "sandbox_required": decision in ("intake_as_tool_candidate", "intake_as_skill_candidate"),
@@ -178,7 +178,7 @@ def weekly_report(*, now: str, store: Path = DEFAULT_STORE, top_n: int = 10) -> 
     clusters: dict[str, list[str]] = {}
     for row in rows:
         clusters.setdefault(row["primary_hub"], []).append(row["full_name"])
-    report = {"schema_version": "WeeklyGitHubSignalReport.v1", "generated_at": now,
+    report = {"schema_version": "WeeklyGitHubSignalReport", "generated_at": now,
               "data_confidence": fx["source_confidence"],
               "caveats": ["Star counts/growth are OWNER-PROVIDED, UNVERIFIED until a 2nd stored snapshot + live "
                           "GitHub metadata confirm.", "Stars = interest signal, not quality/safety.",

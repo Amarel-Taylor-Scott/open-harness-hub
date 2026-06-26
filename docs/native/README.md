@@ -17,7 +17,7 @@ purely for drop-in compatibility. **THE ORIGINAL IS NEVER OVERWRITTEN.**
 |---|---|
 | [overview.md](overview.md) | purpose, owners, contracts, inputs/outputs, the full proof set, limitations |
 | [output-modes.md](output-modes.md) | the eight `output_mode` values + the three registry invariants (only the value-changing modes mutate; only passthrough is byte-identical) |
-| [sidecars.md](sidecars.md) | the `SidecarOverlay.v1` fields + the lineage invariants (every field → handle + resolvable artifact; held-out kept, never served) |
+| [sidecars.md](sidecars.md) | the `SidecarOverlay` fields + the lineage invariants (every field → handle + resolvable artifact; held-out kept, never served) |
 
 ## The eight output modes (single source: `architecture/native_output_modes.json`)
 
@@ -48,8 +48,8 @@ See [output-modes.md](output-modes.md) for the per-mode table; the registry is t
 
 ## Contracts
 
-`schemas/native/*.v1.schema.json` (+ `examples/`): `NativeShapeContract.v1`, `NativeProjection.v1`,
-`SidecarOverlay.v1`, `NativeDiff.v1`, `NativeExportReceipt.v1`. Registered by MAIN in
+`schemas/native/*.v1.schema.json` (+ `examples/`): `NativeShapeContract`, `NativeProjection`,
+`SidecarOverlay`, `NativeDiff`, `NativeExportReceipt`. Registered by MAIN in
 `architecture/contract_registry.json`.
 
 ## Proofs (every one is `--self-test`, deterministic + offline)

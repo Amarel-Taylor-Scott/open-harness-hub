@@ -43,7 +43,7 @@ DEFAULT_BASE_URL = _context_cache_setting("gateway_base_url")
 DEFAULT_OUT_DIR = Path(_context_cache_setting("local_cache_dir"))
 DEFAULT_AUDIT_LOG = _context_cache_setting("local_cache_audit_log")
 DEFAULT_MANIFEST = _context_cache_setting("local_cache_manifest")
-MANIFEST_KIND = "baltor.local-context-cache-manifest.v1"
+MANIFEST_KIND = "baltor.local-context-cache-manifest"
 WRITE_EVENT = "baltor.context_cache.write"
 
 

@@ -1,18 +1,18 @@
 # Context API (C-CONSUME-1) — serving ContextResponse over HTTP
 
 **Purpose.** Expose the proven `ConsumptionService` over read/projection-safe HTTP so an agent can fetch a
-served `ContextResponse.v1` (verified + promoted + receipted facts, held-out warnings separate). The API never
+served `ContextResponse` (verified + promoted + receipted facts, held-out warnings separate). The API never
 computes truth — it delegates to `ConsumptionService` (`run_cfpb_to_consumption`).
 
 **Owner.** `scripts/api_context_handler.py` (pure handler) + dispatch hooks in `scripts/baltor_admin_demo_server.py`.
-**Contract.** `ContextResponse.v1` (`schemas/consumption/`). **Registry.** `architecture/contract_registry.json#api_routes`.
+**Contract.** `ContextResponse` (`schemas/consumption/`). **Registry.** `architecture/contract_registry.json#api_routes`.
 
 ## Routes (all projection-only)
 
 | Route | Returns |
 |---|---|
-| `POST /api/context/serve` | `ContextResponse.v1` from ConsumptionService (token-gated like all POSTs) |
-| `GET /api/context/responses/<id>` | a previously served `ContextResponse.v1` |
+| `POST /api/context/serve` | `ContextResponse` from ConsumptionService (token-gated like all POSTs) |
+| `GET /api/context/responses/<id>` | a previously served `ContextResponse` |
 | `GET /api/context/receipts/<id>` | the verification / optimization / consumption receipt |
 | `GET /api/runtime/sections` | the section maturity matrix summary (the honest scoreboard) |
 | `GET /api/runtime/consumption` | the latest served response summary |
@@ -22,7 +22,7 @@ computes truth — it delegates to `ConsumptionService` (`run_cfpb_to_consumptio
 ```
 POST /api/context/serve
 {"tenant_id": "demo", "corpus": "cfpb", "require_optimized": true}
-→ 200 ContextResponse.v1: answer "10 business days"; served_facts[] (each with source_handle +
+→ 200 ContextResponse: answer "10 business days"; served_facts[] (each with source_handle +
    verification_receipt_id + optimization_receipt_id); held_out_warnings[] (FAQ-30, allegations);
    receipts{verification_receipt_id, optimization_receipt_id, consumption_receipt_id}; lineage; freshness.
 ```

@@ -1,0 +1,48 @@
+{
+  "$id": "determinism/ConsensusRun", "title": "ConsensusRun", "type": "object", "additionalProperties": false,
+  "description": "A multi-model / multi-run aggregation of LLM proposals for ONE decision step. CRITICAL SEMANTICS: a ConsensusRun is an EVIDENCE / AMBIGUITY signal, NOT a source of truth. agreement_score and disagreement_clusters describe how much the models agreed — they do NOT decide the answer. The final_label MUST come from a deterministic validator or an AdjudicationRecord (label_source ∈ {deterministic_validator, adjudication, authority_policy}); label_source can NEVER be 'consensus' or 'majority'. The boolean consensus_only_is_not_truth is pinned true so a downstream gate can assert 'consensus alone cannot serve a fact'. Low agreement_score routes to review/validator, it does not auto-promote. Deterministic when created_at is injected.",
+  "required": ["schema_version", "consensus_run_id", "tenant_id", "source_scope", "workflow_id", "step_id", "per_model_outputs", "agreement_score", "disagreement_clusters", "final_label", "label_source", "consensus_only_is_not_truth", "routed_to_review", "source_handles", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["ConsensusRun"]},
+    "consensus_run_id": {"type": "string", "description": "content-addressed id (sha256 over the sorted per-model outputs + step identity); deterministic"},
+    "tenant_id": {"type": "string"},
+    "source_scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "workflow_id": {"type": "string"},
+    "step_id": {"type": "string"},
+    "per_model_outputs": {
+      "type": "array",
+      "description": "one entry per participating model/run; the raw material the agreement score is computed over",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["model_id", "llm_trace_id", "proposed_decision"],
+        "properties": {
+          "model_id": {"type": "string"},
+          "model_version": {"type": "string"},
+          "provider_id": {"type": "string"},
+          "llm_trace_id": {"type": "string", "description": "link to the LLMTrace for this model's proposal"},
+          "proposed_decision": {"type": "string"}
+        }
+      }
+    },
+    "agreement_score": {"type": "number", "description": "0.0..1.0 share of models agreeing on the modal proposal; a SIGNAL, not the answer"},
+    "disagreement_clusters": {
+      "type": "array",
+      "description": "groups of models that proposed the same distinct answer; surfaces ambiguity",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["decision", "model_ids"],
+        "properties": {
+          "decision": {"type": "string"},
+          "model_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "final_label": {"type": "string", "description": "the decision recorded for this step — produced by label_source (validator/adjudication/authority), NOT by majority vote"},
+    "label_source": {"type": "string", "enum": ["deterministic_validator", "adjudication", "authority_policy"], "description": "WHO produced final_label; can NEVER be 'consensus' or 'majority'. Consensus is evidence only."},
+    "consensus_only_is_not_truth": {"type": "boolean", "enum": [true], "description": "structurally pinned true: consensus alone can never serve a fact; a downstream gate asserts this"},
+    "routed_to_review": {"type": "boolean", "description": "true when agreement was low / ambiguous and the step was sent to a deterministic validator or human review rather than auto-decided"},
+    "adjudication_record_id": {"type": "string", "description": "link to the AdjudicationRecord, when label_source=adjudication"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "handles grounding the final_label (which comes from the authority, not the votes)"},
+    "created_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

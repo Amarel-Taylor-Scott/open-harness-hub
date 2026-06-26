@@ -15,7 +15,7 @@ from pathlib import Path
 from src.baltor.workers import telemetry as T
 from src.baltor.workers.fleet_ledger import FleetLedger
 
-_SCHEMA = Path(__file__).resolve().parents[1] / "schemas" / "workers" / "WorkerTelemetry.v1.schema.json"
+_SCHEMA = Path(__file__).resolve().parents[1] / "schemas" / "workers" / "WorkerTelemetry.schema.json"
 T0 = "2026-06-06T00:00:00Z"
 CAP = "native.export"
 

@@ -45,7 +45,7 @@ _STATE_PATH = _FEEDS_DIR / "runner-state.json"
 _STAGED_PATH = _FEEDS_DIR / "staged-candidates.jsonl"
 _STOP_FILE = _REPO / ".agent" / "STOP_REQUESTED"
 
-STATE_VERSION = "CapabilityDiscoveryRunnerState.v1"
+STATE_VERSION = "CapabilityDiscoveryRunnerState"
 
 
 class LiveDiscoveryDisabled(RuntimeError):

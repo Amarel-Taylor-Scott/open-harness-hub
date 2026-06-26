@@ -73,7 +73,7 @@ def _self_test() -> int:
     # NEGATIVE: an unknown stage id fails
     check("unknown stage id is rejected", bool(validate_stages([{"id": "stage.nope", "canonical_label": "x", "color_token": "x", "page": "x", "workflows": [], "backend_modules": []}], canon)))
     # NEGATIVE: a bad format profile fails schema
-    check("bad format profile rejected (lineage_detail enum)", bool(list(v.iter_errors({"kind": "baltor.format-profile.v1", "id": "format.bad", "lineage_detail": "everything"}))))
+    check("bad format profile rejected (lineage_detail enum)", bool(list(v.iter_errors({"kind": "baltor.format-profile", "id": "format.bad", "lineage_detail": "everything"}))))
 
     print(f"\n{'all validate_stages self-tests passed.' if not failures else f'{len(failures)} FAILURES: {failures}'}")
     return 0 if not failures else 1

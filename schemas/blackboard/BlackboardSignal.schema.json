@@ -1,0 +1,19 @@
+{
+  "$id": "blackboard/BlackboardSignal",
+  "title": "BlackboardSignal",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A SIGNAL entry: an open question or prompt posted to the blackboard to direct the swarm's next attention (e.g. 'what is the sanction's effective date?'). Procedural, not truth-bearing — a signal asserts nothing about the world, so it carries no source_refs requirement of its own. priority orders the swarm's work queue. The matching BlackboardEntry row (kind=signal) carries the shared envelope incl. serves_truth=false.",
+  "required": [
+    "entry_id",
+    "blackboard_id",
+    "question",
+    "priority"
+  ],
+  "properties": {
+    "entry_id": {"type": "string", "description": "id of the BlackboardEntry (kind=signal) this body belongs to"},
+    "blackboard_id": {"type": "string", "description": "the blackboard this signal belongs to"},
+    "question": {"type": "string", "description": "the open question / prompt directing the swarm's attention"},
+    "priority": {"type": "integer", "minimum": 0, "description": "ordering weight for the work queue (higher = sooner); numeric, not a display label"}
+  }
+}

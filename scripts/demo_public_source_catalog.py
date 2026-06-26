@@ -19,7 +19,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CATALOG = REPO_ROOT / "data" / "baltor-demo-source-catalog.json"
 DEFAULT_OUT_DIR = REPO_ROOT / "site" / "baltor-demos" / "public-source-catalog"
-PIPELINE_ID = "baltor.demo.public-source-catalog.v0"
+PIPELINE_ID = "baltor.demo.public-source-catalog"
 SOURCE_HANDLE_PREFIX = "ctx://baltor-demo/source-catalog"
 
 
@@ -95,7 +95,7 @@ def context_object(entry: dict[str, Any], generated_at: str) -> dict[str, Any]:
     source_id = slug(entry.get("source_id") or entry.get("name"))
     source_handle = handle(entry)
     return {
-        "kind": "baltor.context-object.v1",
+        "kind": "baltor.context-object",
         "context_object_id": f"context-object/demo-source-{source_id}",
         "current_version_id": f"context-version/demo-source-{source_id}-{stable_hash(entry)[7:19]}",
         "source_system": "baltor_demo_source_catalog",
@@ -188,7 +188,7 @@ def build_pack(entries: list[dict[str, Any]], objects: list[dict[str, Any]], mat
     domains = Counter(str(entry.get("domain") or "unknown") for entry in entries)
     pack_types = Counter(str(entry.get("demo_pack_type") or "custom") for entry in entries)
     return {
-        "kind": "baltor.context-pack.v1",
+        "kind": "baltor.context-pack",
         "context_pack_id": f"context-pack/public-source-demo-catalog-{stable_hash(source_handles)[7:19]}",
         "pack_type": "custom",
         "task": "Plan public data and repo demos that showcase the full Baltor context pipeline.",
@@ -257,7 +257,7 @@ def build_pack(entries: list[dict[str, Any]], objects: list[dict[str, Any]], mat
 
 def build_receipt(pack: dict[str, Any], source_records: list[dict[str, Any]], generated_at: str) -> dict[str, Any]:
     return {
-        "kind": "baltor.context-receipt.v0",
+        "kind": "baltor.context-receipt",
         "receipt_id": "receipt-" + pack["context_pack_id"].split("/")[-1],
         "pack_id": pack["context_pack_id"],
         "generated_at": generated_at,

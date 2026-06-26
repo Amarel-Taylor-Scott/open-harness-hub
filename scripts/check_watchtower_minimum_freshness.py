@@ -143,23 +143,23 @@ def _self_test() -> int:
     check("refresh is deterministic (same result_id + evidence_id across reruns)",
           res_a.result_id == result.result_id and res_a.evidence["evidence_id"] == result.evidence["evidence_id"])
 
-    # 8) a sample of EACH of the 6 contract schemas validates via validate_ref(artifacts/<Name>.v1)
+    # 8) a sample of EACH of the 6 contract schemas validates via validate_ref(artifacts/<Name>)
     samples = {
-        "FactAssertion.v1": tpriv_assert.to_dict(),
-        "CanonicalFact.v1": global_fact.to_dict(),
-        "FragilityMetadata.v1": rege_frag.to_dict(),
-        "WatchPolicy.v1": rege_pol.to_dict(),
-        "VerificationTask.v1": task.to_dict(),
-        "VerificationResult.v1": result.to_dict(),
+        "FactAssertion": tpriv_assert.to_dict(),
+        "CanonicalFact": global_fact.to_dict(),
+        "FragilityMetadata": rege_frag.to_dict(),
+        "WatchPolicy": rege_pol.to_dict(),
+        "VerificationTask": task.to_dict(),
+        "VerificationResult": result.to_dict(),
     }
     for name, sample in samples.items():
         errs = validate_ref(sample, f"artifacts/{name}")
         check(f"sample {name} validates against its schema", errs == [], str(errs[:2]))
     # also validate the immutable (no_refresh, null horizon) fragility + policy variant
     check("no_refresh FragilityMetadata (null horizon) validates",
-          validate_ref(demo_frag.to_dict(), "artifacts/FragilityMetadata.v1") == [])
+          validate_ref(demo_frag.to_dict(), "artifacts/FragilityMetadata") == [])
     check("no_refresh WatchPolicy validates",
-          validate_ref(demo_pol.to_dict(), "artifacts/WatchPolicy.v1") == [])
+          validate_ref(demo_pol.to_dict(), "artifacts/WatchPolicy") == [])
 
     # 9) GATE-COMPATIBILITY: the fragility dict drives the C40 VerificationGate as designed.
     gate = VerificationGate()

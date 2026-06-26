@@ -4,14 +4,14 @@ projects the LIVE Inference Gateway honestly — request carries an input HASH n
 records the governed-fallback trail; the receipt's allowed_use is never 'served'.
 
 Asserts:
-  A. CONTRACTS: InferenceRequest.v1 + ModelRouteDecision.v1 registered.
-  B. REQUEST: make_inference_request conforms to InferenceRequest.v1; carries input_hash; the RAW prompt text is
+  A. CONTRACTS: InferenceRequest + ModelRouteDecision registered.
+  B. REQUEST: make_inference_request conforms to InferenceRequest; carries input_hash; the RAW prompt text is
      NOT present anywhere in the request (privacy).
   C. ROUTE (clean): a credentialed preferred external node selects without fallback; project_route_decision
-     conforms to ModelRouteDecision.v1.
+     conforms to ModelRouteDecision.
   D. ROUTE (governed fallback): with no credentials the gateway falls back (fallback_used, reason codes recorded,
      not silent); still conforms; blocked is a boolean.
-  E. RECEIPT: infer_local's receipt conforms to ModelInvocationReceipt.v1 and allowed_use is never 'served'.
+  E. RECEIPT: infer_local's receipt conforms to ModelInvocationReceipt and allowed_use is never 'served'.
   F. DETERMINISM + DEPENDENCY LAW: projectors pure; src/teleon/io never imports src.baltor.
 
 Deterministic + offline. Exit 0/1.
@@ -49,14 +49,14 @@ def _self_test() -> int:
         return all(k in rec for k in _required(rel))
 
     contracts = json.dumps(json.loads((_REPO / "architecture" / "contract_registry.json").read_text()))
-    check("A: InferenceRequest.v1 + ModelRouteDecision.v1 registered",
-          "inference/InferenceRequest.v1.schema.json" in contracts and "inference/ModelRouteDecision.v1.schema.json" in contracts)
+    check("A: InferenceRequest + ModelRouteDecision registered",
+          "inference/InferenceRequest.schema.json" in contracts and "inference/ModelRouteDecision.schema.json" in contracts)
 
     secret = "super-secret-prompt-body-xyz"
     req = make_inference_request(object_id="obj-1", requested_model_class="tier:500/[500]",
                                  input_text=secret, now=_NOW, preference_id="pref-1")
     check("B: request conforms + input hashed + raw text absent",
-          conforms(req, "inference/InferenceRequest.v1.schema.json") and req["input_hash"].startswith("sha256:")
+          conforms(req, "inference/InferenceRequest.schema.json") and req["input_hash"].startswith("sha256:")
           and secret not in json.dumps(req), json.dumps(req))
 
     pref = [{"preference_id": "pref-1",
@@ -69,18 +69,18 @@ def _self_test() -> int:
     rc = project_route_decision(route_clean)
     check("C: credentialed preferred node selected, no fallback; route conforms",
           rc.get("selected_provider_node_id") == "model.anthropic.frontier@candidate" and rc.get("fallback_used") is False
-          and conforms(rc, "inference/ModelRouteDecision.v1.schema.json"), json.dumps(rc))
+          and conforms(rc, "inference/ModelRouteDecision.schema.json"), json.dumps(rc))
 
     route_fb = oips.select_provider(resolved, available_secrets=set())
     rf = project_route_decision(route_fb)
     check("D: no creds -> governed fallback recorded (not silent); conforms; blocked is bool",
           rf.get("fallback_used") is True and rf.get("fallback_reason_codes") and isinstance(rf.get("blocked"), bool)
-          and conforms(rf, "inference/ModelRouteDecision.v1.schema.json"), json.dumps(rf))
+          and conforms(rf, "inference/ModelRouteDecision.schema.json"), json.dumps(rf))
 
     res = oips.infer_local(object_id="obj-1", preference_layers=pref, input_text=secret, now=_NOW)
     rcpt = res["receipt"]
     check("E: receipt conforms + allowed_use never 'served'",
-          conforms(rcpt, "inference/ModelInvocationReceipt.v1.schema.json") and rcpt["allowed_use"] != "served", rcpt.get("allowed_use"))
+          conforms(rcpt, "inference/ModelInvocationReceipt.schema.json") and rcpt["allowed_use"] != "served", rcpt.get("allowed_use"))
 
     check("F: projectors deterministic",
           project_route_decision(route_clean) == rc and make_inference_request(object_id="obj-1", requested_model_class="tier:500/[500]", input_text=secret, now=_NOW, preference_id="pref-1") == req)

@@ -51,7 +51,7 @@ def run_model_compatibility(digest: dict, *, now: str, candidate_nodes: list[str
             use = "production_allowed_after_gate"
         else:
             use = "eval_only"             # external, not credentialed offline → cannot verify yet
-        reports.append({"schema_version": "ModelCompatibilityReport.v1", "skill_id": digest["skill_id"],
+        reports.append({"schema_version": "ModelCompatibilityReport", "skill_id": digest["skill_id"],
                         "provider_node_id": nid, "tier_code": node.get("tier_code"),
                         "specialization_match": spec_match, "structured_output_ok": structured_ok,
                         "input_class": "object", "cost_estimate": None, "latency_ms": None,

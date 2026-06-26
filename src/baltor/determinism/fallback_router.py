@@ -70,7 +70,7 @@ class RoutingEvent:
     fabricated: bool                # invariant — always False (a fallback never invents a fact)
     input_signature: str            # a content hash of the routed input (for mining / dedupe)
     created_at: str = EPOCH
-    schema_version: str = "RoutingEvent.v1"
+    schema_version: str = "RoutingEvent"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "event_id": self.event_id,

@@ -63,7 +63,7 @@ def extract_determinism(skill: dict) -> dict[str, Any]:
     cascade = [t for t in RUNTIME_CASCADE if t == "cache" or t == "deterministic" and det or t in adaptive]
     if det and "deterministic" not in cascade:
         cascade.insert(1, "deterministic")
-    return {"schema_version": "DeterminismExtractionReport.v1", "skill_id": skill["name"],
+    return {"schema_version": "DeterminismExtractionReport", "skill_id": skill["name"],
             "deterministic_substeps": det,
             "unresolved_adaptive_steps": adaptive or ["llm_for_ambiguous"],
             "recommended_cascade": cascade or ["llm", "human"],
@@ -82,7 +82,7 @@ def digest_skill(skill: dict, *, source_ref: str, now: str) -> dict[str, Any]:
         decision = "quarantine"
     else:
         decision = "intake_as_skill_candidate"
-    return {"schema_version": "SkillDigestRun.v1", "skill_id": skill_id, "source_ref": source_ref,
+    return {"schema_version": "SkillDigestRun", "skill_id": skill_id, "source_ref": source_ref,
             "source_hash": "sha256:" + hashlib.sha256(skill["raw"].encode()).hexdigest(),
             "capability_slots": [skill_id.replace("-", "_")],
             "required_tools": skill.get("required_tools", []), "required_models": skill.get("required_models", []),
@@ -96,7 +96,7 @@ def digest_skill(skill: dict, *, source_ref: str, now: str) -> dict[str, Any]:
 def build_runtime_candidate(digest: dict, *, now: str) -> dict[str, Any]:
     """A cheaper runtime candidate distilled from the digest — status candidate, original kept as fallback."""
     cid = "rtcand_" + hashlib.blake2b(f"{digest['skill_id']}|{now}".encode(), digest_size=10).hexdigest()
-    return {"schema_version": "SkillToRuntimeCandidate.v1", "candidate_id": cid, "skill_id": digest["skill_id"],
+    return {"schema_version": "SkillToRuntimeCandidate", "candidate_id": cid, "skill_id": digest["skill_id"],
             "capability_slot": digest["capability_slots"][0], "runtime_cascade": digest["recommended_runtime_paths"],
             "fallback_skill_ref": digest["fallback_skill_ref"], "status": "candidate",
             "proof_to_promote": digest["proof_to_promote"], "is_truth": False, "created_at": now}

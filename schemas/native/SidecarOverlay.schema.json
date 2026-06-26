@@ -1,0 +1,73 @@
+{
+  "$id": "native/SidecarOverlay", "title": "SidecarOverlay", "type": "object", "additionalProperties": false,
+  "description": "The governance power that rides ALONGSIDE a same-shape native output without touching the customer's tables/keys/columns: 'do not change my data, give me the context elsewhere'. The sidecar carries per-field facts, the held-out claims that were NOT served (held out is NEVER deleted — it stays visible here), detected conflicts and their reconciliations, verification receipts, warnings, and a field_map (native_path -> source_handle -> artifact_id -> claim_status). held_out_claims and field_map are REQUIRED to exist (even when empty) so a reader can always tell omission from erasure. source_hash binds the overlay to the exact input bytes.",
+  "required": ["schema_version", "source_hash", "held_out_claims", "field_map", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["SidecarOverlay"]},
+    "sidecar_id": {"type": "string"},
+    "source_hash": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "source_id": {"type": "string"},
+    "artifact_ids": {"type": "array", "items": {"type": "string"}},
+    "field_facts": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["native_path", "claim_status"],
+      "properties": {
+        "native_path": {"type": "string"},
+        "value": {"type": "string"},
+        "claim_status": {"type": "string", "enum": ["verified", "unverified", "unverified_allegation", "held_out", "reconciled", "conflicted"]},
+        "source_handle": {"type": "string"},
+        "artifact_id": {"type": "string"},
+        "verification_receipt_id": {"type": "string"}
+      }}},
+    "held_out_claims": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["claim", "reason"],
+      "properties": {
+        "claim": {"type": "string"},
+        "reason": {"type": "string"},
+        "artifact_id": {"type": "string"},
+        "source_handle": {"type": "string"},
+        "native_path": {"type": "string"}
+      }}},
+    "conflicts": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["native_path", "detail"],
+      "properties": {
+        "native_path": {"type": "string"},
+        "detail": {"type": "string"},
+        "candidate_values": {"type": "array", "items": {"type": "string"}},
+        "source_handles": {"type": "array", "items": {"type": "string"}}
+      }}},
+    "reconciliations": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["native_path", "chosen_value", "reason"],
+      "properties": {
+        "native_path": {"type": "string"},
+        "chosen_value": {"type": "string"},
+        "reason": {"type": "string"},
+        "rejected_values": {"type": "array", "items": {"type": "string"}},
+        "receipt_id": {"type": "string"}
+      }}},
+    "verification_receipts": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["receipt_id"],
+      "properties": {
+        "receipt_id": {"type": "string"},
+        "native_path": {"type": "string"},
+        "method": {"type": "string"},
+        "result": {"type": "string", "enum": ["verified", "unverified", "rejected"]}
+      }}},
+    "warnings": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["native_path", "message"],
+      "properties": {
+        "native_path": {"type": "string"},
+        "message": {"type": "string"},
+        "severity": {"type": "string", "enum": ["info", "warning", "critical"]}
+      }}},
+    "field_map": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["native_path", "source_handle", "claim_status"],
+      "properties": {
+        "native_path": {"type": "string"},
+        "source_handle": {"type": "string"},
+        "artifact_id": {"type": "string"},
+        "claim_status": {"type": "string", "enum": ["verified", "unverified", "unverified_allegation", "held_out", "reconciled", "conflicted"]}
+      }}},
+    "created_at": {"type": "string"}
+  }
+}

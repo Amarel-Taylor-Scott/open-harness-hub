@@ -6,11 +6,11 @@ processor results, failures — is one of these envelopes, so CFPB → ESG → c
 → LLM extractors can be swapped without rewriting the runtime. These are SHAPES, not a bus: the bus stays
 ``scripts.context_events`` and durability stays ``scripts.durable_store``.
 
-  CommandEnvelope.v1 — work to be done (durable queue payload)
-  EventEnvelope.v1   — a fact about what happened (CloudEvents 1.0-compatible)
-  ArtifactEnvelope.v1— a stored object (lineage + governance + security)
-  ProcessorResult.v1 — what a processor returns (artifacts/events/commands/metrics)
-  ErrorEnvelope.v1   — a classified failure (retryable vs permanent)
+  CommandEnvelope — work to be done (durable queue payload)
+  EventEnvelope   — a fact about what happened (CloudEvents 1.0-compatible)
+  ArtifactEnvelope— a stored object (lineage + governance + security)
+  ProcessorResult — what a processor returns (artifacts/events/commands/metrics)
+  ErrorEnvelope   — a classified failure (retryable vs permanent)
 
 Determinism: ids are content-derived and ``created_at`` is INJECTED (never a clock read), so envelopes are
 byte-stable in proofs (the C45 lesson). Canonical field names are enforced (see CANONICAL_FIELDS + the
@@ -61,7 +61,7 @@ class CommandEnvelope:
     payload: dict = field(default_factory=dict)
     created_at: str = EPOCH
     command_id: str = ""
-    schema_version: str = "CommandEnvelope.v1"
+    schema_version: str = "CommandEnvelope"
 
     def __post_init__(self) -> None:
         if not self.command_id:
@@ -96,7 +96,7 @@ class EventEnvelope:
     id: str = ""
     specversion: str = "1.0"
     datacontenttype: str = "application/json"
-    baltor_schema: str = "EventEnvelope.v1"
+    baltor_schema: str = "EventEnvelope"
 
     def __post_init__(self) -> None:
         if not self.id:
@@ -128,7 +128,7 @@ class ArtifactEnvelope:
     lineage: dict = field(default_factory=dict)       # run_id, pipeline_id/version, processor_id/version, processor_config_hash
     governance: dict = field(default_factory=dict)    # claim_status, promotion_eligible, model_dependent, requires_human_review
     security: dict = field(default_factory=dict)      # classification, kms_key_ref, retention_policy_id
-    schema_version: str = "ArtifactEnvelope.v1"
+    schema_version: str = "ArtifactEnvelope"
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -151,7 +151,7 @@ class ErrorEnvelope:
     failed_schema: str = ""
     details: dict = field(default_factory=dict)
     error_id: str = ""
-    schema_version: str = "ErrorEnvelope.v1"
+    schema_version: str = "ErrorEnvelope"
 
     def __post_init__(self) -> None:
         if not self.error_id:
@@ -174,7 +174,7 @@ class ProcessorResult:
     metrics: dict = field(default_factory=dict)
     warnings: list = field(default_factory=list)
     errors: list = field(default_factory=list)        # list[ErrorEnvelope|dict]
-    schema_version: str = "ProcessorResult.v1"
+    schema_version: str = "ProcessorResult"
 
     @staticmethod
     def make_ok(*, run_id: str, step_id: str, processor_id: str, processor_version: str,

@@ -1,7 +1,7 @@
 """src.teleon.ports.reward_provider — the SHARED REWARD-PROVIDER port (canonical TELEON home).
 
 A reward provider SCORES one environment run against a declared :data:`RewardSpec` and returns a
-``RewardResult``-shaped dict (see ``schemas/environments/RewardResult.v1``). Deterministic checkers are
+``RewardResult``-shaped dict (see ``schemas/environments/RewardResult``). Deterministic checkers are
 preferred (``deterministic=True``); test runners / diff oracles are candidates behind the same port.
 
 THE INVARIANT: **a reward result is EVIDENCE, never authority.** Every result carries ``is_truth=False``

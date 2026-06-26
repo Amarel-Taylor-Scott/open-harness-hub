@@ -5,9 +5,9 @@ ratifies the repo's existing typed-I/O contracts (no duplicate shells) and fills
 Asserts:
   A. SPINE MAP: architecture/shared_io_spine.json — every contract marked exists/new resolves to a real schema
      file (no dangling refs); the law clause + shared-vs-separate split are recorded.
-  B. OBJECT SHELL RATIFIED: ObjectShell.v1 is registered, and the EXISTING canonical shell builder
-     (src/teleon/templates/compose_object_shell) produces an object carrying ALL ObjectShell.v1 required fields.
-  C. CANONICAL SHELL: 14 sections; required_core is a subset of ObjectShell.v1 required.
+  B. OBJECT SHELL RATIFIED: ObjectShell is registered, and the EXISTING canonical shell builder
+     (src/teleon/templates/compose_object_shell) produces an object carrying ALL ObjectShell required fields.
+  C. CANONICAL SHELL: 14 sections; required_core is a subset of ObjectShell required.
   D. ENVELOPES RATIFIED (not duplicated): Command/Event/Error envelopes are referenced by the spine + exist;
      EventEnvelope is CloudEvents 1.0; ErrorEnvelope carries error_type + retryable.
   E. RESOURCE LAYER: the 6 resource schemas exist + are registered; KIND/OWNERSHIP codes come from the single
@@ -55,29 +55,29 @@ def _self_test() -> int:
           bool(spine.get("law_clause")) and "truth" in json.dumps(spine["shared_vs_separate"]["separate"]))
 
     contracts = json.dumps(json.loads((A / "contract_registry.json").read_text()))
-    check("B: ObjectShell.v1 registered", "shared/ObjectShell.v1.schema.json" in contracts)
-    shell_schema = json.loads((_REPO / "schemas" / "shared" / "ObjectShell.v1.schema.json").read_text())
+    check("B: ObjectShell registered", "shared/ObjectShell.schema.json" in contracts)
+    shell_schema = json.loads((_REPO / "schemas" / "shared" / "ObjectShell.schema.json").read_text())
     obj = TPL.compose_object_shell(object_id="x", object_type="DemoArtifact", mixin_ids=None, now=_NOW, payload={"a": 1})
     missing = [k for k in shell_schema["required"] if k not in obj]
-    check("B: compose_object_shell conforms to ObjectShell.v1 (all required fields present)", not missing, str(missing))
+    check("B: compose_object_shell conforms to ObjectShell (all required fields present)", not missing, str(missing))
 
     canon = json.loads((_REPO / "templates" / "schema-objects" / "canonical_object_shell.json").read_text())
     check("C: canonical shell has 14 sections", len(canon["sections"]) == 14, str(len(canon["sections"])))
-    check("C: required_core subset of ObjectShell.v1 required", set(canon["required_core"]) <= set(shell_schema["required"]))
+    check("C: required_core subset of ObjectShell required", set(canon["required_core"]) <= set(shell_schema["required"]))
 
     refs = {c["name"]: c for L in spine["layers"] for c in L["contracts"]}
     check("D: Command/Event/Error envelopes ratified in spine + exist",
           all(refs.get(n, {}).get("status") == "exists" and (_REPO / refs[n]["schema"]).exists()
-              for n in ("CommandEnvelope.v1", "EventEnvelope.v1", "ErrorEnvelope.v1")))
-    ee = json.loads((_REPO / "schemas" / "envelopes" / "EventEnvelope.v1.schema.json").read_text())
-    err = json.loads((_REPO / "schemas" / "envelopes" / "ErrorEnvelope.v1.schema.json").read_text())
+              for n in ("CommandEnvelope", "EventEnvelope", "ErrorEnvelope")))
+    ee = json.loads((_REPO / "schemas" / "envelopes" / "EventEnvelope.schema.json").read_text())
+    err = json.loads((_REPO / "schemas" / "envelopes" / "ErrorEnvelope.schema.json").read_text())
     check("D: EventEnvelope is CloudEvents 1.0", "1.0" in ee["properties"]["specversion"].get("enum", []))
     check("D: ErrorEnvelope carries error_type + retryable",
           "error_type" in err["properties"] and "retryable" in err["properties"])
 
     for s in ("ResourceRef", "ResourceBinding", "DataResourceSpec", "SecretRef", "KeyRef", "ResourceProvisionReceipt"):
-        check(f"E: {s}.v1 schema exists + registered",
-              (_REPO / "schemas" / "resources" / f"{s}.v1.schema.json").exists() and f"resources/{s}.v1.schema.json" in contracts)
+        check(f"E: {s} schema exists + registered",
+              (_REPO / "schemas" / "resources" / f"{s}.schema.json").exists() and f"resources/{s}.schema.json" in contracts)
     check("E: KIND/OWNERSHIP codes from single source (shared_resource_spine.json)",
           R.KIND["relational_table"] == 100 and R.OWNERSHIP["managed_persistent"] == 200)
     rref = R.make_resource_ref(logical_name="facts_main", kind_code=R.KIND["relational_table"], ownership_code=R.MANAGED_PERSISTENT)
@@ -126,7 +126,7 @@ def _self_test() -> int:
     per_rcpt = R.provision_receipt(persist, now=_NOW, outcome="reused_existing")
     check("H: ephemeral receipt → cleanup_required True; persistent → False",
           eph_rcpt["cleanup_required"] is True and per_rcpt["cleanup_required"] is False
-          and eph_rcpt["schema_version"] == "ResourceProvisionReceipt.v1")
+          and eph_rcpt["schema_version"] == "ResourceProvisionReceipt")
 
     check("I: builders + receipts deterministic",
           R.make_data_resource_spec(logical_name="scratch", kind_code=R.KIND["temp_dataset"], ownership_code=R.PIPELINE_TEMP, ttl_seconds=3600) == temp

@@ -14,7 +14,7 @@ _HELD_OUT_ANSWER = "30 days"
 
 def _receipt(op: str, tenant_id: str, node_ids: list, edge_ids: list, *, now: str = EPOCH) -> dict:
     body = {"op": op, "tenant_id": tenant_id, "node_ids": sorted(node_ids), "edge_ids": sorted(edge_ids)}
-    return {"schema_version": "TemporalGraphReceipt.v1", "receipt_id": "tgr-" + content_hash(body)[7:27],
+    return {"schema_version": "TemporalGraphReceipt", "receipt_id": "tgr-" + content_hash(body)[7:27],
             "op": op, "tenant_id": tenant_id, "node_ids": sorted(node_ids), "edge_ids": sorted(edge_ids),
             "policy_id": "authority_then_freshness", "created_at": now, "content_hash": content_hash(body)}
 

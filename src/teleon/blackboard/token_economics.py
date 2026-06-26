@@ -61,6 +61,11 @@ PER_QUESTION_SHELL_CHARS = 280
 #: stateful read size; the proof depends on this being far smaller than the full doc set, not on its exact value.
 ENTRIES_READ_PER_QUESTION = 4
 
+#: Maximum characters kept in a compact observation digest. The compact entry is intentionally a SMALL fraction of
+#: the source doc; this is the lever that makes the per-question stateful read cheap. Single source: every
+#: observation digest produced by this module is bounded by this constant. Unit: characters.
+OBSERVATION_DIGEST_MAX_CHARS = 160
+
 #: The source documents under demo-data/cfpb-sample that a reader would actually "read" (the seed-graph.json and
 #: compiled .pyc are excluded — they are machine artifacts, not the prose/code a model would read). Relative to
 #: the cfpb-sample dir; resolved lazily so importing this module never touches disk.
@@ -114,17 +119,13 @@ def _distill_entries(docs: Mapping[str, str]) -> list[dict[str, Any]]:
     points back to its source). Pure + deterministic: ids are content-addressed; the digest is a deterministic
     slice. ``serves_truth`` is never set (the store pins it False — this is working state, never truth).
     """
-    #: max characters of a doc kept in a compact observation digest. The compact entry is intentionally a SMALL
-    #: fraction of the doc; this is the lever that makes the per-question stateful read cheap. Named constant.
-    digest_max_chars = 160
-
     entries: list[dict[str, Any]] = []
     for rel in sorted(docs):  # deterministic order over the doc set
         text = docs[rel]
         source_id = canonical_id("src", rel)
         handle = f"ctx://cfpb-sample/{rel}"  # a stable provenance handle back to the source doc
         # a one-line deterministic digest: the first non-trivial run of the doc, whitespace-collapsed + bounded.
-        digest = " ".join(text.split())[:digest_max_chars]
+        digest = " ".join(text.split())[:OBSERVATION_DIGEST_MAX_CHARS]
         entries.append(
             {
                 "kind": KIND_SOURCE,
@@ -336,6 +337,7 @@ __all__ = [
     "ESTIMATE_METHOD",
     "PER_QUESTION_SHELL_CHARS",
     "ENTRIES_READ_PER_QUESTION",
+    "OBSERVATION_DIGEST_MAX_CHARS",
     "CFPB_SAMPLE_DOC_RELPATHS",
     "estimate_tokens",
     "load_cfpb_sample_docs",

@@ -1,5 +1,5 @@
 {
-  "version": "InferenceLaneProfiles.v1",
+  "version": "InferenceLaneProfiles",
   "purpose": "The interchangeable INFERENCE LANES a capability unit can run its model calls on — local (deterministic stub, self-hosted Ollama) and cloud (Gemma via OpenRouter, Mistral, OpenAI Codex, OpenAI frontier, Anthropic). Codex is a first-class lane here, an ALTERNATIVE to the local Ollama/Gemma layers. The objective layer picks the lane per the tenant's priority (minimize_cost -> a free local lane; an accuracy/capability priority -> a capable cloud lane like Codex); the org guardrail policy can FORBID lanes (an air-gapped org forbids every cloud lane -> inference falls back to local Ollama; a no-LLM org forbids every model lane). Mirrors the provider-endpoint registry, one layer up. Each lane maps to a node in architecture/model_provider_graph.json (oips handles eligibility/fallback/receipts for the chosen lane). cost = relative per-call units; capability is a 0..1 capability/quality prior (-> accuracy dimension). Data only; read by src/teleon/inference/lane_selection.py; never a src.baltor symbol; LLM output is never truth.",
   "lanes": [
     {"lane_id": "model.local_stub@v1", "display": "local deterministic stub", "egress": "local",

@@ -1,0 +1,16 @@
+{
+  "$id": "resources/ResourceRef",
+  "title": "ResourceRef",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A portable reference to a shared resource (table, bucket, queue, vector index, graph store, sandbox volume, temp dataset, object store). Business logic NEVER names a raw table/bucket/path or embeds a raw key — it carries a ResourceRef whose logical_name + kind_code + ownership_code resolve to a physical resource via a ResourceBinding. kind_code/ownership_code -> architecture/shared_resource_spine.json.",
+  "required": ["resource_ref", "logical_name", "kind_code", "ownership_code"],
+  "properties": {
+    "resource_ref": {"type": "string", "description": "stable handle, e.g. res://<logical_name>"},
+    "logical_name": {"type": "string"},
+    "kind_code": {"type": "integer"},
+    "ownership_code": {"type": "integer"},
+    "binding_ref": {"type": ["string", "null"], "description": "id of the ResourceBinding that resolves the physical resource"},
+    "tenant_id": {"type": ["string", "null"]}
+  }
+}

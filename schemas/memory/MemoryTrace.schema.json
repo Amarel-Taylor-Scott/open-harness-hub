@@ -1,0 +1,19 @@
+{
+  "$id": "memory/MemoryTrace", "title": "MemoryTrace", "type": "object", "additionalProperties": false,
+  "description": "An auditable, lossless trace of one memory operation (write or recall) through a provider behind a Baltor wrapper. Records the provider used, the (tenant_id, container) scope, the artifacts touched, and the held-out/rejected sets so the operation is reproducible and reversible. Lossless distillation: held_out and rejected are PRESERVED here, never deleted; a rollback_target is always recorded so no transform is irreversible. A trace asserts nothing about canonical truth — it only proves what was remembered/recalled, by whom, from where, and how to roll it back.",
+  "required": ["schema_version", "trace_id", "tenant_id", "container", "operation", "provider_id", "occurred_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["MemoryTrace"]},
+    "trace_id": {"type": "string", "description": "Content-addressed id over the operation (deterministic)."},
+    "tenant_id": {"type": "string"},
+    "container": {"type": "string"},
+    "operation": {"type": "string", "enum": ["write", "recall", "profile", "promote", "hold_out", "rollback"], "description": "The memory operation traced. 'promote' is recorded ONLY when the downstream gates promoted a candidate; the provider/wrapper never sets it on its own."},
+    "provider_id": {"type": "string"},
+    "request_handle": {"type": "string", "description": "Hash/ref of the originating request (write/search) for replay."},
+    "produced_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "Candidate MemoryArtifact ids produced by this operation."},
+    "held_out_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "Artifacts deliberately NOT served. Preserved (held_out != deleted)."},
+    "rejected_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "Artifacts rejected by a gate. Preserved for audit (rejected != deleted)."},
+    "rollback_target": {"type": "string", "description": "The state/artifact id this operation can be rolled back to. Always recorded."},
+    "occurred_at": {"type": "string", "description": "Injected operation time (deterministic; no wall-clock)."}
+  }
+}

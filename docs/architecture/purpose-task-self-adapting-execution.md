@@ -23,11 +23,11 @@ to cloud execution units. Adaptation cost is amortized across thousands of cheap
 
 ## What a PurposeTask is (declared by intent)
 ```
-PurposeTaskSpec.v1
+PurposeTaskSpec
   task_id:            purpose_tasks.pull_sample_info@v1
   purpose:            "Go to sample.com and pull down X information."
-  input_contract:     X            # e.g. SampleQuery.v1
-  output_contract:    Y            # e.g. SampleRecord.v1
+  input_contract:     X            # e.g. SampleQuery
+  output_contract:    Y            # e.g. SampleRecord
   connected_to:       [systems/consumers that depend on Y]   # the blast radius
   success_criteria:   Z            # MEASURABLE thresholds: correctness, freshness, cost ceiling,
                                    #   latency SLA, source-handle coverage, safety = 0 leaks

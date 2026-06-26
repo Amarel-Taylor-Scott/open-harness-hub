@@ -1,0 +1,60 @@
+{
+  "$id": "graph/TemporalFactObservation",
+  "title": "TemporalFactObservation",
+  "description": "An append-only observation of a fact assertion (the current projection is reconstructable from observations + policy).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "observation_id": {
+      "type": "string"
+    },
+    "temporal_fact_id": {
+      "type": "string"
+    },
+    "canonical_fact_key": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "value_normalized": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string"
+    },
+    "source_authority": {
+      "type": "string"
+    },
+    "source_handles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "observed_at": {
+      "type": "string"
+    },
+    "valid_from": {
+      "type": "string"
+    },
+    "valid_to": {
+      "type": "string"
+    },
+    "source_version": {
+      "type": "string"
+    },
+    "claim_status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "observation_id",
+    "canonical_fact_key",
+    "tenant_id",
+    "value_normalized",
+    "content_hash",
+    "source_authority",
+    "observed_at"
+  ]
+}

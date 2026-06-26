@@ -1,0 +1,17 @@
+{
+  "$id": "VerificationResult", "title": "VerificationResult", "type": "object", "additionalProperties": true,
+  "required": ["schema_version", "result_id", "task_id", "fact_id", "scope", "new_status", "applied", "verified_at", "evidence"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["VerificationResult"]},
+    "result_id": {"type": "string"},
+    "task_id": {"type": "string"},
+    "fact_id": {"type": "string"},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_override", "system_reference"]},
+    "new_status": {"type": "string", "enum": ["candidate", "verified_current", "stale", "contested", "superseded", "held_out", "tenant_override", "needs_human", "deprecated"]},
+    "applied": {"type": "boolean"},
+    "verified_at": {"type": "integer"},
+    "evidence": {"type": "object", "additionalProperties": true},
+    "next_verify_at": {},
+    "reason": {"type": "string"}
+  }
+}

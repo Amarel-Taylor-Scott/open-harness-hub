@@ -38,8 +38,8 @@ Neither destination is "serve the majority output as the answer." `ConsensusRun.
 
 ## Contracts
 
-`ConsensusRun.v1` (records `agreement_score`, `clusters`, `disagreement_clusters`, `routing`,
-`can_serve_fact=False`). Projected into the trace store as a `consensus`-kind `WorkflowTrace.v1` with
+`ConsensusRun` (records `agreement_score`, `clusters`, `disagreement_clusters`, `routing`,
+`can_serve_fact=False`). Projected into the trace store as a `consensus`-kind `WorkflowTrace` with
 `verified=False`.
 
 ## Inputs / Outputs

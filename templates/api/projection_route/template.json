@@ -1,0 +1,24 @@
+{
+  "template_id": "api.projection_route",
+  "standard_id": "standard.api_projection",
+  "variables": [
+    {"name": "area", "required": true, "description": "lowercase area token; becomes scripts/api_<area>_handler.py and docs/api/<area>.md"},
+    {"name": "route_path", "required": true, "description": "the HTTP path this handler owns, e.g. /api/<area>/serve"},
+    {"name": "returns_contract", "required": true, "description": "the registered contract returned, e.g. ContextResponse"},
+    {"name": "title", "required": true, "description": "human title for the route"},
+    {"name": "owner", "required": true, "description": "owning module/path or team"}
+  ],
+  "files": [
+    {"path_template": "scripts/api_{{area}}_handler.py", "source": "files/scripts/api_area_handler.py"},
+    {"path_template": "scripts/check_{{area}}_api.py", "source": "files/scripts/check_area_api.py"},
+    {"path_template": "docs/api/{{area}}.md", "source": "files/docs/api/area.md"}
+  ],
+  "required_commands_after_generation": [
+    "python3 scripts/check_{{area}}_api.py --self-test"
+  ],
+  "required_registry_updates": [
+    "architecture/contract_registry.json#api_routes += GET {{route_path}} (returns {{returns_contract}}, projection_only:true, owner scripts/api_{{area}}_handler.py)"
+  ],
+  "required_proofs": ["scripts/check_{{area}}_api.py"],
+  "required_docs": ["docs/api/{{area}}.md"]
+}

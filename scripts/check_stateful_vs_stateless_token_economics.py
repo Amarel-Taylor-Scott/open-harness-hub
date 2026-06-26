@@ -44,6 +44,7 @@ if str(_REPO) not in sys.path:
 
 from src.teleon.blackboard.token_economics import (  # noqa: E402
     ESTIMATE_METHOD,
+    OBSERVATION_DIGEST_MAX_CHARS,
     estimate_token_economics,
     estimate_tokens,
     load_cfpb_sample_docs,
@@ -142,6 +143,10 @@ def _self_test() -> int:
           estimate_tokens("the sanction took effect on 2026-04-15")
           == estimate_tokens("the sanction took effect on 2026-04-15"))
     check("C: estimate_tokens('') == 0 (empty text costs nothing)", estimate_tokens("") == 0)
+    # the digest cap is a single-source constant; any change to it is a seam and must be asserted here.
+    check("C: digest max-chars is exported as OBSERVATION_DIGEST_MAX_CHARS and is positive",
+          isinstance(OBSERVATION_DIGEST_MAX_CHARS, int) and OBSERVATION_DIGEST_MAX_CHARS > 0,
+          f"OBSERVATION_DIGEST_MAX_CHARS={OBSERVATION_DIGEST_MAX_CHARS}")
 
     # ---- D. PROVENANCE PRESERVED ---------------------------------------------------------
     check("D: source_handle_coverage > 0 (every distilled doc keeps a source handle)",

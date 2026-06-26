@@ -50,7 +50,7 @@ def _self_test() -> int:
     code, ing = handle("POST", "/api/native/ingest",
                        {"tenant_id": "demo", "content": {"deadline": "30 days", "product": "card"}, "format": "json"})
     check("POST ingest returns 200", code == 200, str(code))
-    check("ingest result is NativeIngestResult.v1", ing.get("schema_version") == "NativeIngestResult.v1")
+    check("ingest result is NativeIngestResult", ing.get("schema_version") == "NativeIngestResult")
     check("ingest mutated_canonical_truth=false", ing.get("mutated_canonical_truth") is False)
     check("ingest served_fact=false", ing.get("served_fact") is False)
     check("ingest returns source_id + source_hash + refs",

@@ -15,7 +15,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("entity_extraction", "local_rules"),
     task_types=("entity.extract",),
     image="baltor-worker-cpu",
-    output_contract="entities.v1",
+    output_contract="entities",
 )
 def entity_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = payload.get("chunks") or chunk_text(str(payload.get("text") or ""))

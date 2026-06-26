@@ -36,8 +36,8 @@ _TAXONOMY = _REPO / "architecture" / "fragile_context_taxonomy.json"
 _ATLAS = _REPO / "architecture" / "fragile_context_atlas.json"
 _DEMOS = _REPO / "web" / "baltor" / "guided-demos.html"
 _INDUSTRIES = _REPO / "vocabularies" / "industries.yaml"
-_FRAGILITY_SCHEMA = _REPO / "schemas" / "artifacts" / "FragilityMetadata.v1.schema.json"
-_CANONICAL_FACT_SCHEMA = _REPO / "schemas" / "artifacts" / "CanonicalFact.v1.schema.json"
+_FRAGILITY_SCHEMA = _REPO / "schemas" / "artifacts" / "FragilityMetadata.schema.json"
+_CANONICAL_FACT_SCHEMA = _REPO / "schemas" / "artifacts" / "CanonicalFact.schema.json"
 
 #: The 11 fragility failure modes are the canonical contract (single source = fragile_context_taxonomy.json); this count
 #: is a drift guard so a mode can't be silently added/removed without intent. See the taxonomy file for the definitions.

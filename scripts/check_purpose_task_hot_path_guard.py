@@ -35,7 +35,7 @@ if str(_REPO) not in sys.path:
 from src.baltor.purpose_tasks import purpose_task as ct
 
 _SLOT = "reconcile_dates"
-_OC = "ReconcileResult.v1"
+_OC = "ReconcileResult"
 _INPUT = {"query": "error-resolution deadline"}
 _NOW = "2026-06-06T00:00:00Z"
 

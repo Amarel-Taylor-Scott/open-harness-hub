@@ -1169,7 +1169,7 @@ outside the UI. The download page had four package buttons, but no explicit
 manifest showing API paths, package contracts, or governance metadata.
 
 **Done this pass:**
-- Added a deterministic `baltor.serving_manifest.v1` export in
+- Added a deterministic `baltor.serving_manifest` export in
   `scripts/showcase/admin_demo/exports.py`.
 - Preserved fact state, source-count fields, and state history in the text
   context pack instead of flattening everything to candidate/needs-verification.
@@ -2312,7 +2312,7 @@ versioned fetch), measured-lift promotion for registry components.
 
 Owner re-issued max-depth + asked how Teleon self-programs/diagnoses/tunes/improves + about an
 OpenClaw/Hermes layer for open-ended tasks. Committed this wave (all verified independently):
-- **THE BACKBONE**: src/teleon/compiler/ + schemas/runtime/CompiledRuntimeUnit.v1 — promoted
+- **THE BACKBONE**: src/teleon/compiler/ + schemas/runtime/CompiledRuntimeUnit — promoted
   capability → K8s Job/Fly Machine/local process, PURE+deterministic (byte-identical x5),
   only-promoted-compiles enforced in CODE AND SCHEMA, OTel logging on every unit, reuses
   runtime_binding/OIPS/SLA for budgets (no magic values), 40/40 self-test, drift-gated,
@@ -2342,7 +2342,7 @@ registry + auto-compile-on-promotion, PurposeTask intake queue, the variant prop
 Owner: "no shortcuts, everything fully working start to finish, no placeholders, EVERY value-add
 on Fly, then real videos." Phase A (3 agents) + Phase B/C (hand-wired by me), all committed,
 all self-tests green:
-- **eval_suite is a first-class contract field** (PurposeTaskSpec.v1 + CapabilityTask.v1): a user
+- **eval_suite is a first-class contract field** (PurposeTaskSpec + CapabilityTask): a user
   hands Teleon the benchmark that defines DONE; eval_suite_for/eval_pairs seam the gate consumes;
   thresholds single-sourced from the live PROMOTE_AT; benchmark_ref fails honestly; 38-check proof.
 - **compiled-unit registry** (src/teleon/compiler/registry.py): durable append-only, REAL rollback

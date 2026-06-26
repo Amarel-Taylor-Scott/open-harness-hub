@@ -69,7 +69,7 @@
 
 ### `runtime.environment` — The execution-environment profile + provisioning (the medium compute runs IN).
 - **implemented by:** `src/teleon/environments`, `architecture/execution_environment_profiles.json`, `schemas/environments`, `schemas/runtime`
-- **standards:** ExecutionEnvironmentProfile.v1
+- **standards:** ExecutionEnvironmentProfile
 - **PMF role:** Environment is a typed, policy-bounded profile, not ad-hoc.
 
 ## Layer: `capability` (1 primitives)

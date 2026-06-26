@@ -41,7 +41,7 @@ _STATE_PATH = _FEEDS_DIR / "distillation-state.json"
 _STOP_FILE = _REPO / ".agent" / "STOP_REQUESTED"
 _DEFAULT_MIN_CEILING = 0.99  # start with the pure-deterministic capabilities; lower on later scheduled runs
 
-STATE_VERSION = "DistillationState.v1"
+STATE_VERSION = "DistillationState"
 
 
 def _load_state(state_path: Path) -> dict:

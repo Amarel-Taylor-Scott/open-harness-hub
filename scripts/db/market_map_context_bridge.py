@@ -159,7 +159,7 @@ def provider_row(item: tuple[str, str, str, str], *, now: str, source: Path, fin
     name, segment, provider_type, relationship = item
     provider_id = f"market-provider/{slug(name)}"
     return {
-        "kind": "baltor.context-provider.v1",
+        "kind": "baltor.context-provider",
         "provider_id": provider_id,
         "name": name,
         "provider_type": provider_type,
@@ -328,7 +328,7 @@ def self_test() -> int:
         assert plan["counts"]["context_providers"] == len(WATCHLIST), plan
         assert plan["counts"]["context_objects"] == len(WATCHLIST) + len(MARKET_CATEGORIES), plan
         provider = json.loads((Path(tmp) / "context_providers.jsonl").read_text(encoding="utf-8").splitlines()[0])
-        assert provider["kind"] == "baltor.context-provider.v1", provider
+        assert provider["kind"] == "baltor.context-provider", provider
         assert provider["policy"]["acl_filter_before_model"] is True, provider
         context_object = json.loads((Path(tmp) / "context_objects.jsonl").read_text(encoding="utf-8").splitlines()[0])
         assert context_object["object_type"] == "market_watchlist_provider", context_object

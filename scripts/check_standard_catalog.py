@@ -32,12 +32,12 @@ CANONICAL_PATTERNS = {
 
 #: the standard_ids the lane spec requires to be authored.
 REQUIRED_STANDARD_IDS = {
-    "standard.source_adapter.v1", "standard.ingestion_sync.v1", "standard.durable_command.v1",
-    "standard.worker_claim_loop.v1", "standard.processor.v1", "standard.provider_adapter.v1",
-    "standard.api_projection.v1", "standard.ui_projection.v1", "standard.proof_script.v1",
-    "standard.docs_page.v1", "standard.contract_schema.v1", "standard.artifact_object.v1",
-    "standard.optimization_candidate.v1", "standard.reconciliation_decision.v1", "standard.watchtower_task.v1",
-    "standard.tenant_isolation.v1", "standard.review_pack.v1",
+    "standard.source_adapter", "standard.ingestion_sync", "standard.durable_command",
+    "standard.worker_claim_loop", "standard.processor", "standard.provider_adapter",
+    "standard.api_projection", "standard.ui_projection", "standard.proof_script",
+    "standard.docs_page", "standard.contract_schema", "standard.artifact_object",
+    "standard.optimization_candidate", "standard.reconciliation_decision", "standard.watchtower_task",
+    "standard.tenant_isolation", "standard.review_pack",
 }
 
 _REQUIRED_KEYS = {

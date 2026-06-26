@@ -16,7 +16,7 @@ guarantees the law demands, then prints one matrix row:
   * PROOF        — the lane's apply/unit proof for that transform exits 0 (run as a subprocess, --self-test).
 
 It also (a) LOADS the six distillation contract schemas and validates one in-store-shaped DistillationRun
-example against ``DistillationRun.v1`` via the stdlib validator, and (b) prints each apply-proof's PASS line.
+example against ``DistillationRun`` via the stdlib validator, and (b) prints each apply-proof's PASS line.
 Every critical-path transform row must be green for the proof to pass.
 
 Determinism: ``--self-test``, offline, injected ``now`` (the in-memory store + the sub-proofs all inject
@@ -134,9 +134,9 @@ def _self_test() -> int:
     print("Contracts:")
     schemas: dict[str, dict] = {}
     for stem in _CONTRACT_STEMS:
-        sp = _SCHEMA_DIR / f"{stem}.v1.schema.json"
+        sp = _SCHEMA_DIR / f"{stem}.schema.json"
         present = sp.is_file()
-        check(f"contract {stem}.v1 schema loads", present, str(sp))
+        check(f"contract {stem} schema loads", present, str(sp))
         if present:
             schemas[stem] = json.loads(sp.read_text())
 
@@ -147,7 +147,7 @@ def _self_test() -> int:
     opt = g["optimize"]
     bundle = LineageBundle.build(store, opt.entry_id, tenant=_TENANT)
     run_doc = {
-        "schema_version": "DistillationRun.v1",
+        "schema_version": "DistillationRun",
         "run_id": "run-opt-candidate", "tenant_id": _TENANT, "source_scope": "tenant_private",
         "input_artifact_ids": [g["baseline"].entry_id], "output_artifact_ids": [opt.entry_id],
         "input_hashes": [store.get(g["baseline"].entry_id, tenant=_TENANT).content_hash],
@@ -164,7 +164,7 @@ def _self_test() -> int:
     }
     if "DistillationRun" in schemas:
         errs = _validate(run_doc, schemas["DistillationRun"])
-        check("a store-shaped DistillationRun validates against DistillationRun.v1", errs == [], str(errs[:4]))
+        check("a store-shaped DistillationRun validates against DistillationRun", errs == [], str(errs[:4]))
 
     # ── (b) THE TRANSFORM MATRIX — one row per critical-path transform ──────────────────────────────
     print("\nMatrix:")
@@ -244,7 +244,7 @@ def _self_test() -> int:
 
     ok = not fails
     print("\n" + ("PASS — check_lossless_distillation_full_stack: the lossless law is a checkable subsystem — the six "
-                  "contract schemas load and a store-shaped DistillationRun validates against DistillationRun.v1; "
+                  "contract schemas load and a store-shaped DistillationRun validates against DistillationRun; "
                   "every critical-path transform (ingest, decompose, reconcile, optimize) is GREEN across "
                   "RAW_PRESERVED | LINEAGE | REHYDRATION | ROLLBACK | PROOF; the rollback executes pointer-only "
                   "(candidate kept, no version removed); and the CFPB + red-team apply-proofs pass."

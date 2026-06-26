@@ -143,7 +143,7 @@ class AgentBoundaryExpansionRequest:
     grants it. A human must approve it out-of-band; this object only captures the ask + its justification for
     the human-approval queue.
 
-    Field names match ``schemas/agents/AgentBoundaryExpansionRequest.v1.schema.json`` EXACTLY:
+    Field names match ``schemas/agents/AgentBoundaryExpansionRequest.schema.json`` EXACTLY:
     ``capability_id`` (the capability the change concerns), ``requested_change`` (the boundary change being
     requested, e.g. ``{"add_capability": ...}`` / ``{"add_allowed_domain": ...}`` / ``{"raise_max_cost": ...}``
     — described, never applied), and ``justification`` (the agent's stated reason, for the reviewer). The old

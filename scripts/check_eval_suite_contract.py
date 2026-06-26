@@ -3,7 +3,7 @@
 contract field ("the benchmark IS the spec"; closes vision gap D-2, docs/architecture/eval-as-contract.md).
 
 Asserts, deterministically + offline:
-  A. Both schemas (PurposeTaskSpec.v1 + CapabilityTask.v1) are valid Draft-2020-12 AND still validate a spec
+  A. Both schemas (PurposeTaskSpec + CapabilityTask) are valid Draft-2020-12 AND still validate a spec
      WITHOUT eval_suite (backward compatible) — via jsonschema AND the in-repo stdlib validator.
   B. A spec WITH a (raw and normalized) eval_suite validates; a MALFORMED eval_suite is REJECTED by the
      schema (example missing `expected`, missing suite_id, bad judge enum).
@@ -39,9 +39,9 @@ from scripts.teleon_local_runtime import GATE_BASIS, PROMOTE_AT, TRAIN_PARITY  #
 from src.teleon.purpose_tasks import PurposeTaskSpec, eval_suite as es, eval_suite_for  # noqa: E402
 from src.teleon.purpose_tasks.projections import customer_projection, customer_view_is_clean  # noqa: E402
 
-_PT_REF = "purpose_tasks/PurposeTaskSpec.v1"
-_PT_PATH = _REPO / "schemas" / "purpose_tasks" / "PurposeTaskSpec.v1.schema.json"
-_CT_PATH = _REPO / "schemas" / "workers" / "CapabilityTask.v1.schema.json"
+_PT_REF = "purpose_tasks/PurposeTaskSpec"
+_PT_PATH = _REPO / "schemas" / "purpose_tasks" / "PurposeTaskSpec.schema.json"
+_CT_PATH = _REPO / "schemas" / "workers" / "CapabilityTask.schema.json"
 _NOW = "2026-06-11T00:00:00Z"
 
 _INLINE = {"suite_id": "suite.dates@v1#h7a2",
@@ -51,9 +51,9 @@ _REF_SUITE = {"suite_id": "suite.legal@v3#h9c1", "benchmark_ref": "registry://ac
 
 
 def _pt_base() -> dict:
-    return {"schema_version": "PurposeTaskSpec.v1", "task_id": "pt.eval_demo@v1#h001",
+    return {"schema_version": "PurposeTaskSpec", "task_id": "pt.eval_demo@v1#h001",
             "purpose": "Pull X from a source.", "capability_slot": "fetch_demo",
-            "input_contract": "DemoQuery.v1", "output_contract": "DemoRecord.v1",
+            "input_contract": "DemoQuery", "output_contract": "DemoRecord",
             "success_criteria": {"max_cost": 5.0, "min_source_handles": 1},
             "promotion_criteria": {"cost_tolerance": 0.0}, "connected_to": ["demo.consumer"],
             "defined_at": _NOW}
@@ -79,7 +79,7 @@ def _self_test() -> int:
     ct_v = Draft202012Validator(ct_schema)
 
     # A. valid Draft-2020-12 + backward compatible (no eval_suite)
-    for nm, sc in (("PurposeTaskSpec.v1", pt_schema), ("CapabilityTask.v1", ct_schema)):
+    for nm, sc in (("PurposeTaskSpec", pt_schema), ("CapabilityTask", ct_schema)):
         try:
             Draft202012Validator.check_schema(sc)
             check(f"A: {nm} is valid Draft-2020-12", True)
@@ -181,7 +181,7 @@ def _self_test() -> int:
     check("G: customer_view_is_clean() still passes with an eval_suite present", customer_view_is_clean(view))
 
     print("\n" + ("PASS — check_eval_suite_contract: eval_suite is a real, schema-constrained, round-tripping "
-                  "first-class field of PurposeTaskSpec.v1 + CapabilityTask.v1; the gate threshold/holdout "
+                  "first-class field of PurposeTaskSpec + CapabilityTask; the gate threshold/holdout "
                   "policy are single-sourced from the live runtime constants; benchmark_ref fails honestly; "
                   "the runtime-gate seam (eval_suite_for/eval_pairs) is real; and the answer key never leaks "
                   "to a customer. The benchmark IS the spec."

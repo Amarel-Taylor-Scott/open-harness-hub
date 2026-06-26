@@ -30,7 +30,7 @@ bool`, `best_for: [..]`. Three invariants are proven by `scripts/check_native_ou
 | `schema_preserving` | **yes** | no | no | same schema/columns; only VERIFIED value changes (each a NativeDiff + receipt) |
 | `schema_preserving_with_sidecar` | **yes** | yes | no | same schema + verified changes + receipts/conflicts/warnings sidecar |
 | `annotated_native` | no | yes | no | same doc format (MD/HTML/DOCX) + inline annotations/footnotes; no silent value change |
-| `baltor_native` | no | no | no | the advanced `ContextResponse.v1` / `ContextPack.v1` surface |
+| `baltor_native` | no | no | no | the advanced `ContextResponse` / `ContextPack` surface |
 | `dual` | no | yes | no | both the native output AND the baltor-native response (migration path) |
 | `compare` | **yes** | yes | no | original + updated + NativeDiff + sidecar (human review before drop-in) |
 

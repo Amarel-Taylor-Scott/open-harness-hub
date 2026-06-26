@@ -1,0 +1,50 @@
+{
+  "$id": "determinism/RuleCandidate", "title": "RuleCandidate", "type": "object", "additionalProperties": false,
+  "description": "A PROPOSED deterministic rule generated from a PatternCandidate — proposed, NOT active (status defaults to 'proposed'; an LLM may PROPOSE the rule body via the single LLMGateway, but proposing is not promoting). It carries the rule body (decision_table / authority / threshold / routing / ...), its scope, worked examples AND counterexamples, the expected failure modes, a REQUIRED fallback_policy (every active rule must have a deterministic-first-then-fallback path), and — critically — distilled_from_trace_ids + distilled_from_pattern_id, the LOSSLESS link back to the LLM/consensus/adjudication traces it was distilled from (a promoted rule NEVER deletes them). A truth-serving rule (rule_class=truth_serving) demands the strictest promotion bar (near-zero FP + first-promotion human review). tenant_private source_scope cannot yield a global rule unless anonymized + approved. Deterministic when created_at is injected.",
+  "required": ["schema_version", "rule_candidate_id", "tenant_id", "source_scope", "workflow_id", "rule_type", "rule_class", "scope", "input_fields", "output_decision", "rule_body", "examples", "counterexamples", "expected_failure_modes", "fallback_policy", "status", "distilled_from_pattern_id", "distilled_from_trace_ids", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["RuleCandidate"]},
+    "rule_candidate_id": {"type": "string", "description": "content-addressed id over (rule_body + scope + distilled_from_pattern_id); deterministic"},
+    "tenant_id": {"type": "string"},
+    "source_scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"], "description": "tenant_private can NOT yield a global rule unless anonymized + approved (replay/promotion enforce)"},
+    "workflow_id": {"type": "string"},
+    "rule_type": {"type": "string", "enum": ["decision_table", "regex_or_pattern", "source_authority_rule", "graph_rule", "threshold_rule", "schema_rule", "routing_rule", "conflict_detector_rule", "reconciliation_policy_rule", "freshness_rule"], "description": "the deterministic mechanism this rule uses"},
+    "rule_class": {"type": "string", "enum": ["truth_serving", "routing", "optimization", "ui_projection", "reconciliation"], "description": "the risk class that sets the promotion bar; truth_serving demands near-zero FP + human review for first promotion"},
+    "scope": {"type": "string", "description": "where the rule applies (e.g. 'conflict_type=deadline_mismatch on global_public CFPB facts'); narrow scope = safer rule"},
+    "input_fields": {"type": "array", "items": {"type": "string"}, "description": "the input fields the rule reads"},
+    "output_decision": {"type": "string", "description": "the deterministic decision the rule produces (e.g. 'winner=higher_authority_source, loser=held_out')"},
+    "rule_body": {"type": "string", "description": "the executable/serializable rule definition (a handle or canonical text); the deterministic mechanism, not an LLM prompt"},
+    "examples": {"type": "array", "description": "worked positive examples the rule must reproduce", "items": {
+      "type": "object", "additionalProperties": false, "required": ["inputs", "expected_decision", "from_trace_id"],
+      "properties": {
+        "inputs": {"type": "string", "description": "canonical input snapshot"},
+        "expected_decision": {"type": "string"},
+        "from_trace_id": {"type": "string", "description": "the verified trace this example came from (lossless link)"}
+      }
+    }},
+    "counterexamples": {"type": "array", "description": "cases the rule must ABSTAIN on or decide differently (e.g. ambiguous authority, novel doc type); present even if empty", "items": {
+      "type": "object", "additionalProperties": false, "required": ["inputs", "must_not_decide"],
+      "properties": {
+        "inputs": {"type": "string"},
+        "must_not_decide": {"type": "string", "description": "the WRONG decision the rule must never produce here"},
+        "expected_behavior": {"type": "string", "enum": ["abstain", "fallback_to_llm", "route_to_human"], "description": "what the rule should do instead"}
+      }
+    }},
+    "expected_failure_modes": {"type": "array", "items": {"type": "string"}, "description": "the ways this rule could be wrong (ambiguous authority, stale fact, OOD inputs); informs replay/shadow scrutiny; present even if empty"},
+    "fallback_policy": {
+      "type": "object", "additionalProperties": false,
+      "description": "REQUIRED: the deterministic-first-then-fallback path; every active rule must have one (no active rule without a fallback)",
+      "required": ["fallback_target", "trigger"],
+      "properties": {
+        "fallback_target": {"type": "string", "enum": ["llm_gateway", "human_review", "hold_out", "deterministic_authority"], "description": "where uncertain/OOD inputs go"},
+        "trigger": {"type": "string", "enum": ["low_confidence", "unknown_inputs", "out_of_distribution", "rule_abstains", "schema_mismatch"], "description": "what activates the fallback"},
+        "policy_id": {"type": "string", "description": "link to the FallbackPolicy this references, when one is registered"}
+      }
+    },
+    "status": {"type": "string", "enum": ["proposed", "in_replay", "in_shadow", "promoted", "rejected", "retired"], "description": "lifecycle; NOT 'active'/'promoted' by default — a candidate is born 'proposed'"},
+    "proposed_by": {"type": "string", "enum": ["pattern_miner", "llm_gateway", "human"], "description": "who proposed the body; an LLM may propose, but proposing is not promoting"},
+    "distilled_from_pattern_id": {"type": "string", "description": "the PatternCandidate this rule was distilled from (lossless link)"},
+    "distilled_from_trace_ids": {"type": "array", "items": {"type": "string"}, "description": "the LLM/consensus/adjudication WorkflowTrace ids this rule was distilled from; NEVER deleted on promotion (lossless)"},
+    "created_at": {"type": "string", "description": "injected time; deterministic when injected"}
+  }
+}

@@ -6,7 +6,7 @@ vendor-neutral standard for purpose/capability-provisioned, eval-gated, self-ada
 requires neutrality, like OTel/CloudEvents/OCI); Baltor's conformant runtime is **PurposeTask**.
 
 > **Naming layers (do not conflate):** CTS `kind: CapabilityTask` (governed PURPOSE object) ≡ Baltor
-> **`PurposeTask`** (reference impl; `PurposeTaskSpec.v1` built). Baltor's existing **`CapabilityTask.v1`**
+> **`PurposeTask`** (reference impl; `PurposeTaskSpec` built). Baltor's existing **`CapabilityTask`**
 > (FleetLedger) is the LOWER execution unit a worker claims — the substrate a PurposeTask dispatches onto.
 > **Build on the existing substrate; no second runtime/ledger/registry.** Focused increments; never concurrent
 > with another repo-mutating workflow. Lead with the working reference impl, not a committee — a spec without a
@@ -21,7 +21,7 @@ permissions/success-criteria/governance without external approval. Standard ≠ 
 conformant runtime.
 
 ## Phases (each = JSON/code/proof/docs together; map to existing substrate)
-- **P1 — Spec artifacts (CTS-0):** finalize `schemas/purpose_tasks/PurposeTaskSpec.v1` as the conformant
+- **P1 — Spec artifacts (CTS-0):** finalize `schemas/purpose_tasks/PurposeTaskSpec` as the conformant
   `CapabilityTask` contract (add the CTS sections it lacks: triggers · capabilities{required/optional/forbidden}
   · connectedSystems · runtimePolicy.allowedRuntimeClasses · evaluations · adaptation · promotion · provenance ·
   governance.policyGates). Add `architecture/capability_runtime_classes.json` (the abstract runtime-class

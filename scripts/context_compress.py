@@ -205,7 +205,7 @@ def compress(items: list[dict[str, Any]], *, query: str | None = None, max_token
 
     run_seed = json.dumps({"r": [it.get("ref") for it in retained], "q": query, "mt": max_tokens}, sort_keys=True)
     return {
-        "kind": "baltor.compression-run.v1",
+        "kind": "baltor.compression-run",
         "compression_run_id": "comprun-" + sha256(run_seed.encode("utf-8")).hexdigest()[:16],
         "input_refs": [it.get("ref") for it in items],
         "retained_refs": [{"ref": it.get("ref"), "source_handles": it["_handles"]} for it in retained],

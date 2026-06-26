@@ -17,7 +17,7 @@ served truth. Load-bearing law, encoded in the schemas as const/enum constraints
 
 Asserts:
   A. SCHEMAS EXIST + WELL-FORMED: all 13 blackboard contracts are valid JSON and each carries $id (matching its
-     filename: blackboard/<Name>.v1), title, type:object, properties, required, additionalProperties:false (+description).
+     filename: blackboard/<Name>), title, type:object, properties, required, additionalProperties:false (+description).
   B. OUTPUT != TRUTH: serves_truth pinned const false on BlackboardEntry, BlackboardAnalysis, BlackboardSynthesis,
      and GovernedBlackboardEntry. A swarm entry / analysis / synthesis / governed wrapper can never be served truth.
   C. PROVENANCE REQUIRED: BlackboardObservation.source_refs is required AND non-empty (minItems >= 1); a sourceless
@@ -264,7 +264,7 @@ def _self_test() -> int:
     # ---- A. schemas exist + well-formed -------------------------------------------------
     schemas: dict[str, dict] = {}
     for name in _CONTRACTS:
-        path = _SCHEMA_DIR / f"{name}.v1.schema.json"
+        path = _SCHEMA_DIR / f"{name}.schema.json"
         if not path.exists():
             check(f"A: schema file exists: {name}", False, str(path))
             continue
@@ -279,8 +279,8 @@ def _self_test() -> int:
     for name, schema in schemas.items():
         keys_ok = all(k in schema for k in ("$id", "title", "type", "properties", "required", "additionalProperties"))
         shape_ok = (
-            schema.get("$id") == f"blackboard/{name}.v1"
-            and schema.get("title") == f"{name}.v1"
+            schema.get("$id") == f"blackboard/{name}"
+            and schema.get("title") == f"{name}"
             and schema.get("type") == "object"
             and schema.get("additionalProperties") is False
             and isinstance(schema.get("properties"), dict)
@@ -344,8 +344,8 @@ def _self_test() -> int:
     registry = json.loads((_REPO / "architecture" / "contract_registry.json").read_text())
     registry_blob = json.dumps(registry)
     for name in _CONTRACTS:
-        check(f"G: {name}.v1 registered in contract_registry.json",
-              f"schemas/blackboard/{name}.v1.schema.json" in registry_blob)
+        check(f"G: {name} registered in contract_registry.json",
+              f"schemas/blackboard/{name}.schema.json" in registry_blob)
 
     # ---- H. fixtures validate against their contracts (minimal stdlib validator) --------
     fixtures = _fixtures()

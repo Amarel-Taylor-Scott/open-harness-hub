@@ -2,7 +2,7 @@
 
 > **STATUS (2026-06-06).** Slice 1 BUILT + proven (`scripts/check_shared_io_resource_spine.py`, flywheel-
 > registered). Built: the spine map (`architecture/shared_io_spine.json`) ratifying the existing typed-I/O
-> contracts into one named standard; `ObjectShell.v1` (formalizes the canonical 14-section shell) + `ReceiptRef.v1`;
+> contracts into one named standard; `ObjectShell` (formalizes the canonical 14-section shell) + `ReceiptRef`;
 > the **resource layer** (`ResourceRef/ResourceBinding/DataResourceSpec/SecretRef/KeyRef/ResourceProvisionReceipt`
 > + `src/teleon/resources/resource_ref.py` guards + `architecture/shared_resource_spine.json`); embedded redteam.
 > Doc: `docs/shared-io/shared-io-resource-spine.md`.
@@ -30,36 +30,36 @@ table names, raw cloud resources, or hidden environment assumptions in business 
    promotion-decision, EVENT_KINDS; resource layer was the gap).
 2. **SHARED PLATFORM LOCATION** — reconciled to `schemas/{shared,io,resources,evaluation,policy,telemetry}` +
    `src/teleon/{resources,...}` + `architecture/shared_*_spine.json` (NOT `shared-platform/`).
-3. **UNIVERSAL OBJECT SHELL** — `schemas/shared/ObjectShell.v1` ✓ (+ ObjectIdentity/Scope/Status/Visibility/
+3. **UNIVERSAL OBJECT SHELL** — `schemas/shared/ObjectShell` ✓ (+ ObjectIdentity/Scope/Status/Visibility/
    Provenance/Lineage/Policy/Relationships/Receipts mixins QUEUED). Rule: major objects compose/conform; no
    incompatible id/status/visibility/provenance; control on numeric codes. Proof `check_shared_object_shell` (folded
    into the spine proof for now).
-4. **COMMAND / WORK I/O** — `CommandEnvelope.v1` ✓ exists; QUEUED: `WorkItem/WorkerClaim/AckNackReceipt/
-   DeadLetterEntry/IdempotencyKey/OutboxEvent.v1` → `scripts/check_shared_command_work_io.py`.
-5. **EVENT I/O** — `EventEnvelope.v1` ✓ (CloudEvents 1.0; correlation_id+causation_id); QUEUED `CloudEventProjection.v1`
+4. **COMMAND / WORK I/O** — `CommandEnvelope` ✓ exists; QUEUED: `WorkItem/WorkerClaim/AckNackReceipt/
+   DeadLetterEntry/IdempotencyKey/OutboxEvent` → `scripts/check_shared_command_work_io.py`.
+5. **EVENT I/O** — `EventEnvelope` ✓ (CloudEvents 1.0; correlation_id+causation_id); QUEUED `CloudEventProjection`
    → `check_shared_event_io.py`.
-6. **API I/O** — `ErrorEnvelope.v1` ✓; QUEUED `ApiRequestEnvelope/ApiResponseEnvelope/Pagination/FilterSpec/
-   ProjectionRef/AuthScope.v1` + `spec/openapi/shared-api-patterns.yaml` → `check_shared_api_io.py`.
-7. **ARTIFACT / PAYLOAD I/O** — `Receipt.v1`/`ContextPack.v1` ✓, `ReceiptRef.v1` ✓; QUEUED `ArtifactRef/PayloadRef/
-   GeneratedArtifact/ResultEnvelope/OutputContractValidation.v1` → `check_shared_artifact_io.py`.
+6. **API I/O** — `ErrorEnvelope` ✓; QUEUED `ApiRequestEnvelope/ApiResponseEnvelope/Pagination/FilterSpec/
+   ProjectionRef/AuthScope` + `spec/openapi/shared-api-patterns.yaml` → `check_shared_api_io.py`.
+7. **ARTIFACT / PAYLOAD I/O** — `Receipt`/`ContextPack` ✓, `ReceiptRef` ✓; QUEUED `ArtifactRef/PayloadRef/
+   GeneratedArtifact/ResultEnvelope/OutputContractValidation` → `check_shared_artifact_io.py`.
 8. **RESOURCE I/O** — ✓ BUILT: `ResourceRef/ResourceBinding/DataResourceSpec/ResourceProvisionReceipt/SecretRef/
-   KeyRef.v1`; QUEUED `TemporaryResourceSpec/PersistentResourceSpec` (folded into ownership for now), `ResourceProvisionPlan`.
+   KeyRef`; QUEUED `TemporaryResourceSpec/PersistentResourceSpec` (folded into ownership for now), `ResourceProvisionPlan`.
    Ownership modes: external_existing/managed_persistent/managed_ephemeral/pipeline_temp/tenant_dedicated. Proof
    `check_shared_io_resource_spine.py` ✓ (will split to `check_shared_resource_io.py`).
-9. **INFERENCE I/O** — `InferencePreference/ResolvedInferencePreference/ModelInvocationReceipt/FreeLimitedEndpoint.v1`
-   ✓; QUEUED `InferenceRequest/StructuredInferenceRequest/EmbeddingRequest/JudgeRequest/ModelRouteDecision.v1`.
-10. **SANDBOX I/O** — `SandboxRunRequest/Result/Policy.v1` ✓; QUEUED `SandboxNetworkPolicy/SandboxFilesystemPolicy/
-    SandboxSecretPolicy/SandboxReceipt/SandboxRedteamReport.v1`.
+9. **INFERENCE I/O** — `InferencePreference/ResolvedInferencePreference/ModelInvocationReceipt/FreeLimitedEndpoint`
+   ✓; QUEUED `InferenceRequest/StructuredInferenceRequest/EmbeddingRequest/JudgeRequest/ModelRouteDecision`.
+10. **SANDBOX I/O** — `SandboxRunRequest/Result/Policy` ✓; QUEUED `SandboxNetworkPolicy/SandboxFilesystemPolicy/
+    SandboxSecretPolicy/SandboxReceipt/SandboxRedteamReport`.
 11. **EVALUATION / PROMOTION I/O** — `promotion-decision` ✓; QUEUED `EvaluationRun/EvaluationScorecard/
-    PathComparisonReport/RollbackPlan/BoundaryExpansionRequest/HumanApprovalReceipt.v1`.
+    PathComparisonReport/RollbackPlan/BoundaryExpansionRequest/HumanApprovalReceipt`.
 12. **REGISTRY OBJECT I/O** — ensure ContextArtifact/SkillArtifact/ToolArtifact/HarnessArtifact/TemplateArtifact/
     RepoSnapshot/RepoIntakeDecision/ProviderNode conform to ObjectShell (provenance + visibility/status; external ⇒
     source + why_ingested; discovery ≠ trust). QUEUED migration proof.
-13. **TELEMETRY I/O** — `WorkerTelemetry.v1` ✓; QUEUED `TraceContext/TelemetryEvent/MetricSample/JsonLogRecord/
-    SpanLink.v1` + `docs/telemetry/opentelemetry-mapping.md` (logs carry correlation/trace/span/tenant/object ids;
+13. **TELEMETRY I/O** — `WorkerTelemetry` ✓; QUEUED `TraceContext/TelemetryEvent/MetricSample/JsonLogRecord/
+    SpanLink` + `docs/telemetry/opentelemetry-mapping.md` (logs carry correlation/trace/span/tenant/object ids;
     no secrets).
 14. **SECURITY / POLICY I/O** — QUEUED `TenantScope/DataClassification/VisibilityPolicy/DataPolicy/
-    ToolExecutionPolicy/ModelDataPolicy/ResourceAccessPolicy/BoundaryPolicy.v1` (tenant-private never flows to open
+    ToolExecutionPolicy/ModelDataPolicy/ResourceAccessPolicy/BoundaryPolicy` (tenant-private never flows to open
     surfaces; boundary expansion explicit).
 15. **OPENAPI / ASYNCAPI GENERATION** — QUEUED `spec/openapi/contextiseverything-shared-api.yaml`,
     `spec/asyncapi/contextiseverything-events.yaml` (generated/validated from schemas; CloudEvents projection documented).

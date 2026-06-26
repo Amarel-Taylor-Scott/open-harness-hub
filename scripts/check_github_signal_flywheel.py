@@ -3,7 +3,7 @@
 GOVERNED candidates — discovery is not trust, stars are not proof, trend != fit != activation.
 
 Asserts:
-  A. CONTRACTS: RepoSnapshot/RepoTrendSignal/RepoIntakeDecision .v1 present + registered.
+  A. CONTRACTS: RepoSnapshot/RepoTrendSignal/RepoIntakeDecision  present + registered.
   B. FIXTURE: the 10 owner-listed repos, source_confidence == owner_provided_unverified.
   C. SNAPSHOT STORE: weekly growth comes from STORED snapshots — 1 snapshot → trend confidence LOW; a 2nd
      (higher stars) → delta computed from the store, confidence HIGH.
@@ -52,8 +52,8 @@ def _self_test() -> int:
 
     # A
     for c in ("RepoSnapshot", "RepoTrendSignal", "RepoIntakeDecision"):
-        check(f"A: {c}.v1 schema present + registered",
-              (_REPO / "schemas" / "repo_intel" / f"{c}.v1.schema.json").exists() and f"repo_intel/{c}.v1.schema.json" in contracts)
+        check(f"A: {c} schema present + registered",
+              (_REPO / "schemas" / "repo_intel" / f"{c}.schema.json").exists() and f"repo_intel/{c}.schema.json" in contracts)
 
     # B
     check("B: 10 repos in fixture", len(fx["repos"]) == 10, str(len(fx["repos"])))

@@ -3,7 +3,7 @@
 the ingestion maturity matrix are complete and HONEST. Every connector entry declares the full required field set;
 status is in the enum; every ACTIVE connector is backed by an existing proof_script; every CANDIDATE connector
 has a fallback_fixture that EXISTS on disk (a real connector behind the same port, fixture-proven — never faked
-truth); scope/authority defaults are in-enum; output_schema points at SourceArtifact.v1; the 10 named connectors
+truth); scope/authority defaults are in-enum; output_schema points at SourceArtifact; the 10 named connectors
 are all present; and the maturity matrix is consistent with the catalog (same source_classes, honest rungs:
 nothing claims a rung above m6_proof without an existing proof). Deterministic, stdlib-only.
 
@@ -64,8 +64,8 @@ def _self_test() -> int:
     by_id = {c.get("adapter_id"): c for c in conns}
 
     check("all 10 named connectors are present", _EXPECTED <= set(by_id), str(sorted(_EXPECTED - set(by_id))))
-    check("output_schema points at SourceArtifact.v1 for every connector",
-          all(c.get("output_schema", "").endswith("SourceArtifact.v1.schema.json") for c in conns))
+    check("output_schema points at SourceArtifact for every connector",
+          all(c.get("output_schema", "").endswith("SourceArtifact.schema.json") for c in conns))
 
     missing_fields, bad_status, bad_scope, bad_auth, bad_sync, bad_cursor = [], [], [], [], [], []
     active_no_proof, candidate_no_fixture, missing_proof_file, missing_fixture = [], [], [], []

@@ -242,7 +242,7 @@ operators can verify that each runtime layer is alive without scraping pages.
 Required heartbeat fields:
 
 ```text
-kind = baltor.debug_heartbeat.v1
+kind = baltor.debug_heartbeat
 server.pid
 server.uptime_seconds
 run.run_id
@@ -343,7 +343,7 @@ term_clarity_concerns[].safe_context_instruction
 graph.nodes[type=TermClarityConcern]
 graph.edges[type=HAS_TERM_CLARITY_CONCERN]
 context_pack.term_clarity_concerns
-glossary_resolution_packets[].kind = baltor.glossary-resolution-packet.v1
+glossary_resolution_packets[].kind = baltor.glossary-resolution-packet
 glossary_resolution_packets[].status = needs_glossary_review
 glossary_resolution_packets[].review_routes
 glossary_resolution_packets[].safe_context_policy.block_global_memory_promotion = true

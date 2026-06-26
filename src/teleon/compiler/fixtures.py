@@ -48,7 +48,7 @@ _FIXTURE_CAPABILITY: dict[str, Any] = {
 #: a fixture OIPS resolved-preference whose budget_policy supplies a token ceiling (so budgets.max_tokens is
 #: policy-sourced, not the default constant) — proves the budget JOIN, not a magic number.
 _FIXTURE_RESOLVED_PREFERENCE: dict[str, Any] = {
-    "schema_version": "ResolvedInferencePreference.v1",
+    "schema_version": "ResolvedInferencePreference",
     "preference_id": "pref-fixture",
     "effective": {"budget_policy": {"max_output_tokens": 512, "max_model_cost_usd": 0.02}},
 }

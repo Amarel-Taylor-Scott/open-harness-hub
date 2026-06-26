@@ -1,0 +1,38 @@
+{
+  "$id": "workers/WorkerLifecyclePolicy",
+  "title": "WorkerLifecyclePolicy",
+  "description": "Worker lifecycle policy (cold/burst/warm/hot/scheduled).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "lifecycle_policy_id": {
+      "type": "string"
+    },
+    "min_workers": {
+      "type": "number"
+    },
+    "max_workers": {
+      "type": "number"
+    },
+    "keepalive_after_task_seconds": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "drain_before_shutdown": {
+      "type": "boolean"
+    },
+    "idle_shutdown_seconds": {
+      "type": [
+        "number",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "lifecycle_policy_id",
+    "min_workers",
+    "max_workers"
+  ]
+}

@@ -21,8 +21,8 @@ _STD = _REPO / "architecture" / "standard_catalog.json"
 
 #: the 7 templates the lane spec requires to be BUILT (status active).
 REQUIRED_ACTIVE = {
-    "ingestion.source_adapter.v1", "worker.command_handler.v1", "api.projection_route.v1",
-    "ui.projection_page.v1", "provider.adapter.v1", "proof.self_test.v1", "docs.section_page.v1",
+    "ingestion.source_adapter", "worker.command_handler", "api.projection_route",
+    "ui.projection_page", "provider.adapter", "proof.self_test", "docs.section_page",
 }
 _MIN_TEMPLATES = 17
 

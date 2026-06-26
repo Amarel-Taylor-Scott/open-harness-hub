@@ -48,8 +48,8 @@ Engine: `src/baltor/determinism/`. The existing reference authority it asserts-e
 
 ## Contracts
 
-`ConsensusRun.v1` · `WorkflowTrace.v1` · `PatternCandidate.v1` · `RuleCandidate.v1` · `RuleReplayReport.v1` ·
-`ShadowRunReport.v1` · `RulePromotionReceipt.v1` · `DeterministicRule.v1`.
+`ConsensusRun` · `WorkflowTrace` · `PatternCandidate` · `RuleCandidate` · `RuleReplayReport` ·
+`ShadowRunReport` · `RulePromotionReceipt` · `DeterministicRule`.
 
 ## Inputs / Outputs
 

@@ -44,8 +44,8 @@ changes, vector+fulltext+graph in one retrieval) — exactly the fragile-fact / 
   temporal_graph.graphiti@candidate, observability.{langfuse,phoenix,langsmith}@candidate,
   lineage.openlineage@candidate, annotation.web_annotation@v1, native.json_pointer@v1, native.json_patch@v1.
   Fits the existing external_capability_catalog + replacement-matrix machinery.
-- **C-OBS-1 — Observability seam**: ObservabilityProviderPort + EvalProviderPort + SpanTree.v1 +
-  ContextOperationSpan.v1; wrap Langfuse/Phoenix/LangSmith; Baltor proofs remain authority. (OTel/OpenInference adjacent.)
+- **C-OBS-1 — Observability seam**: ObservabilityProviderPort + EvalProviderPort + SpanTree +
+  ContextOperationSpan; wrap Langfuse/Phoenix/LangSmith; Baltor proofs remain authority. (OTel/OpenInference adjacent.)
 - **C-NATIVE-1 standards strengthening** (already shipped base): add formal JSON Patch + Web Annotation
   bodies + PDF/HTML/DOCX selectors to the sidecar (OPP-native-format).
 

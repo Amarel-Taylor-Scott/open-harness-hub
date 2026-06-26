@@ -18,7 +18,7 @@ from scripts.security.tenant_catalog import TenantPolicy
 
 def _req(*, classification="internal") -> LLMRequest:
     return LLMRequest(request_id="r", tenant_id="acme", task_type="conflict_explanation",
-                      prompt_id="p", prompt_version="v1", schema_id="ConflictExplanation.v1",
+                      prompt_id="p", prompt_version="v1", schema_id="ConflictExplanation",
                       input_artifact_ids=["art-a"], data_classification=classification,
                       routing_policy=RoutingPolicy(preferred_providers=["openai.default"], fallback_providers=["stub.local"]))
 

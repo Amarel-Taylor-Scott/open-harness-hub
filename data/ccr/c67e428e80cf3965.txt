@@ -23,7 +23,7 @@ class BlackboardProviderPort:
     def describe(self) -> dict
         # Static capability card: ``{provider_id, name, status, append_only, requires_network,
     def create_blackboard(self, task: str, tenant_scope: str, *, now: str) -> dict
-        # Open a new tenant-scoped Blackboard.v1 workspace and return its row dict.
+        # Open a new tenant-scoped Blackboard workspace and return its row dict.
     def append_entry(self, blackboard_id: str, entry: dict, *, worker_receipt: dict, now: str) -> dict
         # APPEND exactly one typed BlackboardEntry under a MANDATORY worker receipt; return the stored row.
     def query(self, blackboard_id: str, *, kind: str | None=None, author_worker_id: str | None=None, iteration: int | None=None, limit: int | None=None) -> list[dict]

@@ -1,8 +1,8 @@
 """Teleon egress intent and route-policy decisions.
 
 This module is the deterministic control layer before transport. A worker asks
-for an outbound action by creating an ``EgressIntent.v1``; the route broker
-chooses an ``EgressRouteDecision.v1`` from the repo-owned policy taxonomy.
+for an outbound action by creating an ``EgressIntent``; the route broker
+chooses an ``EgressRouteDecision`` from the repo-owned policy taxonomy.
 
 The decision is evidence only. It never asserts that a response is true.
 """
@@ -20,8 +20,8 @@ from src.teleon.experiments.ids import canonical_id, sha256_hex
 _REPO = Path(__file__).resolve().parents[3]
 _ROUTE_POLICY_PATH = _REPO / "architecture" / "egress_route_policy_taxonomy.json"
 
-INTENT_SCHEMA_VERSION = "EgressIntent.v1"
-ROUTE_DECISION_SCHEMA_VERSION = "EgressRouteDecision.v1"
+INTENT_SCHEMA_VERSION = "EgressIntent"
+ROUTE_DECISION_SCHEMA_VERSION = "EgressRouteDecision"
 DEFAULT_ROUTE_POLICY_ID = "direct_public_internet"
 BLOCKED_ROUTE_POLICY_ID = "manual_review_blocked"
 #: transport kind stamped on an allowed decision — single-sourced from the approved transport adapter so the
@@ -142,14 +142,14 @@ def decide_route(
     now: str,
     policies: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Return an ``EgressRouteDecision.v1`` for ``intent``.
+    """Return an ``EgressRouteDecision`` for ``intent``.
 
     High-risk route families require an explicit approval ref. Unknown policies,
     unsupported URL schemes, or blocked policies produce a blocked decision
     instead of falling through to another network path.
     """
     if intent.get("schema_version") != INTENT_SCHEMA_VERSION:
-        raise EgressPolicyError("intent must be EgressIntent.v1")
+        raise EgressPolicyError("intent must be EgressIntent")
     policies = policies or route_policies_by_id()
     approved_route_refs = approved_route_refs or set()
     requested_policy_id = str(intent.get("route_policy_id") or DEFAULT_ROUTE_POLICY_ID)

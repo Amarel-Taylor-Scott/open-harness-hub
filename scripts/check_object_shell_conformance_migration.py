@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""scripts.check_object_shell_conformance_migration — PROOF: object families migrate to the canonical ObjectShell.v1
+"""scripts.check_object_shell_conformance_migration — PROOF: object families migrate to the canonical ObjectShell
 LOSSLESSLY — the shell conforms, the original is preserved verbatim (rehydratable), and the migration is recorded in
 lineage. Distillation is never replacement. Table-driven: ONE sample per conformed family; the proof + the manifest
 stay in lock-step (a family marked `conformed` in architecture/object_shell_migration.json MUST have a passing sample
 here — "conformed" can never be claimed without a lossless proof).
 
 Per conformed family asserts:
-  A. CONFORMS: migrate_to_shell produces an object carrying ALL ObjectShell.v1 required sections + the right object_type/id.
+  A. CONFORMS: migrate_to_shell produces an object carrying ALL ObjectShell required sections + the right object_type/id.
   B. LOSSLESS ROUND-TRIP: rehydrate(shell) == the original (byte-identical; original lives in payload, never overwritten).
   C. INTEGRITY + HANDLES: the shell keeps the artifact's content_hash; derived_from -> source_handles + relationships.
   D. LINEAGE: migrated_from + original_preserved=true + original_payload_hash (auditable + reversible).
@@ -49,14 +49,14 @@ _SAMPLES: dict[str, tuple[str, str, dict]] = {
         "kind": "skill_artifact", "skill_artifact_id": "skill_reconcile_dates_001", "skill_name": "reconcile_dates",
         "version": "v1", "derived_from": ["skill://openskillshub/reconcile_dates", "ctx://acme/decisions/ADR-014"],
         "content_hash": "sha256:beadfeed" + "1" * 56, "steps": ["parse", "normalize", "compare", "emit"],
-        "inputs_schema": "InputDates.v1", "outputs_schema": "ReconcileResult.v1",
+        "inputs_schema": "InputDates", "outputs_schema": "ReconcileResult",
         "policy": {"visibility": "internal", "executable": "gated_through_sandbox"}, "created_at": "2026-06-02T00:00:00Z",
     }),
     "ToolArtifact": ("tool_artifact_id", "OpenToolsHub:ToolArtifact@logical", {
         "kind": "tool_artifact", "tool_artifact_id": "tool_ofac_lookup_001", "tool_name": "ofac_sanctions_lookup",
         "version": "v1", "transport": "mcp", "api_style": "mcp_tool",
         "derived_from": ["tool://opentoolshub/ofac_sanctions_lookup", "ctx://acme/source/SANCTIONS"],
-        "content_hash": "sha256:cafef00d" + "2" * 56, "inputs_schema": "LookupQuery.v1", "outputs_schema": "LookupResult.v1",
+        "content_hash": "sha256:cafef00d" + "2" * 56, "inputs_schema": "LookupQuery", "outputs_schema": "LookupResult",
         "policy": {"visibility": "internal", "executable": "gated_through_sandbox", "side_effects": "read_only"},
         "created_at": "2026-06-03T00:00:00Z",
     }),
@@ -111,8 +111,8 @@ _SAMPLES: dict[str, tuple[str, str, dict]] = {
         "policy": {"visibility": "internal", "promotion": "eval_gated_human_approved"},
         "created_at": "2026-06-07T00:00:00Z",
     }),
-    "ModelInvocationReceipt": ("receipt_id", "schemas/inference/ModelInvocationReceipt.v1.schema.json", {
-        "schema_version": "ModelInvocationReceipt.v1", "kind": "model_invocation_receipt",
+    "ModelInvocationReceipt": ("receipt_id", "schemas/inference/ModelInvocationReceipt.schema.json", {
+        "schema_version": "ModelInvocationReceipt", "kind": "model_invocation_receipt",
         "receipt_id": "llmrcpt_reconcile_2026w23_001", "request_id": "llmreq_reconcile_2026w23_001",
         "object_id": "ctxart_demo_001", "preference_id": "pref_reconcile_dates_v1", "requested_model_class": "balanced",
         "selected_provider_node_id": "model.local_stub@v1", "selected_model": "local-stub@v1", "selected_region": "local",
@@ -130,8 +130,8 @@ _SAMPLES: dict[str, tuple[str, str, dict]] = {
         "content_hash": "sha256:9c0ffee5" + "9" * 56,
         "policy": {"visibility": "internal", "secrets": "by_reference_only"}, "created_at": "2026-06-07T00:00:00Z",
     }),
-    "SandboxRunResult": ("run_id", "schemas/sandbox/SandboxRunResult.v1.schema.json", {
-        "schema_version": "SandboxRunResult.v1", "kind": "sandbox_run_result",
+    "SandboxRunResult": ("run_id", "schemas/sandbox/SandboxRunResult.schema.json", {
+        "schema_version": "SandboxRunResult", "kind": "sandbox_run_result",
         "run_id": "sbxrun_reconcile_dates_2026w23_001", "provider_id": "sandbox.local_golden@v1",
         "status": "ok", "exit_code": 0, "output_contract_valid": True,
         "policy_violations": [], "secrets_leaked": False, "network_events": [], "duration_ms": 42, "cost_estimate": 0.0,
@@ -145,7 +145,7 @@ _SAMPLES: dict[str, tuple[str, str, dict]] = {
         "policy": {"visibility": "internal", "secrets": "by_reference_only"}, "created_at": "2026-06-07T00:00:00Z",
     }),
     "EvaluationScorecard": ("eval_id", "OpenHarnessHub:EvaluationScorecard@logical", {
-        "kind": "evaluation_scorecard", "schema_version": "EvaluationScorecard.v1",
+        "kind": "evaluation_scorecard", "schema_version": "EvaluationScorecard",
         "eval_id": "eval_source_handle_preservation_2026w23_001",
         "harness_ref": "harness://openharnesshub/source_handle_preservation@v1",
         "system_under_test": "ctxpack://acme/packs/ctxart_demo_001 + impl://teleon/impl_reconcile_dates_v3",
@@ -170,13 +170,13 @@ def _self_test() -> int:
         if not ok:
             fails.append(n)
 
-    shell_schema = json.loads((_REPO / "schemas" / "shared" / "ObjectShell.v1.schema.json").read_text())
+    shell_schema = json.loads((_REPO / "schemas" / "shared" / "ObjectShell.schema.json").read_text())
     required = shell_schema["required"]
 
     for otype, (id_field, source_schema, sample) in _SAMPLES.items():
         shell = M.migrate_to_shell(sample, object_type=otype, id_field=id_field, source_schema=source_schema, now=_NOW)
         missing = [k for k in required if k not in shell]
-        check(f"A[{otype}]: shell carries ALL ObjectShell.v1 required sections + right type/id",
+        check(f"A[{otype}]: shell carries ALL ObjectShell required sections + right type/id",
               not missing and shell["object_type"] == otype and shell["object_id"] == sample[id_field], f"missing {missing}")
         check(f"B[{otype}]: LOSSLESS round-trip — rehydrate(shell) == original (byte-identical)", M.rehydrate(shell) == sample)
         check(f"C[{otype}]: content_hash preserved + derived_from -> source_handles + relationships",
@@ -203,7 +203,7 @@ def _self_test() -> int:
           f"unaccounted={sorted(all_families - (conformed | backlog))} extra_samples={sorted(set(_SAMPLES) - all_families)}")
 
     print("\n" + (f"PASS — check_object_shell_conformance_migration: {len(_SAMPLES)} families "
-                  f"({', '.join(sorted(_SAMPLES))}) migrate to ObjectShell.v1 losslessly — all required sections, "
+                  f"({', '.join(sorted(_SAMPLES))}) migrate to ObjectShell losslessly — all required sections, "
                   "originals preserved verbatim (rehydratable), content_hash + handles carried, migration recorded in "
                   "lineage, canonical builder reused (candidate status); manifest stays lock-step with the proof "
                   f"({len(conformed)} conformed, {len(backlog)} backlog)." if not fails else f"{len(fails)} FAILURES: {fails}"))

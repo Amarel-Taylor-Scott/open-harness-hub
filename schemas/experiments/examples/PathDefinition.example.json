@@ -1,0 +1,46 @@
+{
+  "valid": {
+    "schema_version": "PathDefinition",
+    "path_id": "path-recon-deterministic-1a2b3c4d",
+    "capability_slot": "reconciliation.answer",
+    "input_contract": "consumption/ConsumptionRequest",
+    "output_contract": "consumption/ContextResponse",
+    "mode": "candidate",
+    "promotion_criteria": "criteria-recon-default-v1",
+    "rollback_target": "path-recon-baseline-llm-0099",
+    "description": "deterministic Reg-E reconciliation rule challenging the baseline LLM path",
+    "defined_at": "2026-06-06T00:00:00Z"
+  },
+  "valid_baseline": {
+    "schema_version": "PathDefinition",
+    "path_id": "path-recon-baseline-llm-0099",
+    "capability_slot": "reconciliation.answer",
+    "input_contract": "consumption/ConsumptionRequest",
+    "output_contract": "consumption/ContextResponse",
+    "mode": "baseline",
+    "promotion_criteria": "criteria-recon-default-v1",
+    "rollback_target": "path-recon-baseline-llm-0099",
+    "defined_at": "2026-06-06T00:00:00Z"
+  },
+  "invalid_missing_rollback_target": {
+    "schema_version": "PathDefinition",
+    "path_id": "path-recon-no-rollback",
+    "capability_slot": "reconciliation.answer",
+    "input_contract": "consumption/ConsumptionRequest",
+    "output_contract": "consumption/ContextResponse",
+    "mode": "candidate",
+    "promotion_criteria": "criteria-recon-default-v1",
+    "defined_at": "2026-06-06T00:00:00Z"
+  },
+  "invalid_bad_mode": {
+    "schema_version": "PathDefinition",
+    "path_id": "path-recon-bad-mode",
+    "capability_slot": "reconciliation.answer",
+    "input_contract": "consumption/ConsumptionRequest",
+    "output_contract": "consumption/ContextResponse",
+    "mode": "champion",
+    "promotion_criteria": "criteria-recon-default-v1",
+    "rollback_target": "path-recon-baseline-llm-0099",
+    "defined_at": "2026-06-06T00:00:00Z"
+  }
+}

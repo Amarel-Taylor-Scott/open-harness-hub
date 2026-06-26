@@ -60,10 +60,10 @@ def check_command(command_type: str, output_type: str | None = None, *, buckets:
     try:
         b = route(command_type, buckets=buckets)
     except WorkerPolicyError as e:
-        return {"schema_version": "ErrorEnvelope.v1", "allowed": False, "reason": "unknown_prefix",
+        return {"schema_version": "ErrorEnvelope", "allowed": False, "reason": "unknown_prefix",
                 "error": str(e), "command_type": command_type}
     if output_type is not None and not validate_output(b, output_type):
-        return {"schema_version": "ErrorEnvelope.v1", "allowed": False, "reason": "forbidden_output",
+        return {"schema_version": "ErrorEnvelope", "allowed": False, "reason": "forbidden_output",
                 "error": f"bucket {b['bucket_id']!r} forbids output {output_type!r}",
                 "worker_bucket": b["bucket_id"], "command_type": command_type}
     return {"allowed": True, "worker_bucket": b["bucket_id"], "command_type": command_type,

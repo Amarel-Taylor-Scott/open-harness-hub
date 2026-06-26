@@ -23,7 +23,7 @@ DEFAULT_FIXTURE = REPO_ROOT / "data" / "cfpb-demo" / "complaints-fixture.json"
 DEFAULT_OUT_DIR = REPO_ROOT / "site" / "baltor-demos" / "cfpb-complaints"
 CFPB_API_URL = "https://www.consumerfinance.gov/data-research/consumer-complaints/search/api/v1/"
 CFPB_SOURCE_URL = "https://www.consumerfinance.gov/data-research/consumer-complaints/"
-PIPELINE_ID = "baltor.demo.cfpb-consumer-complaints.v0"
+PIPELINE_ID = "baltor.demo.cfpb-consumer-complaints"
 SOURCE_HANDLE_PREFIX = "ctx://cfpb/consumer-complaints"
 MAX_LIVE_RESPONSE_BYTES = 2_000_000
 
@@ -140,7 +140,7 @@ def context_object(complaint: dict[str, Any], retrieved_at: str) -> dict[str, An
     handle = source_handle(complaint)
     title = " / ".join(part for part in [complaint.get("product"), complaint.get("issue")] if part)
     return {
-        "kind": "baltor.context-object.v1",
+        "kind": "baltor.context-object",
         "context_object_id": f"context-object/cfpb-complaint-{cid}",
         "current_version_id": f"context-version/cfpb-complaint-{cid}-{stable_hash(complaint)[7:19]}",
         "source_system": "cfpb_consumer_complaint_database",
@@ -225,7 +225,7 @@ def build_pack(records: list[dict[str, Any]], objects: list[dict[str, Any]], ret
     timely_yes = sum(1 for item in records if str(item.get("timely") or "").lower() == "yes")
     with_narrative = sum(1 for item in records if item.get("complaint_what_happened"))
     return {
-        "kind": "baltor.context-pack.v1",
+        "kind": "baltor.context-pack",
         "context_pack_id": f"context-pack/cfpb-complaints-demo-{stable_hash(source_handles)[7:19]}",
         "pack_type": "customer_pack",
         "task": "Public corpus demo: turn CFPB complaint records into governed context objects and aggregate claims.",
@@ -299,7 +299,7 @@ def build_pack(records: list[dict[str, Any]], objects: list[dict[str, Any]], ret
 
 def build_receipt(pack: dict[str, Any], source_records: list[dict[str, Any]], retrieved_at: str) -> dict[str, Any]:
     return {
-        "kind": "baltor.context-receipt.v0",
+        "kind": "baltor.context-receipt",
         "receipt_id": "receipt-" + pack["context_pack_id"].split("/")[-1],
         "pack_id": pack["context_pack_id"],
         "generated_at": retrieved_at,

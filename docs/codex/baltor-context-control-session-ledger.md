@@ -257,7 +257,7 @@ Next action:
 - Added debug heartbeat contract:
   - `GET /api/debug/heartbeat`
   - `GET /api/admin-dashboard/heartbeat`
-  - heartbeat kind: `baltor.debug_heartbeat.v1`
+  - heartbeat kind: `baltor.debug_heartbeat`
   - payload includes server uptime, run heartbeat, queue stats, latest worker
     event ID, worker ledger path/status, recent worker heartbeat files, latest
     events, and contract endpoints.
@@ -316,13 +316,13 @@ Latest live proof:
 - ZIP hierarchy: 5 folders, 5 files, 5 pages, 11 components
 - connector catalog: 8 connectors
 - context gateway: `ctxr-adm-6877a1ce38`, 8 handles, fetched one component
-- heartbeat: `baltor.debug_heartbeat.v1`, run stage `serve`, Redis available,
+- heartbeat: `baltor.debug_heartbeat`, run stage `serve`, Redis available,
   latest worker event ID present
 - exports: audit, context-pack, graph, manifest, rag, safe-context, text
 - approval, budget-blocked, and permanent-failure queues: 0
 - shared queue pending: 5
 - TryCloudflare checks: heartbeat 200, connector catalog 200, gateway status
-  200; content checks confirmed `baltor.debug_heartbeat.v1`,
+  200; content checks confirmed `baltor.debug_heartbeat`,
   `last_worker_event`, `recent_worker_events`, `worker_event_records`,
   `latest_context_worker_event_id`, `indexed_mirror_first`, `gitlab`,
   `unrestricted_raw_tools_exposed: false`, `context_connectors`,
@@ -387,7 +387,7 @@ Latest live proof:
 - connector run ID: `adm-285412fb1f`
 - context gateway: `ctxr-adm-7d7d20594e`, 8 handles, fetched one component
 - MCP wrapper self-test: ok, 8 connectors, heartbeat kind
-  `baltor.debug_heartbeat.v1`
+  `baltor.debug_heartbeat`
 - Docker context worker: healthy and processing queue events
 - shared queue pending: 65
 - approval, budget-blocked, and permanent-failure queues: 0
@@ -445,7 +445,7 @@ Latest live proof:
 - connector run ID: `adm-bc2e348a1f`
 - context gateway: `ctxr-adm-77e227b079`, 8 handles, fetched one component
 - MCP wrapper self-test: ok, 8 connectors, heartbeat kind
-  `baltor.debug_heartbeat.v1`
+  `baltor.debug_heartbeat`
 - Docker context worker rebuilt/restarted and healthy
 - shared queue pending: 47
 - shared pending sample has 10 inherited jobs without timestamps from the older
@@ -494,7 +494,7 @@ Latest live proof:
 - pending sample missing timestamps: 10 inherited old jobs
 - approval, budget-blocked, and permanent-failure queues: 0
 - MCP wrapper self-test: ok, 8 connectors, heartbeat kind
-  `baltor.debug_heartbeat.v1`
+  `baltor.debug_heartbeat`
 - TryCloudflare heartbeat: 200 and contains `active_worker_jobs`,
   `active_worker_job_count`, and `pending_sample_missing_timestamps`
 
@@ -543,7 +543,7 @@ Next action:
 ## 2026-06-01 Queue Health API Contract
 
 - Added `/api/admin-dashboard/queue-health`.
-  - Package type: `baltor.queue-health.v1`
+  - Package type: `baltor.queue-health`
   - Includes summarized queue counts, active worker jobs, pending sample,
     recent worker events, and source stream.
 - Added the route to `scripts/test_baltor_admin_demo_flow.py` so it is covered
@@ -566,7 +566,7 @@ Latest live proof:
 - connector run ID: `adm-41c66b414e`
 - context gateway: `ctxr-adm-689050735a`, 8 handles, fetched one component
 - queue-health endpoint: local 200 and TryCloudflare 200
-- queue-health fields confirmed: `baltor.queue-health.v1`,
+- queue-health fields confirmed: `baltor.queue-health`,
   `active_worker_job_count`, `pending_sample`, `recent_worker_events`
 - queue pending: 37
 - active worker job count: 2
@@ -616,10 +616,10 @@ Latest live proof:
 - stale active worker jobs: 0
 - stale pending jobs: 0
 - queue-health endpoint: local 200 and TryCloudflare 200
-- queue-health fields confirmed: `baltor.queue-health.v1`, thresholds,
+- queue-health fields confirmed: `baltor.queue-health`, thresholds,
   warnings, stale active/pending counts
 - MCP wrapper self-test: ok, 8 connectors, heartbeat kind
-  `baltor.debug_heartbeat.v1`
+  `baltor.debug_heartbeat`
 
 Next action:
 
@@ -631,7 +631,7 @@ Next action:
 
 - Added `context_queue_health` to `scripts/baltor_context_gateway_mcp.py`.
   - It forwards to `/api/admin-dashboard/queue-health`.
-  - It is read-only and returns `baltor.queue-health.v1`.
+  - It is read-only and returns `baltor.queue-health`.
   - The MCP self-test now checks queue health alongside status, connectors,
     heartbeat, search, fetch, and trace.
 - Updated:
@@ -652,10 +652,10 @@ Self-test result:
 - tools: `context_status`, `context_search`, `context_fetch`,
   `context_trace`, `context_connectors`, `context_heartbeat`,
   `context_queue_health`
-- queue health kind: `baltor.queue-health.v1`
+- queue health kind: `baltor.queue-health`
 - queue health warnings: 0
 - connectors: 8
-- heartbeat kind: `baltor.debug_heartbeat.v1`
+- heartbeat kind: `baltor.debug_heartbeat`
 
 Next action:
 
@@ -694,7 +694,7 @@ Latest live proof:
 - stale pending jobs: 0
 - queue health warning count: 0
 - pending sample missing timestamps: 0
-- MCP queue health kind: `baltor.queue-health.v1`
+- MCP queue health kind: `baltor.queue-health`
 
 Next action:
 
@@ -748,9 +748,9 @@ Latest live proof:
 - queue health warning count: 0
 - pending sample missing timestamps: 0
 - proof trend status: `growing`, pending delta: 2, sample count: 7
-- cloud queue-health route returned `baltor.queue-health.v1` with `trend` and
+- cloud queue-health route returned `baltor.queue-health` with `trend` and
   `recent_samples`
-- MCP queue health kind: `baltor.queue-health.v1`
+- MCP queue health kind: `baltor.queue-health`
 
 Next action:
 
@@ -806,9 +806,9 @@ Latest live proof:
 - proof trend status: `growing`, pending delta: 2, sample count: 5
 - throughput status: `estimated`, jobs/minute: 4.125, estimated drain seconds:
   3520
-- cloud queue-health route returned `baltor.queue-health.v1` with `trend`,
+- cloud queue-health route returned `baltor.queue-health` with `trend`,
   `throughput`, and `recent_samples`
-- MCP queue health kind: `baltor.queue-health.v1`
+- MCP queue health kind: `baltor.queue-health`
 
 Next action:
 
@@ -872,7 +872,7 @@ Latest live proof:
 - persisted history existed and loaded 5 samples during proof output; after
   restart, local and TryCloudflare queue-health both reported
   `history.exists: true` and `history.loaded_sample_count: 8`
-- MCP queue health kind: `baltor.queue-health.v1`
+- MCP queue health kind: `baltor.queue-health`
 
 Next action:
 
@@ -1004,7 +1004,7 @@ Latest live proof:
   3233
 - throughput families: `context_gateway`, `deterministic_pipeline`,
   `local_llm_review`, `node_research`
-- MCP self-test passed with `queue_health_kind: baltor.queue-health.v1`.
+- MCP self-test passed with `queue_health_kind: baltor.queue-health`.
 - TryCloudflare ownership search returned ownership facts with event types,
   refresh risks, source handles, and `ownership_change_records`.
 
@@ -1307,7 +1307,7 @@ Next action:
 - Added source-scoped glossary resolution packets to
   `scripts/baltor_admin_demo_server.py`.
   - Each `term_clarity_concern` now creates a
-    `baltor.glossary-resolution-packet.v1` packet.
+    `baltor.glossary-resolution-packet` packet.
   - Packets include `term`, `concern_id`, `concern_type`, evidence,
     possible meanings, linked claim IDs, review routes, a proposed
     source-local glossary entry, and safe-context policy.
@@ -1315,11 +1315,11 @@ Next action:
     promotion until a term is reviewed.
 - Added a dedicated glossary export:
   - `/api/admin-demo/runs/<run_id>/exports/glossary`
-  - package type `baltor.glossary.v1`
+  - package type `baltor.glossary`
 - Added gateway glossary API:
   - `GET /api/context-gateway/glossary?term=agency`
   - `POST /api/context-gateway/glossary`
-  - response kind `baltor.context-glossary.v1`
+  - response kind `baltor.context-glossary`
 - Added MCP wrapper support:
   - new tool: `context_glossary`
   - self-test checks glossary packet count and kind.
@@ -1374,7 +1374,7 @@ Latest live proof:
   2937
 - worker manifest validation passed with 88 workers.
 - MCP self-test passed with `search_result_id: ctxr-adm-c3fe067845`,
-  `glossary_kind: baltor.context-glossary.v1`, and
+  `glossary_kind: baltor.context-glossary`, and
   `glossary_packet_count: 3`.
 - TryCloudflare glossary search returned `glossary-001` for `agency`, including
   possible meanings, source-local proposed glossary entry, review routes, and
@@ -1456,7 +1456,7 @@ Next action:
   - Uses the local client/SDK shim.
   - Supports direct execution as `python3 scripts/baltor_context_cache.py`.
   - Writes `cache-manifest.json` with kind
-    `baltor.local-context-cache-manifest.v1`.
+    `baltor.local-context-cache-manifest`.
   - Links each cache write to context path, glossary path, audit log, source
     handle count, glossary packet count, and no-raw-source policy.
 - Updated the end-to-end proof to assert the cache manifest exists, has the
@@ -1479,7 +1479,7 @@ Latest proof:
 - context gateway result: `ctxr-adm-2f67310d56`
 - cache manifest:
   `/tmp/baltor-context-cache-proof-nxwnc8e1/cache-manifest.json`
-- manifest kind: `baltor.local-context-cache-manifest.v1`
+- manifest kind: `baltor.local-context-cache-manifest`
 - manifest entry count: 1
 - source handles cached: 11
 - glossary packets cached: 12
@@ -1497,7 +1497,7 @@ Next action:
 
 - Added `scripts/baltor_context_cache_read.py`.
   - Reads a local `cache-manifest.json`.
-  - Validates kind `baltor.local-context-cache-manifest.v1`.
+  - Validates kind `baltor.local-context-cache-manifest`.
   - Prints either Markdown or JSON summary output.
   - Does not contact the context gateway or source systems.
 - Added `.claude/commands/baltor-cache-status.md`.
@@ -1544,7 +1544,7 @@ Next action:
 - Defined a provider-neutral Baltor adapter concept:
   `repo_wiki_status`, `repo_wiki_generate`, `repo_wiki_search`,
   `repo_wiki_fetch`, and `repo_wiki_manifest`.
-- Added a normalized `baltor.repo-wiki-page.v1` target shape with repo/ref,
+- Added a normalized `baltor.repo-wiki-page` target shape with repo/ref,
   commit SHA, generated timestamp, source handles, claims, and staleness
   policy.
 
@@ -1592,18 +1592,18 @@ Latest proof:
 
 - Added `context_object_graph_records()` to the admin demo server.
   - Projects an existing run into standardized record families:
-    `baltor.context-object.v1`, `baltor.context-version.v1`,
-    `baltor.context-artifact.v1`, `baltor.context-relationship.v1`,
-    `baltor.context-event.v1`, and `baltor.context-pack.v1`.
+    `baltor.context-object`, `baltor.context-version`,
+    `baltor.context-artifact`, `baltor.context-relationship`,
+    `baltor.context-event`, and `baltor.context-pack`.
   - Source records, connector envelopes, claims, RAG records, graph nodes,
     graph edges, and context packs are converted into source-linked, policy
     carrying, versioned records.
   - Relationships map graph edge labels into controlled relationship types,
     including `MAY_SUPERSEDE` for dated ownership conflicts.
 - Added `context-objects` as an export kind.
-  - Package type: `baltor.context-objects.v1`.
+  - Package type: `baltor.context-objects`.
   - Internal record envelope kind:
-    `baltor.context-object-graph-records.v1`.
+    `baltor.context-object-graph-records`.
   - Download page now includes a context objects export button.
 - Updated end-to-end proof assertions.
   - Requires context objects, versions, artifacts, relationships, events, and
@@ -1625,7 +1625,7 @@ Latest proof:
 - context gateway result: `ctxr-adm-8357098fd0`
 - exports include `context-objects`
 - context cache manifest kind:
-  `baltor.local-context-cache-manifest.v1`
+  `baltor.local-context-cache-manifest`
 - MCP self-test passed with `search_result_id: ctxr-adm-8357098fd0`
 - queue trend: `growing` during the latest proof window
 - queue-health warnings: 1 stale-pending backlog warning from the shared queue.
@@ -1644,7 +1644,7 @@ Latest proof:
 - Expanded `/api/context-gateway/context-schema-catalog`.
   - Now includes provider, pack-builder, and product-surface schema kinds.
 - Added `/api/context-gateway/product-surface`.
-  - Returns `baltor.context-product-surface.v1`.
+  - Returns `baltor.context-product-surface`.
   - Exposes modules, interfaces, deployment models, standards mappings, MVP
     phases, and invariants.
 - Added `context_product_surface` to the MCP wrapper and self-test.
@@ -1671,7 +1671,7 @@ Latest proof:
   `/api/context-gateway/product-surface`
 - schema catalog count from MCP self-test: 9
 - product surface kind from MCP self-test:
-  `baltor.context-product-surface.v1`
+  `baltor.context-product-surface`
 - product module count from MCP self-test: 14
 - MCP tools include `context_product_surface`
 - queue trend: `shrinking`
@@ -1690,7 +1690,7 @@ Follow-up:
 Next action:
 
 - Add a repo-wiki import mock/export shape such as
-  `baltor.repo-wiki-page.v1` so generated wiki pages can be represented in
+  `baltor.repo-wiki-page` so generated wiki pages can be represented in
   context packs with commit-scoped source handles before wiring a real
   DeepWiki/OpenDeepWiki/RepoWiki backend.
 
@@ -1706,15 +1706,15 @@ Next action:
   - Documents that LoRA/domain rerankers are eval-gated adapter profiles with
     lineage and source handles, not global source-of-truth rules.
 - Added `schemas/context-reranker-profile.schema.json`.
-  - Defines `baltor.context-reranker-profile.v1`.
+  - Defines `baltor.context-reranker-profile`.
   - Captures stage, slot, examples, deployment modes, candidate-pool limits,
     latency profile, training metadata, and policy.
 - Added `schemas/context-reranking-policy.schema.json`.
-  - Defines `baltor.context-reranking-policy.v1`.
+  - Defines `baltor.context-reranking-policy`.
   - Captures source-aware scoring signals, pipeline stages, escalation
     triggers, and LoRA adapter promotion policy.
 - Added `/api/context-gateway/reranking`.
-  - Returns `baltor.context-reranking.v1`.
+  - Returns `baltor.context-reranking`.
   - Exposes seven reranker profiles, the source-aware policy, and a sample
     rerank decision.
 - Added MCP tool `context_reranking`.
@@ -1769,18 +1769,18 @@ Latest proof:
     conflict, temporal fragility, graph centrality, downstream risk, source
     quality, ambiguity, and model disagreement.
 - Added `schemas/context-model-profile.schema.json`.
-  - Defines `baltor.context-model-profile.v1`.
+  - Defines `baltor.context-model-profile`.
   - Captures tier, slot, deployment modes, example model families, default
     tasks, max risk, cost profile, privacy constraints, and policy.
 - Added `schemas/context-model-routing-policy.schema.json`.
-  - Defines `baltor.context-model-routing-policy.v1`.
+  - Defines `baltor.context-model-routing-policy`.
   - Captures the weighted escalation formula, threshold ladder, escalation
     triggers, and provider-neutral policy assertions.
 - Added `docs/architecture/baltor-model-routing-ladder.md`.
   - Documents the deterministic -> small local -> mid open -> large open ->
     ensemble -> frontier -> human review ladder and the score thresholds.
 - Added `/api/context-gateway/model-routing`.
-  - Returns `baltor.context-model-routing.v1`.
+  - Returns `baltor.context-model-routing`.
   - Exposes seven model profiles, the routing policy, and a sample route
     decision for the requested task/risk profile.
 - Added MCP tool `context_model_routing`.
@@ -1829,10 +1829,10 @@ Latest proof:
 
 - Extended the context-object schema family for flexible, non-fragile context
   documents:
-  - `baltor.context-assertion.v1`
-  - `baltor.context-dimension-definition.v1`
-  - `baltor.context-dimension-value.v1`
-- Extended `baltor.context-object.v1` with optional namespaced `facets`,
+  - `baltor.context-assertion`
+  - `baltor.context-dimension-definition`
+  - `baltor.context-dimension-value`
+- Extended `baltor.context-object` with optional namespaced `facets`,
   `five_w_one_h`, and `dimension_summary` fields.
 - Updated the schema catalog to expose 12 schema records.
 - Updated the `context-objects` export so every run now materializes:
@@ -1885,7 +1885,7 @@ Next action:
 ## 2026-06-01 Context Dimensions Gateway Tool
 
 - Added `/api/context-gateway/dimensions`.
-  - Returns `baltor.context-dimensions.v1`.
+  - Returns `baltor.context-dimensions`.
   - Supports `run_id`, `dimension_id`, `subject_id`, and `max_values`.
   - Returns empty but valid contract metadata when no run exists, so initial
     route readiness checks remain stable.
@@ -1911,7 +1911,7 @@ Latest proof:
 - dimensions route included in route proof:
   `/api/context-gateway/dimensions`
 - MCP self-test:
-  - `dimensions_kind: baltor.context-dimensions.v1`
+  - `dimensions_kind: baltor.context-dimensions`
   - `dimension_definition_count: 1`
   - `dimension_value_count: 5`
   - tools include `context_dimensions`
@@ -1955,7 +1955,7 @@ Latest proof:
   - `/admin-demo/explore?run=adm-4c5ea8f4a8`
   - `/admin-dashboard/monitor?run=adm-4c5ea8f4a8`
 - MCP self-test:
-  - `dimensions_kind: baltor.context-dimensions.v1`
+  - `dimensions_kind: baltor.context-dimensions`
   - `dimension_definition_count: 1`
   - `dimension_value_count: 5`
   - tools include `context_dimensions`
@@ -2054,7 +2054,7 @@ Next action:
   - `schemas/context-event.schema.json`
   - `schemas/context-pack.schema.json`
 - Added `/api/context-gateway/context-schema-catalog`.
-  - Returns `baltor.context-schema-catalog.v1`.
+  - Returns `baltor.context-schema-catalog`.
   - Lists the context graph schema family and contract layers.
 - Added `context_schema_catalog` to the MCP wrapper and self-test.
 - Updated the end-to-end proof to assert the schema catalog includes object,
@@ -2081,7 +2081,7 @@ Latest proof:
 - context gateway result: `ctxr-adm-c54fb4953a`
 - schema catalog route included in route proof:
   `/api/context-gateway/context-schema-catalog`
-- schema catalog kind: `baltor.context-schema-catalog.v1`
+- schema catalog kind: `baltor.context-schema-catalog`
 - schema count from MCP self-test: 6
 - MCP tools include `context_schema_catalog`
 - queue trend: `shrinking`
@@ -2097,13 +2097,13 @@ Latest proof:
     `contextSchema`, JSON Schema, JSON-LD/schema.org, W3C PROV, W3C Web
     Annotation, RO-Crate, SPDX/CycloneDX, OpenLineage, and OpenTelemetry.
 - Added `schemas/context-object.schema.json`.
-  - Defines `baltor.context-object.v1`.
+  - Defines `baltor.context-object`.
   - Requires `ctx://` source handles and policy fields for derived context,
     promotion, and raw-source-dump handling.
   - Includes provenance, evidence selectors, lineage, MCP delivery metadata,
     freshness, and policy controls.
 - Added `/api/context-gateway/context-object-schema`.
-  - Returns `baltor.context-object-schema.v1`.
+  - Returns `baltor.context-object-schema`.
   - Exposes the raw JSON Schema plus a compact standards profile and policy
     summary for clients.
 - Added `context_object_schema` to the MCP wrapper and self-test.
@@ -2125,11 +2125,11 @@ Latest proof:
 - connector-envelope proof run: `adm-abf78fecd5`
 - context gateway result: `ctxr-adm-9b87821bfe`
 - context cache manifest kind:
-  `baltor.local-context-cache-manifest.v1`
+  `baltor.local-context-cache-manifest`
 - schema route included in route proof:
   `/api/context-gateway/context-object-schema`
 - MCP self-test:
-  `context_object_kind: baltor.context-object.v1`
+  `context_object_kind: baltor.context-object`
 - MCP tools include `context_object_schema`
 - queue trend: `shrinking`
 - queue-health warnings: 1 stale-pending backlog warning from the shared queue.
@@ -2139,11 +2139,11 @@ Latest proof:
 - Added `archive/legacy/docs/architecture/baltor-event-driven-context-sync.md`.
   - Covers push, pull, and push-then-pull sync modes.
   - Defines normalized sync events, check gates, worker routing, and
-    `baltor.repo-wiki-artifact-manifest.v1`.
+    `baltor.repo-wiki-artifact-manifest`.
   - Maps GitHub/GitLab events, CI artifacts, Tekton, Argo Events, local hooks,
     file watchers, and scheduled polling into Baltor lanes.
 - Added `/api/context-gateway/sync-contracts`.
-  - Returns `baltor.context-sync-contracts.v1`.
+  - Returns `baltor.context-sync-contracts`.
   - Exposes trigger types, check gates, artifact manifest kinds, worker routing,
     and connector summaries.
 - Added `context_sync_contracts` to the local MCP wrapper and self-test.
@@ -2166,7 +2166,7 @@ Latest proof:
 - sync route included in route proof:
   `/api/context-gateway/sync-contracts`
 - MCP self-test:
-  `sync_contract_kind: baltor.context-sync-contracts.v1`
+  `sync_contract_kind: baltor.context-sync-contracts`
 - sync trigger count: 9
 - queue trend: `shrinking`
 - queue-health warnings: 1 stale-pending backlog warning from the shared queue.
@@ -2174,6 +2174,6 @@ Latest proof:
 Next action:
 
 - Add a repo-wiki import mock/export shape such as
-  `baltor.repo-wiki-page.v1` so generated wiki pages can be represented in
+  `baltor.repo-wiki-page` so generated wiki pages can be represented in
   context packs with commit-scoped source handles before wiring a real
   DeepWiki/OpenDeepWiki/RepoWiki backend.

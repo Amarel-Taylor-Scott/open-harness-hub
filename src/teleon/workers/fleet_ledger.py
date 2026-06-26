@@ -46,7 +46,7 @@ class FleetLedger:
     def register_worker(self, *, worker_id: str, capability_ids: list, worker_bucket: str = "",
                         provider_id: str = "", queue_names: list | None = None, resource_class: str = "standard_cpu",
                         max_concurrency: int = 1, shutdown_after_idle_seconds: int = 120, now: str = EPOCH) -> dict:
-        w = {"schema_version": "CapabilityWorker.v1", "worker_id": worker_id, "capability_ids": list(capability_ids),
+        w = {"schema_version": "CapabilityWorker", "worker_id": worker_id, "capability_ids": list(capability_ids),
              "worker_bucket": worker_bucket, "provider_id": provider_id, "status": "starting",
              "queue_names": list(queue_names or []), "resource_class": resource_class, "current_task_id": "",
              "active_task_count": 0, "max_concurrency": max_concurrency, "started_at": now, "heartbeat_at": now,
@@ -88,7 +88,7 @@ class FleetLedger:
         if idempotency_key in self._idem:
             return self._tasks[self._idem[idempotency_key]]
         tid = _hid("task-", tenant_id, capability_id, idempotency_key)
-        t = {"schema_version": "CapabilityTask.v1", "task_id": tid, "tenant_id": tenant_id,
+        t = {"schema_version": "CapabilityTask", "task_id": tid, "tenant_id": tenant_id,
              "capability_id": capability_id, "worker_bucket": worker_bucket, "task_type": task_type,
              "priority_class": priority_class, "status": QUEUED, "queue_name": queue_name,
              "payload_ref": payload_ref, "idempotency_key": idempotency_key, "required_provider": required_provider,

@@ -72,7 +72,7 @@ class NativeExportReceipt:
     byte_identical_to_source: bool
     original_overwritten: bool      # ALWAYS False — the invariant, recorded for auditors
     created_at: str
-    schema_version: str = "NativeExportReceipt.v1"
+    schema_version: str = "NativeExportReceipt"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "receipt_id": self.receipt_id, "source_hash": self.source_hash,

@@ -2,9 +2,9 @@
 """scripts.teleon_preseed_capabilities — pre-seed Teleon with capability-DEFINED units across the full
 execution-style spectrum, and PROVE the seed is coherent.
 
-Each unit in architecture/teleon_capability_seed.json is a pure PurposeTaskSpec.v1 (declared by intent +
+Each unit in architecture/teleon_capability_seed.json is a pure PurposeTaskSpec (declared by intent +
 capability_slot + stable input->output contract, NOT by per-task code). This module:
-  - validates every unit against the PurposeTaskSpec.v1 schema (+ the model-built eval_suite rule),
+  - validates every unit against the PurposeTaskSpec schema (+ the model-built eval_suite rule),
   - classifies each unit's escalation tier with the REAL ladder (src/teleon/exploration/ladder.py) and confirms
     it matches the declared tier (template T0 -> deterministic T1 -> model T2 -> open-ended T3),
   - provisions an implementation BY CAPABILITY (priority-ordered registry; provision-by-capability, not code),
@@ -32,7 +32,7 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
 
 _REPO = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _SEED_PATH = _REPO / "architecture" / "teleon_capability_seed.json"
-_SCHEMA_PATH = _REPO / "schemas" / "purpose_tasks" / "PurposeTaskSpec.v1.schema.json"
+_SCHEMA_PATH = _REPO / "schemas" / "purpose_tasks" / "PurposeTaskSpec.schema.json"
 
 
 def _seed() -> dict:
@@ -298,7 +298,7 @@ def _self_test() -> int:
 
     for u in units:
         spec, v = u["spec"], u["variety"]
-        ck(f"{v}: spec is a valid PurposeTaskSpec.v1 (capability-defined, not code)",
+        ck(f"{v}: spec is a valid PurposeTaskSpec (capability-defined, not code)",
            validator.is_valid(spec), str([e.message for e in validator.iter_errors(spec)][:1]))
         # model-built units must carry the eval_suite that DEFINES done (the spec's own rule, via eval_suite_for)
         if str(spec.get("build_mode")) == "model":
@@ -370,7 +370,7 @@ def _self_test() -> int:
 
     print("\n" + ("PASS - teleon_preseed_capabilities: 8 capability-DEFINED units span the full spectrum "
                   "(template -> deterministic -> det+tool -> skill -> tool -> skill+tool -> model -> open-ended), "
-                  "each a valid PurposeTaskSpec.v1 classified at its tier by the real ladder, provisioned by "
+                  "each a valid PurposeTaskSpec classified at its tier by the real ladder, provisioned by "
                   "capability; nothing serves truth; the open-ended worker stays a sandboxed, human-bounded "
                   "candidate; AND the non-det -> det descent is DEMONSTRATED on the real adapt() engine — a model "
                   "capability is promoted to an equivalent, cheaper deterministic rule with the model kept as a "

@@ -6,7 +6,7 @@ specs (docs/contracts/{openapi,asyncapi}.runtime.yaml) are preserved; these GENE
 layer that must cover every registered route/channel and is regenerated, never hand-edited.
 
   - OpenAPI 3.1 from contract_registry.api_routes (one path+method per registered route; bodies/returns reference the
-    registered envelope/artifact schemas; every operation declares an ErrorEnvelope.v1 error response; projection-only
+    registered envelope/artifact schemas; every operation declares an ErrorEnvelope error response; projection-only
     routes carry x-projection-only). Includes the src/teleon/inference/api_projection /api/inference/* read routes.
   - AsyncAPI 3.0 from contract_registry.command_types (CommandEnvelope), event_types (EventEnvelope / CloudEvents) and
     log_events, grouped onto registered queue channels.
@@ -27,9 +27,9 @@ _OPENAPI = _OUT / "openapi.generated.json"
 _ASYNCAPI = _OUT / "asyncapi.generated.json"
 # $ref paths are relative to docs/contracts/ (mirrors the hand-written *.runtime.yaml convention)
 _REF_PREFIX = "../../schemas/"
-_ERR = "envelopes/ErrorEnvelope.v1.schema.json"
-_CMD = "envelopes/CommandEnvelope.v1.schema.json"
-_EVT = "envelopes/EventEnvelope.v1.schema.json"
+_ERR = "envelopes/ErrorEnvelope.schema.json"
+_CMD = "envelopes/CommandEnvelope.schema.json"
+_EVT = "envelopes/EventEnvelope.schema.json"
 
 
 def _registry() -> dict:
@@ -37,11 +37,11 @@ def _registry() -> dict:
 
 
 def _schema_index() -> dict:
-    """logical name (e.g. 'ResolvedInferencePreference.v1') -> schema path relative to schemas/, for every schema on disk."""
+    """logical name (e.g. 'ResolvedInferencePreference') -> schema path relative to schemas/, for every schema on disk."""
     idx: dict[str, str] = {}
     for f in sorted((_REPO / "schemas").rglob("*.schema.json")):
         rel = f.relative_to(_REPO / "schemas").as_posix()
-        idx[f.name.replace(".schema.json", "")] = rel  # 'ResolvedInferencePreference.v1'
+        idx[f.name.replace(".schema.json", "")] = rel  # 'ResolvedInferencePreference'
     return idx
 
 
@@ -74,7 +74,7 @@ def build_openapi() -> dict:
             "x-status": r.get("status", "active"),
             "responses": {
                 "200": {"description": "OK", **({"content": ok_content} if ok_content else {})},
-                "4XX": {"description": "error (ErrorEnvelope.v1)",
+                "4XX": {"description": "error (ErrorEnvelope)",
                         "content": {"application/json": {"schema": _ref(_ERR)}}},
             },
         }
@@ -86,7 +86,7 @@ def build_openapi() -> dict:
             "version": str(reg.get("version", "1.0")),
             "description": ("GENERATED from architecture/contract_registry.json api_routes by "
                            "scripts/build_contract_specs.py — do not hand-edit. Projection-only HTTP surface; "
-                           "bodies/returns are the versioned envelope/artifact schemas; errors are ErrorEnvelope.v1."),
+                           "bodies/returns are the versioned envelope/artifact schemas; errors are ErrorEnvelope."),
         },
         "paths": paths,
     }
@@ -98,12 +98,12 @@ def build_asyncapi() -> dict:
     cmd_channel = "runtime.commands" if "runtime.commands" in queues else "pipeline.commands"
     channels: dict = {
         cmd_channel: {
-            "description": "Durable work queue (lease/ack/nack→DLQ); payload is a CommandEnvelope.v1.",
+            "description": "Durable work queue (lease/ack/nack→DLQ); payload is a CommandEnvelope.",
             "messages": {c["name"]: {"name": c["name"], "x-status": c.get("status", "active"),
                                      "payload": _ref(_CMD)} for c in sorted(reg.get("command_types", []), key=lambda x: x["name"])},
         },
         "runtime.events": {
-            "description": "Facts about what happened (CloudEvents 1.0 EventEnvelope.v1).",
+            "description": "Facts about what happened (CloudEvents 1.0 EventEnvelope).",
             "messages": {e["name"]: {"name": e["name"], "x-status": e.get("status", "active"),
                                      "payload": _ref(_EVT)} for e in sorted(reg.get("event_types", []), key=lambda x: x["name"])},
         },
@@ -120,7 +120,7 @@ def build_asyncapi() -> dict:
             "version": str(reg.get("version", "1.0")),
             "description": ("GENERATED from architecture/contract_registry.json (command_types / event_types / "
                            "log_events) by scripts/build_contract_specs.py — do not hand-edit. Commands are "
-                           "CommandEnvelope.v1 on durable queues; events are EventEnvelope.v1 (CloudEvents 1.0)."),
+                           "CommandEnvelope on durable queues; events are EventEnvelope (CloudEvents 1.0)."),
         },
         "channels": channels,
     }

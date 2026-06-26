@@ -141,7 +141,7 @@ def _sentiment(text: str) -> dict[str, Any]:
     polarity = "negative" if score < -0.1 else "positive" if score > 0.1 else "neutral"
     direction = "escalating" if neg > pos else "resolving" if pos > neg else "flat"
     return {"polarity": polarity, "score": score, "direction": direction,
-            "neg_terms": neg, "pos_terms": pos, "method": "lexicon.v1"}
+            "neg_terms": neg, "pos_terms": pos, "method": "lexicon"}
 
 
 def decompose_multigrain(record: Mapping[str, Any], *, native_id: str,

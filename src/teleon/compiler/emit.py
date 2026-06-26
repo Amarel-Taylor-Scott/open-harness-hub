@@ -213,7 +213,7 @@ def emit_repo(unit: dict, *, scm: str = "github") -> dict[str, str]:
     image = unit["container"]["image"]
     b = unit["budgets"]
     contract = {
-        "schema_version": "TeleonCapabilityRepo.v1", "capability_id": cap, "capability_version": ver,
+        "schema_version": "TeleonCapabilityRepo", "capability_id": cap, "capability_version": ver,
         "runtime_class": unit["runtime_class"], "command": cmd, "env_refs": env_refs, "image": image,
         "budgets": {"timeout_s": int(b["timeout_s"]), "max_attempts": int(b["max_attempts"]), "max_tokens": int(b["max_tokens"])},
         "otel_attrs": unit["logging"]["otel_attrs"], "serves_truth": False, "generated": GENERATED_MARK,

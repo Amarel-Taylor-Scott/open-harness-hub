@@ -38,7 +38,7 @@ they discover reusable procedures.
     "source_uri": "s3://...",
     "context_refs": []
   },
-  "output_contract": "evidence_packet.v1",
+  "output_contract": "evidence_packet",
   "model_policy": {
     "lane": "deterministic|small|medium|frontier",
     "allow_remote": false

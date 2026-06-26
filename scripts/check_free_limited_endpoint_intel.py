@@ -3,7 +3,7 @@
 endpoints + repos by governance class, scores risk, and gates promotion — honestly and deterministically.
 
 Asserts:
-  A. CONTRACTS: FreeLimitedEndpoint.v1 + EndpointDueDiligenceReport.v1 + GatewayRepoAssessment.v1 registered.
+  A. CONTRACTS: FreeLimitedEndpoint + EndpointDueDiligenceReport + GatewayRepoAssessment registered.
   B. REGISTRY: official candidates seeded; EVERY rate_limit_claim is owner_provided_unverified (confidence
      'unverified') — third-party free-tier claims are never trusted.
   C. CLAWLESS: classified browser_agent_runtime (700), NOT an LLM endpoint / inference provider; sandbox-gated.
@@ -49,8 +49,8 @@ def _self_test() -> int:
     A = _REPO / "architecture"
     contracts = json.dumps(json.loads((A / "contract_registry.json").read_text()))
     check("A: 3 contracts registered", all(s in contracts for s in (
-        "inference/FreeLimitedEndpoint.v1.schema.json", "inference/EndpointDueDiligenceReport.v1.schema.json",
-        "inference/GatewayRepoAssessment.v1.schema.json")))
+        "inference/FreeLimitedEndpoint.schema.json", "inference/EndpointDueDiligenceReport.schema.json",
+        "inference/GatewayRepoAssessment.schema.json")))
 
     reg = json.loads((A / "free_limited_llm_endpoint_registry.json").read_text())["endpoints"]
     reports = {r["endpoint_id"]: r for r in FE.run_registry()}

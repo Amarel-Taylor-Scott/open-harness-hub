@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-11. **Status:** built + self-tested (41/41), live the moment a `FLY_API_TOKEN` exists.
 **Code:** `scripts/deploy/teleon_machines_runner.py` ·
-**Consumes:** `src/teleon/compiler/` (`CompiledRuntimeUnit`) + `schemas/runtime/CompiledRuntimeUnit.v1.schema.json` ·
+**Consumes:** `src/teleon/compiler/` (`CompiledRuntimeUnit`) + `schemas/runtime/CompiledRuntimeUnit.schema.json` ·
 **Reuses:** `scripts/deploy/fly_worker_controller.py` (`MachinesAPI`) ·
 **CLI:** `python -m scripts.deploy.teleon_machines_runner`.
 
@@ -34,7 +34,7 @@ needed — so the HTTP code lives in exactly one place and the controller file i
 1. **Load** the unit — a `--launch <unit.json>` file, or a `unit_id` looked up under
    `dist/local-services-state/teleon-compiler/` (the compiled-unit registry, when present).
 2. **Validate at the launch boundary** (`assert_launchable`): the unit must be the right `schema_version`,
-   **schema-valid** against `CompiledRuntimeUnit.v1` (the compiler's own `validate_unit`), **promoted**
+   **schema-valid** against `CompiledRuntimeUnit` (the compiler's own `validate_unit`), **promoted**
    (`gate_evidence.status == "promoted"`), targeted at `fly_machine`, and structurally non-truth. Anything else
    is **REFUSED** with a precise reason. **The only-promoted law holds at launch, not just at compile** — a
    hand-rolled unit that skipped the compiler is still caught here.
@@ -62,7 +62,7 @@ needed — so the HTTP code lives in exactly one place and the controller file i
   tokens; that's the in-machine runtime's job, and the ceiling rides as an OTel/budget attribute).
 - **Teardown is unconditional and runner-owned** (`auto_destroy=false`): the receipt is written *before* destroy,
   and a teardown error is recorded, never swallowed. The runner only ever tears down its own (`managed_by`) machine.
-- **Receipt = lossless lineage.** `TeleonRunReceipt.v1` carries: machine id, started/finished/duration, outcome +
+- **Receipt = lossless lineage.** `TeleonRunReceipt` carries: machine id, started/finished/duration, outcome +
   exit code, **and the full lineage** — `unit_id`, `capability_id`, `capability_version`, `backend`,
   `runtime_class`, the unit's **own** `receipt_refs` (the model-call receipts behind it), `rollback_target`,
   `source_spec_hash`, and the unit's **OTel attrs** (trace correlation survives from compile into the run).

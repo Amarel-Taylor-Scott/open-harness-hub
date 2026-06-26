@@ -37,7 +37,7 @@ def handle(method: str, path: str, query: dict | None = None) -> tuple:
     r = _demo(tenant)
     store = r["store"]
     if method == "POST" and p == "/api/graph/temporal/rebuild":
-        return 200, {"schema_version": "TemporalGraphReceipt.v1", "rebuilt": True, "projection_only": True,
+        return 200, {"schema_version": "TemporalGraphReceipt", "rebuilt": True, "projection_only": True,
                      "receipt": r["receipt"], "current": r["state"]["current_value"]}
     if method != "GET":
         return 405, {"error": "method not allowed", "path": path}

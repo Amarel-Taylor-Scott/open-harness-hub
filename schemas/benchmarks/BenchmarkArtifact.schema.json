@@ -1,0 +1,29 @@
+{
+  "$id": "benchmarks/BenchmarkArtifact",
+  "title": "BenchmarkArtifact",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "An OpenBenchmarkHub benchmark definition: WHAT to measure (capability slots, datasets/tasks, metrics) + its limits + suitability. A benchmark is EVIDENCE, not authority — it is RUN_BY a HarnessArtifact (OpenHarnessHub) and its results cannot by themselves promote a Teleon candidate or become Baltor truth. External benchmarks are catalogued as owner_provided_unverified until confirmed against their official source.",
+  "required": ["benchmark_id", "display_name", "benchmark_family", "capability_slots", "metrics", "datasets",
+               "harnesses", "known_limitations", "contamination_risk", "visibility", "owner", "status_code"],
+  "properties": {
+    "benchmark_id": {"type": "string"},
+    "display_name": {"type": "string"},
+    "benchmark_family": {"type": "string", "description": "-> architecture/benchmark_family_codes.json"},
+    "capability_slots": {"type": "array", "items": {"type": "string"}},
+    "input_contracts": {"type": "array", "items": {"type": "string"}},
+    "output_contracts": {"type": "array", "items": {"type": "string"}},
+    "metrics": {"type": "array", "items": {"type": "string"}},
+    "datasets": {"type": "array"},
+    "harnesses": {"type": "array", "description": "OpenHarnessHub harness ids that RUN this benchmark (or [] + a missing reason)"},
+    "expected_results": {"type": "object", "description": "first-party benchmarks: the ground-truth answer/held-out facts"},
+    "known_limitations": {"type": "array", "items": {"type": "string"}},
+    "contamination_risk": {"type": "string", "enum": ["low", "medium", "high", "unknown"]},
+    "suitability_notes": {"type": "string"},
+    "source": {"type": "string", "description": "first_party | owner_provided_unverified | official_docs"},
+    "confidence": {"type": "string", "enum": ["unverified", "low", "medium", "high"]},
+    "visibility": {"type": "string", "enum": ["public_reference", "public_metadata", "gated", "customer_private", "internal_only"]},
+    "owner": {"type": "string"},
+    "status_code": {"type": "integer", "description": "200 candidate · 500 active reference (never a truth authority)"}
+  }
+}

@@ -172,7 +172,7 @@ def due_diligence(endpoint: dict) -> dict:
     is_provider = code in (100, 200, 300, 400)  # only official endpoints/aggregators are inference providers
     proposal = propose_provider_node(endpoint, code) if is_provider and phase >= 1 else None
     return {
-        "schema_version": "EndpointDueDiligenceReport.v1",
+        "schema_version": "EndpointDueDiligenceReport",
         "endpoint_id": endpoint.get("endpoint_id") or endpoint.get("repo_id") or "(unknown)",
         "class_code": code, "class_label": _class_label(code),
         "risk_score": risk, "risk_dimensions": dims,
@@ -212,7 +212,7 @@ def assess_gateway_repo(repo: dict) -> dict:
         code, reasons = 900, ["raw_key_present_in_listing"]
     pol = _policy()["by_class"][str(code)]
     return {
-        "schema_version": "GatewayRepoAssessment.v1",
+        "schema_version": "GatewayRepoAssessment",
         "repo_id": repo.get("repo_id") or repo.get("example_id") or "(unknown)",
         "class_code": code, "class_label": _class_label(code), "role": pol["role"],
         "executable": pol["executable"], "is_inference_provider": code in (100, 200, 300, 400),

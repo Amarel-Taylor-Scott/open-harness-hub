@@ -13,7 +13,7 @@ For each working provider it asserts, in one pass (the table columns):
   HANDLE     — EVERY artifact carries a populated external_source_handle (the upstream id)
   LINEAGE    — EVERY artifact carries lineage with that same external_source_handle + a rollback_target
   SCOPED     — tenant/project scoping holds: a search in tenant A never returns tenant B (negative-tested)
-  TRACE      — a MemoryTrace is written for each operation AND validates against MemoryTrace.v1
+  TRACE      — a MemoryTrace is written for each operation AND validates against MemoryTrace
   RESULT     — PASS only if all of the above hold for that provider
 
 Also asserts the candidate api/mcp stubs raise UnavailableProvider (naming env://SUPERMEMORY_API_KEY)
@@ -50,18 +50,18 @@ from src.baltor.ports.memory_provider import (  # noqa: E402
 _NOW = 1_700_000_000
 _NOW_ISO = "2026-06-05T00:00:00Z"  # injected ISO string for the trace occurred_at (deterministic)
 
-#: MemoryTrace.v1 schema — the trace each operation writes must validate against it.
-_TRACE_SCHEMA = _REPO / "schemas" / "memory" / "MemoryTrace.v1.schema.json"
+#: MemoryTrace schema — the trace each operation writes must validate against it.
+_TRACE_SCHEMA = _REPO / "schemas" / "memory" / "MemoryTrace.schema.json"
 
 
 def _make_trace(*, operation: str, provider_id: str, tenant_id: str, container: str,
                 request_handle: str, produced_ids: list[str], rollback_target: str) -> dict:
-    """Build a MemoryTrace.v1 for one operation — deterministic id from the operation tuple. LOSSLESS:
+    """Build a MemoryTrace for one operation — deterministic id from the operation tuple. LOSSLESS:
     held_out/rejected are recorded (empty here — nothing dropped), and a rollback_target is always set."""
     trace_id = "mtr-" + hashlib.sha256(
         f"{operation}|{provider_id}|{tenant_id}|{container}|{request_handle}".encode()).hexdigest()[:16]
     return {
-        "schema_version": "MemoryTrace.v1",
+        "schema_version": "MemoryTrace",
         "trace_id": trace_id,
         "tenant_id": tenant_id,
         "container": container,
@@ -157,7 +157,7 @@ def _run_provider(label: str, prov) -> dict:
                      and a["lineage"].get("external_source_handle") == a.get("external_source_handle")
                      and bool(a["lineage"].get("rollback_target")) for a in all_arts)
 
-    # ── traces validate against MemoryTrace.v1 ──
+    # ── traces validate against MemoryTrace ──
     import json as _json
     trace_schema = _json.loads(_TRACE_SCHEMA.read_text(encoding="utf-8"))
     traces = [trace_write, trace_search, trace_profile]
@@ -222,7 +222,7 @@ def _self_test() -> int:
         check(f"{r['label']}: EVERY artifact carries a populated external_source_handle", r["handle_ok"])
         check(f"{r['label']}: EVERY artifact's lineage carries that handle + a rollback_target (lossless)", r["lineage_ok"])
         check(f"{r['label']}: tenant/project scoping holds — tenant A search never returns tenant B (no leak)", r["scoped_ok"])
-        check(f"{r['label']}: a MemoryTrace was written for each op AND validates against MemoryTrace.v1", r["trace_ok"])
+        check(f"{r['label']}: a MemoryTrace was written for each op AND validates against MemoryTrace", r["trace_ok"])
         check(f"{r['label']}: end-to-end RESULT is PASS", r["ok"])
 
     # ── candidate stubs fail CLOSED (never serve) — the only "serve" path is to fail closed ──
@@ -258,7 +258,7 @@ def _self_test() -> int:
     check("negative control: a forged served/canonical artifact is REJECTED by the governance predicate",
           _artifact_governance_problems(forged) != [])
 
-    print(f"\n{'PASS — check_memory_provider_full_stack: the governed memory stack runs end-to-end offline with NO credentials on the local + emulator providers (write->search->profile yields candidate MemoryArtifacts with external_source_handle + lineage + rollback_target; tenant/project scoping holds with no cross-tenant leak; a MemoryTrace is written per op and validates against MemoryTrace.v1); the candidate api/mcp stubs fail CLOSED naming env://SUPERMEMORY_API_KEY; nothing is a served/canonical fact.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
+    print(f"\n{'PASS — check_memory_provider_full_stack: the governed memory stack runs end-to-end offline with NO credentials on the local + emulator providers (write->search->profile yields candidate MemoryArtifacts with external_source_handle + lineage + rollback_target; tenant/project scoping holds with no cross-tenant leak; a MemoryTrace is written per op and validates against MemoryTrace); the candidate api/mcp stubs fail CLOSED naming env://SUPERMEMORY_API_KEY; nothing is a served/canonical fact.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
     return 0 if not fails else 1
 
 

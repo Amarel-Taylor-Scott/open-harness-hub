@@ -1,0 +1,51 @@
+{
+  "valid": {
+    "schema_version": "MemoryArtifact",
+    "artifact_id": "mem-7c1d4a9b2e0f5a83",
+    "tenant_id": "acme",
+    "scope": "tenant_private",
+    "container": "support-agent",
+    "external_source_handle": "supermemory:mem_01HX9Q",
+    "claim_status": "candidate",
+    "content": {"text": "Customer prefers email over phone for dispute updates."},
+    "provider_id": "memory.emulator@v1",
+    "provenance": {"recall_query": "contact preference", "score": 0.82, "search_mode": "hybrid"},
+    "lineage": {
+      "recalled_at": "2026-06-05T00:00:00Z",
+      "source_handles": ["ctx://tenant/acme/source/ticket/T-1029"],
+      "transform_run": "memrun-0001",
+      "rollback_target": "mem-0000000000000000"
+    },
+    "security": {
+      "classification": "internal",
+      "contains_pii": false,
+      "redaction_applied": false
+    },
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_missing_external_source_handle": {
+    "schema_version": "MemoryArtifact",
+    "artifact_id": "mem-7c1d4a9b2e0f5a83",
+    "tenant_id": "acme",
+    "scope": "tenant_private",
+    "container": "support-agent",
+    "claim_status": "candidate",
+    "content": {"text": "Customer prefers email over phone for dispute updates."},
+    "provider_id": "memory.emulator@v1",
+    "lineage": {"recalled_at": "2026-06-05T00:00:00Z"},
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_bad_claim_status": {
+    "schema_version": "MemoryArtifact",
+    "artifact_id": "mem-7c1d4a9b2e0f5a83",
+    "tenant_id": "acme",
+    "scope": "tenant_private",
+    "container": "support-agent",
+    "external_source_handle": "supermemory:mem_01HX9Q",
+    "claim_status": "served",
+    "content": {"text": "Customer prefers email over phone for dispute updates."},
+    "provider_id": "memory.emulator@v1",
+    "lineage": {"recalled_at": "2026-06-05T00:00:00Z"},
+    "created_at": "2026-06-05T00:00:00Z"
+  }
+}

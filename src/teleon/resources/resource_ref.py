@@ -129,7 +129,7 @@ def validate_resource_spec(spec: dict) -> tuple[bool, list[str]]:
 def provision_receipt(spec: dict, *, now: str, outcome: str = "provisioned", binding_id: str | None = None,
                       local_fallback_used: bool = False, reasons: list[str] | None = None) -> dict:
     own = spec.get("ownership_code")
-    return {"schema_version": "ResourceProvisionReceipt.v1",
+    return {"schema_version": "ResourceProvisionReceipt",
             "receipt_id": _sid("rprcpt", spec["spec_id"], now, outcome),
             "spec_id": spec["spec_id"], "resource_ref": f"res://{spec['logical_name']}",
             "binding_id": binding_id, "outcome": outcome, "provider": spec.get("provider", "local"),

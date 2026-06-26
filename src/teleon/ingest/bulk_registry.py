@@ -140,7 +140,7 @@ def ingest_to_feed(dump_path: str | Path, *, registry_format: str, out_path: str
     """Read a registry dump file, map it, and write a discovered-feed JSON the runner ingests. Returns a summary."""
     dump = json.loads(Path(dump_path).read_text(encoding="utf-8"))
     rows = ingest_dump(dump, registry_format=registry_format)
-    feed = {"feed_version": "DiscoveredCapabilityFeed.v1", "discovered_at": "bulk",
+    feed = {"feed_version": "DiscoveredCapabilityFeed", "discovered_at": "bulk",
             "discovery_method": f"bulk_registry_ingest({registry_format}) — deterministic field mapping, no LLM",
             "governance": "CANDIDATES ONLY — discovery is not trust; bulk-ingested heuristics, Stage-2 confirm pending.",
             "candidates": rows}

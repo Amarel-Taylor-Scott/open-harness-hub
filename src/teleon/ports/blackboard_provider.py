@@ -2,14 +2,14 @@
 
 A blackboard provider is the durable, typed analytical STATE substrate for one stateful-swarm task: a shared
 workspace where bounded workers post signals, observations, gaps, calculations, analyses and a synthesis across
-iterations (see ``schemas/blackboard/Blackboard.v1`` + ``BlackboardEntry.v1`` and the typed-body contracts).
+iterations (see ``schemas/blackboard/Blackboard`` + ``BlackboardEntry`` and the typed-body contracts).
 The thesis: agents build persistent typed source-backed state (a blackboard) instead of re-reading docs every
 turn. Teleon RUNS the blackboard as a runtime substrate; Baltor governs what (if anything) becomes served truth.
 
 THE INVARIANT (mirrors the agent-runtime / environment ports): **a blackboard entry is analytical WORKING STATE,
 never served truth.** Every stored entry carries ``serves_truth=False`` (pinned const false by the schema) — a
 worker DISCOVERS/REASONS and PROPOSES onto the blackboard; Baltor STORES/VERIFIES/RECONCILES/CONSUMES separately
-(see ``GovernedBlackboardEntry.v1``, the governance seam — it never makes an entry truth either).
+(see ``GovernedBlackboardEntry``, the governance seam — it never makes an entry truth either).
 
 The store is APPEND-ONLY: entries are written once, with a mandatory :class:`BlackboardWorkerReceipt` recording
 WHAT a worker did (never asserting the entries are true). There is no update and no delete — provenance is
@@ -32,7 +32,7 @@ from typing import Any, Protocol, runtime_checkable
 #: derived from it (and even ``GovernedBlackboardEntry`` keeps ``serves_truth`` const false).
 BLACKBOARD_SERVES_TRUTH = False
 
-#: the typed BlackboardEntry kinds (mirrors the ``BlackboardEntry.v1`` enum; single source for the providers).
+#: the typed BlackboardEntry kinds (mirrors the ``BlackboardEntry`` enum; single source for the providers).
 KIND_SIGNAL = "signal"
 KIND_OBSERVATION = "observation"
 KIND_GAP = "gap"
@@ -50,7 +50,7 @@ BLACKBOARD_ENTRY_KINDS = (
     KIND_SOURCE,
 )
 
-#: the Blackboard.v1 status enum (open -> converged -> compressed). Single source for the providers.
+#: the Blackboard status enum (open -> converged -> compressed). Single source for the providers.
 STATUS_OPEN = "open"
 STATUS_CONVERGED = "converged"
 STATUS_COMPRESSED = "compressed"
@@ -103,7 +103,7 @@ class BlackboardProviderPort(Protocol):
         ...
 
     def create_blackboard(self, task: str, tenant_scope: str, *, now: str) -> dict:
-        """Open a new tenant-scoped Blackboard.v1 workspace and return its row dict.
+        """Open a new tenant-scoped Blackboard workspace and return its row dict.
 
         ``tenant_scope`` is REQUIRED — working state is tenant-isolated and never crosses tenants; an empty
         scope raises :class:`BlackboardWriteRejected` (``missing_tenant_scope``). The blackboard is born

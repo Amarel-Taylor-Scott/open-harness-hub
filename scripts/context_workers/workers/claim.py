@@ -25,7 +25,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("claim_extraction", "fact_signals"),
     task_types=("claim.extract", "fact.candidate.detect"),
     image="baltor-worker-cpu",
-    output_contract="claims.v1",
+    output_contract="claims",
 )
 def claim_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = payload.get("chunks") or chunk_text(str(payload.get("text") or ""))

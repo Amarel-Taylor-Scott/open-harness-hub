@@ -1,0 +1,27 @@
+{
+  "$id": "environments/RewardResult",
+  "title": "RewardResult",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The MEASUREMENT produced by applying a RewardSpec to one environment run. EVIDENCE only: is_truth is always false and a reward result is never a promotion authority by itself — it is a number plus a per-check breakdown, scored deterministically against a declared ruler. passed is a convenience verdict (typically score == max_score, or a spec-defined threshold). The breakdown[] preserves per-check lineage so a winner always has lineage to the losing checks.",
+  "required": [
+    "reward_result_id",
+    "reward_spec_id",
+    "run_id",
+    "score",
+    "max_score",
+    "passed",
+    "breakdown",
+    "is_truth"
+  ],
+  "properties": {
+    "reward_result_id": {"type": "string", "description": "unique id of this measurement"},
+    "reward_spec_id": {"type": "string", "description": "the RewardSpec used to score (the ruler)"},
+    "run_id": {"type": "string", "description": "the environment run that was scored"},
+    "score": {"type": "number", "description": "the achieved score (0 <= score <= max_score)"},
+    "max_score": {"type": "number", "minimum": 0, "description": "the achievable total, echoed from the RewardSpec"},
+    "passed": {"type": "boolean", "description": "convenience verdict for whether the run met the spec's threshold"},
+    "breakdown": {"type": "array", "items": {"type": "object"}, "description": "per-check results {check_id, points, max_points, passed, detail} — lineage from the total to each scoring unit"},
+    "is_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — a reward result is evidence/measurement, never served truth, and never a promotion authority on its own"}
+  }
+}

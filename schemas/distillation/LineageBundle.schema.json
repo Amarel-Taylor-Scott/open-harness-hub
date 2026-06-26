@@ -1,0 +1,22 @@
+{
+  "$id": "distillation/LineageBundle", "title": "LineageBundle", "type": "object", "additionalProperties": false,
+  "description": "The complete lineage for ONE derived artifact: every link it needs to answer the promotability test — which raw + source artifacts (and their exact source handles) back it, which transform runs created it, which receipts warrant it, what was held out / rejected on the way, which prior versions it superseded, and where rollback points. Built by LineageBundle.build(store, artifact_id). A promotable served artifact MUST reach at least one source artifact id (check enforces). tenant_private lineage never enters a global_public bundle.",
+  "required": ["schema_version", "artifact_id", "tenant_id", "scope", "raw_artifact_ids", "source_artifact_ids", "source_handles", "transform_run_ids", "receipts", "held_out_artifact_ids", "rejected_candidate_ids", "prior_version_ids", "rollback_target_ids"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["LineageBundle"]},
+    "artifact_id": {"type": "string", "description": "the derived artifact this bundle traces"},
+    "tenant_id": {"type": "string"},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "raw_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "raw layer ids reached by walking parents to the root"},
+    "source_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "source layer ids; a promotable served artifact must reach >=1"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "exact ctx://... source handles backing this artifact; no empty handle on a promotable artifact"},
+    "parent_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "immediate parents (one hop up the derivation chain)"},
+    "transform_run_ids": {"type": "array", "items": {"type": "string"}, "description": "DistillationRun ids that produced this artifact and its ancestors"},
+    "receipts": {"type": "array", "items": {"type": "string"}, "description": "receipt ids proving each transform was warranted/safe"},
+    "held_out_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "items held out anywhere along the lineage; rehydratable, not erased"},
+    "rejected_candidate_ids": {"type": "array", "items": {"type": "string"}, "description": "losing candidates along the lineage; the winner keeps lineage to the losers"},
+    "prior_version_ids": {"type": "array", "items": {"type": "string"}, "description": "versions superseded by the current one; superseded never deleted"},
+    "rollback_target_ids": {"type": "array", "items": {"type": "string"}, "description": "the version(s) the active pointer can revert to"},
+    "complete": {"type": "boolean", "description": "true when every required link resolved with no empty/dangling handle"}
+  }
+}

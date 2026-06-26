@@ -77,7 +77,7 @@ dist/baltor-context-cache/
 
 The cache writer stores compact facts, risks, source handles, and glossary
 packets. It does not mirror raw source documents. `cache-manifest.json` uses
-kind `baltor.local-context-cache-manifest.v1`, records the latest cached run,
+kind `baltor.local-context-cache-manifest`, records the latest cached run,
 and keeps a small auditable entry list for local Markdown, Obsidian, Basic
 Memory, or Claude-Mem style sync.
 

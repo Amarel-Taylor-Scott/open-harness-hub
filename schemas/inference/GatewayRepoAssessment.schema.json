@@ -1,0 +1,21 @@
+{
+  "$id": "inference/GatewayRepoAssessment",
+  "title": "GatewayRepoAssessment",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "Assessment of a gateway/discovery repo or browser runtime: its governance class (discovery_list = metadata only; self_hosted_gateway = lab candidate only; browser_agent_runtime = sandbox/runtime candidate, NOT an LLM endpoint; shared-key/bypass/reverse-engineered = quarantine), with the import/execution posture. No repo is imported or executed from this assessment; metadata only.",
+  "required": ["repo_id", "class_code", "class_label", "role", "executable", "is_inference_provider", "import_allowed", "reasons", "is_truth"],
+  "properties": {
+    "repo_id": {"type": "string"},
+    "class_code": {"type": "integer"},
+    "class_label": {"type": "string"},
+    "role": {"type": "string"},
+    "executable": {"type": "string"},
+    "is_inference_provider": {"type": "boolean"},
+    "import_allowed": {"type": "boolean", "description": "whether the repo may be imported into the codebase (always false for slice 1 — metadata only)"},
+    "recommended_phase": {"type": "integer"},
+    "portfolio_mapping": {"type": "object"},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "is_truth": {"type": "boolean", "const": false}
+  }
+}

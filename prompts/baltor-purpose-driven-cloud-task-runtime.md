@@ -3,7 +3,7 @@
 Build the **Purpose-Driven Cloud Task (PurposeTask)** runtime: a cloud-agnostic, backend-flexible,
 self-evaluating, self-adapting task object **provisioned by purpose/capability, not by code or infra type.**
 Vision: `docs/architecture/purpose-task-self-adapting-execution.md`. PoC + contract already built (flywheel 316:
-`src/baltor/purpose_tasks/` + `schemas/purpose_tasks/PurposeTaskSpec.v1` + check_purpose_task_{poc,contracts}).
+`src/baltor/purpose_tasks/` + `schemas/purpose_tasks/PurposeTaskSpec` + check_purpose_task_{poc,contracts}).
 
 > **NAMING (load-bearing):** internal name is **PurposeTask** (a.k.a. Purpose-Driven Cloud Task). Do NOT call it
 > "Cloud Task" — that collides with **Google Cloud Tasks** (a managed async queue/dispatch product). PurposeTask

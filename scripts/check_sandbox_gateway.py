@@ -3,7 +3,7 @@
 promotion — local golden path offline, external providers candidate-only, sandbox output is NOT truth.
 
 Asserts:
-  A. CONTRACTS + CATALOG: SandboxRunRequest/Result/Policy.v1 present + registered; provider catalog loads with a
+  A. CONTRACTS + CATALOG: SandboxRunRequest/Result/Policy present + registered; provider catalog loads with a
      local offline_default.
   B. CATALOG GOVERNANCE: local providers active; every EXTERNAL provider is candidate WITH a local_equivalent;
      CubeSandbox is candidate, E2B-compatible, with risks + proof_to_promote (not golden path).
@@ -58,7 +58,7 @@ def _self_test() -> int:
 
     # A
     for c in ("SandboxRunRequest", "SandboxRunResult", "SandboxPolicy"):
-        check(f"A: {c}.v1 registered", f"sandbox/{c}.v1.schema.json" in contracts)
+        check(f"A: {c} registered", f"sandbox/{c}.schema.json" in contracts)
     check("A: catalog offline_default is local", cat["offline_default"] == SB.OFFLINE_DEFAULT_PROVIDER and by_id[cat["offline_default"]]["status"] == "active")
 
     # B

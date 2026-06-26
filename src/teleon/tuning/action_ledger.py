@@ -35,7 +35,7 @@ if str(_REPO) not in sys.path:
 
 from src.teleon.experiments.ids import ID_HASH_SUFFIX_LEN, sha256_hex  # noqa: E402  single-source hash helpers
 
-LEDGER_SCHEMA_VERSION = "TeleonActionLedger.v1"
+LEDGER_SCHEMA_VERSION = "TeleonActionLedger"
 ACTION_ID_PREFIX = "act"            #: human-readable prefix; the suffix is a content hash (never truncation-only)
 SERVES_TRUTH = False                #: an action record is evidence, never a truth claim (CLAUDE.md governance)
 _INDEX_DB_SUFFIX = ".idx.db"        #: co-located rebuildable SQLite index → writes never escape the ledger's dir

@@ -1,7 +1,7 @@
 """src.teleon.io.event_io — project an internal EventBus event into a CloudEvents-compatible EventEnvelope.
 
 The bus (scripts/context_events) emits {seq, kind, stage, component, correlation_id, causation_id, object_ref,
-payload}. This pure projector maps that to a CloudEvents 1.0 envelope (EventEnvelope.v1 / CloudEventProjection.v1),
+payload}. This pure projector maps that to a CloudEvents 1.0 envelope (EventEnvelope / CloudEventProjection),
 enforcing the spine's guarantees: specversion 1.0, deterministic id from (source,type,seq) [never wall-clock],
 type in the allowed kind set (single source), correlation_id present (causation defaults to it for root events),
 and NO raw secret in data (redacted). Pure + deterministic; no src.baltor import (inputs are plain dicts).

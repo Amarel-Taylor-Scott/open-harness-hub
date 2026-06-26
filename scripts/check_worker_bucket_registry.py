@@ -59,8 +59,8 @@ def _self_test() -> int:
     chk("only the gated buckets publish truth", truth_yes <= _TRUTH_BUCKETS, str(truth_yes - _TRUTH_BUCKETS))
     for bid in ("open_ended_agent", "browser", "model_inference"):
         fo = set(buckets[bid]["forbidden_outputs"])
-        chk(f"{bid} forbids CanonicalFact.v1 + ContextResponse.v1", {"CanonicalFact.v1", "ContextResponse.v1"} <= fo)
-    chk("model_inference must emit ModelTrace", "ModelTrace.v1" in buckets["model_inference"]["allowed_outputs"])
+        chk(f"{bid} forbids CanonicalFact + ContextResponse", {"CanonicalFact", "ContextResponse"} <= fo)
+    chk("model_inference must emit ModelTrace", "ModelTrace" in buckets["model_inference"]["allowed_outputs"])
     chk("cpu_gpu_compute has a gpu resource class", any(c.startswith("gpu_") for c in buckets["cpu_gpu_compute"]["resource_classes"]))
     chk("utility forbids the LLM gateway", "LLMGatewayPort" in pol["utility"]["forbidden_ports"])
     chk("open_ended_agent requires sandbox + review", buckets["open_ended_agent"]["sandbox_required"] and buckets["open_ended_agent"]["review_required"])

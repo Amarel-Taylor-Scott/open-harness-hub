@@ -1,0 +1,21 @@
+{
+  "$id": "environments/RewardProviderNode",
+  "title": "RewardProviderNode",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A node in the reward-provider graph: a concrete scorer the spine MAY route a RewardSpec to (deterministic checker, test runner, diff oracle). status moves candidate -> reference -> active under governance; a node is never born active. deterministic flags whether the scorer yields the same RewardResult for the same input+output (preferred — non-deterministic scorers are held back / used only as advisory). serves_truth is always false — a scorer produces a measurement (RewardResult, is_truth=false), never served truth.",
+  "required": [
+    "provider_id",
+    "name",
+    "status",
+    "deterministic",
+    "serves_truth"
+  ],
+  "properties": {
+    "provider_id": {"type": "string", "description": "unique id of this reward provider node"},
+    "name": {"type": "string", "description": "human-readable name, e.g. 'local-deterministic-checker' or 'pytest-runner'"},
+    "status": {"type": "string", "enum": ["candidate", "reference", "active"], "description": "governance status; nodes start as candidate, NEVER active by default"},
+    "deterministic": {"type": "boolean", "description": "true when the scorer is reproducible for the same input+output (preferred)"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — a reward provider produces a measurement, never served truth"}
+  }
+}

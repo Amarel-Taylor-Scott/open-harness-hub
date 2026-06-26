@@ -13,7 +13,7 @@ THE STORE IS APPEND-ONLY AND TRUTH-FREE:
     :class:`BlackboardWriteRejected` (``append_only_violation``). Re-writing the SAME content is idempotent
     (the content-addressed id makes a duplicate a no-op), so a worker that retries its turn is safe.
   - **source-backed** — an ``observation`` with empty/missing ``source_refs`` is REJECTED (``sourceless_observation``):
-    a sourceless claim can never be reconciled or promoted by Baltor (``BlackboardObservation.v1``).
+    a sourceless claim can never be reconciled or promoted by Baltor (``BlackboardObservation``).
   - **never truth** — an entry that sets ``serves_truth`` true is REJECTED (``serves_truth_forbidden``); every
     STORED entry's ``serves_truth`` is pinned False (``BLACKBOARD_SERVES_TRUTH``). A blackboard is working
     state; only Baltor's separate governance + verification rail may promote anything derived from it.
@@ -126,13 +126,29 @@ class LocalSqliteBlackboard:
         )
         self._conn.commit()
 
-    def _next_seq(self) -> int:
-        """A monotonic per-store insertion counter (deterministic ordering key). Not wall-clock, not RNG."""
+    def _next_seq(self, *, autocommit: bool = True) -> int:
+        """A monotonic per-store insertion counter (deterministic ordering key). Not wall-clock, not RNG.
+
+        ``autocommit=False`` is used when the caller is already inside an explicit ``BEGIN`` / ``COMMIT``
+        transaction so the increment is not committed prematurely (keeping entry + receipt atomic).
+        """
         cur = self._conn.cursor()
         cur.execute("INSERT INTO _seq(name, value) VALUES('entry', 1) "
                     "ON CONFLICT(name) DO UPDATE SET value = value + 1")
         cur.execute("SELECT value FROM _seq WHERE name='entry'")
-        return int(cur.fetchone()[0])
+        seq = int(cur.fetchone()[0])
+        if autocommit:
+            self._conn.commit()
+        return seq
+
+    def _transaction(self):
+        """Return the underlying sqlite3 connection as a context manager for one atomic transaction.
+
+        ``sqlite3.Connection`` supports the context-manager protocol starting with a ``BEGIN`` and ending
+        with ``COMMIT`` on clean exit or ``ROLLBACK`` on exception. All writes that must be atomic (entry +
+        receipt + sequence increments) run inside this context.
+        """
+        return self._conn
 
     # ---- describe / status ---------------------------------------------------------------
     def describe(self) -> dict:
@@ -160,25 +176,26 @@ class LocalSqliteBlackboard:
 
     # ---- create --------------------------------------------------------------------------
     def create_blackboard(self, task: str, tenant_scope: str, *, now: str) -> dict:
-        """Open a new tenant-scoped Blackboard.v1 workspace (status=open, entry_count=0). REQUIRES a tenant_scope
+        """Open a new tenant-scoped Blackboard workspace (status=open, entry_count=0). REQUIRES a tenant_scope
         (else :class:`BlackboardWriteRejected` ``missing_tenant_scope``). The id is content-addressed from
-        (task, tenant_scope, now) so the same call is idempotent. Returns the Blackboard.v1-shaped row dict."""
+        (task, tenant_scope, now) so the same call is idempotent. Returns the Blackboard-shaped row dict."""
         if not tenant_scope:
             raise BlackboardWriteRejected(
                 BlackboardWriteRejected.MISSING_TENANT_SCOPE,
                 "create_blackboard requires a non-empty tenant_scope (working state is tenant-isolated)",
             )
         blackboard_id = canonical_id("bb", task, tenant_scope, now)
-        seq = self._next_seq()
         cur = self._conn.cursor()
         # idempotent create: the same (task, tenant_scope, now) re-uses the existing row (content-addressed id).
-        cur.execute(
-            "INSERT OR IGNORE INTO blackboards"
-            "(blackboard_id, task, tenant_scope, created_at, status, iteration, seq) "
-            "VALUES(?,?,?,?,?,?,?)",
-            (blackboard_id, task, tenant_scope, now, STATUS_OPEN, 0, seq),
-        )
-        self._conn.commit()
+        # Wrapped in a transaction so the _seq increment + row write are atomic and never partially visible.
+        with self._transaction():
+            seq = self._next_seq(autocommit=False)
+            cur.execute(
+                "INSERT OR IGNORE INTO blackboards"
+                "(blackboard_id, task, tenant_scope, created_at, status, iteration, seq) "
+                "VALUES(?,?,?,?,?,?,?)",
+                (blackboard_id, task, tenant_scope, now, STATUS_OPEN, 0, seq),
+            )
         return self._blackboard_row(blackboard_id)
 
     def _blackboard_row(self, blackboard_id: str) -> dict:
@@ -201,7 +218,7 @@ class LocalSqliteBlackboard:
             "tenant_scope": row["tenant_scope"],
             "created_at": row["created_at"],
             "status": row["status"],
-            "entry_count": int(count),  # projection of the entry stream (Blackboard.v1)
+            "entry_count": int(count),  # projection of the entry stream (Blackboard)
             "iteration": int(row["iteration"]),
         }
 
@@ -213,6 +230,9 @@ class LocalSqliteBlackboard:
         ``serves_truth`` is pinned False (the input's ``serves_truth`` is read only to REJECT a truthy value).
         Idempotent on a content-identical re-write of the same ``entry_id``; an append-only violation on a
         content-DIFFERENT re-write. Deterministic when ``now`` is injected.
+
+        The entry insert + receipt insert + sequence increments run in a single SQLite transaction so a
+        crash mid-write never leaves an entry without a receipt (or vice versa).
         """
         bb = self._blackboard_row(blackboard_id)  # raises unknown_blackboard if absent
 
@@ -296,45 +316,58 @@ class LocalSqliteBlackboard:
             )
 
         # record the mandatory worker receipt (idempotent on its own content-addressed id).
-        receipt_id = self._record_receipt(blackboard_id, worker_receipt, entry_ids=[entry_id], now=now)
-
-        seq = self._next_seq()
-        cur.execute(
-            "INSERT INTO entries"
-            "(entry_id, blackboard_id, kind, author_worker_id, iteration, source_refs, serves_truth, "
-            " tenant_scope, created_at, body, content_hash, receipt_id, seq) "
-            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (
-                entry_id,
-                blackboard_id,
-                kind,
-                author_worker_id,
-                iteration,
-                json.dumps(source_refs, separators=(",", ":")),
-                0,  # serves_truth pinned False on every stored row — THE INVARIANT
-                tenant_scope,
-                now,
-                json.dumps(body, separators=(",", ":")),
-                content_hash,
-                receipt_id,
-                seq,
-            ),
-        )
-        # keep the blackboard.iteration projection monotonic (never rewinds; entry_count is computed on read).
-        if iteration > int(bb["iteration"]):
-            cur.execute(
-                "UPDATE blackboards SET iteration=? WHERE blackboard_id=?", (iteration, blackboard_id)
+        # Wrapped in a transaction so entry + receipt + sequence increments are all-or-nothing.
+        with self._transaction():
+            receipt_id = self._record_receipt(
+                blackboard_id, worker_receipt, entry_ids=[entry_id], now=now, autocommit=False
             )
-        self._conn.commit()
+            seq = self._next_seq(autocommit=False)
+            cur.execute(
+                "INSERT INTO entries"
+                "(entry_id, blackboard_id, kind, author_worker_id, iteration, source_refs, serves_truth, "
+                " tenant_scope, created_at, body, content_hash, receipt_id, seq) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    entry_id,
+                    blackboard_id,
+                    kind,
+                    author_worker_id,
+                    iteration,
+                    json.dumps(source_refs, separators=(",", ":")),
+                    0,  # serves_truth pinned False on every stored row — THE INVARIANT
+                    tenant_scope,
+                    now,
+                    json.dumps(body, separators=(",", ":")),
+                    content_hash,
+                    receipt_id,
+                    seq,
+                ),
+            )
+            # keep the blackboard.iteration projection monotonic (never rewinds; entry_count is computed on read).
+            if iteration > int(bb["iteration"]):
+                cur.execute(
+                    "UPDATE blackboards SET iteration=? WHERE blackboard_id=?", (iteration, blackboard_id)
+                )
         return self._entry_row(entry_id)
 
-    def _record_receipt(self, blackboard_id: str, worker_receipt: dict, *, entry_ids: list[str], now: str) -> str:
-        """Persist a BlackboardWorkerReceipt.v1-shaped row and return its content-addressed receipt_id.
+    def _record_receipt(
+        self,
+        blackboard_id: str,
+        worker_receipt: dict,
+        *,
+        entry_ids: list[str],
+        now: str,
+        autocommit: bool = True,
+    ) -> str:
+        """Persist a BlackboardWorkerReceipt-shaped row and return its content-addressed receipt_id.
 
         The receipt records WHAT the worker did (worker id/kind, entries written, input/output content hashes,
         start/complete timestamps). It NEVER asserts the entries are true. No raw secrets/keys: any
         ``llm_route_receipt_ref`` is kept verbatim only if it is an env:// / receipt-id handle (the schema's
         pattern); we do not synthesize one. Idempotent on its content-addressed id.
+
+        ``autocommit=False`` is used when the caller is already inside an explicit transaction so the
+        sequence increment + receipt insert are committed together with the entry insert.
         """
         worker_id = worker_receipt["worker_id"]
         worker_kind = worker_receipt.get("worker_kind", "worker")
@@ -364,11 +397,13 @@ class LocalSqliteBlackboard:
         cur = self._conn.cursor()
         existing = cur.execute("SELECT receipt_id FROM receipts WHERE receipt_id=?", (receipt_id,)).fetchone()
         if existing is None:
-            seq = self._next_seq()
+            seq = self._next_seq(autocommit=autocommit)
             cur.execute(
                 "INSERT INTO receipts(receipt_id, blackboard_id, body, seq) VALUES(?,?,?,?)",
                 (receipt_id, blackboard_id, json.dumps(body, separators=(",", ":")), seq),
             )
+        if autocommit:
+            self._conn.commit()
         return receipt_id
 
     def _entry_row(self, entry_id: str) -> dict:

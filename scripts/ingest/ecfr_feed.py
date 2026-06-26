@@ -44,7 +44,7 @@ from scripts.foundry.scrapers import CannedFetcher, Fetcher, HttpFetcher, conten
 # ── Constants (single source of truth; No-Magic-Values) ──────────────────────
 ECFR_TITLES_URL = "https://www.ecfr.gov/api/versioner/v1/titles.json"
 SOURCE_HANDLE_PREFIX = "ctx://ecfr/title"
-PARSER_ID = "ecfr_feed.titles_json.v1"
+PARSER_ID = "ecfr_feed.titles_json"
 
 #: Per-title material freshness fields hashed for the CDC identity (a change in any of these =
 #: the cached title context is stale). Order fixed for a stable hash.

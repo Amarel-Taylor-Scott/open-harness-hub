@@ -38,7 +38,7 @@ def _serving_manifest(run: dict[str, Any], result: dict[str, Any]) -> dict[str, 
     run_id = str(run.get("run_id") or "")
     base_path = f"/api/admin-demo/runs/{run_id}/exports"
     return {
-        "package_type": "baltor.serving_manifest.v1",
+        "package_type": "baltor.serving_manifest",
         "run_id": run_id,
         "status": run.get("status"),
         "summary": {
@@ -105,7 +105,7 @@ def _text_pack(run: dict[str, Any], result: dict[str, Any]) -> bytes:
             },
         })
     payload = {
-        "package_type": "baltor.text_pack.v1",
+        "package_type": "baltor.text_pack",
         "serving_manifest": _serving_manifest(run, result),
         "run": _lineage(run),
         "facts": facts,
@@ -157,7 +157,7 @@ def _audit_zip(run: dict[str, Any], result: dict[str, Any]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         manifest = _serving_manifest(run, result)
-        manifest["package_type"] = "baltor.audit_packet.v1"
+        manifest["package_type"] = "baltor.audit_packet"
         manifest["run"] = _lineage(run)
         manifest["files"] = [
             "manifest.json",

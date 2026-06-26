@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scripts.check_teleon_agent_gateway_boundary_schema_match — PROOF: the RUNTIME
 AgentBoundaryExpansionRequest emitted by the Teleon Agent Capability Gateway matches its published schema
-``schemas/agents/AgentBoundaryExpansionRequest.v1.schema.json`` EXACTLY, AND the two load-bearing safety
+``schemas/agents/AgentBoundaryExpansionRequest.schema.json`` EXACTLY, AND the two load-bearing safety
 invariants survive — status is ALWAYS ``pending_human_approval`` and ``auto_applied`` is ALWAYS False, no
 matter what the caller asks for.
 
@@ -41,7 +41,7 @@ from src.teleon.agent_gateway.gateway import (
 )
 
 _NOW = "2026-06-08T00:00:00Z"  # injected — determinism
-_SCHEMA_PATH = _REPO / "schemas" / "agents" / "AgentBoundaryExpansionRequest.v1.schema.json"
+_SCHEMA_PATH = _REPO / "schemas" / "agents" / "AgentBoundaryExpansionRequest.schema.json"
 
 #: JSON-schema ``type`` -> the Python type(s) a value of that type must be. ``bool`` is intentionally NOT a
 #: valid ``integer``/``number`` (JSON booleans are not numbers), and ``int`` IS a valid ``number``.
@@ -171,7 +171,7 @@ def _self_test() -> int:
           repr(legacy.get("requested_change")))
 
     print("\n" + ("PASS — check_teleon_agent_gateway_boundary_schema_match: the runtime "
-                  "AgentBoundaryExpansionRequest now matches schemas/agents/AgentBoundaryExpansionRequest.v1 "
+                  "AgentBoundaryExpansionRequest now matches schemas/agents/AgentBoundaryExpansionRequest "
                   "EXACTLY (capability_id / requested_change / justification, all required fields present with "
                   "the declared JSON types), the safety invariants are preserved (status forced "
                   "'pending_human_approval', auto_applied forced False — a caller asking for approved/auto-apply "

@@ -1,7 +1,7 @@
 # Teleon Capability Runtime Compiler — promoted capability → deployable runtime unit
 
 **Date:** 2026-06-11. **Status:** built + self-tested (PoC of the backbone; see "What's still demo vs product").
-**Code:** `src/teleon/compiler/` · **Schema:** `schemas/runtime/CompiledRuntimeUnit.v1.schema.json` ·
+**Code:** `src/teleon/compiler/` · **Schema:** `schemas/runtime/CompiledRuntimeUnit.schema.json` ·
 **CLI:** `python -m src.teleon.compiler`.
 
 **Owner intent (the backbone call):** *"Teleon… take contracts/intents/capabilities and automatically build out
@@ -53,7 +53,7 @@ The compiler is the **boundary between "an intent that passed the gate" and "a t
 gate decides *whether* a capability is good; the compiler turns the good ones into *runnable, logged, bounded*
 units — and refuses the rest.
 
-## What a CompiledRuntimeUnit is (`CompiledRuntimeUnit.v1`)
+## What a CompiledRuntimeUnit is (`CompiledRuntimeUnit`)
 
 The per-capability analog of `deploy_topology.json`'s per-service entry. One promoted capability → one unit per
 `exec_target`:
@@ -64,7 +64,7 @@ The per-capability analog of `deploy_topology.json`'s per-service entry. One pro
 | `capability_id` / `capability_version` | the promoted capability record (lineage to the source) |
 | `runtime_class` | the CTS-portable class the CapabilityTask declared (`architecture/capability_runtime_classes.json`) |
 | `backend` | **`src/teleon/purpose_tasks/runtime_binding.bind_allowed`** — the SAME class→backend authority PurposeTask uses |
-| `binding` | the full `RuntimeClassBinding.v1` decision (WHY this backend — lineage, not just which) |
+| `binding` | the full `RuntimeClassBinding` decision (WHY this backend — lineage, not just which) |
 | `exec_target` | `fly_machine` \| `k8s_job` \| `local_process` (the deployable shape this unit pins) |
 | `container.image` | `deploy_topology.json` `image.registry_hint` |
 | `container.command` | the capability runner argv (`-m scripts.teleon_local_runtime --run-capability <id>`) — self-describing |
@@ -107,7 +107,7 @@ borrows everything else.
 
 `compile_capability` raises `NotPromotedError` when `capability["status"] != "promoted"`. An un-gated capability
 **must never become a runtime** — the gate is the admission boundary, and the compiler enforces it at the door.
-It is also enforced **structurally**: `CompiledRuntimeUnit.v1` pins `gate_evidence.status` to `"promoted"`, so a
+It is also enforced **structurally**: `CompiledRuntimeUnit` pins `gate_evidence.status` to `"promoted"`, so a
 unit that claims to deploy a non-promoted capability cannot even validate. A `candidate` or `rolled-back`
 capability is refused with a clear, actionable reason ("run the eval gate to promotion first, then compile").
 
@@ -182,7 +182,7 @@ falls back to a deterministic fixture otherwise. It refuses a non-promoted capab
 **Real now:**
 - The compile is real, pure, and deterministic; the refusal law holds in code **and** schema.
 - All three emitters produce **valid, parseable** configs (the self-test parses the k8s YAML and the fly JSON,
-  and `jsonschema`-validates every unit against `CompiledRuntimeUnit.v1`).
+  and `jsonschema`-validates every unit against `CompiledRuntimeUnit`).
 - It reads **live** promoted-capability state and compiles `cap-redact` (the live promoted capability) end-to-end.
 - Budgets/resources/backends are **joined from policy**, proven by `budget_basis` + the self-test.
 

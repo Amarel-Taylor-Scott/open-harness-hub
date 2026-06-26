@@ -1,7 +1,7 @@
 """src.baltor.ports.source_adapter — the SourceAdapterPort capability interface.
 
 A source adapter is the ONLY thing that touches a raw upstream source. It turns a fetched object into governed
-SourceArtifacts (SourceArtifact.v1) carrying tenant_id/source_id/source_version/source_handle/content_hash/scope/
+SourceArtifacts (SourceArtifact) carrying tenant_id/source_id/source_version/source_handle/content_hash/scope/
 authority/lineage/security — and NOTHING ELSE. It never writes final served facts, never bypasses the artifact
 ledger, and never lets a tenant_private source update global_public. Decomposition → ledger → gate happen downstream.
 
@@ -32,7 +32,7 @@ class SourceAdapterPort(Protocol):
     def plan(self, *, tenant_id: str, source_id: str, scope: str, authority: str,
              sync_mode: str, cursor: dict[str, Any] | None, now: str) -> dict[str, Any]:
         """Produce a deterministic IngestionRun plan (run_id, mode, cursor window) for this source WITHOUT
-        fetching. `now` is injected — no wall-clock. Returns an IngestionRun.v1-shaped dict (status='planned')."""
+        fetching. `now` is injected — no wall-clock. Returns an IngestionRun-shaped dict (status='planned')."""
         ...
 
     def scan(self, *, tenant_id: str, source_id: str, scope: str, cursor: dict[str, Any] | None,
@@ -49,7 +49,7 @@ class SourceAdapterPort(Protocol):
 
     def normalize(self, payload: Any, *, tenant_id: str, source_id: str, source_version: str,
                   scope: str, authority: str, now: str) -> dict[str, Any]:
-        """Turn one raw payload into governed SourceArtifact.v1 records + the per-type source handles. MUST set
+        """Turn one raw payload into governed SourceArtifact records + the per-type source handles. MUST set
         tenant_id/source_id/source_version/source_handle/content_hash/scope/authority on every artifact and MUST
         NOT emit any served/promotion-final fact. Returns {'consumable', 'source_artifacts', 'artifacts', ...}.
         A source whose parser is a cataloged candidate returns consumable=False with a reason + the raw stored."""

@@ -14,7 +14,7 @@ What this proves (the LEAN-CORE detection front end of the ContextOps loop):
     tenant_private context stays tenant-scoped (is_customer_private_override, never widened);
   * THE INVARIANT: every result pins serves_truth=False — a triage is a routing signal, NEVER a served fact;
   * determinism: identical inputs → byte-identical result + a content-addressed, clock-free triage_id;
-  * the v1-shaped to_dict() VALIDATES against schemas/contextops/ContextTriageResult.v1.schema.json and a
+  * the v1-shaped to_dict() VALIDATES against schemas/contextops/ContextTriageResult.schema.json and a
     serves_truth=true mutation is REJECTED by that schema (red-team at the contract layer).
 
 Deterministic, stdlib-only, offline (no network, no RNG, no wall-clock).
@@ -52,7 +52,7 @@ from src.baltor.contextops.triage import (  # noqa: E402
     ContextTriageClassifier,
 )
 
-_SCHEMA = _REPO / "schemas" / "contextops" / "ContextTriageResult.v1.schema.json"
+_SCHEMA = _REPO / "schemas" / "contextops" / "ContextTriageResult.schema.json"
 
 # the twelve canonical lanes (single source for the proof — must equal TRIAGE_LANES AND the contract enum).
 _EXPECTED_LANES = {
@@ -82,7 +82,7 @@ def _self_test() -> int:
     # ── the lane taxonomy is the single source and equals the contract enum ────────────────────────────
     check("TRIAGE_LANES is exactly the 12 canonical lanes",
           set(TRIAGE_LANES) == _EXPECTED_LANES, str(sorted(_EXPECTED_LANES ^ set(TRIAGE_LANES))))
-    check("contract ContextTriageResult.v1 lane enum equals TRIAGE_LANES (no drift)",
+    check("contract ContextTriageResult lane enum equals TRIAGE_LANES (no drift)",
           set(schema.get("properties", {}).get("lane", {}).get("enum", [])) == set(TRIAGE_LANES))
 
     # ── a fixture per lane — each fires, and every result validates + pins serves_truth=False ───────────
@@ -145,7 +145,7 @@ def _self_test() -> int:
         seen_lanes.add(expect)
         check(f"{fk}: serves_truth pinned False (a triage is never a served fact)", res.serves_truth is False)
         errs = _validate(res.to_dict(), schema)
-        check(f"{fk}: to_dict() validates against ContextTriageResult.v1", errs == [], str(errs[:3]))
+        check(f"{fk}: to_dict() validates against ContextTriageResult", errs == [], str(errs[:3]))
         check(f"{fk}: primary lane is one of the 12", res.lane in _EXPECTED_LANES, res.lane)
 
     check("every one of the 12 lanes was demonstrated by a fixture",
@@ -245,7 +245,7 @@ def _self_test() -> int:
                 'fact, a model_interpretation requires source support, current/rate/fee/deadline claims are fragile, '
                 'a FAQ ranks below a source of law, tenant_private context stays tenant-scoped; every result pins '
                 'serves_truth=False; identical inputs give a byte-identical result + a clock-free content-addressed '
-                'triage_id; to_dict() validates against ContextTriageResult.v1 and a serves_truth=true / '
+                'triage_id; to_dict() validates against ContextTriageResult and a serves_truth=true / '
                 'out-of-enum-lane mutation is rejected by that schema.')
     print("\n" + (pass_msg if ok else f"{len(fails)} FAILURES: {fails}"))
     return 0 if ok else 1

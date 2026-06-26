@@ -11,8 +11,8 @@ from typing import Any
 
 from . import model
 
-_PURPOSE_DRAFT_SCHEMA = "PurposeTaskDraft.v1"
-_CAP_DRAFT_SCHEMA = "CapabilityTaskDraft.v1"
+_PURPOSE_DRAFT_SCHEMA = "PurposeTaskDraft"
+_CAP_DRAFT_SCHEMA = "CapabilityTaskDraft"
 _GENERIC_TOKENS = {"prod", "dev", "staging", "test", "function", "job", "app", "svc", "service", "worker",
                    "cron", "lambda", "fn", "handler", "v1", "v2"}
 

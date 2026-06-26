@@ -62,9 +62,9 @@ def _self_test() -> int:
     steps_seen = [p[1] for p in processed] + ["source"]
     check("each step executed exactly once (no double-process)", sorted(set(steps_seen)) == ["decompose", "govern", "package", "source"] and len(steps_seen) == len(set(steps_seen)))
     arts = ledger.run_artifacts(run_id)
-    check("terminal ContextPack artifact produced", "ContextPack.v1" in arts and arts["ContextPack.v1"].get("context_pack_id"))
+    check("terminal ContextPack artifact produced", "ContextPack" in arts and arts["ContextPack"].get("context_pack_id"))
     check("receipt facts_served matches verified facts (gate held across queues)",
-          arts["Receipt.v1"]["facts_served"] == arts["VerifiedFactSet.v1"]["count"])
+          arts["Receipt"]["facts_served"] == arts["VerifiedFactSet"]["count"])
     check("all step queues fully drained", all(store.stats(q)["queued"] == 0 and store.stats(q)["dead"] == 0 for q in queues))
 
     store.close()

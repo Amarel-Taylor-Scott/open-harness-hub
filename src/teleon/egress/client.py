@@ -163,7 +163,7 @@ class EgressClient:
     ) -> dict[str, Any]:
         response_hash = response_summary.get("response_hash") or "sha256:" + sha256_hex(response_summary)
         return {
-            "schema_version": "EgressAttempt.v1",
+            "schema_version": "EgressAttempt",
             "attempt_id": canonical_id("ega", intent["intent_id"], decision["decision_id"], status, completed_at),
             "intent_id": intent["intent_id"],
             "decision_id": decision["decision_id"],

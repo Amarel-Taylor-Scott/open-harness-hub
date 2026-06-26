@@ -45,7 +45,7 @@ schemas/context-object.schema.json
 Kind:
 
 ```text
-baltor.context-object.v1
+baltor.context-object
 ```
 
 Required capabilities:
@@ -69,7 +69,7 @@ Do not conflate these:
 | --- | --- | --- | --- |
 | Runtime context schema | LangChain `contextSchema` | One invocation | user ID, role, tenant, environment, request ID |
 | Agent state schema | LangGraph state | One run or checkpointed conversation | evolving messages, tool results, work plan |
-| Context object | `baltor.context-object.v1` | Persistent or cacheable | source-linked claim, repo-wiki page, glossary packet, context-pack item |
+| Context object | `baltor.context-object` | Persistent or cacheable | source-linked claim, repo-wiki page, glossary packet, context-pack item |
 | Context pack | `implementation_pack`, `review_pack` | Request/serving artifact | compressed set of context objects and handles |
 
 LangChain `contextSchema` is useful for invoking the Baltor client:
@@ -90,7 +90,7 @@ Baltor context objects are what the gateway returns or caches.
 
 ```json
 {
-  "kind": "baltor.context-object.v1",
+  "kind": "baltor.context-object",
   "@context": {
     "schema": "https://schema.org/",
     "prov": "http://www.w3.org/ns/prov#",

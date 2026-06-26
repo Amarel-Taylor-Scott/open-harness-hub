@@ -167,7 +167,7 @@ def build_candidates() -> list[dict]:
 def build_feed() -> dict:
     cands = build_candidates()
     return {
-        "feed_version": "DiscoveredCapabilityFeed.v1",
+        "feed_version": "DiscoveredCapabilityFeed",
         "discovered_at": "2026-06-20",
         "discovery_method": "cross-project import from the DueCare entity-intelligence reference dump (not live re-crawled)",
         "provenance": _PROVENANCE,
@@ -198,8 +198,8 @@ def _self_test() -> int:
     taxonomy = json.loads((_REPO / "architecture" / "fragile_context_taxonomy.json").read_text())
     valid_modes = {m["id"] for m in taxonomy["fragility_modes"]}
 
-    ck("feed conforms to DiscoveredCapabilityFeed.v1 with provenance + governance",
-       feed["feed_version"] == "DiscoveredCapabilityFeed.v1" and bool(feed.get("provenance")) and bool(feed.get("governance")))
+    ck("feed conforms to DiscoveredCapabilityFeed with provenance + governance",
+       feed["feed_version"] == "DiscoveredCapabilityFeed" and bool(feed.get("provenance")) and bool(feed.get("governance")))
     req = {"capability_slot", "intent", "category", "source_kind", "source_name", "source_url", "license",
            "determinism_ceiling", "verify_note", "fragility", "adoptable", "serves_truth"}
     ck("every candidate carries the required candidate keys", all(req <= set(c) for c in cands),

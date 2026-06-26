@@ -2,7 +2,7 @@
 """scripts.check_consumption_service — proof (C-CONSUME-1): the ConsumptionService serves ONLY consumable
 packs, every served fact carries a source handle + receipt lineage, held-out artifacts appear only as
 warnings, allegations are never served, and a non-consumable pack is REFUSED (no served facts). Also covers
-ContextResponse.v1 schema failure cases (missing receipts / missing source handle on a served fact).
+ContextResponse schema failure cases (missing receipts / missing source handle on a served fact).
 
 CLI: python3 scripts/check_consumption_service.py --self-test
 """
@@ -51,8 +51,8 @@ def _self_test() -> int:
                     answer="10 business days", now=NOW)
     resp = out["response"].to_dict()
     check("a consumable pack is SERVED", out["decision"] == "served")
-    check("ContextResponse validates", validate_ref(resp, "consumption/ContextResponse.v1") == [], str(validate_ref(resp, "consumption/ContextResponse.v1")[:3]))
-    check("ConsumptionReceipt validates", validate_ref(out["receipt"].to_dict(), "consumption/ConsumptionReceipt.v1") == [])
+    check("ContextResponse validates", validate_ref(resp, "consumption/ContextResponse") == [], str(validate_ref(resp, "consumption/ContextResponse")[:3]))
+    check("ConsumptionReceipt validates", validate_ref(out["receipt"].to_dict(), "consumption/ConsumptionReceipt") == [])
     check("every served fact has a source handle + verification + optimization lineage",
           all(f.get("source_handle") and f.get("verification_receipt_id") and f.get("optimization_receipt_id") for f in resp["served_facts"]))
     check("held-out artifacts appear only as warnings", [h["artifact_id"] for h in resp["held_out_warnings"]] == ["fact-faq-30"]
@@ -78,9 +78,9 @@ def _self_test() -> int:
 
     # schema failure cases
     bad_missing_receipt = dict(resp); bad_missing_receipt.pop("receipts")
-    check("a ContextResponse missing receipts FAILS schema", validate_ref(bad_missing_receipt, "consumption/ContextResponse.v1") != [])
+    check("a ContextResponse missing receipts FAILS schema", validate_ref(bad_missing_receipt, "consumption/ContextResponse") != [])
     bad_handle = json_with_handleless(resp)
-    check("a served fact missing a source handle FAILS schema", validate_ref(bad_handle, "consumption/ContextResponse.v1") != [])
+    check("a served fact missing a source handle FAILS schema", validate_ref(bad_handle, "consumption/ContextResponse") != [])
 
     print(f"\n{'PASS — check_consumption_service: serves only consumable packs (handles + receipt lineage on every served fact, held-out as warnings, allegations never served); refuses non-consumable packs; deterministic; schema enforced.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
     return 0 if not fails else 1

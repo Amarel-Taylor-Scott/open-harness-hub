@@ -181,7 +181,7 @@ def run_matrix(items: list[dict[str, Any]] | None = None, *, models: tuple[str, 
         "best_condition": max(CONDITIONS, key=lambda c: m(head_model, c)),
     }
     return {
-        "kind": "baltor.context-lift-matrix.v1",
+        "kind": "baltor.context-lift-matrix",
         "conditions": list(CONDITIONS), "models": list(models),
         "cells": cells, "by_model": by_model, "summary": summary,
         "honesty": {

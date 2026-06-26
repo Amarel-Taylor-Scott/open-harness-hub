@@ -1,0 +1,22 @@
+{
+  "$id": "sales/TargetCompany",
+  "title": "TargetCompany",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "A lead-funnel target. Real named companies require owner approval to seed and are public_claim_safe=false by default; exemplar/synthetic targets (is_synthetic=true) exercise the tooling without naming anyone. A pain_hypothesis is a category assumption to confirm via an AUTHORIZED diagnostic — never a public claim.",
+  "required": ["company_id", "is_synthetic", "category", "likely_product_fit", "pain_hypothesis", "public_claim_safe"],
+  "properties": {
+    "company_id": {"type": "string"},
+    "company_name": {"type": "string"},
+    "is_synthetic": {"type": "boolean"},
+    "website": {"type": ["string", "null"], "description": "public site (metadata only); no login/paywall/security bypass"},
+    "category": {"type": "string"},
+    "likely_product_fit": {"type": "string", "enum": ["Teleon", "Baltor", "OpenContextHub", "OpenSkillsHub", "OpenToolsHub", "OpenHarnessHub"]},
+    "pain_hypothesis": {"type": "string"},
+    "evidence_required": {"type": "boolean"},
+    "authorization_basis": {"type": ["string", "null"]},
+    "outreach_owner": {"type": ["string", "null"]},
+    "public_claim_safe": {"type": "boolean"},
+    "owner_approved_to_seed": {"type": "boolean", "description": "real named companies require this true"}
+  }
+}

@@ -4,7 +4,7 @@ DETERMINISTIC runtime candidate (keeping the original as fallback), parses skill
 quarantines unsafe skills. Discovery≠trust; promotion needs sandbox+eval+redteam.
 
 Asserts:
-  A. CONTRACTS: SkillDigestRun/DeterminismExtractionReport/SkillToRuntimeCandidate .v1 present + registered.
+  A. CONTRACTS: SkillDigestRun/DeterminismExtractionReport/SkillToRuntimeCandidate  present + registered.
   B. PARSE-ONLY: the deterministic SKILL.md parses to metadata; the adapter NEVER executes (no exec/subprocess/os.system).
   C. DETERMINISM EXTRACTION: the deterministic sample yields the expected substeps (allowlist · ranking · parser ·
      http_fetch_first · conflict_holdout) + a cheap→expensive cascade incl deterministic, confidence high.
@@ -47,7 +47,7 @@ def _self_test() -> int:
 
     contracts = json.dumps(json.loads((_REPO / "architecture" / "contract_registry.json").read_text()))
     for c in ("SkillDigestRun", "DeterminismExtractionReport", "SkillToRuntimeCandidate"):
-        check(f"A: {c}.v1 registered", f"digestion/{c}.v1.schema.json" in contracts)
+        check(f"A: {c} registered", f"digestion/{c}.schema.json" in contracts)
 
     # B parse-only
     good = D.parse_skill_md((_FX / "deterministic_skill_sample" / "SKILL.md").read_text())
@@ -89,7 +89,7 @@ def _self_test() -> int:
 
     # H composes the sandbox gateway
     check("H: sandbox run required before promotion + Sandbox Gateway contract exists",
-          "sandbox_run" in dg["proof_to_promote"] and (_REPO / "schemas" / "sandbox" / "SandboxRunRequest.v1.schema.json").exists())
+          "sandbox_run" in dg["proof_to_promote"] and (_REPO / "schemas" / "sandbox" / "SandboxRunRequest.schema.json").exists())
 
     # I determinism
     check("I: digest deterministic for fixed now", D.digest_skill(good, source_ref="x", now=_NOW) == D.digest_skill(good, source_ref="x", now=_NOW))

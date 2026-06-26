@@ -87,7 +87,7 @@ def _build(store: LosslessStore, tenant: str = _TENANT, scope: str = TENANT_PRIV
                                   role="winner", now=_NOW)
     # an old ContextResponse served from the baseline (must stay readable across a rollback).
     old_response = store.put_derived(tenant, key="cfpb/response/regE",
-                                     body={"schema_version": "ContextResponse.v1", "answer": "10 business days"},
+                                     body={"schema_version": "ContextResponse", "answer": "10 business days"},
                                      parent_ids=[baseline.entry_id], source_handles=[_HANDLE], scope=scope,
                                      transform_type="consume", transform_run_id="run-consume-1",
                                      role="context_response", now=_NOW)
@@ -198,7 +198,7 @@ def _self_test() -> int:
     plan = RollbackPlan.of(store, key=_PACK_KEY, tenant=_TENANT, to_id=g["baseline"].entry_id, reason="redteam")
     receipt = execute(store, plan, now=_NOW)
     resp_after = store.get(g["old_response"].entry_id, tenant=_TENANT)
-    response_readable = resp_after.body.get("schema_version") == "ContextResponse.v1"
+    response_readable = resp_after.body.get("schema_version") == "ContextResponse"
     candidate_kept = store.has(g["candidate"].entry_id) and receipt.candidate_preserved
     attack_fails_safely("make an old ContextResponse unreadable", response_readable and candidate_kept,
                         f"readable={response_readable} candidate_kept={candidate_kept}")

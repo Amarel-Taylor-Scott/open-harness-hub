@@ -84,7 +84,7 @@ class RuleReplayReport:
     tenant_leak_count: int          # global rule touched tenant_private data — MUST be 0
     verdicts: list
     created_at: str = EPOCH
-    schema_version: str = "RuleReplayReport.v1"
+    schema_version: str = "RuleReplayReport"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "report_id": self.report_id,

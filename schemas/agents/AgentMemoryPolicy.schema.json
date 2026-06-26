@@ -1,0 +1,17 @@
+{
+  "$id": "agents/AgentMemoryPolicy",
+  "title": "AgentMemoryPolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The memory-governance contract for an agent run on the shared plane. scope bounds what the run may read/write: tenant (this tenant's memory only), run (ephemeral, this run only), or none (no memory access). cross_tenant is pinned const false — an agent run can NEVER read or write across tenants; tenant-private lineage never becomes global. writes_allowed gates whether the run may persist memory at all (deny-by-default: false unless explicitly enabled). Anything an agent writes to memory is a candidate proposal, not vouched truth.",
+  "required": [
+    "scope",
+    "cross_tenant",
+    "writes_allowed"
+  ],
+  "properties": {
+    "scope": {"type": "string", "enum": ["tenant", "run", "none"], "description": "memory visibility bound: tenant = this tenant only; run = ephemeral to this run; none = no memory access"},
+    "cross_tenant": {"type": "boolean", "const": false, "description": "ALWAYS false — cross-tenant memory access is forbidden; tenant-private lineage never becomes global"},
+    "writes_allowed": {"type": "boolean", "description": "when false (default), the run may not persist memory; when true, writes are scoped by `scope` and remain candidate proposals"}
+  }
+}

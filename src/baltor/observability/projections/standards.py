@@ -173,7 +173,7 @@ def to_json_patch(*, before: dict, after: dict, governance: dict,
     """Wrap an RFC 6902 patch with Baltor provenance — a portable, deterministic FACT DELTA. The bare
     `patch` array is standards-conformant; the wrapper records who/what authorized the change."""
     return {
-        "schema": "baltor/FactDelta.v1",
+        "schema": "baltor/FactDelta",
         "from_version": from_version,
         "to_version": to_version,
         "patch": json_patch_ops(before, after),

@@ -317,7 +317,7 @@ def interrogate(graph: ContextGraph, question: str, *,
 
     run_seed = json.dumps({"q": question, "auth": authority, "v": answer_value}, sort_keys=True)
     return {
-        "kind": "baltor.graph-interrogation-run.v1",
+        "kind": "baltor.graph-interrogation-run",
         "interrogation_run_id": "gir-" + sha256(run_seed.encode("utf-8")).hexdigest()[:16],
         "question": question,
         "answer": answer,

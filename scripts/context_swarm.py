@@ -231,7 +231,7 @@ def _human_review_request(graph: ContextGraph, oid: str, risk: str, findings: li
     handles = sorted({h for f in findings for h in f.get("evidence", []) if h.startswith("ctx://")})
     seed = json.dumps({"o": oid, "t": trigger, "r": risk}, sort_keys=True)
     return {
-        "kind": "baltor.steward-review-request.v1",
+        "kind": "baltor.steward-review-request",
         "review_request_id": "rr-" + sha256(seed.encode("utf-8")).hexdigest()[:16],
         "trigger": trigger,
         "subject": oid,
@@ -309,7 +309,7 @@ def swarm_object(graph: ContextGraph, object_id: str, *, purpose: str = "verify"
     confidence = round(non_negative / len(findings), 4) if findings else 0.0
 
     consensus = {
-        "kind": "baltor.swarm-consensus.v1",
+        "kind": "baltor.swarm-consensus",
         "object_ref": object_id,
         "risk_level": risk,
         "requires_human_review": requires_human_review,
@@ -334,7 +334,7 @@ def swarm_object(graph: ContextGraph, object_id: str, *, purpose: str = "verify"
     run_seed = json.dumps({"o": object_id, "p": purpose,
                            "f": [f["summary"] for f in findings]}, sort_keys=True)
     return {
-        "kind": "baltor.swarm-run.v1",
+        "kind": "baltor.swarm-run",
         "swarm_run_id": "swarm-" + sha256(run_seed.encode("utf-8")).hexdigest()[:16],
         "object_ref": object_id,
         "purpose": purpose,
@@ -344,7 +344,7 @@ def swarm_object(graph: ContextGraph, object_id: str, *, purpose: str = "verify"
         "review_requests": review_requests,
         "canonical_mutated": False,
         "receipt": {
-            "kind": "baltor.swarm-receipt.v1",
+            "kind": "baltor.swarm-receipt",
             "swarm_receipt_id": "swrc-" + sha256(run_seed.encode("utf-8")).hexdigest()[:16],
             "object_ref": object_id, "findings_count": len(findings), "risk_level": risk,
             "requires_human_review": requires_human_review, "review_requests": [r["review_request_id"] for r in review_requests],

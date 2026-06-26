@@ -1,0 +1,13 @@
+{
+  "$id": "CommandEnvelope", "title": "CommandEnvelope", "type": "object", "additionalProperties": false,
+  "required": ["schema_version","command_id","command_type","tenant_id","run_id","queue","idempotency_key","correlation_id","created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["CommandEnvelope"]},
+    "command_id": {"type": "string"}, "command_type": {"type": "string"}, "tenant_id": {"type": "string"},
+    "run_id": {"type": "string"}, "pipeline_id": {"type": "string"}, "pipeline_version": {"type": "string"},
+    "step_id": {"type": "string"}, "processor_id": {"type": "string"}, "processor_version": {"type": "string"},
+    "queue": {"type": "string"}, "priority": {"type": "string", "enum": ["p0","p1","p2","p3"]},
+    "idempotency_key": {"type": "string"}, "correlation_id": {"type": "string"}, "causation_id": {"type": "string"},
+    "payload": {"type": "object"}, "created_at": {"type": "string"}
+  }
+}

@@ -25,7 +25,7 @@ if __name__ == "__main__" and __package__ in (None, ""):  # pragma: no cover
     if _R not in sys.path:
         sys.path.insert(0, _R)
 
-BENCHMARK = "RuleArena-representative.v1"
+BENCHMARK = "RuleArena-representative"
 
 
 def _airline_baggage(x):  # rule: 1st bag $35, 2nd $45, each bag >50lb +$100

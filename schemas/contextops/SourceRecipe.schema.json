@@ -1,0 +1,192 @@
+{
+  "$id": "contextops/SourceRecipe",
+  "title": "SourceRecipe",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The M2 rung of the cost ladder \u2014 a REUSABLE, deterministic recipe for how to reach + read an authoritative source, distilled from a SourceDiscoveryReport so the same source never has to be re-researched by an LLM. It REQUIRES the source's authority (so reconciliation precedence is encoded, not re-derived), a cross_source policy (how many/which independent confirmations are needed before its output is trusted), and watch triggers (when the recipe must be re-run because the source may have changed). It is a method, not a fact \u2014 it tells the extractor where to look; the extractor's output is still only a candidate. Deterministic when created_at is injected.",
+  "required": [
+    "schema_version",
+    "recipe_id",
+    "tenant_id",
+    "source_scope",
+    "fact_key",
+    "source_handle",
+    "authority",
+    "access",
+    "cross_source",
+    "watch_triggers",
+    "expected_output_schema",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "SourceRecipe"
+      ]
+    },
+    "recipe_id": {
+      "type": "string",
+      "description": "content-addressed over (source_handle, fact_key, access); version in metadata, never in the id"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "fact_key": {
+      "type": "string",
+      "description": "the fact this recipe is a source for"
+    },
+    "source_handle": {
+      "type": "string",
+      "description": "the source this recipe reads (opaque content-addressable handle)"
+    },
+    "derived_from_report_id": {
+      "type": "string",
+      "description": "the SourceDiscoveryReport this recipe distilled (M1->M2 lineage)"
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "REQUIRED \u2014 the authority of this source, encoded so reconciliation precedence is checkable",
+      "required": [
+        "source_type",
+        "authority_rank",
+        "officialness"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "source_of_law",
+            "regulation",
+            "statute",
+            "official_agency",
+            "agency_faq",
+            "vendor_doc",
+            "primary_dataset",
+            "secondary_summary",
+            "blog",
+            "tenant_document"
+          ]
+        },
+        "authority_rank": {
+          "type": "integer",
+          "description": "higher outranks lower \u2014 a FAQ recipe can never outrank a regulation recipe"
+        },
+        "officialness": {
+          "type": "string",
+          "enum": [
+            "official",
+            "semi_official",
+            "unofficial"
+          ]
+        }
+      }
+    },
+    "access": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "how to reach the source \u2014 method, locator, and the retry/rate-limit policy",
+      "required": [
+        "method",
+        "locator",
+        "retry_policy"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "http_get",
+            "api",
+            "file",
+            "fixture"
+          ]
+        },
+        "locator": {
+          "type": "string",
+          "description": "the URL/path/fixture id (no secrets \u2014 auth references a vault handle if needed)"
+        },
+        "auth_ref": {
+          "type": "string",
+          "description": "a vault reference, NEVER an inline secret/key/token"
+        },
+        "retry_policy": {
+          "type": "string",
+          "enum": [
+            "none",
+            "fixed_backoff",
+            "exponential_backoff"
+          ]
+        },
+        "rate_limit_per_min": {
+          "type": "integer"
+        }
+      }
+    },
+    "cross_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "REQUIRED \u2014 the cross-source confirmation policy for output read via this recipe",
+      "required": [
+        "policy",
+        "min_independent_sources"
+      ],
+      "properties": {
+        "policy": {
+          "type": "string",
+          "enum": [
+            "single_official_source_ok",
+            "two_independent_sources_required",
+            "official_source_plus_secondary_confirmation",
+            "tenant_private_requires_human_signoff",
+            "current_value_requires_fresh_source"
+          ]
+        },
+        "min_independent_sources": {
+          "type": "integer"
+        }
+      }
+    },
+    "watch_triggers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "on_demand",
+          "scheduled",
+          "source_change",
+          "conflict_triggered",
+          "high_value_periodic",
+          "tenant_policy_change",
+          "provider_health"
+        ]
+      },
+      "description": "REQUIRED \u2014 when this recipe must re-run because the source may have changed; at least one"
+    },
+    "parser_provider": {
+      "type": "string",
+      "description": "the parser/extractor provider this recipe pairs with (a catalog adapter id)"
+    },
+    "expected_output_schema": {
+      "type": "string",
+      "description": "the schema the recipe's read output must validate against (e.g. fact_assertion_candidate)"
+    },
+    "reliability_score_id": {
+      "type": "string",
+      "description": "the SourceReliabilityScore backing this recipe's trust"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

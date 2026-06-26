@@ -1,0 +1,87 @@
+{
+  "valid": {
+    "schema_version": "PathComparisonReport",
+    "report_id": "pcr-recon-3c4d5e6f7a8b9001",
+    "run_id": "ppr-recon-7f3a9c2e1b4d5a60",
+    "capability_slot": "reconciliation.answer",
+    "baseline_path_id": "path-recon-baseline-llm-0099",
+    "candidate_verdicts": [
+      {
+        "candidate_path_id": "path-recon-deterministic-1a2b3c4d",
+        "same_input": true,
+        "same_output_contract": true,
+        "output_equivalent": true,
+        "source_handles_preserved": true,
+        "held_out_not_leaked": true,
+        "safety_ok": true,
+        "cost_delta": -0.41,
+        "recommended_action": "promote",
+        "notes": "all gates green: same input, same answer (10 business days), handles preserved, FAQ 30-day value not leaked, 41x cheaper"
+      }
+    ],
+    "compared_at": "2026-06-06T00:00:00Z"
+  },
+  "valid_keep_baseline_on_leak": {
+    "schema_version": "PathComparisonReport",
+    "report_id": "pcr-recon-leakcase-99",
+    "run_id": "ppr-recon-7f3a9c2e1b4d5a60",
+    "capability_slot": "reconciliation.answer",
+    "baseline_path_id": "path-recon-baseline-llm-0099",
+    "candidate_verdicts": [
+      {
+        "candidate_path_id": "path-recon-leaky-9z8y7x",
+        "same_input": true,
+        "same_output_contract": true,
+        "output_equivalent": false,
+        "source_handles_preserved": true,
+        "held_out_not_leaked": false,
+        "safety_ok": false,
+        "cost_delta": -0.40,
+        "recommended_action": "keep_baseline",
+        "notes": "candidate leaked the held-out FAQ '30 days' value into the answer; held_out_not_leaked=false blocks promotion"
+      }
+    ],
+    "compared_at": "2026-06-06T00:00:00Z"
+  },
+  "invalid_bad_recommended_action": {
+    "schema_version": "PathComparisonReport",
+    "report_id": "pcr-recon-badaction",
+    "run_id": "ppr-recon-7f3a9c2e1b4d5a60",
+    "capability_slot": "reconciliation.answer",
+    "baseline_path_id": "path-recon-baseline-llm-0099",
+    "candidate_verdicts": [
+      {
+        "candidate_path_id": "path-recon-deterministic-1a2b3c4d",
+        "same_input": true,
+        "same_output_contract": true,
+        "output_equivalent": true,
+        "source_handles_preserved": true,
+        "held_out_not_leaked": true,
+        "safety_ok": true,
+        "cost_delta": -0.41,
+        "recommended_action": "serve_candidate"
+      }
+    ],
+    "compared_at": "2026-06-06T00:00:00Z"
+  },
+  "invalid_verdict_missing_gate": {
+    "schema_version": "PathComparisonReport",
+    "report_id": "pcr-recon-missinggate",
+    "run_id": "ppr-recon-7f3a9c2e1b4d5a60",
+    "capability_slot": "reconciliation.answer",
+    "baseline_path_id": "path-recon-baseline-llm-0099",
+    "candidate_verdicts": [
+      {
+        "candidate_path_id": "path-recon-deterministic-1a2b3c4d",
+        "same_input": true,
+        "same_output_contract": true,
+        "output_equivalent": true,
+        "source_handles_preserved": true,
+        "safety_ok": true,
+        "cost_delta": -0.41,
+        "recommended_action": "promote"
+      }
+    ],
+    "compared_at": "2026-06-06T00:00:00Z"
+  }
+}

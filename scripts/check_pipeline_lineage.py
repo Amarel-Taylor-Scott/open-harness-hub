@@ -51,7 +51,7 @@ def _self_test() -> int:
     check("lineage carries a non-empty OTel span tree", lin["span_count"] >= 3, str(lin["span_count"]))
     check("the span tree is VALID (one trace_id, parents resolve, single root)", validate_span_tree(lin["spans"]) == [])
     check("span tree trace_id == run_id", all(s["trace_id"] == res["run_id"] for s in lin["spans"]))
-    check("ContextPack artifact appears in the lineage", any(a["artifact_type"] == "ContextPack.v1" for a in lin["artifacts"]))
+    check("ContextPack artifact appears in the lineage", any(a["artifact_type"] == "ContextPack" for a in lin["artifacts"]))
     check("unknown run id → no lineage", run_lineage(ledger, store, "run-nope") is None)
 
     store.close()

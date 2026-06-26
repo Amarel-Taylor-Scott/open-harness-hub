@@ -1,0 +1,25 @@
+{
+  "template_id": "worker.command_handler",
+  "standard_id": "standard.durable_command",
+  "variables": [
+    {"name": "handler_name", "required": true, "description": "lowercase handler name; becomes scripts/handlers/<handler_name>.py"},
+    {"name": "command_type", "required": true, "description": "dotted command_type token registered in contract_registry.json#command_types, e.g. corpus.refresh"},
+    {"name": "queue_name", "required": true, "description": "durable queue_name the command is enqueued onto, e.g. ingest.corpus"},
+    {"name": "title", "required": true, "description": "human title for the handler"},
+    {"name": "owner", "required": true, "description": "owning module/path or team"}
+  ],
+  "files": [
+    {"path_template": "scripts/handlers/{{handler_name}}.py", "source": "files/scripts/handlers/handler_name.py"},
+    {"path_template": "scripts/check_{{handler_name}}_handler.py", "source": "files/scripts/check_handler_name_handler.py"},
+    {"path_template": "docs/runtime/{{handler_name}}.md", "source": "files/docs/runtime/handler_name.md"}
+  ],
+  "required_commands_after_generation": [
+    "python3 scripts/check_{{handler_name}}_handler.py --self-test"
+  ],
+  "required_registry_updates": [
+    "architecture/contract_registry.json#command_types += {{command_type}}",
+    "architecture/contract_registry.json#queue_names += {{queue_name}}"
+  ],
+  "required_proofs": ["scripts/check_{{handler_name}}_handler.py"],
+  "required_docs": ["docs/runtime/{{handler_name}}.md"]
+}

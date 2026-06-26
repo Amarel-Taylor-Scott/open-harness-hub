@@ -183,7 +183,7 @@ Before declaring the demo healthy, prove:
 - Context gateway search returns a typed context pack with source handles.
 - Context gateway fetch expands one handle without dumping unlimited raw source.
 - Local cache writer stores bounded context and glossary packets with source
-  handles, writes a `baltor.local-context-cache-manifest.v1` manifest, then
+  handles, writes a `baltor.local-context-cache-manifest` manifest, then
   records an auditable local memory write event.
 - Context gateway connector catalog returns governed connector envelopes.
 - Debug heartbeat returns server, run, queue, worker, event, and contract state.
@@ -227,7 +227,7 @@ Proof run:
   domain term, and `CCO` as an acronym without a source-local definition.
 - glossary resolution packets: 12 source-scoped packets. The filtered gateway
   route `/api/context-gateway/glossary?term=agency` returns one
-  `baltor.glossary-resolution-packet.v1` packet that blocks global memory and
+  `baltor.glossary-resolution-packet` packet that blocks global memory and
   canonical graph promotion until glossary review.
 - routes checked: `/admin-demo/`, `/admin-demo/sources`,
   `/admin-demo/monitoring`, `/admin-demo/outputs`, `/admin-demo/download`,
@@ -252,7 +252,7 @@ Proof run:
   active worker jobs.
 - Monitor HTML includes a Queue health section that renders active jobs and a
   pending backlog sample without requiring raw JSON inspection.
-- `/api/admin-dashboard/queue-health` returns `baltor.queue-health.v1` for
+- `/api/admin-dashboard/queue-health` returns `baltor.queue-health` for
   external monitors.
 - Queue health now includes active/pending stale thresholds, stale counts, and
   warnings. Latest proof showed zero stale active jobs, 10 stale pending sample
@@ -323,7 +323,7 @@ Latest cache-manifest proof:
   `/tmp/baltor-context-cache-proof-nxwnc8e1/cache-manifest.json`
 - cache audit path:
   `/tmp/baltor-context-cache-proof-nxwnc8e1/cache-writes.jsonl`
-- manifest kind: `baltor.local-context-cache-manifest.v1`
+- manifest kind: `baltor.local-context-cache-manifest`
 - manifest entries: 1
 - cache source handles: 11
 - glossary resolution packets: 12
@@ -346,7 +346,7 @@ Latest repo-wiki connector proof:
 Latest sync-contract endpoint proof:
 
 - `/api/context-gateway/sync-contracts` returns
-  `baltor.context-sync-contracts.v1`.
+  `baltor.context-sync-contracts`.
 - It exposes `push`, `pull`, and `push_then_pull` modes, sync check gates,
   worker routing, repo-wiki artifact manifest kinds, connector trigger
   summaries, and commit-scoped output policy.
@@ -354,36 +354,36 @@ Latest sync-contract endpoint proof:
 - Latest verified run: `adm-4f92a59602`.
 - Latest connector-envelope proof run: `adm-6eac40e3bc`.
 - Latest MCP self-test result: `sync_contract_kind:
-  baltor.context-sync-contracts.v1`, `sync_trigger_count: 9`,
+  baltor.context-sync-contracts`, `sync_trigger_count: 9`,
   `search_result_id: ctxr-adm-4f92a59602`.
 
 Context object standards profile:
 
 - `schemas/context-object.schema.json` defines
-  `baltor.context-object.v1` for durable, auditable, source-linked context.
+  `baltor.context-object` for durable, auditable, source-linked context.
 - `docs/architecture/baltor-context-object-standards.md` maps the profile to
   MCP delivery, LangChain-style runtime `contextSchema`, JSON Schema,
   JSON-LD/schema.org, W3C PROV, W3C Web Annotation, RO-Crate, SPDX/CycloneDX,
   OpenLineage, and OpenTelemetry.
 - `/api/context-gateway/context-object-schema` returns
-  `baltor.context-object-schema.v1` with the raw schema, standards mapping, and
+  `baltor.context-object-schema` with the raw schema, standards mapping, and
   policy summary.
 - MCP wrapper exposes the same contract as `context_object_schema`.
 - `docs/architecture/baltor-context-object-graph-profile.md` now stores the
   broader graph-profile standard for versioning, artifacts, typed
   relationships, append-only lineage/history events, and task-specific packs.
 - `/api/context-gateway/context-schema-catalog` returns
-  `baltor.context-schema-catalog.v1` and advertises the context object graph
+  `baltor.context-schema-catalog` and advertises the context object graph
   schema family.
 - `docs/architecture/baltor-context-fabric-product-blueprint.md` stores the
   product framing for Context Fabric: modules, interfaces, deployment models,
   standards mappings, packaging, MVP phases, and product invariants.
 - `/api/context-gateway/product-surface` returns
-  `baltor.context-product-surface.v1` and exposes the same product contract for
+  `baltor.context-product-surface` and exposes the same product contract for
   MCP/API clients.
 - Admin demo exports now include `context-objects`.
-  - Export package type: `baltor.context-objects.v1`.
-  - Internal record kind: `baltor.context-object-graph-records.v1`.
+  - Export package type: `baltor.context-objects`.
+  - Internal record kind: `baltor.context-object-graph-records`.
   - It materializes context objects, immutable versions, derived artifacts,
     typed relationships, source-linked assertions, dimension definitions,
     dimension values, append-only events, and a context pack projection from a
@@ -433,11 +433,11 @@ TryCloudflare proof:
 - gateway status URL returned HTTP 200 and contained
   `baltor-context-gateway`, `context_search`, and
   `retrieval_policy_owned_by_baltor`.
-- heartbeat URL returned HTTP 200 and contained `baltor.debug_heartbeat.v1`;
+- heartbeat URL returned HTTP 200 and contained `baltor.debug_heartbeat`;
 - connector catalog URL returned HTTP 200 and contained `indexed_mirror_first`,
   `gitlab`, and `unrestricted_raw_tools_exposed: false`.
 - queue-health URL returned HTTP 200 through TryCloudflare and included
-  `baltor.queue-health.v1`, `trend`, `throughput`, `history`, and
+  `baltor.queue-health`, `trend`, `throughput`, `history`, and
   `recent_samples`.
 - ownership context search through TryCloudflare returned dated ownership facts
   with event types, source handles, refresh risks, entity candidates,

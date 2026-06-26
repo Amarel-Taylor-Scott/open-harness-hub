@@ -60,14 +60,14 @@ def _self_test() -> int:
     rec1 = ledger.get_run(r1["run_id"])
     check("run ledger records pipeline + version + tenant", rec1["pipeline_version"] == "v1" and rec1["tenant_id"] == "acme")
     check("all 4 steps recorded done", len(rec1["steps"]) == 4 and all(s["status"] == "done" for s in rec1["steps"]))
-    facts_art = ledger.get_artifact(r1["artifact_ids"]["AtomicFactSet.v1"])
+    facts_art = ledger.get_artifact(r1["artifact_ids"]["AtomicFactSet"])
     check("AtomicFactSet artifact content-addressed (>0 facts, #field handles)",
           facts_art["content_hash"] and facts_art["payload"]["count"] > 0
           and all("#" in f["source_handle"] for f in facts_art["payload"]["facts"]))
-    held = ledger.get_artifact(r1["artifact_ids"]["HeldOutAllegationSet.v1"])
+    held = ledger.get_artifact(r1["artifact_ids"]["HeldOutAllegationSet"])
     check("held-out allegations NOT promotion-eligible", all(not a["promotion_eligible"] for a in held["payload"]["allegations"]))
     check("all gates passed", r1["failed_gates"] == [], str(r1["gates"]))
-    receipt = ledger.get_artifact(r1["artifact_ids"]["Receipt.v1"])["payload"]
+    receipt = ledger.get_artifact(r1["artifact_ids"]["Receipt"])["payload"]
     check("receipt facts_served matches verified fact count", receipt["facts_served"] == facts_art["payload"]["count"])
 
     # ── reprocessing semantics ──
@@ -86,8 +86,8 @@ def _self_test() -> int:
     rec2 = ledger.get_run(r2["run_id"])
     pkg_step = next(s for s in rec2["steps"] if s["step_id"] == "package")
     check("v2 lineage shows package.context_pack@v2 (processor swapped by manifest)", pkg_step["processor"] == "package.context_pack@v2")
-    pack2 = ledger.get_artifact(r2["artifact_ids"]["ContextPack.v1"])["payload"]
-    check("v2 pack carries the v2-only fact_index (real swap, not relabel)", "fact_index" in pack2 and pack2["kind"] == "baltor.context-pack.v2")
+    pack2 = ledger.get_artifact(r2["artifact_ids"]["ContextPack"])["payload"]
+    check("v2 pack carries the v2-only fact_index (real swap, not relabel)", "fact_index" in pack2 and pack2["kind"] == "baltor.context-pack")
 
     # ── multi-grain decomposer as a processor-version swap (v3 side-by-side) ──
     v3 = specs["cfpb_structured_ingest@v3"]
@@ -97,7 +97,7 @@ def _self_test() -> int:
     rec3 = ledger.get_run(r3["run_id"])
     dec_step = next(s for s in rec3["steps"] if s["step_id"] == "decompose")
     check("v3 lineage shows decompose.multigrain@v2 (grain = processor-version swap)", dec_step["processor"] == "decompose.multigrain@v2")
-    mg = ledger.get_artifact(r3["artifact_ids"]["MultiGrainSet.v1"])["payload"]
+    mg = ledger.get_artifact(r3["artifact_ids"]["MultiGrainSet"])["payload"]
     grains0 = mg["per_record"][0]["grains"]
     check("v3 produced multi-grain artifact (facts+sentences+paragraphs+conclusion+sentiment)",
           set(grains0) == {"fact", "sentence", "paragraph", "conclusion", "sentiment"})

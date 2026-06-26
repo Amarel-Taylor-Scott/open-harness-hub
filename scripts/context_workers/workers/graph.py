@@ -14,7 +14,7 @@ from scripts.context_workers.registry import TaskContext, TaskResult, registry
     capabilities=("graph_extraction", "lineage_edges"),
     task_types=("graph.extract", "node_edge.build"),
     image="baltor-worker-cpu",
-    output_contract="context_graph.v1",
+    output_contract="context_graph",
 )
 def graph_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     chunks = payload.get("chunks") or []

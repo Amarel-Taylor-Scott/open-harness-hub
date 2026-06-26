@@ -3,7 +3,7 @@
 
 A parse that "ran" is not the same as a parse SAFE to feed into claim extraction. This worker scores a parsed
 document (the ``{"pages":[{"page_no","blocks":[...]}]}`` shape) on text/page coverage, reading-order
-monotonicity, table fidelity, and mean block confidence, and emits the ``ParsedDocument.v1`` ``quality`` block
+monotonicity, table fidelity, and mean block confidence, and emits the ``ParsedDocument`` ``quality`` block
 plus human-readable warnings. It RANKS a parse; it is NEVER a served fact (no truth path). Pure + deterministic:
 the same parse always yields the same scores. stdlib only.
 

@@ -1,0 +1,23 @@
+{
+  "template_id": "ui.projection_page",
+  "standard_id": "standard.ui_projection",
+  "variables": [
+    {"name": "page", "required": true, "description": "lowercase page name; becomes web/baltor/<page>.html"},
+    {"name": "api_endpoint", "required": true, "description": "the projection API the page fetches, e.g. /api/context/serve"},
+    {"name": "title", "required": true, "description": "human page title"},
+    {"name": "owner", "required": true, "description": "owning module/path or team"}
+  ],
+  "files": [
+    {"path_template": "web/baltor/{{page}}.html", "source": "files/web/baltor/page.html"},
+    {"path_template": "scripts/check_{{page}}_ui.py", "source": "files/scripts/check_page_ui.py"},
+    {"path_template": "docs/ui/{{page}}.md", "source": "files/docs/ui/page.md"}
+  ],
+  "required_commands_after_generation": [
+    "python3 scripts/check_{{page}}_ui.py --self-test"
+  ],
+  "required_registry_updates": [
+    "architecture/section_maturity_matrix.json ui_pages += web/baltor/{{page}}.html"
+  ],
+  "required_proofs": ["scripts/check_{{page}}_ui.py"],
+  "required_docs": ["docs/ui/{{page}}.md"]
+}

@@ -76,7 +76,7 @@ Non-reference surfaces ({', '.join(s['section_id'] for s in candidates)}) are ho
 
 ## 2. Correctness invariant status
 INGEST(CFPB decompose) → Verify (gate) → Optimize (bake-off) → Consumption-readiness → ConsumptionService →
-served `ContextResponse.v1`. Reference result: answer **"10 business days"**, FAQ-30 held out as a warning, every
+served `ContextResponse`. Reference result: answer **"10 business days"**, FAQ-30 held out as a warning, every
 served fact source-handled + receipt-lineaged, deterministic. Total sections inventoried: **{len(secs)}**.
 
 ## 3. What works now
@@ -124,7 +124,7 @@ served fact source-handled + receipt-lineaged, deterministic. Total sections inv
 - The admin server is the single allowlisted monolith (split target tracked).
 
 ## 25. Definition of done for next pass
-api_runtime reaches M10: POST /api/context/serve returns a schema-valid ContextResponse.v1 (projection-only, no
+api_runtime reaches M10: POST /api/context/serve returns a schema-valid ContextResponse (projection-only, no
 secrets), GET responses/<id> + receipts/<id> work, check_consumption_api is registered + green, and the matrix
 status flips to m10_complete.
 """

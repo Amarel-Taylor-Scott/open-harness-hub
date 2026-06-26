@@ -36,8 +36,8 @@ Standing law: `docs/codex/lossless-distillation.md`. Engine: `src/baltor/distill
 
 ## Contracts
 
-`DistillationRun.v1`, `LineageBundle.v1`, `InformationRetentionReport.v1`, `RehydrationReport.v1`,
-`PromotionRecord.v1`, `RollbackPlan.v1`.
+`DistillationRun`, `LineageBundle`, `InformationRetentionReport`, `RehydrationReport`,
+`PromotionRecord`, `RollbackPlan`.
 
 ## Inputs / Outputs
 

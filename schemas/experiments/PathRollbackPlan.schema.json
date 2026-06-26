@@ -1,0 +1,18 @@
+{
+  "$id": "experiments/PathRollbackPlan", "title": "PathRollbackPlan", "type": "object", "additionalProperties": false,
+  "description": "The plan to undo a path promotion by moving the active-path pointer for a capability_slot back to the prior baseline — and ONLY the pointer. rollback_target_path_id is the path the pointer reverts to (the prior baseline, == the promotion's rollback_target); from_path_id is the currently-promoted candidate the pointer moves AWAY from but is NEVER deleted (deletes_paths MUST be false, deletes_prior_runs MUST be false). A path promotion is always reversible because every PathPromotionDecision carries a rollback_target; this plan executes that reversal. References the promotion_decision_id it reverses. Mirrors the lossless distillation RollbackPlan: promotion is a pointer move, rollback is the inverse pointer move, the losing/winning paths and prior ParallelPathRuns are all KEPT.",
+  "required": ["schema_version", "plan_id", "capability_slot", "from_path_id", "rollback_target_path_id", "promotion_decision_id", "deletes_paths", "deletes_prior_runs", "reason", "planned_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["PathRollbackPlan"]},
+    "plan_id": {"type": "string"},
+    "capability_slot": {"type": "string", "description": "the capability whose active-path pointer will move"},
+    "from_path_id": {"type": "string", "description": "the promoted candidate the pointer moves AWAY from; kept, never deleted"},
+    "rollback_target_path_id": {"type": "string", "description": "the prior baseline the pointer reverts to (== the promotion's rollback_target)"},
+    "promotion_decision_id": {"type": "string", "description": "the PathPromotionDecision this rollback reverses"},
+    "deletes_paths": {"type": "boolean", "enum": [false], "description": "MUST be false — rollback moves the pointer only, never deletes a path definition"},
+    "deletes_prior_runs": {"type": "boolean", "enum": [false], "description": "MUST be false — prior ParallelPathRuns stay readable after rollback"},
+    "reason": {"type": "string", "description": "why rollback (e.g. handle-coverage dropped, held-out leak detected post-promotion, cost regression)"},
+    "rollback_receipt_id": {"type": "string", "description": "the receipt written when the plan executes"},
+    "planned_at": {"type": "string", "description": "injected time"}
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$id": "io/IdempotencyKey",
+  "title": "IdempotencyKey",
+  "type": "object",
+  "additionalProperties": true,
+  "description": "The idempotency mapping that makes enqueue safe to retry — projected from the FleetLedger's idempotency index: a (idempotency_key) resolves to exactly one live task, so re-enqueuing the same key returns the same work item instead of duplicating it.",
+  "required": ["idempotency_key", "task_id", "tenant_id", "capability_id"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "idempotency_key": {"type": "string"},
+    "task_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "capability_id": {"type": "string"}
+  }
+}

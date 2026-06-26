@@ -9,7 +9,7 @@
 > - **Runtime product / SaaS:** **Teleon** — the purpose-driven, eval-gated, self-adaptive compute runtime.
 > - **Open standard (neutral, stewarded by OpenHarnessHub):** **Capability Task Specification (CTS)** / the
 >   "Open CapabilityTask Spec"; the formal object/kind is **CapabilityTask**. *Teleon implements the spec.*
-> - **Core object (product language):** **PurposeTask** (`PurposeTaskSpec.v1`, shipped; an instance is
+> - **Core object (product language):** **PurposeTask** (`PurposeTaskSpec`, shipped; an instance is
 >   colloquially "a teleon") — Teleon is the reference implementation of CTS.
 > - **Dashboards:** **Teleon Control Tower** (staff) · **Capability Assurance Portal** (customer).
 > - **Domains:** `teleon.dev` (owned). Standard `capabilitytasks.org`/`.io` UNVERIFIED. **Caution:**
@@ -85,7 +85,7 @@ Factory at the cloud layer** — the economic thesis competitors don't center on
   integrations.
 
 ## Object model (a small family, not one YAML)
-`CapabilityTask` (stable contract — built: `PurposeTaskSpec.v1`, CTS-0 conformant) · `CapabilityImplementation`
+`CapabilityTask` (stable contract — built: `PurposeTaskSpec`, CTS-0 conformant) · `CapabilityImplementation`
 (candidate) · `CapabilityRuntimeBinding` (task/impl→runtime class) · `CapabilityEvalSuite` (golden/regression/
 **adversarial**/shadow/human-rubric) · `CapabilityRun` (input/output hash · impl · runtime · cost · latency ·
 policy status · trace · artifacts) · `CapabilityPromotion` (candidate vs incumbent · evidence · approvals ·
@@ -116,7 +116,7 @@ auditable operational memory — failure modes · successful/rejected strategies
    the portfolio + compiler.
 
 ## Build order (mapped to what's SHIPPED — build the next unbuilt rung)
-SHIPPED (flywheel 318): `PurposeTaskSpec.v1` (CTS-0) + runtime-class vocabulary + PurposeTask PoC (provision-by-
+SHIPPED (flywheel 318): `PurposeTaskSpec` (CTS-0) + runtime-class vocabulary + PurposeTask PoC (provision-by-
 capability + drift→side-by-side→promote-if-wins, baseline kept) + Parallel-Path Engine (eval-gated promotion +
 rollback) + execution-backend selector (cloud-agnostic) + numeric provider/preference graph + dashboard
 redaction core (staff/customer projections, deny-by-default).

@@ -51,11 +51,11 @@ _A = _REPO / "architecture"
 #: the compiler's own version — changing it changes unit_id, so a recompile under a new compiler is attributable
 #: (no-magic-values: one definition, surfaced in provenance + the OTel attrs).
 COMPILER_VERSION = "teleon_capability_compiler@v1"
-SCHEMA_VERSION = "CompiledRuntimeUnit.v1"
-#: the contract schema the produced unit validates against (repo ref form: "<dir>/<Name>.v1", matching the
-#: schema's own $id). validate_unit loads schemas/runtime/CompiledRuntimeUnit.v1.schema.json and checks with
+SCHEMA_VERSION = "CompiledRuntimeUnit"
+#: the contract schema the produced unit validates against (repo ref form: "<dir>/<Name>", matching the
+#: schema's own $id). validate_unit loads schemas/runtime/CompiledRuntimeUnit.schema.json and checks with
 #: jsonschema (the unit schema uses union types + const, which the minimal stdlib validator does not cover).
-UNIT_SCHEMA_REF = "runtime/CompiledRuntimeUnit.v1"
+UNIT_SCHEMA_REF = "runtime/CompiledRuntimeUnit"
 #: the ONLY capability status that may compile to a runtime (the gate is the admission boundary).
 PROMOTED_STATUS = "promoted"
 #: the three deployable shapes a unit can emit — PORTABLE by construction (never cloud-locked to one).
@@ -358,12 +358,12 @@ def compile_capability(
 
 
 def _unit_schema() -> dict:
-    """The CompiledRuntimeUnit.v1 schema document (single source: schemas/runtime/CompiledRuntimeUnit.v1)."""
-    return json.loads((_REPO / "schemas" / "runtime" / "CompiledRuntimeUnit.v1.schema.json").read_text(encoding="utf-8"))
+    """The CompiledRuntimeUnit schema document (single source: schemas/runtime/CompiledRuntimeUnit)."""
+    return json.loads((_REPO / "schemas" / "runtime" / "CompiledRuntimeUnit.schema.json").read_text(encoding="utf-8"))
 
 
 def validate_unit(unit: dict) -> list[str]:
-    """Schema-validate a compiled unit against runtime/CompiledRuntimeUnit.v1. Uses the full ``jsonschema``
+    """Schema-validate a compiled unit against runtime/CompiledRuntimeUnit. Uses the full ``jsonschema``
     Draft-2020-12 validator (the unit schema uses union types like ``["integer","number"]`` + ``const`` — the same
     keywords the inference receipt schemas rely on, which the minimal stdlib validator does not cover). Returns a
     sorted list of error strings ([] = valid). Raises if ``jsonschema`` is unavailable (the repo ships it)."""

@@ -5,7 +5,7 @@ The side runner (scripts/context_workers/capability_discovery_runner.py) finds c
 (skills repos, tools repos, MCP servers, plugins, skills packs). THIS module is the governed intake + the
 non-deterministic -> most-deterministic walk for each:
 
-  1. NORMALIZE — source-adapter validation maps a raw discovered row to a CapabilityCandidate.v1 (capability_slot,
+  1. NORMALIZE — source-adapter validation maps a raw discovered row to a CapabilityCandidate (capability_slot,
      intent, input/output contract, category, source provenance, gap/lift hypotheses, determinism estimates).
   2. SCREEN (the cheap Stage-1 gap/lift screen) — a candidate is ACCEPTED only if it declares a real structural
      gap, a real lift, and a determinism estimate in [0,1]. Rejected candidates are RETAINED (held out, not
@@ -42,7 +42,7 @@ from src.teleon.evolution import CapabilityEvolutionGraph, RunnerNode, plan_desc
 _REPO = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 _STAGING_DIR = _REPO / "data" / "capability-candidates"
 
-SCHEMA_VERSION = "CapabilityCandidate.v1"
+SCHEMA_VERSION = "CapabilityCandidate"
 
 #: the source kinds the adapters accept (matches the discovered-feed source_kind field). Two families: discovery-
 #: source kinds (where a candidate was FOUND) + implementation kinds (what BACKS it — a REST/HTTP API, a library,
@@ -79,7 +79,7 @@ def _content_hash(slot: str, source_name: str, intent: str) -> str:
 
 
 def normalize_candidate(raw: dict) -> dict:
-    """Source-adapter: validate + normalize one discovered row into a CapabilityCandidate.v1. Raises SeederError
+    """Source-adapter: validate + normalize one discovered row into a CapabilityCandidate. Raises SeederError
     on a row missing the structural fields an adapter needs (slot/intent/source/category/source_kind)."""
     if not isinstance(raw, dict):
         raise SeederError("candidate row is not an object")
@@ -259,7 +259,7 @@ def _self_test() -> int:
             "gap_hypothesis": "the model has no real-time market access", "lift_hypothesis": "adds a live data API call",
             "determinism_ceiling": 1.0, "deterministic_coverage_estimate": 1.0}
     cand = normalize_candidate(good)
-    ck("normalize produces a CapabilityCandidate.v1 (candidate, never truth)",
+    ck("normalize produces a CapabilityCandidate (candidate, never truth)",
        cand["schema_version"] == SCHEMA_VERSION and cand["status"] == "candidate" and cand["serves_truth"] is False
        and cand["content_hash"].startswith("sha256:"))
     ck("a well-formed candidate passes the gap/lift screen", screen(cand)["accepted"] is True)
@@ -318,7 +318,7 @@ def _self_test() -> int:
            {"federal-register", "regulation", "legal-statute", "financial-data", "scraping", "email", "research"} <= cats,
            str(sorted(cats)))
 
-    print("\n" + ("PASS - capability_seeder: discovered rows normalize into governed CapabilityCandidate.v1, pass a "
+    print("\n" + ("PASS - capability_seeder: discovered rows normalize into governed CapabilityCandidate, pass a "
                   "cheap gap/lift SCREEN (rejects retained, not dropped), and each accepted capability is WALKED "
                   "from its non-deterministic root to the most-deterministic runner it can support (a documented "
                   "deterministic fork covering the estimated fraction, residual routed to the preserved model — "

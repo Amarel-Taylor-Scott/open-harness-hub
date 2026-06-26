@@ -26,8 +26,8 @@ from src.baltor.contextops.source_recipe import build_source_recipe
 from src.baltor.ports.research_agent_provider import AGENT_SERVES_TRUTH
 
 #: contract versions this module emits (single source).
-SOURCE_CANDIDATE_SCHEMA_VERSION = "SourceCandidate.v1"
-RELIABILITY_SCORE_SCHEMA_VERSION = "SourceReliabilityScore.v1"
+SOURCE_CANDIDATE_SCHEMA_VERSION = "SourceCandidate"
+RELIABILITY_SCORE_SCHEMA_VERSION = "SourceReliabilityScore"
 
 #: discovery reads the SHARED canonical source_type→rank map (unified with reliability on 2026-06-18, A3 —
 #: discovery's prior divergent values vendor_doc=40/agency_faq=20/secondary_summary=15/tenant_document=50 are

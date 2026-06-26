@@ -33,7 +33,7 @@ def _self_test() -> int:
     policy = TenantPolicy("acme")
     known = {"art-a", "art-b"}
 
-    resp = gw.complete(_req("ConflictExplanation.v1"), policy, known_artifact_ids=known)
+    resp = gw.complete(_req("ConflictExplanation"), policy, known_artifact_ids=known)
     check("request routes to stub.local@v1", resp.provider == "stub.local" and resp.status == "ok", f"{resp.provider}/{resp.status}")
     check("stub output is schema-valid + grounded + policy-valid", resp.validation.get("ok") is True, str(resp.validation))
     check("output cites only KNOWN input artifacts (grounding)", set(resp.output_json["evidence_artifact_ids"]) <= known)
@@ -42,14 +42,14 @@ def _self_test() -> int:
           tr["provider"] == "stub.local" and tr["model"] and tr["prompt_hash"].startswith("sha256:") and tr["validation"])
 
     # invalid output (schema the stub cannot satisfy) is HANDLED, not crashed
-    bad = gw.complete(_req("StrictConflict.v1"), policy, known_artifact_ids=known)
+    bad = gw.complete(_req("StrictConflict"), policy, known_artifact_ids=known)
     check("an unsatisfiable schema yields a non-ok status (escalated to needs_human), not a crash",
           bad.status == "needs_human", bad.status)
     check("the failed attempt is traced as invalid (schema validation caught it)",
           any(a["status"] == "invalid" for a in bad.trace["attempts"]), str([a["status"] for a in bad.trace["attempts"]]))
 
     # cache: a repeat of a good request returns from cache (no second provider call recorded as ok twice)
-    again = gw.complete(_req("ConflictExplanation.v1"), policy, known_artifact_ids=known)
+    again = gw.complete(_req("ConflictExplanation"), policy, known_artifact_ids=known)
     check("repeat request is served from cache", again.trace.get("cached") is True or again.status == "ok")
 
     print(f"\n{'PASS — check_llm_gateway_stub: gateway routes to the stub provider, validates schema+grounding, escalates invalid output, and traces every attempt.' if not fails else f'{len(fails)} FAILURES: {fails}'}")

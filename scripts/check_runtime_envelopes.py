@@ -25,9 +25,9 @@ def _self_test() -> int:
                           processor_version="v1", payload={"records": []})
     check("CommandEnvelope gets a content-derived command_id + idempotency_key + correlation_id",
           cmd.command_id.startswith("cmd-") and cmd.idempotency_key and cmd.correlation_id == "run-1")
-    check("CommandEnvelope schema_version is versioned", cmd.schema_version == "CommandEnvelope.v1")
+    check("CommandEnvelope schema_version is versioned", cmd.schema_version == "CommandEnvelope")
 
-    evt = EventEnvelope(type="baltor.pipeline.step.completed.v1", source="baltor.test",
+    evt = EventEnvelope(type="baltor.pipeline.step.completed", source="baltor.test",
                         subject="run-1/step/decompose", tenant_id="acme", run_id="run-1", causation_id=cmd.command_id,
                         data={"facts": 3})
     check("EventEnvelope is CloudEvents-shaped (specversion/id/source/type/time/datacontenttype/subject/data)",
@@ -35,7 +35,7 @@ def _self_test() -> int:
     check("correlation/causation chain links event→command", evt.causation_id == cmd.command_id and evt.correlation_id == "run-1")
 
     art = ArtifactEnvelope(artifact_id="run-1:atomic_fact:f1", tenant_id="acme", artifact_type="atomic_fact",
-                           artifact_schema_version="AtomicFact.v1", content_hash=content_hash({"x": 1}),
+                           artifact_schema_version="AtomicFact", content_hash=content_hash({"x": 1}),
                            payload={"text": "t", "field": "company", "claim_status": "fact", "promotion_eligible": True},
                            lineage={"run_id": "run-1", "pipeline_id": "p", "pipeline_version": "v1",
                                     "processor_id": "decompose.cfpb_structured", "processor_version": "v1"},

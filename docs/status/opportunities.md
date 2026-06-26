@@ -3,7 +3,7 @@
 From `architecture/opportunities.json`.
 
 ## P0 (now)
-- **OPP-api-serve** (api_runtime, M, risk medium) — Expose POST /api/context/serve returning ContextResponse.v1. Done when: POST /api/context/serve returns schema-valid ContextResponse.v1
+- **OPP-api-serve** (api_runtime, M, risk medium) — Expose POST /api/context/serve returning ContextResponse. Done when: POST /api/context/serve returns schema-valid ContextResponse
 - **OPP-worker-consume** (workers, M, risk medium) — Durable context.consume command through ConsumptionService. Done when: enqueue context.consume → worker drains → ContextResponse written
 - **OPP-teleon-agent-capability-gateway** (teleon_agent_gateway, L, risk low) — Teleon Agent Capability Gateway — serve AI agents as customers: stable deterministic receipt-backed CapabilityTasks instead of token-burning re-reasoning. Done when: AgentCapabilityCard + run contracts exist + proven
 

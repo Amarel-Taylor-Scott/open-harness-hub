@@ -14,7 +14,7 @@ from pathlib import Path
 
 _REPO = Path(__file__).resolve().parents[1]
 _DOC = _REPO / "docs" / "workers" / "flywheel-supervisor-scaling.md"
-_SCHEMA = _REPO / "schemas" / "workers" / "SupervisorScaling.v1.schema.json"
+_SCHEMA = _REPO / "schemas" / "workers" / "SupervisorScaling.schema.json"
 _CONCEPTS = ["leader lease", "shard", "idempotent", "source of truth", "minReplicas", "SKIP LOCKED",
              "coordination pressure"]
 

@@ -3,7 +3,7 @@
 Single source = architecture/credential_registry.json (env-var NAMES only, never values). The descent calls
 reachable()/missing_for() to pick the cheapest tool that meets the bar AND is reachable, and to say honestly WHICH key
 would unlock a blocked path ("needs OH_LIBRARIESIO_KEY") instead of fabricating a result. Reads os.environ first, then a
-local .env. Complements SecretRef.v1 (resolves a name to a value at runtime) + the service-auth model. serves_truth=false;
+local .env. Complements SecretRef (resolves a name to a value at runtime) + the service-auth model. serves_truth=false;
 Teleon layer — never imports src.baltor.
 """
 from __future__ import annotations

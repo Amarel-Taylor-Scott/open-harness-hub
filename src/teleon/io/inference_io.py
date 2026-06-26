@@ -19,18 +19,18 @@ def _sha(s: str) -> str:
 
 def make_inference_request(*, object_id: str, requested_model_class: str, input_text: str, now: str,
                            preference_id: str = "", task_intent: str = "", tenant_id: str = "") -> dict:
-    """Build an InferenceRequest.v1. The raw prompt is NOT stored — only its hash."""
+    """Build an InferenceRequest. The raw prompt is NOT stored — only its hash."""
     input_hash = _sha(input_text)
     rid = "inreq_" + hashlib.blake2b(f"{object_id}|{preference_id}|{now}|{input_hash}".encode(), digest_size=10).hexdigest()
-    return {"schema_version": "InferenceRequest.v1", "request_id": rid, "object_id": object_id,
+    return {"schema_version": "InferenceRequest", "request_id": rid, "object_id": object_id,
             "preference_id": preference_id or None, "task_intent": task_intent or None,
             "requested_model_class": requested_model_class, "input_hash": input_hash,
             "tenant_id": tenant_id or None, "created_at": now}
 
 
 def project_route_decision(route: dict) -> dict:
-    """Name oips.select_provider's output as a ModelRouteDecision.v1 (carrying the recorded fallback trail)."""
-    out = {"schema_version": "ModelRouteDecision.v1"}
+    """Name oips.select_provider's output as a ModelRouteDecision (carrying the recorded fallback trail)."""
+    out = {"schema_version": "ModelRouteDecision"}
     for k in _ROUTE_FIELDS:
         if k in route:
             out[k] = route[k]

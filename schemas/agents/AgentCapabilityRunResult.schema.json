@@ -1,0 +1,31 @@
+{
+  "$id": "agents/AgentCapabilityRunResult",
+  "title": "AgentCapabilityRunResult",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The COMPACT, receipt-backed outcome of one AgentCapabilityRunRequest — what the gateway returns to the agent instead of the full raw corpus / tool-logs / reasoning chain. status is verified|succeeded|failed|unavailable (verified = Baltor governs the served facts; succeeded = a deterministic result with no truth claim; unavailable = could not run within policy/cost/freshness — e.g. a candidate runtime is not executed here). It carries the output, the source_handles that back any served facts, the held_out items (alternatives/contradictions kept separate, never silently dropped — lossless), the receipt_id, whether an LLM fallback_used, a tokens_saved_estimate (the agent's reason to call Teleon rather than re-solve), and the allowed_use carried forward. serves_truth is pinned const false: the gateway proposes/serves GOVERNED EVIDENCE under Baltor's rail; the result itself is never self-asserted, promotable truth.",
+  "required": [
+    "request_id",
+    "capability_id",
+    "status",
+    "source_handles",
+    "held_out",
+    "fallback_used",
+    "tokens_saved_estimate",
+    "serves_truth",
+    "allowed_use"
+  ],
+  "properties": {
+    "request_id": {"type": "string", "description": "echoes the request_id of the AgentCapabilityRunRequest"},
+    "capability_id": {"type": "string", "description": "the capability that ran"},
+    "status": {"type": "string", "enum": ["verified", "succeeded", "failed", "unavailable"], "description": "verified = facts governed by Baltor's verification rail; succeeded = deterministic result, no truth claim; failed = ran but errored; unavailable = could not run within policy/cost/freshness (candidate runtime not executed; capability not allowed)"},
+    "output": {"type": ["object", "string", "array", "number", "boolean", "null"], "description": "the compact result of the capability; for context capabilities this is governed EVIDENCE (with source_handles), never self-asserted LLM truth"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "the source handles that back any served facts (ctx://... / provenance refs); empty only when the capability serves no facts (e.g. a pure utility hash)"},
+    "held_out": {"type": "array", "items": {"type": "object"}, "description": "alternatives, contradictions, or superseded values kept SEPARATE and surfaced, never silently dropped (lossless distillation); e.g. a held-out '30 days' beside a served '10 business days'"},
+    "receipt_id": {"type": ["string", "null"], "description": "id of the AgentCapabilityReceipt for this run; null only when status=unavailable and no receipt was produced"},
+    "fallback_used": {"type": ["string", "null"], "description": "the token-ladder step actually used if it fell past deterministic (e.g. 'api', 'llm_fallback', 'human'), or null when the deterministic/cache hot path served it; an LLM step never makes the output truth"},
+    "tokens_saved_estimate": {"type": ["integer", "number", "null"], "description": "estimated frontier tokens the agent saved by calling this governed capability instead of re-solving the workflow itself (the gateway's value metric)"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — the gateway serves governed EVIDENCE under Baltor's rail; a capability result is never self-asserted, promotable truth"},
+    "allowed_use": {"type": "array", "items": {"type": "string"}, "description": "the uses this output is governed for, carried forward from the capability + request"}
+  }
+}

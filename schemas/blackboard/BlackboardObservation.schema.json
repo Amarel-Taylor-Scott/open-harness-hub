@@ -1,0 +1,21 @@
+{
+  "$id": "blackboard/BlackboardObservation",
+  "title": "BlackboardObservation",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "An OBSERVATION entry: a factual statement a worker extracted from a source. PROVENANCE IS MANDATORY — source_refs is required and non-empty (minItems 1): an observation with no source is rejected, because a sourceless claim can never be reconciled or promoted by Baltor. confidence records the worker's calibrated belief but is evidence, not authority. The matching BlackboardEntry row (kind=observation) carries serves_truth=false; an observation is candidate working state, never served truth.",
+  "required": [
+    "entry_id",
+    "blackboard_id",
+    "statement",
+    "source_refs",
+    "confidence"
+  ],
+  "properties": {
+    "entry_id": {"type": "string", "description": "id of the BlackboardEntry (kind=observation) this body belongs to"},
+    "blackboard_id": {"type": "string", "description": "the blackboard this observation belongs to"},
+    "statement": {"type": "string", "description": "the factual statement extracted from the source(s)"},
+    "source_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1, "description": "BlackboardSourceRef ids backing this observation — REQUIRED and non-empty; a sourceless observation is rejected"},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1, "description": "the worker's calibrated confidence in the statement (evidence, not authority)"}
+  }
+}

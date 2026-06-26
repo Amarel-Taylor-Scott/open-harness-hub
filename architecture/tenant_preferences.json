@@ -1,5 +1,5 @@
 {
-  "version": "TenantPreferences.v1",
+  "version": "TenantPreferences",
   "purpose": "The tunable front door per tenant. A tenant declares: a SOFT objective + axis priorities (what to optimize), HARD constraints (blockers that must hold — e.g. MIT-only license, vetted-only sources, no external egress), an accuracy tolerance (how far a descent may drop accuracy), and free-form SUGGESTIONS (advisory hints). This COMPILES to the machinery we already have: hard_constraints -> an OrgGuardrailPolicy (excludes disallowed providers/runners/forks before any selection — safety beats objective), objective_preset/weights -> a CapabilityObjective (ranks the allowed options), accuracy.max_accuracy_drop -> the A/B harness tolerance. Hard blocks; soft ranks; suggestions advise. Data only — read by src/teleon/governance/tenant_preferences.py; never a src.baltor symbol; never serves truth.",
   "default": {
     "objective_preset": "balanced",

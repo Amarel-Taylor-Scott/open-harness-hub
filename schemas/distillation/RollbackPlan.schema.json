@@ -1,0 +1,20 @@
+{
+  "$id": "distillation/RollbackPlan", "title": "RollbackPlan", "type": "object", "additionalProperties": false,
+  "description": "The plan to undo a promotion by moving the active pointer back — and ONLY the pointer. The lossless law's rollback gate: rollback_target_id is the version the pointer reverts to; from_artifact_id is the currently-promoted candidate that the pointer moves away from but is NEVER deleted (deletes_artifacts MUST be false, deletes_prior_responses MUST be false). Executing the plan writes a rollback receipt (rollback_receipt_id). Tenant-scoped: a rollback for tenant A only touches tenant A's pointer.",
+  "required": ["schema_version", "plan_id", "tenant_id", "scope", "artifact_key", "from_artifact_id", "rollback_target_id", "deletes_artifacts", "deletes_prior_responses", "reason"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["RollbackPlan"]},
+    "plan_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "artifact_key": {"type": "string", "description": "the logical key whose current pointer will move"},
+    "from_artifact_id": {"type": "string", "description": "the promoted candidate the pointer moves AWAY from; kept, never deleted"},
+    "rollback_target_id": {"type": "string", "description": "the version the pointer reverts to (the prior active version)"},
+    "promotion_id": {"type": "string", "description": "the PromotionRecord this rollback reverses"},
+    "deletes_artifacts": {"type": "boolean", "description": "MUST be false — rollback moves the pointer only, never deletes the promoted candidate"},
+    "deletes_prior_responses": {"type": "boolean", "description": "MUST be false — prior consumed responses stay readable after rollback"},
+    "reason": {"type": "string", "description": "why rollback (e.g. monitoring red, handle-leak, stale-served)"},
+    "rollback_receipt_id": {"type": "string", "description": "the receipt written when the plan executes"},
+    "planned_at": {"type": "string", "description": "injected time"}
+  }
+}

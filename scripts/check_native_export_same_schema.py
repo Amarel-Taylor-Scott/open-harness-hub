@@ -96,7 +96,7 @@ def _self_test() -> int:
           lossy_shape != in_shape, "dropped 'active' but shapes compared equal — check is blind")
 
     # ── every declared OUTPUT_MODE is exportable without error (mode vocabulary coverage) ──
-    ctx = {"schema_version": "ContextResponse.v1", "response_id": "ctxresp-demo"}
+    ctx = {"schema_version": "ContextResponse", "response_id": "ctxresp-demo"}
     for mode in OUTPUT_MODES:
         vc = changes if mode in ("schema_preserving", "schema_preserving_with_sidecar", "compare") else None
         r = svc.export(raw_json, output_mode=mode, verified_changes=vc, context_response=ctx, now=_NOW)

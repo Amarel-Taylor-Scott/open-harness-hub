@@ -28,11 +28,11 @@ def _self_test() -> int:
             fails.append(name)
 
     for name in _REQUIRED:
-        fp = _S / f"{name}.v1.schema.json"
-        chk(f"{name}.v1 schema exists", fp.exists())
+        fp = _S / f"{name}.schema.json"
+        chk(f"{name} schema exists", fp.exists())
         if fp.exists():
             sch = json.loads(fp.read_text())
-            chk(f"{name} $id == graph/{name}.v1", sch.get("$id") == f"graph/{name}.v1")
+            chk(f"{name} $id == graph/{name}", sch.get("$id") == f"graph/{name}")
             chk(f"{name} additionalProperties false", sch.get("additionalProperties") is False)
             bad = _bad_keys(sch)
             chk(f"{name} uses only stdlib-validator keywords", bad == [], str(bad))

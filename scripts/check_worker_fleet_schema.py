@@ -12,7 +12,7 @@ def _self_test() -> int:
         print(f"  [{'ok' if ok else 'FAIL'}] {n}{(': '+d) if d and not ok else ''}");
         (fails.append(n) if not ok else None)
     for n in _SCHEMAS:
-        fp=_S/f"{n}.v1.schema.json"; chk(f"{n}.v1 schema parses",fp.exists() and json.loads(fp.read_text()).get("$id")==f"workers/{n}.v1")
+        fp=_S/f"{n}.schema.json"; chk(f"{n} schema parses",fp.exists() and json.loads(fp.read_text()).get("$id")==f"workers/{n}")
     life={p["lifecycle_policy_id"] for p in json.loads((_A/"worker_lifecycle_policies.json").read_text())["policies"]}
     batch={p["batch_policy_id"] for p in json.loads((_A/"worker_batch_policies.json").read_text())["policies"]}
     sla={p["sla_policy_id"] for p in json.loads((_A/"worker_sla_policies.json").read_text())["policies"]}

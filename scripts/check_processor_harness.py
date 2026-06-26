@@ -43,7 +43,7 @@ def _self_test() -> int:
     ctx = build_context(tenant_id="acme", run_id="run-1", step_id="graph")
     ok = run_command(reg, _cmd("graph.deterministic_edges", "v1", step="graph", payload={"edge_count": 3}), ctx)
     check("harness runs a processor successfully", ok["ok"] and ok["status"] == "ok", str(ok.get("error")))
-    check("harness validated the ProcessorResult", ok["result"]["schema_version"] == "ProcessorResult.v1")
+    check("harness validated the ProcessorResult", ok["result"]["schema_version"] == "ProcessorResult")
     check("emitted event published through the event_bus port", len(ctx.event_bus.events) == 1)
     check("structured log span recorded (started + completed)",
           any(r["event"] == "pipeline.step.completed" for r in ctx.logger.records))

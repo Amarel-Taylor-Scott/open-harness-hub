@@ -11,7 +11,7 @@ in an isolated temp dir behind a PROOF GATE, and the gate's invariants hold:
   * a HIGH-RISK snippet that passes still needs a human-approval hook → 'needs_human_approval', can_register=False,
     until a human approves; nothing here auto-registers/executes a production worker;
   * the sandbox is provisioned with NO secrets (secrets_present pinned False) and the temp dir is cleaned up;
-  * the gate result is shaped like VerifierProofResult.v1.
+  * the gate result is shaped like VerifierProofResult.
 
 Deterministic, stdlib-only, offline (the temp-dir run touches no real network/secret). No clock (time injected).
 CLI: PYTHONPATH=. python3 scripts/check_contextops_sandbox_gate.py --self-test
@@ -99,8 +99,8 @@ def _self_test() -> int:
     check("an approved snippet may register (can_register=True)", res.can_register is True)
     check("an approved snippet's sandbox + proof both passed", res.sandbox_passed and res.proof_passed)
     check("the sandbox carries NO secrets (secrets_present pinned False)", res.sandbox_report.secrets_present is False)
-    check("the gate result is shaped like VerifierProofResult.v1",
-          res.to_dict().get("schema_version") == "VerifierProofResult.v1"
+    check("the gate result is shaped like VerifierProofResult",
+          res.to_dict().get("schema_version") == "VerifierProofResult"
           and res.to_dict().get("gate_decision") in GATE_DECISIONS)
 
     # ── 2) static scanner flags network/secret/escape (and not innocent comments). ──
@@ -175,7 +175,7 @@ def _self_test() -> int:
 
     ok = not fails
     print(
-        f"\n{'PASS — check_contextops_sandbox_gate: a drafted snippet runs in an isolated, cleaned-up temp dir behind a proof gate; a clean+proven snippet is approved + may register; network/secret/escape attempts are statically BLOCKED before they run (rejected, can_register=False); secret access is forbidden even when network is allowed; an unproven snippet (failing unit test) can never register; a high-risk snippet that passes still needs a human-approval hook before use (nothing auto-registers/executes); the sandbox carries no secrets; the result is shaped like VerifierProofResult.v1 and is deterministic.' if ok else f'{len(fails)} FAILURES: {fails}'}"
+        f"\n{'PASS — check_contextops_sandbox_gate: a drafted snippet runs in an isolated, cleaned-up temp dir behind a proof gate; a clean+proven snippet is approved + may register; network/secret/escape attempts are statically BLOCKED before they run (rejected, can_register=False); secret access is forbidden even when network is allowed; an unproven snippet (failing unit test) can never register; a high-risk snippet that passes still needs a human-approval hook before use (nothing auto-registers/executes); the sandbox carries no secrets; the result is shaped like VerifierProofResult and is deterministic.' if ok else f'{len(fails)} FAILURES: {fails}'}"
     )
     return 0 if ok else 1
 

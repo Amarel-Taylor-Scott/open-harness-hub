@@ -159,7 +159,7 @@ function renderExportManifest(ready) {
   var summary = state.latestSummary || {};
   var base = "/api/admin-demo/runs/" + encodeURIComponent(state.activeRunId) + "/exports";
   node.textContent = JSON.stringify({
-    package_type: "baltor.serving_manifest.v1",
+    package_type: "baltor.serving_manifest",
     run_id: state.activeRunId,
     summary: {
       sources: summary.sources || 0,

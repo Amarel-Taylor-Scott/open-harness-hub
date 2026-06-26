@@ -52,7 +52,7 @@ class FactAssertion:
                                   "obj": self.object, "ten": self.tenant_id})
 
     def to_dict(self) -> dict:
-        return {"schema_version": "FactAssertion.v1", "assertion_id": self.assertion_id,
+        return {"schema_version": "FactAssertion", "assertion_id": self.assertion_id,
                 "claim_text": self.claim_text, "claim_type": self.claim_type,
                 "source_handle": self.source_handle, "scope": self.scope, "asserted_at": self.asserted_at,
                 "subject": self.subject, "predicate": self.predicate, "object": self.object,

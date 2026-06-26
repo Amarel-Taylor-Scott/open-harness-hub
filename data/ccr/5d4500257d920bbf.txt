@@ -16,7 +16,7 @@ def _is_current_value(fact_key: str) -> bool
 def freshness_policy(*, fact_key: str) -> dict
     # Derive the freshness block deterministically. A current/moving value (deadline/rate/fee/…) requires a
 def build_verification_recipe(*, tenant_id: str, source_scope: str, fact_key: str, input_source_recipe_ids: list[str], extractor_id: str, winning_source_type: str, min_authority_rank: int, cross_source_policy: str, min_independent_sources: int, validators: list[str] | None=None, success_criteria: str='', tenant_scope: str='', watch_triggers: list[str] | None=None, now: str) -> dict
-    # Build a VerificationRecipe.v1 dict (the M3 rung) for a fact_key.
+    # Build a VerificationRecipe dict (the M3 rung) for a fact_key.
 ```
 ## intra-module call edges
 src.baltor.contextops.verification_recipe.freshness_policy -> src.baltor.contextops.verification_recipe._is_current_value

@@ -92,7 +92,7 @@ def _self_test() -> int:
     rdy = cgate.assess(best["candidate_pack"], verification_receipt=vr, optimization_receipt=best["receipt"].to_dict(),
                        signals={"excluded_ids": EXCLUDED}, now=NOW)
     check("a verified + promoted + leak-free pack is CONSUMABLE", rdy.consumable is True, str(rdy.checks))
-    check("ConsumptionReadinessReport validates against schema", validate_ref(rdy.to_dict(), "artifacts/ConsumptionReadinessReport.v1") == [], str(validate_ref(rdy.to_dict(), "artifacts/ConsumptionReadinessReport.v1")[:3]))
+    check("ConsumptionReadinessReport validates against schema", validate_ref(rdy.to_dict(), "artifacts/ConsumptionReadinessReport") == [], str(validate_ref(rdy.to_dict(), "artifacts/ConsumptionReadinessReport")[:3]))
     rdy2 = cgate.assess(best["candidate_pack"], verification_receipt=vr, optimization_receipt=best["receipt"].to_dict(),
                         signals={"excluded_ids": EXCLUDED}, now=NOW)
     check("readiness report id is deterministic", rdy.report_id == rdy2.report_id)

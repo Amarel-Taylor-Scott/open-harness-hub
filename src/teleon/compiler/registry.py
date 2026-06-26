@@ -64,7 +64,7 @@ _REPO = Path(__file__).resolve().parents[3]
 
 # ── single-source constants (no-magic-values) ────────────────────────────────────────────────────────────────
 #: the registry's own schema/format version — surfaced in every record so a later format change is attributable.
-REGISTRY_RECORD_VERSION = "CompiledUnitRegistryRecord.v1"
+REGISTRY_RECORD_VERSION = "CompiledUnitRegistryRecord"
 #: the two record kinds in the append-only log. A `register` adds/activates a unit (demoting the prior active
 #: one); a `demote` marks a unit inactive WITHOUT deleting it (lossless supersession). ONE definition each.
 KIND_REGISTER = "register"

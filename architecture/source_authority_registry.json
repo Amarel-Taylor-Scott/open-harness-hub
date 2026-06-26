@@ -1,5 +1,5 @@
 {
-  "schema_version": "SourceAuthorityRegistry.v1",
+  "schema_version": "SourceAuthorityRegistry",
   "description": "EARNED source authority. A source's rank is DERIVED from its publisher/domain (and whether its provenance is verified/signed), NOT assigned as a number on an artifact. scripts/artifact_graph/source_authority.classify() resolves a (publisher, source_uri, signed) into a tier+rank+lineage; reconciliation reads rank from there. Longest/most-specific domain match wins, on a domain-segment boundary (a true subdomain or exact host) so a look-alike like 'sec.gov.attacker.com' never earns sec.gov's authority. Each rule carries an 'authority_id' family so multi-source corroboration counts one real authority ONCE even across its many subdomains (e.g. OFAC's sanctionssearch.ofac.treas.gov + ofac.treasury.gov = one voice); the bare '.gov'/'.mil' catch-alls carry none and fall back to the domain. A top-tier domain whose provenance is NOT verified is DOWNGRADED (claimed != verified). An unlisted publisher earns 'unverified' (rank 10) — never a neutral default. To grant a source authority, add a publisher rule here; never hand-type a source_rank on an artifact.",
   "tiers": {
     "source_of_law":     {"rank": 100, "definition": "binding primary text: statute / regulation / the codified eCFR or Federal Register rule"},

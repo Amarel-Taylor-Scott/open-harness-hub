@@ -6,7 +6,7 @@ with everything unsafe surfaced separately as warnings. *No artifact is consumab
 
 ```
 INGEST (CFPB) → decompose → [artifacts] → Verification Gate (C40) → Optimization bake-off (C43/C43.1)
-   → Consumption-Readiness Gate → ConsumptionService → served ContextResponse.v1 (+ ConsumptionReceipt)
+   → Consumption-Readiness Gate → ConsumptionService → served ContextResponse (+ ConsumptionReceipt)
 ```
 
 ## The runtime
@@ -26,7 +26,7 @@ INGEST (CFPB) → decompose → [artifacts] → Verification Gate (C40) → Opti
 
 ## Contracts (registered)
 
-`ContextResponse.v1`, `ConsumptionReceipt.v1`, `ConsumptionRequest.v1` (`schemas/consumption/`), registered in
+`ContextResponse`, `ConsumptionReceipt`, `ConsumptionRequest` (`schemas/consumption/`), registered in
 `architecture/contract_registry.json`. A served fact's schema **requires** `artifact_id` + `source_handle` +
 `claim_status`; the response **requires** the three receipt ids + lineage + freshness.
 

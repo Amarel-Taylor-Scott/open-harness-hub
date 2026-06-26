@@ -38,7 +38,7 @@ def _self_test() -> int:
     # local projects the governed facts
     lp = local.project(store, tenant)
     chk("local projection includes the verified-current fact", any(f["value_normalized"] == "10 business days" for f in lp["facts"]))
-    chk("local projection is a projection, not truth (schema)", lp["schema_version"] == "TemporalGraphProjection.v1")
+    chk("local projection is a projection, not truth (schema)", lp["schema_version"] == "TemporalGraphProjection")
 
     # graphiti candidate is NOT a blocker: it fails closed, never fabricates
     try:

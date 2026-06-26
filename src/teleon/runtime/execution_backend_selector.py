@@ -60,7 +60,7 @@ def _est_cost(backend: str, pricebook: dict, runtime_ms: int) -> float:
 
 
 def _decision(action: str, backend: str, reason: str, **extra) -> dict:
-    return {"schema_version": "ExecutionProviderDecision.v1", "action": action, "backend": backend,
+    return {"schema_version": "ExecutionProviderDecision", "action": action, "backend": backend,
             "reason": reason, **extra}
 
 

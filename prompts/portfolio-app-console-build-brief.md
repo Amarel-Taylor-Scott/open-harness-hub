@@ -6,7 +6,7 @@ sign in. The complexity is not page count; it is **identity, tenancy, roles, and
 multiple products**. Three OPEN decisions (§5) gate the rest.
 
 ## What exists today (ground truth, not greenfield-everywhere)
-- **Data plane is already multi-tenant:** `tenant_id` flows through `CapabilityTask.v1`, `PurposeTaskSpec.v1`,
+- **Data plane is already multi-tenant:** `tenant_id` flows through `CapabilityTask`, `PurposeTaskSpec`,
   objects, receipts. The Shared I/O Spine (`architecture/shared_io_spine.json`) already gives us ObjectShell,
   CommandEnvelope, EventEnvelope, ResourceRef, ModelInvocationReceipt, work-I/O, etc.
 - **Many projection consoles exist but are UNAUTHENTICATED demos:** `web/baltor/{dashboard,reviews,fleet,

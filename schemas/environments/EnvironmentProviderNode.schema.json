@@ -1,0 +1,25 @@
+{
+  "$id": "environments/EnvironmentProviderNode",
+  "title": "EnvironmentProviderNode",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A node in the environment-provider graph: a concrete environment backend the spine MAY route a run to (e.g. a local-first golden-path environment, or a Repo2RLEnv/Harbor/OpenEnv-style environment held as a CANDIDATE). status moves candidate -> reference -> active under governance; a node is never born active. requires_docker / requires_network expose its capability needs so policy can keep deny-by-default (local_equivalent names the local-first fallback that runs without them). serves_truth is always false — the node measures agents, it does not produce served truth.",
+  "required": [
+    "provider_id",
+    "name",
+    "status",
+    "requires_docker",
+    "requires_network",
+    "local_equivalent",
+    "serves_truth"
+  ],
+  "properties": {
+    "provider_id": {"type": "string", "description": "unique id of this provider node"},
+    "name": {"type": "string", "description": "human-readable name, e.g. 'local-golden-path' or 'repo2rlenv'"},
+    "status": {"type": "string", "enum": ["candidate", "reference", "active"], "description": "governance status; nodes start as candidate, NEVER active by default"},
+    "requires_docker": {"type": "boolean", "description": "true if this environment needs containers (gated; deny-by-default locally)"},
+    "requires_network": {"type": "boolean", "description": "true if this environment needs network (gated; deny-by-default locally)"},
+    "local_equivalent": {"type": ["string", "null"], "description": "id/name of the local-first fallback environment that runs without docker/network, or null if none"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — an environment node measures agents/runtimes; it never serves truth"}
+  }
+}

@@ -17,7 +17,7 @@ Deterministic + offline: no network, no wall-clock in any id; the receipt id is 
 
 CLI:
     python3 scripts/generate_from_template.py --list
-    python3 scripts/generate_from_template.py --template proof.self_test.v1 --proof_name foo \\
+    python3 scripts/generate_from_template.py --template proof.self_test --proof_name foo \\
         --title "Foo proof" --owner scripts/foo.py --subject_module scripts.foo
     python3 scripts/generate_from_template.py --self-test
 """
@@ -121,7 +121,7 @@ def generate(template_id: str, variables: dict, *, repo: Path = _REPO, force: bo
         written.append(target_rel)
 
     receipt = {
-        "schema_version": "TemplateGenerationReceipt.v1",
+        "schema_version": "TemplateGenerationReceipt",
         "receipt_id": _receipt_id(rendered, template_id),
         "template_id": template_id,
         "standard_id": entry.get("standard_id"),
@@ -187,14 +187,14 @@ def _self_test() -> int:
 
         # missing required variable -> refusal
         try:
-            generate("proof.self_test.v1", {"proof_name": "demo"}, repo=tmp, write_receipt=False)
+            generate("proof.self_test", {"proof_name": "demo"}, repo=tmp, write_receipt=False)
             check("refuses missing required variable", False, "did not raise")
         except GenerationError as e:
             check("refuses missing required variable", "missing required" in str(e))
 
         full = {"proof_name": "demo_gen", "title": "Demo gen proof", "owner": "scripts/demo.py",
                 "subject_module": "scripts.demo"}
-        rec = generate("proof.self_test.v1", full, repo=tmp)
+        rec = generate("proof.self_test", full, repo=tmp)
         gen = tmp / "scripts" / "check_demo_gen.py"
         check("rendered the proof file", gen.exists())
         check("generated proof contains --self-test", "--self-test" in gen.read_text())
@@ -207,22 +207,22 @@ def _self_test() -> int:
             shutil.copytree(_REPO / "templates", tmp2 / "templates")
             (tmp2 / "architecture").mkdir(parents=True, exist_ok=True)
             shutil.copy(_CATALOG, tmp2 / "architecture" / "template_catalog.json")
-            rec2 = generate("proof.self_test.v1", full, repo=tmp2, write_receipt=False)
+            rec2 = generate("proof.self_test", full, repo=tmp2, write_receipt=False)
             check("deterministic receipt id across runs", rec["receipt_id"] == rec2["receipt_id"])
         finally:
             shutil.rmtree(tmp2, ignore_errors=True)
 
         # refuse overwrite without --force
         try:
-            generate("proof.self_test.v1", full, repo=tmp, write_receipt=False)
+            generate("proof.self_test", full, repo=tmp, write_receipt=False)
             check("refuses overwrite without --force", False, "did not raise")
         except GenerationError as e:
             check("refuses overwrite without --force", "without --force" in str(e))
-        rec3 = generate("proof.self_test.v1", full, repo=tmp, force=True, write_receipt=False)
+        rec3 = generate("proof.self_test", full, repo=tmp, force=True, write_receipt=False)
         check("--force allows overwrite", rec3["receipt_id"] == rec["receipt_id"])
 
         # docs template renders with required headings
-        docs = generate("docs.section_page.v1",
+        docs = generate("docs.section_page",
                         {"area": "runtime", "section": "demo-sec", "title": "Demo Sec", "owner": "scripts/x.py"},
                         repo=tmp)
         page = tmp / "docs" / "runtime" / "demo-sec.md"

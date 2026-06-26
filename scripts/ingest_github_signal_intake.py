@@ -95,7 +95,7 @@ def build_candidates() -> list[dict]:
 def build_feed() -> dict:
     cands = build_candidates()
     return {
-        "feed_version": "DiscoveredCapabilityFeed.v1",
+        "feed_version": "DiscoveredCapabilityFeed",
         "discovered_at": "2026-06-20",
         "discovery_method": "GitHub Signal Flywheel — owner-shared repos fetched live by repo-intake reviewer agents (provenance verified, owners corrected, dead/unscrapeable links flagged)",
         "provenance": "owner-shared repo list 2026-06-20; reviewed live via WebFetch/WebSearch agents; URLs/owners as corrected below.",
@@ -126,8 +126,8 @@ def _self_test() -> int:
     denied = {x.lower() for x in json.loads((_REPO / "architecture" / "org_guardrail_policies.json").read_text())
               ["policies"]["entity-intelligence-vetted-deps"]["denied_licenses"]}
 
-    ck("feed conforms to DiscoveredCapabilityFeed.v1 with provenance + governance + unfetchable record",
-       feed["feed_version"] == "DiscoveredCapabilityFeed.v1" and bool(feed.get("provenance"))
+    ck("feed conforms to DiscoveredCapabilityFeed with provenance + governance + unfetchable record",
+       feed["feed_version"] == "DiscoveredCapabilityFeed" and bool(feed.get("provenance"))
        and bool(feed.get("governance")) and isinstance(feed.get("unfetchable"), list))
     ck("every candidate has a disposition in the allowed set", all(c["disposition"] in _DISPOSITIONS for c in cands),
        str([c["repo"] for c in cands if c["disposition"] not in _DISPOSITIONS]))

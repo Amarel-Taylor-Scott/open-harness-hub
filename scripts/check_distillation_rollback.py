@@ -47,7 +47,7 @@ def _setup(store: LosslessStore) -> dict:
                                  role="baseline", now=_NOW)
     # an old ContextResponse served FROM the baseline (must stay readable after a future rollback).
     old_response = store.put_derived(_TENANT, key="cfpb/response/regE",
-                                     body={"schema_version": "ContextResponse.v1", "answer": "10 business days",
+                                     body={"schema_version": "ContextResponse", "answer": "10 business days",
                                            "served_from": "baseline"}, parent_ids=[baseline.entry_id],
                                      source_handles=[_HANDLE], transform_type="consume",
                                      transform_run_id="run-consume-baseline", role="context_response", now=_NOW)
@@ -93,7 +93,7 @@ def _self_test() -> int:
     # 2) the old ContextResponse remains readable.
     resp = store.get(old_response.entry_id, tenant=_TENANT)
     check("the old ContextResponse remains readable after rollback",
-          resp.body["schema_version"] == "ContextResponse.v1" and resp.body["answer"] == "10 business days")
+          resp.body["schema_version"] == "ContextResponse" and resp.body["answer"] == "10 business days")
 
     # 3) a rollback receipt was written (as a lossless derived entry reaching both versions).
     check("a rollback receipt is returned", receipt.receipt_id.startswith("rbkrcpt-"))

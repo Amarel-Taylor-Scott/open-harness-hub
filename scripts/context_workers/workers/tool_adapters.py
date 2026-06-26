@@ -196,7 +196,7 @@ def _adapter_record(adapter: str, *, status: str = "ready", **extra: Any) -> dic
     capabilities=("document_parsing", "layout_analysis", "table_extraction", "rag_preparation"),
     task_types=("document.parse", "document.parse.docling"),
     image="baltor-worker-cpu",
-    output_contract="parsed_document.v1",
+    output_contract="parsed_document",
 )
 def parse_docling(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "docling"
@@ -249,7 +249,7 @@ def parse_docling(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("document_parsing", "mime_detection", "metadata_extraction", "fallback_parser"),
     task_types=("document.parse", "document.parse.tika"),
     image="baltor-worker-cpu",
-    output_contract="parsed_document.v1",
+    output_contract="parsed_document",
 )
 def parse_tika(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "tika"
@@ -281,7 +281,7 @@ def parse_tika(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("markdown_conversion", "document_parsing", "llm_preparation"),
     task_types=("document.parse", "document.parse.markitdown"),
     image="baltor-worker-cpu",
-    output_contract="parsed_document.v1",
+    output_contract="parsed_document",
 )
 def parse_markitdown(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "markitdown"
@@ -310,7 +310,7 @@ def parse_markitdown(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("document_partitioning", "layout_elements", "pdf_partition", "office_partition", "llm_preparation"),
     task_types=("document.parse", "document.parse.unstructured"),
     image="baltor-worker-cpu",
-    output_contract="parsed_document.v1",
+    output_contract="parsed_document",
 )
 def parse_unstructured(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "unstructured"
@@ -353,7 +353,7 @@ def parse_unstructured(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("pdf_page_extraction", "bbox_extraction", "image_extraction", "metadata_extraction"),
     task_types=("document.parse.pymupdf", "document.assets.extract"),
     image="baltor-worker-cpu",
-    output_contract="pdf_blocks.v1",
+    output_contract="pdf_blocks",
 )
 def parse_pymupdf(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "pymupdf"
@@ -406,7 +406,7 @@ def parse_pymupdf(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("pdf_table_extraction", "pdf_layout_debug", "bbox_extraction"),
     task_types=("document.parse.pdfplumber", "table.extract"),
     image="baltor-worker-cpu",
-    output_contract="pdfplumber_document.v1",
+    output_contract="pdfplumber_document",
 )
 def parse_pdfplumber(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "pdfplumber"
@@ -512,7 +512,7 @@ def _osint_authorized(payload: dict[str, Any]) -> bool:
     capabilities=("osint", "passive_recon", "breach_check", "dns_intel", "domain_intel", "ip_reputation", "github_intel"),
     task_types=("osint.openosint.run", "research.osint"),
     image="baltor-worker-research",
-    output_contract="openosint_result.v1",
+    output_contract="openosint_result",
 )
 def openosint_run(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "openosint"
@@ -567,7 +567,7 @@ def openosint_run(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("osint_catalog", "preflight", "authorization_gate"),
     task_types=("osint.openosint.catalog",),
     image="baltor-worker-research",
-    output_contract="openosint_catalog.v1",
+    output_contract="openosint_catalog",
 )
 def openosint_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "openosint"
@@ -606,7 +606,7 @@ marker_cli_extract = registry.register(
     capabilities=("document_parsing", "ocr", "table_extraction", "image_extraction", "markdown_conversion"),
     task_types=("document.parse.marker",),
     image="baltor-worker-cpu",
-    output_contract="parsed_document.v1",
+    output_contract="parsed_document",
 )(_cli_adapter_worker("marker", ["marker_single"], "parsed_document"))
 
 mineru_cli_extract = registry.register(
@@ -617,7 +617,7 @@ mineru_cli_extract = registry.register(
     capabilities=("document_parsing", "ocr", "table_extraction", "formula_extraction", "image_extraction"),
     task_types=("document.parse.mineru",),
     image="baltor-worker-cpu",
-    output_contract="parsed_document.v1",
+    output_contract="parsed_document",
 )(_cli_adapter_worker("mineru", ["mineru"], "parsed_document"))
 
 paddleocr_cli_extract = registry.register(
@@ -628,7 +628,7 @@ paddleocr_cli_extract = registry.register(
     capabilities=("ocr", "layout_analysis", "table_extraction", "formula_extraction"),
     task_types=("document.ocr", "document.ocr.paddle"),
     image="baltor-worker-ocr",
-    output_contract="ocr_document.v1",
+    output_contract="ocr_document",
 )(_cli_adapter_worker("paddleocr", ["paddleocr"], "ocr_document"))
 
 
@@ -640,7 +640,7 @@ paddleocr_cli_extract = registry.register(
     capabilities=("scientific_pdf_parsing", "citation_extraction", "tei_xml", "metadata_extraction"),
     task_types=("document.parse.grobid", "citation.extract"),
     image="baltor-worker-cpu",
-    output_contract="grobid_document.v1",
+    output_contract="grobid_document",
 )
 def parse_grobid(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "grobid"
@@ -689,7 +689,7 @@ def parse_grobid(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("tokenization", "sentence_segmentation", "pos_tagging", "dependency_parsing", "ner", "entity_ruler"),
     task_types=("nlp.spacy.extract", "entity.extract"),
     image="baltor-worker-ml",
-    output_contract="spacy_extract.v1",
+    output_contract="spacy_extract",
 )
 def spacy_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "spacy"
@@ -742,7 +742,7 @@ def spacy_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("svo_triples", "definition_extraction", "quotation_extraction", "noun_phrase_extraction"),
     task_types=("nlp.textacy.extract", "relationship.extract"),
     image="baltor-worker-ml",
-    output_contract="textacy_extract.v1",
+    output_contract="textacy_extract",
 )
 def textacy_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "textacy"
@@ -790,7 +790,7 @@ def textacy_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("multilingual_nlp", "dependency_parsing", "ner", "lemmatization"),
     task_types=("nlp.stanza.extract",),
     image="baltor-worker-ml",
-    output_contract="stanza_extract.v1",
+    output_contract="stanza_extract",
 )
 def stanza_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "stanza"
@@ -830,7 +830,7 @@ def stanza_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("zero_shot_ner", "custom_entity_detection", "cpu_entity_extraction"),
     task_types=("nlp.gliner.extract", "entity.extract.custom"),
     image="baltor-worker-ml",
-    output_contract="gliner_entities.v1",
+    output_contract="gliner_entities",
 )
 def gliner_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "gliner"
@@ -861,7 +861,7 @@ def gliner_extract(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("encoding_repair", "unicode_normalization", "text_hygiene"),
     task_types=("text.ftfy.repair", "text.normalize"),
     image="baltor-worker-cpu",
-    output_contract="repaired_text.v1",
+    output_contract="repaired_text",
 )
 def ftfy_repair(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "ftfy"
@@ -892,7 +892,7 @@ def ftfy_repair(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("language_detection", "routing_signal", "multilingual_preflight"),
     task_types=("text.language.detect",),
     image="baltor-worker-cpu",
-    output_contract="language_detection.v1",
+    output_contract="language_detection",
 )
 def language_detect(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "lingua"
@@ -927,7 +927,7 @@ def language_detect(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("fuzzy_matching", "alias_detection", "entity_resolution"),
     task_types=("entity.alias.detect", "entity.rapidfuzz.alias"),
     image="baltor-worker-cpu",
-    output_contract="alias_candidates.v1",
+    output_contract="alias_candidates",
 )
 def rapidfuzz_alias(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "rapidfuzz"
@@ -968,7 +968,7 @@ def rapidfuzz_alias(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("minhash", "near_duplicate_detection", "lsh_ready"),
     task_types=("dedupe.minhash", "dedupe.datasketch.minhash"),
     image="baltor-worker-cpu",
-    output_contract="minhash_dedupe.v1",
+    output_contract="minhash_dedupe",
 )
 def datasketch_minhash(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "datasketch"
@@ -1013,7 +1013,7 @@ def datasketch_minhash(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("pii_detection", "privacy_filter", "anonymization_preflight"),
     task_types=("privacy.presidio.detect", "pii.detect"),
     image="baltor-worker-audit",
-    output_contract="presidio_findings.v1",
+    output_contract="presidio_findings",
 )
 def presidio_detect(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "presidio"
@@ -1046,7 +1046,7 @@ def presidio_detect(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("tfidf", "hashing_vectorizer", "topic_features", "deterministic_text_features"),
     task_types=("nlp.sklearn.features", "text.features"),
     image="baltor-worker-cpu",
-    output_contract="sklearn_features.v1",
+    output_contract="sklearn_features",
 )
 def sklearn_features(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "sklearn"
@@ -1092,7 +1092,7 @@ def sklearn_features(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("graph_metrics", "centrality", "community_detection", "connected_components"),
     task_types=("graph.networkx.analyze", "graph.metrics"),
     image="baltor-worker-cpu",
-    output_contract="networkx_metrics.v1",
+    output_contract="networkx_metrics",
 )
 def networkx_analyze(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "networkx"
@@ -1144,7 +1144,7 @@ def networkx_analyze(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("rdf_export", "jsonld", "turtle", "sparql_ready", "semantic_web"),
     task_types=("graph.rdf.export", "graph.export"),
     image="baltor-worker-cpu",
-    output_contract="rdf_export.v1",
+    output_contract="rdf_export",
 )
 def rdf_export(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     adapter = "rdflib"
@@ -1181,7 +1181,7 @@ def _service_adapter(name: str, env_var: str, output_key: str, description: str,
         capabilities=capabilities,
         task_types=(name,),
         image="baltor-worker-research",
-        output_contract=f"{output_key}.v1",
+        output_contract=f"{output_key}",
     )
     def service_worker(ctx: TaskContext, payload: dict[str, Any], *, _name: str = name, _env_var: str = env_var, _output_key: str = output_key) -> TaskResult:
         adapter = _name.rsplit(".", 1)[-1].replace("_", "-")
@@ -1413,7 +1413,7 @@ _service_adapter(
     capabilities=("adapter_discovery", "preflight", "configuration"),
     task_types=("context.adapters.catalog",),
     image="baltor-worker-orchestrator",
-    output_contract="adapter_catalog.v1",
+    output_contract="adapter_catalog",
 )
 def adapter_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     modules = {
@@ -1505,7 +1505,7 @@ def adapter_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("adapter_benchmarking", "pipeline_orchestration", "configuration_comparison"),
     task_types=("context.pipeline.experimental_adapters", "context.pipeline.compare_adapters"),
     image="baltor-worker-orchestrator",
-    output_contract="adapter_experiment.v1",
+    output_contract="adapter_experiment",
 )
 def experimental_adapters_pipeline(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     text = _text_from_payload(payload)

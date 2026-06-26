@@ -17,10 +17,10 @@ paths:
       summary: Enqueue a pipeline run (CommandEnvelope work onto the durable queue)
       requestBody:
         required: true
-        content: { application/json: { schema: { $ref: "../../schemas/envelopes/CommandEnvelope.v1.schema.json" } } }
+        content: { application/json: { schema: { $ref: "../../schemas/envelopes/CommandEnvelope.schema.json" } } }
       responses:
         "200": { description: "run accepted", content: { application/json: { schema: { type: object, required: [run_id], properties: { run_id: { type: string } } } } } }
-        "422": { description: "schema validation failed (ErrorEnvelope)", content: { application/json: { schema: { $ref: "../../schemas/envelopes/ErrorEnvelope.v1.schema.json" } } } }
+        "422": { description: "schema validation failed (ErrorEnvelope)", content: { application/json: { schema: { $ref: "../../schemas/envelopes/ErrorEnvelope.schema.json" } } } }
   /api/runtime/runs/{run_id}:
     get:
       summary: Get a run's artifacts/edges/vectors/conflicts/reconciliations (projection)
@@ -38,8 +38,8 @@ paths:
       responses: { "200": { description: OK } }
 components:
   schemas:
-    CommandEnvelope: { $ref: "../../schemas/envelopes/CommandEnvelope.v1.schema.json" }
-    EventEnvelope: { $ref: "../../schemas/envelopes/EventEnvelope.v1.schema.json" }
-    ArtifactEnvelope: { $ref: "../../schemas/envelopes/ArtifactEnvelope.v1.schema.json" }
-    ProcessorResult: { $ref: "../../schemas/envelopes/ProcessorResult.v1.schema.json" }
-    ErrorEnvelope: { $ref: "../../schemas/envelopes/ErrorEnvelope.v1.schema.json" }
+    CommandEnvelope: { $ref: "../../schemas/envelopes/CommandEnvelope.schema.json" }
+    EventEnvelope: { $ref: "../../schemas/envelopes/EventEnvelope.schema.json" }
+    ArtifactEnvelope: { $ref: "../../schemas/envelopes/ArtifactEnvelope.schema.json" }
+    ProcessorResult: { $ref: "../../schemas/envelopes/ProcessorResult.schema.json" }
+    ErrorEnvelope: { $ref: "../../schemas/envelopes/ErrorEnvelope.schema.json" }

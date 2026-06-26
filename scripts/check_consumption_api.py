@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """scripts.check_consumption_api — proof (C-CONSUME-1): POST /api/context/serve returns a schema-valid
-ContextResponse.v1 from ConsumptionService with the CFPB reference result, and the route is registered. Tests the
+ContextResponse from ConsumptionService with the CFPB reference result, and the route is registered. Tests the
 pure request handler (no socket) so the contract is deterministic + offline.
 
 CLI: python3 scripts/check_consumption_api.py --self-test
@@ -27,8 +27,8 @@ def _self_test() -> int:
 
     code, resp = handle("POST", "/api/context/serve", {"tenant_id": "demo", "corpus": "cfpb", "require_optimized": True})
     check("POST /api/context/serve returns 200", code == 200, str(code))
-    check("response is ContextResponse.v1 (schema-valid)", resp.get("schema_version") == "ContextResponse.v1"
-          and validate_ref(resp, "consumption/ContextResponse.v1") == [], str(validate_ref(resp, "consumption/ContextResponse.v1")[:3]))
+    check("response is ContextResponse (schema-valid)", resp.get("schema_version") == "ContextResponse"
+          and validate_ref(resp, "consumption/ContextResponse") == [], str(validate_ref(resp, "consumption/ContextResponse")[:3]))
     check("answer contains '10 business days'", "10 business days" in resp.get("answer", ""), resp.get("answer"))
     check("served_facts length > 0", len(resp.get("served_facts", [])) > 0)
     check("held_out_warnings length > 0", len(resp.get("held_out_warnings", [])) > 0)
@@ -53,7 +53,7 @@ def _self_test() -> int:
     routes = {r["route"] for r in reg.get("api_routes", [])}
     check("POST /api/context/serve is registered in contract_registry.json", "POST /api/context/serve" in routes)
 
-    print(f"\n{'PASS — check_consumption_api: POST /api/context/serve returns a schema-valid ContextResponse.v1 from ConsumptionService (answer 10 business days; FAQ-30 held out; handles + receipt lineage; no allegation served); route registered.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
+    print(f"\n{'PASS — check_consumption_api: POST /api/context/serve returns a schema-valid ContextResponse from ConsumptionService (answer 10 business days; FAQ-30 held out; handles + receipt lineage; no allegation served); route registered.' if not fails else f'{len(fails)} FAILURES: {fails}'}")
     return 0 if not fails else 1
 
 

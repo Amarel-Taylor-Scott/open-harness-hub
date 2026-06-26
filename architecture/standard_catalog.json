@@ -4,7 +4,7 @@
   "status_enum": ["draft", "active", "enforced", "deprecated"],
   "standards": [
     {
-      "standard_id": "standard.source_adapter.v1",
+      "standard_id": "standard.source_adapter",
       "pattern_id": "source_adapter_pattern",
       "title": "Governed source adapter behind one SourceAdapterPort",
       "status": "active",
@@ -36,11 +36,11 @@
         "scripts/ingest/sanctions_feed_live.py",
         "scripts/ingest/decompose_structured.py"
       ],
-      "template_ids": ["ingestion.source_adapter.v1"],
+      "template_ids": ["ingestion.source_adapter"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_consumption_api.py"]
     },
     {
-      "standard_id": "standard.ingestion_sync.v1",
+      "standard_id": "standard.ingestion_sync",
       "pattern_id": "ingestion_sync_pattern",
       "title": "Idempotent ingestion sync / fetch loop",
       "status": "active",
@@ -69,11 +69,11 @@
         "scripts/ingest/ecfr_feed.py",
         "scripts/durable_store.py"
       ],
-      "template_ids": ["ingestion.source_adapter.v1"],
+      "template_ids": ["ingestion.source_adapter"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.durable_command.v1",
+      "standard_id": "standard.durable_command",
       "pattern_id": "durable_command_pattern",
       "title": "Durable CommandEnvelope enqueued onto one durable store",
       "status": "active",
@@ -102,11 +102,11 @@
         "scripts/durable_store.py",
         "scripts/runtime/processor_harness.py"
       ],
-      "template_ids": ["worker.command_handler.v1"],
+      "template_ids": ["worker.command_handler"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_durable_worker_parallel.py"]
     },
     {
-      "standard_id": "standard.worker_claim_loop.v1",
+      "standard_id": "standard.worker_claim_loop",
       "pattern_id": "worker_claim_loop_pattern",
       "title": "Stateless durable worker claim/ack loop",
       "status": "active",
@@ -137,11 +137,11 @@
         "scripts/durable_store.py",
         "scripts/check_durable_worker_parallel.py"
       ],
-      "template_ids": ["worker.command_handler.v1"],
+      "template_ids": ["worker.command_handler"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_durable_worker_parallel.py"]
     },
     {
-      "standard_id": "standard.processor.v1",
+      "standard_id": "standard.processor",
       "pattern_id": "processor_harness_pattern",
       "title": "Processor run through the standard ProcessorHarness via the registry",
       "status": "active",
@@ -170,11 +170,11 @@
         "scripts/runtime/processor_registry.py",
         "scripts/runtime/builtin_processors.py"
       ],
-      "template_ids": ["worker.command_handler.v1"],
+      "template_ids": ["worker.command_handler"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.provider_adapter.v1",
+      "standard_id": "standard.provider_adapter",
       "pattern_id": "provider_adapter_pattern",
       "title": "Provider adapter behind a structural capability port",
       "status": "active",
@@ -203,11 +203,11 @@
         "catalog/adapters/anthropic-claude-opus.yaml",
         "architecture/external_capability_catalog.json"
       ],
-      "template_ids": ["provider.adapter.v1"],
+      "template_ids": ["provider.adapter"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.api_projection.v1",
+      "standard_id": "standard.api_projection",
       "pattern_id": "api_projection_route_pattern",
       "title": "Projection-only HTTP route via a pure request handler",
       "status": "active",
@@ -225,7 +225,7 @@
       ],
       "naming_rules": "Route 'METHOD /api/<area>/<resource>'; handler module scripts/api_<area>_handler.py exporting ROUTES.",
       "file_location_rules": "scripts/api_<area>_handler.py; the admin server delegates to it (MAIN wires the server).",
-      "contract_rules": "Returns a registered contract (e.g. ContextResponse.v1); route registered in contract_registry.json#api_routes with projection_only:true and an owner.",
+      "contract_rules": "Returns a registered contract (e.g. ContextResponse); route registered in contract_registry.json#api_routes with projection_only:true and an owner.",
       "proof_rules": "Proof drives the handler directly (no socket), asserts status + contract shape + no secret markers. Offline, --self-test.",
       "doc_rules": "Document route, method, returns-contract, projection-only guarantee, owner.",
       "registry_rules": "Register the route in contract_registry.json#api_routes; MAIN folds into section_maturity_matrix.json.",
@@ -236,11 +236,11 @@
         "architecture/contract_registry.json",
         "scripts/check_consumption_api.py"
       ],
-      "template_ids": ["api.projection_route.v1"],
+      "template_ids": ["api.projection_route"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
     },
     {
-      "standard_id": "standard.ui_projection.v1",
+      "standard_id": "standard.ui_projection",
       "pattern_id": "ui_projection_page_pattern",
       "title": "Projection-only UI page that renders an API (computes no truth)",
       "status": "active",
@@ -269,11 +269,11 @@
         "scripts/api_context_handler.py",
         "scripts/check_consumption_ui.py"
       ],
-      "template_ids": ["ui.projection_page.v1"],
+      "template_ids": ["ui.projection_page"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
     },
     {
-      "standard_id": "standard.proof_script.v1",
+      "standard_id": "standard.proof_script",
       "pattern_id": "proof_script_pattern",
       "title": "Deterministic offline proof script with --self-test",
       "status": "enforced",
@@ -304,11 +304,11 @@
         "scripts/check_file_layout_policy.py",
         "scripts/check_durable_worker_parallel.py"
       ],
-      "template_ids": ["proof.self_test.v1"],
+      "template_ids": ["proof.self_test"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
     },
     {
-      "standard_id": "standard.docs_page.v1",
+      "standard_id": "standard.docs_page",
       "pattern_id": "documentation_page_pattern",
       "title": "Section documentation page with the required headings",
       "status": "active",
@@ -336,17 +336,17 @@
         "docs/runtime/fragile-fact-watchtower.md",
         "docs/backend/architecture-overview.md"
       ],
-      "template_ids": ["docs.section_page.v1"],
+      "template_ids": ["docs.section_page"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
     },
     {
-      "standard_id": "standard.contract_schema.v1",
+      "standard_id": "standard.contract_schema",
       "pattern_id": "contract_schema_pattern",
       "title": "Versioned contract schema validated by ref",
       "status": "active",
       "applies_to": "Any data contract exchanged between components (request/response/artifact envelope).",
       "must_have": [
-        "schema_version field on the object (e.g. ContextResponse.v1)",
+        "schema_version field on the object (e.g. ContextResponse)",
         "validated through scripts/runtime/schema_validator.validate_ref(obj, ref)",
         "version lives in the schema_version field, NEVER in the id or name",
         "registered in contract_registry.json (artifact_types / api_routes returns)"
@@ -369,11 +369,11 @@
         "architecture/contract_registry.json",
         "scripts/check_contract_registry_manifest.py"
       ],
-      "template_ids": ["api.projection_route.v1"],
+      "template_ids": ["api.projection_route"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.artifact_object.v1",
+      "standard_id": "standard.artifact_object",
       "pattern_id": "artifact_envelope_pattern",
       "title": "Content-addressed governed artifact object",
       "status": "active",
@@ -402,11 +402,11 @@
         "scripts/runtime/consumption.py",
         "scripts/check_artifact_type_registry.py"
       ],
-      "template_ids": ["ingestion.source_adapter.v1"],
+      "template_ids": ["ingestion.source_adapter"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.optimization_candidate.v1",
+      "standard_id": "standard.optimization_candidate",
       "pattern_id": "optimization_candidate_pattern",
       "title": "Governed optimization candidate with baseline/regression/promotion",
       "status": "active",
@@ -436,11 +436,11 @@
         "scripts/runtime/consumption.py",
         "scripts/check_consumption_api.py"
       ],
-      "template_ids": ["worker.command_handler.v1"],
+      "template_ids": ["worker.command_handler"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.reconciliation_decision.v1",
+      "standard_id": "standard.reconciliation_decision",
       "pattern_id": "reconciliation_decision_pattern",
       "title": "Deterministic reconciliation decision over conflicting claims",
       "status": "active",
@@ -469,11 +469,11 @@
         "scripts/check_cfpb_reconciliation.py",
         "scripts/runtime/verification_gate.py"
       ],
-      "template_ids": ["worker.command_handler.v1"],
+      "template_ids": ["worker.command_handler"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.watchtower_task.v1",
+      "standard_id": "standard.watchtower_task",
       "pattern_id": "watchtower_verification_task_pattern",
       "title": "Watchtower verification task enforcing minimum freshness",
       "status": "active",
@@ -502,11 +502,11 @@
         "docs/runtime/fragile-fact-watchtower.md",
         "scripts/runtime/consumption.py"
       ],
-      "template_ids": ["worker.command_handler.v1"],
+      "template_ids": ["worker.command_handler"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.tenant_isolation.v1",
+      "standard_id": "standard.tenant_isolation",
       "pattern_id": "tenant_isolation_pattern",
       "title": "Tenant isolation carried on every governed object and boundary",
       "status": "enforced",
@@ -535,11 +535,11 @@
         "scripts/runtime/context.py",
         "scripts/check_experiments_isolation.py"
       ],
-      "template_ids": ["api.projection_route.v1"],
+      "template_ids": ["api.projection_route"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     },
     {
-      "standard_id": "standard.review_pack.v1",
+      "standard_id": "standard.review_pack",
       "pattern_id": "review_pack_pattern",
       "title": "Review pack / queue for high-risk artifacts before promotion",
       "status": "active",
@@ -568,7 +568,7 @@
         "scripts/check_review_pack_recorders.py",
         "scripts/runtime/consumption.py"
       ],
-      "template_ids": ["docs.section_page.v1"],
+      "template_ids": ["docs.section_page"],
       "enforcement_proofs": ["scripts/check_standard_catalog.py"]
     }
   ]

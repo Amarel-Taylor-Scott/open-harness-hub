@@ -1,0 +1,82 @@
+{
+  "$id": "graph/TemporalFactEdge",
+  "title": "TemporalFactEdge",
+  "description": "A deterministic temporal edge between fact nodes (CONTRADICTS/SUPERSEDES/HELD_OUT_BY/RECONCILED_BY/VERIFIED_BY/\u2026).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "edge_id": {
+      "type": "string"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "from_temporal_fact_id": {
+      "type": "string"
+    },
+    "to_temporal_fact_id": {
+      "type": "string"
+    },
+    "edge_type": {
+      "type": "string"
+    },
+    "edge_source": {
+      "type": "string",
+      "enum": [
+        "deterministic",
+        "llm_candidate",
+        "human",
+        "imported",
+        "provider"
+      ]
+    },
+    "valid_from": {
+      "type": "string"
+    },
+    "valid_to": {
+      "type": "string"
+    },
+    "observed_at": {
+      "type": "string"
+    },
+    "source_artifact_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source_handles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_json": {
+      "type": "object"
+    },
+    "policy_id": {
+      "type": "string"
+    },
+    "policy_version": {
+      "type": "string"
+    },
+    "receipt_id": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "edge_id",
+    "tenant_id",
+    "from_temporal_fact_id",
+    "to_temporal_fact_id",
+    "edge_type",
+    "edge_source",
+    "created_at"
+  ]
+}

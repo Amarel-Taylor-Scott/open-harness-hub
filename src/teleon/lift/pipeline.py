@@ -12,7 +12,7 @@ from typing import Any
 
 from . import adoption, normalize, semantic_lifter
 
-_RUNTIME_PROFILE_SCHEMA = "RuntimeProfile.v1"
+_RUNTIME_PROFILE_SCHEMA = "RuntimeProfile"
 
 
 @dataclass(frozen=True)

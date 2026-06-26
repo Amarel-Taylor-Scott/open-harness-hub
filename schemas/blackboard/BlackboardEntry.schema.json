@@ -1,0 +1,27 @@
+{
+  "$id": "blackboard/BlackboardEntry",
+  "title": "BlackboardEntry",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "One typed row on the blackboard, written by exactly one bounded worker during one iteration. The base envelope shared by every entry kind (signal | observation | gap | calculation | analysis | synthesis | source). source_refs[] carries the PROVENANCE handles the entry leans on (BlackboardSourceRef ids) so no claim is sourceless. serves_truth is pinned const false — a blackboard entry is analytical working state, NEVER served truth; Baltor decides separately (see GovernedBlackboardEntry) whether anything derived from it may be promoted. author_worker_id + iteration give per-row lineage for receipts and convergence accounting.",
+  "required": [
+    "entry_id",
+    "blackboard_id",
+    "kind",
+    "author_worker_id",
+    "iteration",
+    "source_refs",
+    "serves_truth",
+    "created_at"
+  ],
+  "properties": {
+    "entry_id": {"type": "string", "description": "unique id of this entry"},
+    "blackboard_id": {"type": "string", "description": "the blackboard this entry belongs to"},
+    "kind": {"type": "string", "enum": ["signal", "observation", "gap", "calculation", "analysis", "synthesis", "source"], "description": "the typed entry kind; determines which specialized contract (BlackboardSignal/Observation/Gap/Calculation/Analysis/Synthesis/SourceRef) carries its body"},
+    "author_worker_id": {"type": "string", "description": "id of the bounded worker that wrote this entry (lineage)"},
+    "iteration": {"type": "integer", "minimum": 0, "description": "iteration/round in which this entry was written"},
+    "source_refs": {"type": "array", "items": {"type": "string"}, "description": "BlackboardSourceRef ids this entry leans on (provenance handles); may be empty for purely procedural kinds (signal) but an observation must be non-empty per BlackboardObservation"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — a blackboard entry is analytical working state, never served truth; promotion is a separate Baltor-governed decision"},
+    "created_at": {"type": "string", "description": "ISO-8601 timestamp when the entry was written"}
+  }
+}

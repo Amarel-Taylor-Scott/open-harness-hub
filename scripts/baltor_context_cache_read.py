@@ -28,7 +28,7 @@ def _context_cache_setting(name: str) -> str:
 
 DEFAULT_OUT_DIR = Path(_context_cache_setting("local_cache_dir"))
 DEFAULT_MANIFEST = _context_cache_setting("local_cache_manifest")
-MANIFEST_KIND = "baltor.local-context-cache-manifest.v1"
+MANIFEST_KIND = "baltor.local-context-cache-manifest"
 
 
 def load_manifest(path: Path) -> dict[str, Any]:

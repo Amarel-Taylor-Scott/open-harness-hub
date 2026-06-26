@@ -73,7 +73,7 @@ global rules unless anonymized+approved; private prompts/responses → object st
 no secrets.
 
 PART 3 — Consensus recorder (src/baltor/determinism/consensus.py): record multi-model/multi-run outputs;
-compute agreement score; record disagreement clusters; DOES NOT decide truth; emit ConsensusRun.v1;
+compute agreement score; record disagreement clusters; DOES NOT decide truth; emit ConsensusRun;
 low agreement → human/review or deterministic validator. Proof: scripts/check_consensus_recorder.py
 (multiple outputs recorded; agreement computed; disagreement does not promote truth; consensus alone
 cannot serve a fact).
@@ -81,7 +81,7 @@ cannot serve a fact).
 PART 4 — Pattern miner (src/baltor/determinism/pattern_miner.py): find repeated non-deterministic
 decisions (same conflict classification, reconciliation outcome, authority classification, routing,
 held-out reason, optimization rejection reason, entity normalization, parser/source classification) →
-PatternCandidate.v1. Proof: scripts/check_determinism_pattern_miner.py.
+PatternCandidate. Proof: scripts/check_determinism_pattern_miner.py.
 
 PART 5 — Rule candidate generator (src/baltor/determinism/rule_candidate_generator.py): rule types —
 decision_table, regex_or_pattern, source_authority_rule, graph_rule, threshold_rule, schema_rule,
@@ -92,10 +92,10 @@ scripts/check_rule_candidate_generation.py.
 
 PART 6 — Replay engine (src/baltor/determinism/replay_engine.py): run a RuleCandidate against historical
 WorkflowTraces; compare to verified final decisions; compute precision, recall, FP, FN, abstention rate,
-unsafe-promotion count, tenant-leakage risk → RuleReplayReport.v1. Proof: scripts/check_rule_replay_engine.py.
+unsafe-promotion count, tenant-leakage risk → RuleReplayReport. Proof: scripts/check_rule_replay_engine.py.
 
 PART 7 — Shadow mode (src/baltor/determinism/shadow_runner.py): rule runs alongside current LLM/human path;
-output recorded but NOT used; compare to final decision → ShadowRunReport.v1. Proof: scripts/check_rule_shadow_mode.py.
+output recorded but NOT used; compare to final decision → ShadowRunReport. Proof: scripts/check_rule_shadow_mode.py.
 
 PART 8 — Promotion gate (src/baltor/determinism/rule_promotion_gate.py): schema valid; source handles
 preserved; precision threshold met; unsafe FP = 0 for truth-serving rules; tenant isolation safe; no

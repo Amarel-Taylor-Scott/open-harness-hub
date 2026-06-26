@@ -3,7 +3,7 @@
 ## Purpose
 
 The **sidecar** is where Baltor keeps the governance *power* when a customer keeps their native shape. It is a
-`SidecarOverlay.v1` returned alongside (never instead of) the native output, so a customer can say *"do not
+`SidecarOverlay` returned alongside (never instead of) the native output, so a customer can say *"do not
 change my tables — give me the context elsewhere"* and still get receipts, conflicts, held-out claims,
 reconciliations, and full lineage. This is the lossless-distillation law on the export layer: a value omitted
 from the native output is **held out in the sidecar, never erased**.
@@ -16,7 +16,7 @@ from the native output is **held out in the sidecar, never erased**.
 
 ## Contracts
 
-`SidecarOverlay.v1`:
+`SidecarOverlay`:
 
 | field | meaning |
 |---|---|

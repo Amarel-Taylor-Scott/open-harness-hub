@@ -126,7 +126,7 @@ class CostLadderMetrics:
 
     def to_dict(self) -> dict:
         return {
-            "schema_version": "CostLadderMetrics.v1",
+            "schema_version": "CostLadderMetrics",
             "ladder_id": self.ladder_id,
             "fact_keys": list(self.fact_keys),
             "llm_calls_avoided": self.llm_calls_avoided,

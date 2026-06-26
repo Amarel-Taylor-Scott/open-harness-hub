@@ -1,0 +1,37 @@
+{
+  "$id": "agents/AgentCapabilityCard",
+  "title": "AgentCapabilityCard",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The PUBLIC, stable description of ONE governed CapabilityTask the Teleon Agent Capability Gateway offers to agent consumers — what `describe` returns. It is a contract an agent can plan against: the purpose, the input/output contracts, the allowed_use / forbidden_use envelope, the expected_cost + expected_latency it can budget for, the freshness_policy on any served facts, and the governance switches deterministic_first (the token-saving ladder runs deterministic/cache/API BEFORE any LLM), llm_fallback_allowed (whether a frontier LLM may be reached at all, and only when policy allows), and receipt_required (whether a run MUST emit an AgentCapabilityReceipt). Law: agents ASK, Teleon EXECUTES, Baltor governs truth — a capability proposes/serves governed evidence, never self-asserted LLM truth.",
+  "required": [
+    "capability_id",
+    "purpose",
+    "input_contract",
+    "output_contract",
+    "allowed_use",
+    "forbidden_use",
+    "expected_cost",
+    "expected_latency",
+    "freshness_policy",
+    "policy_notes",
+    "deterministic_first",
+    "llm_fallback_allowed",
+    "receipt_required"
+  ],
+  "properties": {
+    "capability_id": {"type": "string", "description": "stable id of the capability (e.g. cfpb.deadline.verify, utility.hash, json.schema.validate)"},
+    "purpose": {"type": "string", "description": "the declared, bounded purpose of this capability — what repeatable workflow it solves so the agent does not burn tokens re-solving it"},
+    "input_contract": {"type": "object", "description": "the shape/contract of accepted input (a schema-ref or inline shape); what the agent must send"},
+    "output_contract": {"type": "object", "description": "the shape/contract of the returned output; what the agent can rely on receiving"},
+    "allowed_use": {"type": "array", "items": {"type": "string"}, "description": "the uses this capability's output is licensed/governed for (carried forward onto every result and receipt)"},
+    "forbidden_use": {"type": "array", "items": {"type": "string"}, "description": "uses explicitly disallowed (e.g. 'treat as legal advice', 'auto-promote to served truth')"},
+    "expected_cost": {"type": "object", "description": "expected cost envelope the agent can budget against (e.g. {unit: 'usd', typical, max, metric: 'per_successful_run'})"},
+    "expected_latency": {"type": "object", "description": "expected latency envelope (e.g. {unit: 'ms', p50, p95})"},
+    "freshness_policy": {"type": "object", "description": "freshness/recency guarantees on any served facts (e.g. {max_age: '24h', cdc: true, revocation_handled: true}); volatile public facts without CDC/revocation handling are not served"},
+    "policy_notes": {"type": "string", "description": "human-readable governance notes (review requirements, jurisdiction, signer accountability)"},
+    "deterministic_first": {"type": "boolean", "const": true, "description": "ALWAYS true — the token-saving ladder runs cached-verified -> deterministic parser -> direct API -> local calc BEFORE any LLM; deterministic-first is a gateway invariant, not a per-capability toggle"},
+    "llm_fallback_allowed": {"type": "boolean", "description": "whether a frontier-LLM step is permitted for this capability at all, and only after the deterministic ladder is exhausted and policy allows; LLM output is still never served truth"},
+    "receipt_required": {"type": "boolean", "description": "when true, a run of this capability MUST emit an AgentCapabilityReceipt or be treated as unavailable"}
+  }
+}

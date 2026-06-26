@@ -3,7 +3,7 @@
 
 Pure request handler (method, path, body) -> (status, json), so the contract is testable WITHOUT a socket and
 the admin server just delegates to it. It NEVER fabricates truth: /api/context/serve calls the proven
-ConsumptionService (run_cfpb_to_consumption) and returns its ContextResponse.v1; retrieval reads a process
+ConsumptionService (run_cfpb_to_consumption) and returns its ContextResponse; retrieval reads a process
 cache of what was served; /api/runtime/sections projects the section maturity matrix. No raw pack is served, no
 gate is bypassed, no secrets are emitted. UI/dashboard consume THIS projection — they do not compute truth.
 """
@@ -36,9 +36,9 @@ def _as_bool(v, default: bool = True) -> bool:
 
 
 def serve(body: dict) -> tuple:
-    req = {"schema_version": "ConsumptionRequest.v1", "tenant_id": str(body.get("tenant_id") or "demo"),
+    req = {"schema_version": "ConsumptionRequest", "tenant_id": str(body.get("tenant_id") or "demo"),
            "corpus": str(body.get("corpus") or "cfpb"), "require_optimized": _as_bool(body.get("require_optimized"), True)}
-    errs = validate_ref(req, "consumption/ConsumptionRequest.v1")
+    errs = validate_ref(req, "consumption/ConsumptionRequest")
     if errs:
         return 400, {"error": "invalid ConsumptionRequest", "details": errs[:3]}
     if req["corpus"] != "cfpb":

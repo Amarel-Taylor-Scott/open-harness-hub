@@ -15,7 +15,7 @@ safety core is **already built + proven** (`src/baltor/purpose_tasks/projections
 ## Build (each = schema/code/proof/docs; reuse the supervisor_projection + admin-server route patterns)
 - **P1 — remaining contracts:** `schemas/purpose_tasks/{PurposeTaskRun,PurposeTaskImplementation,
   PurposeTaskRuntimeClass,PurposeTaskEvaluation,PurposeTaskPromotion,PurposeTaskRollback,TaskOrientation,
-  PurposeTaskProjection,PurposeTaskCustomerProjection}.v1` (register in contract_registry). `PurposeTaskSpec.v1`
+  PurposeTaskProjection,PurposeTaskCustomerProjection}.v1` (register in contract_registry). `PurposeTaskSpec`
   + the runtime-class vocabulary already exist.
 - **P2 — registries:** `architecture/{purpose_task_registry,purpose_task_runtime_classes(exists),
   purpose_task_success_criteria,purpose_task_promotion_policies,purpose_task_boundary_expansion_policies}.json`.

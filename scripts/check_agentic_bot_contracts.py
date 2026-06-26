@@ -226,7 +226,7 @@ def _self_test() -> int:
     # ---- A. schemas exist + well-formed -------------------------------------------------
     schemas: dict[str, dict] = {}
     for name in _CONTRACTS:
-        path = _SCHEMA_DIR / f"{name}.v1.schema.json"
+        path = _SCHEMA_DIR / f"{name}.schema.json"
         if not path.exists():
             check(f"A: schema file exists: {name}", False, str(path))
             continue
@@ -241,8 +241,8 @@ def _self_test() -> int:
     for name, schema in schemas.items():
         keys_ok = all(k in schema for k in ("$id", "title", "type", "properties", "required", "additionalProperties"))
         shape_ok = (
-            schema.get("$id") == f"agents/{name}.v1"
-            and schema.get("title") == f"{name}.v1"
+            schema.get("$id") == f"agents/{name}"
+            and schema.get("title") == f"{name}"
             and schema.get("type") == "object"
             and schema.get("additionalProperties") is False
             and isinstance(schema.get("properties"), dict)
@@ -294,8 +294,8 @@ def _self_test() -> int:
     registry = json.loads((_REPO / "architecture" / "contract_registry.json").read_text())
     registry_blob = json.dumps(registry)
     for name in _CONTRACTS:
-        check(f"D: {name}.v1 registered in contract_registry.json",
-              f"schemas/agents/{name}.v1.schema.json" in registry_blob)
+        check(f"D: {name} registered in contract_registry.json",
+              f"schemas/agents/{name}.schema.json" in registry_blob)
 
     # ---- E. fixtures validate against their contracts (minimal stdlib validator) --------
     fixtures = _fixtures()

@@ -22,7 +22,7 @@ class LocalFunctionEmulator:
 
     def describe(self) -> dict:
         return {"provider_id": self.provider_id, "kind": "local_function_emulator", "offline": True,
-                "owns_truth": False, "contract": "CapabilityTask.v1"}
+                "owns_truth": False, "contract": "CapabilityTask"}
 
     def health(self) -> dict:
         return {"provider_id": self.provider_id, "available": True, "reason": "offline emulator always available"}

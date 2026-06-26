@@ -69,7 +69,7 @@ from src.baltor.experiments import (  # noqa: E402
 # ── injected deterministic fixtures (no wall-clock, no RNG) ─────────────────────────────────────────────
 _NOW = "2026-06-06T00:00:00Z"
 _SLOT = RECONCILIATION_CAPABILITY_SLOT  # "reconciliation.answer"
-_OUTPUT_CONTRACT = "consumption/ContextResponse.v1"
+_OUTPUT_CONTRACT = "consumption/ContextResponse"
 _REG_HANDLE = "ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i"
 _FAQ_HANDLE = "ctx://public/source/cfpb-faq/error-resolution#q12"
 #: the CFPB FAQ value the baseline deliberately HELD OUT — must NEVER leak into a candidate served output.
@@ -98,10 +98,10 @@ _OTHER_SNAPSHOT = {
 
 def _path(path_id: str, mode: str, *, output_contract: str = _OUTPUT_CONTRACT) -> dict[str, Any]:
     return {
-        "schema_version": "PathDefinition.v1",
+        "schema_version": "PathDefinition",
         "path_id": path_id,
         "capability_slot": _SLOT,
-        "input_contract": "consumption/ConsumptionRequest.v1",
+        "input_contract": "consumption/ConsumptionRequest",
         "output_contract": output_contract,
         "mode": mode,
         "promotion_criteria": "criteria/recon-equivalence-cost-ceiling",
@@ -208,12 +208,12 @@ def _self_test() -> int:  # noqa: C901 - a redteam reads best as one linear list
     # a hand-forged "decision" that is NOT a schema-valid promote is rejected by the contract layer.
     forged = {"decision": "promote", "promoted_path_id": _CAND_LEAK["path_id"]}  # missing every gate/id
     check("ATTACK-1: a hand-forged 'promote' object missing the gates is REJECTED by the schema",
-          _sv.validate_ref(forged, "experiments/PathPromotionDecision.v1") != [])
+          _sv.validate_ref(forged, "experiments/PathPromotionDecision") != [])
     # a SCHEMA-COMPLETE forgery: every required field present, decision='promote', but ALL gates FALSE.
     # the contract's if/then constraint now REJECTS this (passing the schema implies a legitimate promote
     # shape), AND the runtime barrier is_promote_authorized re-derives the gates and refuses to serve it.
     forged_full = {
-        "schema_version": "PathPromotionDecision.v1", "decision_id": "ppd-forged",
+        "schema_version": "PathPromotionDecision", "decision_id": "ppd-forged",
         "report_id": report["report_id"], "run_id": run["run_id"], "capability_slot": _SLOT,
         "candidate_path_id": _CAND_LEAK["path_id"], "baseline_path_id": _BASELINE["path_id"],
         "decision": "promote", "promoted_path_id": _CAND_LEAK["path_id"],
@@ -223,7 +223,7 @@ def _self_test() -> int:  # noqa: C901 - a redteam reads best as one linear list
         "reason": "forged", "decided_at": _NOW,
     }
     check("ATTACK-1: a SCHEMA-COMPLETE forged 'promote' with ALL gates FALSE is REJECTED by the contract (if/then)",
-          _sv.validate_ref(forged_full, "experiments/PathPromotionDecision.v1") != [])
+          _sv.validate_ref(forged_full, "experiments/PathPromotionDecision") != [])
     check("ATTACK-1: is_promote_authorized() refuses the all-false-gate forgery (label != authorization)",
           path_promotion.is_promote_authorized(forged_full) is False)
     check("ATTACK-1: even fed the forged 'promote', the serve layer keeps serving the BASELINE (no candidate)",
@@ -382,11 +382,11 @@ def _self_test() -> int:  # noqa: C901 - a redteam reads best as one linear list
     forged_serve = copy.deepcopy(run)
     forged_serve["candidate_served"] = True
     forged_serve["served_path_id"] = _CAND_GOOD["path_id"]
-    check("ATTACK-6: a forged candidate_served=true run is REJECTED by the ParallelPathRun.v1 contract",
-          _sv.validate_ref(forged_serve, "experiments/ParallelPathRun.v1") != [])
+    check("ATTACK-6: a forged candidate_served=true run is REJECTED by the ParallelPathRun contract",
+          _sv.validate_ref(forged_serve, "experiments/ParallelPathRun") != [])
     # and a real run is schema-clean (the contract is doing real work, not always-failing).
-    check("ATTACK-6: the honest run validates clean against ParallelPathRun.v1",
-          _sv.validate_ref(run, "experiments/ParallelPathRun.v1") == [])
+    check("ATTACK-6: the honest run validates clean against ParallelPathRun",
+          _sv.validate_ref(run, "experiments/ParallelPathRun") == [])
 
     # ── ATTACK 7 · a failed candidate attempts to delete/overwrite the baseline (rollback must survive) ──
     # the leak candidate FAILED; its decision must still preserve the baseline as the rollback target, and a
@@ -398,8 +398,8 @@ def _self_test() -> int:  # noqa: C901 - a redteam reads best as one linear list
           fail_plan["rollback_target_path_id"] == _BASELINE["path_id"])
     check("ATTACK-7: rollback NEVER deletes — deletes_paths=false AND deletes_prior_runs=false (baseline survives)",
           fail_plan["deletes_paths"] is False and fail_plan["deletes_prior_runs"] is False)
-    check("ATTACK-7: the rollback plan validates against experiments/PathRollbackPlan.v1",
-          _sv.validate_ref(fail_plan, "experiments/PathRollbackPlan.v1") == [])
+    check("ATTACK-7: the rollback plan validates against experiments/PathRollbackPlan",
+          _sv.validate_ref(fail_plan, "experiments/PathRollbackPlan") == [])
     # the baseline definition + the prior run object are UNTOUCHED by any decision/plan (still readable).
     check("ATTACK-7: the baseline PathDefinition is unchanged after the failed-candidate motion",
           _BASELINE["path_id"] == "path-recon-baseline-authority" and _BASELINE["mode"] == "baseline")

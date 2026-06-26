@@ -5,12 +5,12 @@ candidate, ranks the FAQ candidate LOWER (a FAQ can NEVER outrank a regulation),
 EXISTING Baltor artifacts FIRST (cheapest rung), and PROPOSES a SourceRecipe for the winning candidate.
 
 Concretely:
-  - the driver returns a schema-valid SourceDiscoveryReport.v1 (serves_truth pinned False) plus full
-    SourceCandidate.v1 + SourceReliabilityScore.v1 objects (served_as_truth pinned False on every score);
+  - the driver returns a schema-valid SourceDiscoveryReport (serves_truth pinned False) plus full
+    SourceCandidate + SourceReliabilityScore objects (served_as_truth pinned False on every score);
   - the eCFR regulation candidate is classified source_type=regulation with a HIGHER authority_rank than the
     agency-FAQ candidate (the load-bearing precedence invariant: FAQ < regulation);
   - the WINNER is the regulation, never the FAQ; the proposed SourceRecipe targets the regulation handle and
-    validates against SourceRecipe.v1;
+    validates against SourceRecipe;
   - the "search existing artifacts FIRST" rung: when the regulation handle is already held, reused_existing is
     True (no new research needed for a source we already hold);
   - determinism: same task + same now -> byte-identical output; nothing is served as a fact.
@@ -38,7 +38,7 @@ _REG_HANDLE = "ctx://public/source/ecfr/12-CFR-1005.11#para.c.1.i"
 _FAQ_HANDLE = "ctx://public/source/cfpb-faq/error-resolution#q12"
 
 _TASK = {
-    "schema_version": "ResearchTask.v1",
+    "schema_version": "ResearchTask",
     "task_id": "rtask-cfpb-deadline-disc",
     "tenant_id": "acme",
     "source_scope": "global_public",
@@ -54,7 +54,7 @@ _TASK = {
 
 
 def _schema(name: str) -> dict:
-    return json.loads((_SCHEMA_DIR / f"{name}.v1.schema.json").read_text())
+    return json.loads((_SCHEMA_DIR / f"{name}.schema.json").read_text())
 
 
 def _self_test() -> int:
@@ -70,7 +70,7 @@ def _self_test() -> int:
 
     # ── the report is schema-valid + serves no truth. ──
     report = out["report"]
-    check("discovery returns a schema-valid SourceDiscoveryReport.v1",
+    check("discovery returns a schema-valid SourceDiscoveryReport",
           _validate(report, _schema("SourceDiscoveryReport")) == [])
     check("discovery report serves_truth is pinned FALSE (the report serves no truth)",
           report.get("serves_truth") is False and out.get("serves_truth") is False)
@@ -79,10 +79,10 @@ def _self_test() -> int:
     cands = {c["candidate_id"]: c for c in out["candidates"]}
     scores = {s["candidate_id"]: s for s in out["scores"]}
     for cid, c in cands.items():
-        check(f"candidate {c['source_type']} validates against SourceCandidate.v1",
+        check(f"candidate {c['source_type']} validates against SourceCandidate",
               _validate(c, _schema("SourceCandidate")) == [])
     for cid, s in scores.items():
-        check(f"reliability score for {cands[cid]['source_type']} validates against SourceReliabilityScore.v1",
+        check(f"reliability score for {cands[cid]['source_type']} validates against SourceReliabilityScore",
               _validate(s, _schema("SourceReliabilityScore")) == [])
         check(f"reliability score for {cands[cid]['source_type']} pins served_as_truth FALSE",
               s.get("served_as_truth") is False)
@@ -111,7 +111,7 @@ def _self_test() -> int:
     recipe = out["proposed_recipe"]
     check("discovery PROPOSES a SourceRecipe for the winning candidate",
           recipe is not None and recipe.get("source_handle") == _REG_HANDLE)
-    check("the proposed SourceRecipe validates against SourceRecipe.v1",
+    check("the proposed SourceRecipe validates against SourceRecipe",
           recipe is not None and _validate(recipe, _schema("SourceRecipe")) == [])
     check("the proposed recipe is lineage-linked back to the discovery report (M1->M2)",
           recipe is not None and recipe.get("derived_from_report_id") == report["report_id"])

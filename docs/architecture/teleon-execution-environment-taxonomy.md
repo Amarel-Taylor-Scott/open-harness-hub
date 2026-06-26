@@ -26,8 +26,8 @@ pre-autotune contract for every class in
 CapabilityTask / PurposeTask
   -> worker bucket
   -> runtime_class
-  -> ExecutionEnvironmentProfile.v1
-  -> RuntimeClassBinding.v1
+  -> ExecutionEnvironmentProfile
+  -> RuntimeClassBinding
   -> ExecutionProviderDecision
   -> local/function/K8s/job/browser/GPU/workflow backend
 ```

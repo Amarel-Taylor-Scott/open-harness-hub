@@ -1,0 +1,15 @@
+{
+  "$id": "memory/MemorySearchRequest", "title": "MemorySearchRequest", "type": "object", "additionalProperties": false,
+  "description": "A request to recall/search a memory/context provider behind a Baltor wrapper. Recall returns candidate MemoryArtifacts (retrieved != served): nothing here can pull a canonical/served fact. Search is ALWAYS bounded to a (tenant_id, container) so no cross-tenant recall is possible, and uses injected time for determinism.",
+  "required": ["schema_version", "tenant_id", "scope", "container", "query", "now"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["MemorySearchRequest"]},
+    "tenant_id": {"type": "string", "description": "Owning tenant. Required: recall is scoped to this tenant only."},
+    "scope": {"type": "string", "enum": ["global_public", "tenant_private", "tenant_shared"]},
+    "container": {"type": "string", "description": "Project/container scope the recall is bounded to."},
+    "query": {"type": "string", "description": "The recall query string."},
+    "search_mode": {"type": "string", "enum": ["hybrid", "memories", "documents"], "description": "Mirrors the provider's hybrid/memories/documents modes. Provider-agnostic; the wrapper maps it."},
+    "limit": {"type": "integer", "description": "Max candidate results to return."},
+    "now": {"type": "string", "description": "Injected time for the recall (deterministic; no wall-clock)."}
+  }
+}

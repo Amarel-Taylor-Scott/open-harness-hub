@@ -126,7 +126,7 @@ def _claim_text(claim: dict[str, Any]) -> str:
     capabilities=("ambiguity_detection", "context_safety", "local_rules"),
     task_types=("context.ambiguity.scan", "claim.ambiguity.detect"),
     image="baltor-worker-audit",
-    output_contract="context_ambiguity.v1",
+    output_contract="context_ambiguity",
 )
 def ambiguity_scan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     concerns: list[dict[str, Any]] = []
@@ -157,7 +157,7 @@ def ambiguity_scan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("conflict_detection", "claim_reconciliation", "local_rules"),
     task_types=("context.conflict.scan", "claim.conflict.detect"),
     image="baltor-worker-audit",
-    output_contract="conflict_candidates.v1",
+    output_contract="conflict_candidates",
 )
 def conflict_scan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     claims = _claims(payload)
@@ -192,7 +192,7 @@ def conflict_scan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("fragile_fact_detection", "claim_records", "context_safety"),
     task_types=("context.fragile_fact.enrich", "claim.risk.enrich"),
     image="baltor-worker-audit",
-    output_contract="claim_risk_records.v1",
+    output_contract="claim_risk_records",
 )
 def fragile_fact_enrich(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     records: list[dict[str, Any]] = []
@@ -314,7 +314,7 @@ def _review_task(ctx: TaskContext, name: str, payload: dict[str, Any], *, index:
     capabilities=("model_routing", "cost_control", "fine_tuning_feedback"),
     task_types=("model.cascade.catalog",),
     image="baltor-worker-orchestrator",
-    output_contract="model_cascade_policy.v1",
+    output_contract="model_cascade_policy",
 )
 def model_cascade_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     return TaskResult.success({"model_cascade_policy": load_cascade_policy(str(payload.get("policy_path") or "") or None)})
@@ -328,7 +328,7 @@ def model_cascade_catalog(ctx: TaskContext, payload: dict[str, Any]) -> TaskResu
     capabilities=("llm_review_planning", "hierarchical_models", "graph_enrichment", "summarization", "conflict_review"),
     task_types=("llm.trust.plan", "context.llm_review.plan"),
     image="baltor-worker-orchestrator",
-    output_contract="llm_trust_plan.v1",
+    output_contract="llm_trust_plan",
 )
 def llm_trust_plan(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     tasks: list[dict[str, Any]] = []
@@ -520,7 +520,7 @@ def _run_llm_json(ctx: TaskContext, task_name: str, payload: dict[str, Any], *, 
     capabilities=("claim_review", "structured_json"),
     task_types=("llm.claim.review",),
     image="baltor-worker-gpu",
-    output_contract="llm_claim_reviews.v1",
+    output_contract="llm_claim_reviews",
 )
 def llm_claim_review(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     output = _run_llm_json(ctx, "llm.claim.review", payload, output_key="llm_claim_reviews", schema_hint={
@@ -544,7 +544,7 @@ def llm_claim_review(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("conflict_detection", "structured_json"),
     task_types=("llm.conflict.review",),
     image="baltor-worker-gpu",
-    output_contract="llm_conflict_reviews.v1",
+    output_contract="llm_conflict_reviews",
 )
 def llm_conflict_review(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     output = _run_llm_json(ctx, "llm.conflict.review", payload, output_key="llm_conflict_reviews", schema_hint={
@@ -567,7 +567,7 @@ def llm_conflict_review(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult
     capabilities=("graph_extraction", "structured_json"),
     task_types=("llm.graph.enrich",),
     image="baltor-worker-gpu",
-    output_contract="llm_graph_enrichment.v1",
+    output_contract="llm_graph_enrichment",
 )
 def llm_graph_enrich(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     output = _run_llm_json(ctx, "llm.graph.enrich", payload, output_key="llm_graph_enrichment", schema_hint={
@@ -596,7 +596,7 @@ def llm_graph_enrich(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     capabilities=("summarization", "structured_json"),
     task_types=("llm.context.summarize",),
     image="baltor-worker-gpu",
-    output_contract="llm_summaries.v1",
+    output_contract="llm_summaries",
 )
 def llm_context_summarize(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     output = _run_llm_json(ctx, "llm.context.summarize", payload, output_key="llm_summaries", schema_hint={
@@ -619,7 +619,7 @@ def llm_context_summarize(ctx: TaskContext, payload: dict[str, Any]) -> TaskResu
     capabilities=("audit_review", "structured_json"),
     task_types=("llm.audit.review",),
     image="baltor-worker-audit",
-    output_contract="llm_audit_reviews.v1",
+    output_contract="llm_audit_reviews",
 )
 def llm_audit_review(ctx: TaskContext, payload: dict[str, Any]) -> TaskResult:
     output = _run_llm_json(ctx, "llm.audit.review", payload, output_key="llm_audit_reviews", schema_hint={

@@ -9,7 +9,7 @@ Asserts:
      (identity/status/visibility/provenance/receipts/source_handles/security).
   C. NUMERIC CODES: status/visibility/edge code tables are numeric; a 'candidate' status (200) + an 'active'
      status exist; runtime distinguishes candidate≠active by NUMBER.
-  D. CONTRACTS: TemplateArtifact.v1 + SchemaObjectTemplate.v1 present + registered in contract_registry.
+  D. CONTRACTS: TemplateArtifact + SchemaObjectTemplate present + registered in contract_registry.
   E. REGISTRY: internal_name 'Shared Template Registry'; OpenTemplatesHub.io noted as NOT-launched future
      surface; existing templates/ + scripts reused (no-reinvention recorded).
   F. SCHEMA-OBJECT TEMPLATES: >=9 families incl ContextArtifact/PurposeTask/ModelInvocationReceipt; every family
@@ -82,9 +82,9 @@ def _self_test() -> int:
 
     # D. contracts
     for c in ("TemplateArtifact", "SchemaObjectTemplate"):
-        p = _REPO / "schemas" / "templates" / f"{c}.v1.schema.json"
-        check(f"D: {c}.v1 schema present", p.exists())
-        check(f"D: {c}.v1 registered", f"templates/{c}.v1.schema.json" in contracts)
+        p = _REPO / "schemas" / "templates" / f"{c}.schema.json"
+        check(f"D: {c} schema present", p.exists())
+        check(f"D: {c} registered", f"templates/{c}.schema.json" in contracts)
 
     # E. registry
     check("E: internal_name 'Shared Template Registry'", reg["internal_name"] == "Shared Template Registry")

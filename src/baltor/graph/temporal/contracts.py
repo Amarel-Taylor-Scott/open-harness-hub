@@ -107,7 +107,7 @@ class TemporalFactNode:
 
     def to_dict(self) -> dict:
         d = asdict(self)
-        d["schema_version"] = "TemporalFactNode.v1"
+        d["schema_version"] = "TemporalFactNode"
         return d
 
     def authority_rank(self) -> int:

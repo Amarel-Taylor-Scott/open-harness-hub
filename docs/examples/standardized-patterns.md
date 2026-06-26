@@ -27,8 +27,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/ingest/sanctions_feed_live.py`
 - **pattern_id:** `source_adapter_pattern` (also exercises `ingestion_sync_pattern`)
-- **standard_id:** `standard.source_adapter.v1`
-- **template_id:** `ingestion.source_adapter.v1`
+- **standard_id:** `standard.source_adapter`
+- **template_id:** `ingestion.source_adapter`
 - **proof command:** `python3 scripts/check_multi_source_ingestion.py --self-test`
 - **why it is the standard:** It is the live oracle-source adapter that turns a fetched
   upstream into the SAME governed artifact chain every other source must produce
@@ -42,8 +42,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/ingest/decompose_structured.py`
 - **pattern_id:** `processor_harness_pattern`
-- **standard_id:** `standard.processor.v1`
-- **template_id:** `worker.command_handler.v1` (processor handler scaffold)
+- **standard_id:** `standard.processor`
+- **template_id:** `worker.command_handler` (processor handler scaffold)
 - **proof command:** `python3 scripts/check_cfpb_decompose_via_harness.py --self-test`
 - **why it is the standard:** It is the canonical finer-grain decomposition routine —
   a structured `SourceArtifact` record becomes promotion-eligible `atomic_fact`
@@ -56,8 +56,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/flywheel_worker.py` (claim loop) over `scripts/durable_store.py` (the one durable store)
 - **pattern_id:** `worker_claim_loop_pattern` (built on `durable_command_pattern`)
-- **standard_id:** `standard.worker_claim_loop.v1`
-- **template_id:** `worker.command_handler.v1`
+- **standard_id:** `standard.worker_claim_loop`
+- **template_id:** `worker.command_handler`
 - **proof command:** `python3 scripts/check_durable_worker_parallel.py --self-test`
 - **why it is the standard:** It is the stateless claim → handler → ack/nack loop over
   the single SQLite durable store. N workers against one queue share work with NO
@@ -69,8 +69,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/api_context_handler.py`
 - **pattern_id:** `api_projection_route_pattern`
-- **standard_id:** `standard.api_projection.v1`
-- **template_id:** `api.projection_route.v1`
+- **standard_id:** `standard.api_projection`
+- **template_id:** `api.projection_route`
 - **proof command:** `python3 scripts/check_consumption_api.py --self-test`
 - **why it is the standard:** It is a pure request handler `(method, path, body) -> (status, json)`
   so the route contract is testable WITHOUT a socket. It NEVER fabricates truth — it
@@ -83,8 +83,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `web/baltor/consume.html`
 - **pattern_id:** `ui_projection_page_pattern`
-- **standard_id:** `standard.ui_projection.v1`
-- **template_id:** `ui.projection_page.v1`
+- **standard_id:** `standard.ui_projection`
+- **template_id:** `ui.projection_page`
 - **proof command:** `python3 scripts/check_consumption_ui.py --self-test`
 - **why it is the standard:** It renders the CFPB Reg E correctness invariant by fetching the
   `/api/context/serve` projection and rendering ONLY — it computes, stores, and mutates
@@ -96,8 +96,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `architecture/external_capability_catalog.json` (the `parser_manager` slot: `parser.stub@v1` emulator + `parser.docling@v1` / `parser.unstructured@v1` candidates)
 - **pattern_id:** `capability_catalog_entry_pattern` (the slot card) + `dependency_emulator_pattern` (the stub)
-- **standard_id:** `standard.provider_adapter.v1`
-- **template_id:** `provider.adapter.v1`
+- **standard_id:** `standard.provider_adapter`
+- **template_id:** `provider.adapter`
 - **proof command:** `python3 scripts/check_external_capability_catalog.py --self-test`
 - **why it is the standard:** A 3rd-party capability cannot land without a slot card —
   category, the currently-wired adapter, a candidate primary external repo, fallbacks,
@@ -111,8 +111,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/runtime/optimization.py`
 - **pattern_id:** `optimization_candidate_pattern`
-- **standard_id:** `standard.optimization_candidate.v1`
-- **template_id:** `worker.command_handler.v1` (candidate as a governed command)
+- **standard_id:** `standard.optimization_candidate`
+- **template_id:** `worker.command_handler` (candidate as a governed command)
 - **proof command:** `python3 scripts/check_optimization_suite.py --self-test`
 - **why it is the standard:** It runs the baseline → candidate → regression-gate →
   promote loop: a candidate context pack is measured against a frozen `BaselineSnapshot`
@@ -126,8 +126,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/artifact_graph/reconciliation.py`
 - **pattern_id:** `reconciliation_decision_pattern` (emits the `held_out_warning_pattern`)
-- **standard_id:** `standard.reconciliation_decision.v1`
-- **template_id:** `worker.command_handler.v1` (reconciler as a governed command)
+- **standard_id:** `standard.reconciliation_decision`
+- **template_id:** `worker.command_handler` (reconciler as a governed command)
 - **proof command:** `python3 scripts/check_cfpb_reconciliation.py --self-test`
 - **why it is the standard:** When sources disagree it produces a deterministic decision
   record (winner + reason + the recorded losers — never a silent merge) using explicit
@@ -140,8 +140,8 @@ Verify everything here with `python3 scripts/check_standardized_examples.py --se
 
 - **Canonical example:** `scripts/make_review_pack.py`
 - **pattern_id:** `review_pack_pattern`
-- **standard_id:** `standard.review_pack.v1`
-- **template_id:** `docs.section_page.v1` (review-pack section doc scaffold)
+- **standard_id:** `standard.review_pack`
+- **template_id:** `docs.section_page` (review-pack section doc scaffold)
 - **proof command:** `python3 scripts/check_review_pack_recorders.py --self-test`
 - **why it is the standard:** When risk warrants review it assembles a review pack — the
   object, its sources, conflicts, and the proposed decision — content-addressed (no

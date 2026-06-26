@@ -2,7 +2,7 @@
 
 The cost of running a path is NOT hardcoded in business logic: it is read from
 ``architecture/execution_backend_pricebook.json`` (CONFIG, single source of cost — see CLAUDE.md "No Magic
-Values"). ``estimate(...)`` returns a ``PathCostReport.v1`` dict carrying the pricebook-derived relative
+Values"). ``estimate(...)`` returns a ``PathCostReport`` dict carrying the pricebook-derived relative
 cost, the ``pricebook_version`` it was computed from (reproducibility), and the per-entry ``confidence``
 (a 'low' placeholder price must never silently drive a production decision).
 
@@ -25,7 +25,7 @@ _REPO = Path(__file__).resolve().parents[3]
 #: the single source of execution-backend cost (CONFIG, never a parallel literal in code).
 PRICEBOOK_PATH = _REPO / "architecture" / "execution_backend_pricebook.json"
 
-SCHEMA_VERSION = "PathCostReport.v1"
+SCHEMA_VERSION = "PathCostReport"
 #: the pricebook pins this; cost reports mirror it (the validator enum-bounds it).
 COST_CURRENCY = "relative-unit"
 
@@ -48,7 +48,7 @@ def estimate(
     pricebook: dict[str, Any] | None = None,
     pricebook_bytes: bytes | None = None,
 ) -> dict[str, Any]:
-    """Relative-cost ``PathCostReport.v1`` for a path on ``backend_id``, from the pricebook CONFIG.
+    """Relative-cost ``PathCostReport`` for a path on ``backend_id``, from the pricebook CONFIG.
 
     The pricebook is the single source of cost: ``request_cost``, ``duration_cost_per_s``,
     ``idle_cost_per_s`` and ``confidence`` are carried straight from the named backend entry — never typed

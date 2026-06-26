@@ -122,12 +122,12 @@ class Flywheel:
             status, action, rationale = classify_failure(cf, sid)
             # a degraded-but-up surface is recorded healthy with a latency note (not a failure)
             degraded = hb.up and hb.latency_ms is not None and hb.latency_ms > LATENCY_WARN_MS
-            heartbeats.append(mint_record("SurfaceHeartbeat.v1",
+            heartbeats.append(mint_record("SurfaceHeartbeat",
                 {"surface": sid, "up": hb.up, "latency_ms": hb.latency_ms,
                  "degraded": degraded, "detail": hb.detail},
                 produced_by="teleon.monitoring", created_at=now))
             if action != ACTION_NONE:
-                proposals.append(mint_record("ResolutionProposal.v1",
+                proposals.append(mint_record("ResolutionProposal",
                     {"surface": sid, "status": status, "consecutive_failures": cf,
                      "action": action, "auto_executed": False, "rationale": rationale},
                     produced_by="teleon.monitoring", created_at=now))
@@ -183,7 +183,7 @@ def _self_test() -> int:
        t0["registry"]["status"] == STATUS_TRANSIENT and t0["registry"]["action"] == ACTION_RETRY)
     ck("a healthy surface yields no proposal", "identity" not in t0)
     ck("every heartbeat + proposal is a governed record (schema_version + is_truth:false + provenance)",
-       all(h["envelope"] == "GovernedRecord.v1" and h["is_truth"] is False for h in ticks[0]["heartbeats"])
+       all(h["envelope"] == "GovernedRecord" and h["is_truth"] is False for h in ticks[0]["heartbeats"])
        and all(p["is_truth"] is False for p in ticks[0]["proposals"]))
 
     # tick 2: registry recovered (its 3rd ping is up) → no proposal; teleon now persistent (3x)

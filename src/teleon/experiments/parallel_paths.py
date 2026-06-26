@@ -34,7 +34,7 @@ RunnerResult = dict[str, Any]
 #: runner(path_definition, input_snapshot) -> RunnerResult.
 Runner = Callable[[dict[str, Any], Any], RunnerResult]
 
-SCHEMA_VERSION = "ParallelPathRun.v1"
+SCHEMA_VERSION = "ParallelPathRun"
 #: the served result is ALWAYS one of these modes — never a candidate/shadow/canary (schema enum-bounds it).
 SERVABLE_MODES = ("baseline", "fallback")
 #: a challenger result carries one of these modes; recorded, never served (schema enum-bounds it).
@@ -110,7 +110,7 @@ def run_parallel(
     now: str,
     validate: bool = True,
 ) -> dict[str, Any]:
-    """Run the baseline + each candidate on the SAME ``input_snapshot``; return a ``ParallelPathRun.v1`` dict.
+    """Run the baseline + each candidate on the SAME ``input_snapshot``; return a ``ParallelPathRun`` dict.
 
     - Records ``input_snapshot_hash`` = sha256 of the canonical bytes of ``input_snapshot`` (the proof that
       baseline and every candidate saw IDENTICAL input).
@@ -121,7 +121,7 @@ def run_parallel(
 
     The baseline path's mode must be servable (baseline/fallback). ``runner`` performs the actual execution
     so this function stays pure. ``now`` is injected. With ``validate=True`` the result is checked against
-    the ParallelPathRun.v1 schema before returning (a contract breach raises).
+    the ParallelPathRun schema before returning (a contract breach raises).
     """
     if baseline_path.get("mode") not in SERVABLE_MODES:
         raise ValueError(

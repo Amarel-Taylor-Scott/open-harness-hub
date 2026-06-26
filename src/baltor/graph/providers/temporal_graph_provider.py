@@ -25,18 +25,18 @@ class TemporalGraphProviderPort(Protocol):
     def project(self, store: TemporalGraphStore, tenant_id: str) -> dict:  # read-only projection
         ...
 
-    def status(self) -> dict:  # TemporalGraphProviderStatus.v1
+    def status(self) -> dict:  # TemporalGraphProviderStatus
         ...
 
 
 def _status(provider_id: str, status: str, available: bool, reason: str = "", credential_ref: str = "") -> dict:
-    return {"schema_version": "TemporalGraphProviderStatus.v1", "provider_id": provider_id, "status": status,
+    return {"schema_version": "TemporalGraphProviderStatus", "provider_id": provider_id, "status": status,
             "available": available, "reason": reason, "credential_ref": credential_ref}
 
 
 def _projection(store: TemporalGraphStore, tenant_id: str, provider_id: str) -> dict:
     snap = store.snapshot(tenant_id)
-    return {"schema_version": "TemporalGraphProjection.v1", "tenant_id": tenant_id, "scope": "global_public",
+    return {"schema_version": "TemporalGraphProjection", "tenant_id": tenant_id, "scope": "global_public",
             "provider_id": provider_id, "facts": snap["facts"], "edges": snap["edges"], "as_of": ""}
 
 

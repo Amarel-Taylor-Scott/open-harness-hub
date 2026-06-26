@@ -66,9 +66,9 @@ M7/M8 when the proofs clear the risk-scaled bar.
 
 ## Contracts
 
-`WorkflowTrace.v1` · `LLMTrace.v1` · `ConsensusRun.v1` · `AdjudicationRecord.v1` · `PatternCandidate.v1` ·
-`RuleCandidate.v1` · `RuleReplayReport.v1` · `ShadowRunReport.v1` · `DeterministicRule.v1` ·
-`RulePromotionReceipt.v1` · `FallbackPolicy.v1` (schemas under `schemas/determinism/`).
+`WorkflowTrace` · `LLMTrace` · `ConsensusRun` · `AdjudicationRecord` · `PatternCandidate` ·
+`RuleCandidate` · `RuleReplayReport` · `ShadowRunReport` · `DeterministicRule` ·
+`RulePromotionReceipt` · `FallbackPolicy` (schemas under `schemas/determinism/`).
 
 ## Inputs / Outputs
 

@@ -25,7 +25,7 @@ source handles + receipts + production-relevant scorecards + redteam.
 2. **Boundary** — DONE in the map/bridge graph. (companies/openBenchmarkHub/*.md docs still QUEUED.)
 3. **Contracts (QUEUED):** `schemas/benchmarks/{BenchmarkArtifact,BenchmarkCard,BenchmarkDatasetRef,BenchmarkTaskRef,
    BenchmarkMetric,BenchmarkResult,BenchmarkRunRef,BenchmarkLeaderboard,BenchmarkSuitabilityReport,BenchmarkRiskReport,
-   BenchmarkContaminationReport,BenchmarkToCapabilityMap}.v1`. BenchmarkArtifact.v1 required: benchmark_id,
+   BenchmarkContaminationReport,BenchmarkToCapabilityMap}.v1`. BenchmarkArtifact required: benchmark_id,
    display_name, benchmark_family, capability_slots, input_contracts, output_contracts, metrics, datasets,
    harnesses, known_limitations, contamination_risk, suitability_notes, visibility, owner, status_code.
 4. **Registry (QUEUED):** `architecture/{open_benchmark_registry,benchmark_metric_registry,benchmark_family_codes,

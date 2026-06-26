@@ -1,9 +1,9 @@
 MODULE src/teleon/io/object_shell_migration.py
 ## API signatures
 ```python
-"""src.teleon.io.object_shell_migration — LOSSLESS migration of an object family to the canonical ObjectShell.v1."""
+"""src.teleon.io.object_shell_migration — LOSSLESS migration of an object family to the canonical ObjectShell."""
 def migrate_to_shell(obj: dict, *, object_type: str, id_field: str, source_schema: str, now: str) -> dict
-    # Wrap any object as an ObjectShell.v1, losslessly. The original is preserved in payload; lineage records the
+    # Wrap any object as an ObjectShell, losslessly. The original is preserved in payload; lineage records the
 def rehydrate(shell: dict) -> dict
     # Return the original object preserved by the migration — proving the wrap was lossless.
 def migrate_context_artifact(context_artifact: dict, *, now: str) -> dict

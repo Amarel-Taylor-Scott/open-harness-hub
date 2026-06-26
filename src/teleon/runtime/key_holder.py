@@ -4,7 +4,7 @@ The credential REGISTRY catalogs which secrets exist + what they unlock; `creden
 resolves a service's secret VALUE for an actual call and hands back ready-to-use auth headers — honoring the byo/platform
 key-ownership model + platform_limits. A developer "adds a key" by setting its env var (BYO -> their account/plan); the
 holder picks it up. REDACTION-SAFE: it never logs a value and exposes only a redacted status; the raw value goes only to
-the caller making the request. Complements SecretRef.v1 (the typed ref). serves_truth=false; Teleon layer.
+the caller making the request. Complements SecretRef (the typed ref). serves_truth=false; Teleon layer.
 """
 from __future__ import annotations
 

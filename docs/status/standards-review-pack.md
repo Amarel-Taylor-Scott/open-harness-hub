@@ -29,7 +29,7 @@ The miner flags repeated one-offs that should be standardized rather than re-wri
 disk: `scripts/new.py`. These are candidates for a shared template/standard.
 
 ## 7. Sample generated component
-A component is generated deterministically from an active template — e.g. `--template ingestion.source_adapter.v1`
+A component is generated deterministically from an active template — e.g. `--template ingestion.source_adapter`
 (a real ACTIVE entry in the template catalog) — so a recommended standard becomes a reusable component, not a new one-off.
 
 ## 8. Proof results

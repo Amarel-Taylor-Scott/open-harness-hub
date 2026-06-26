@@ -40,7 +40,7 @@ class SupervisorLedger:
     # ── instances ─────────────────────────────────────────────────────────
     def register_instance(self, *, supervisor_id: str, hostname: str = "", pid: int = 0,
                           version: str = "", now: str) -> dict:
-        inst = {"schema_version": "SupervisorInstance.v1", "supervisor_id": supervisor_id, "hostname": hostname,
+        inst = {"schema_version": "SupervisorInstance", "supervisor_id": supervisor_id, "hostname": hostname,
                 "pid": pid, "version": version, "status": "running", "started_at": now,
                 "heartbeat_at": now, "last_tick_at": ""}
         self._instances[supervisor_id] = inst
@@ -78,7 +78,7 @@ class SupervisorLedger:
 
     # ── shard leases (high-volume scans) ────────────────────────────────────
     def register_shard(self, *, shard_id: str, shard_type: str, shard_key: str) -> dict:
-        s = {"schema_version": "SupervisorShard.v1", "shard_id": shard_id, "shard_type": shard_type,
+        s = {"schema_version": "SupervisorShard", "shard_id": shard_id, "shard_type": shard_type,
              "shard_key": shard_key, "owner_id": "", "lease_until": "", "heartbeat_at": "", "status": "unclaimed"}
         self._shards[shard_id] = s
         return s
@@ -120,7 +120,7 @@ class SupervisorLedger:
         unique constraint on (idempotency_key)."""
         if idempotency_key in self._decisions:
             return self._decisions[idempotency_key]
-        d = {"schema_version": "SupervisorDecision.v1",
+        d = {"schema_version": "SupervisorDecision",
              "decision_id": _hid("sdec-", supervisor_id, decision_type, idempotency_key),
              "supervisor_id": supervisor_id, "shard_id": shard_id, "decision_type": decision_type,
              "reason": reason, "idempotency_key": idempotency_key,
@@ -134,7 +134,7 @@ class SupervisorLedger:
     # ── ticks (lag accounting) ──────────────────────────────────────────────
     def record_tick(self, *, supervisor_id: str, shard_id: str = "", started_at: str, duration_ms: int,
                     due_task_count: int = 0, scheduled_count: int = 0, interval_ms: int = 0) -> dict:
-        t = {"schema_version": "SupervisorTick.v1", "supervisor_id": supervisor_id, "shard_id": shard_id,
+        t = {"schema_version": "SupervisorTick", "supervisor_id": supervisor_id, "shard_id": shard_id,
              "started_at": started_at, "duration_ms": duration_ms, "due_task_count": due_task_count,
              "scheduled_count": scheduled_count, "interval_ms": interval_ms}
         self._ticks.append(t)

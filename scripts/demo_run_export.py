@@ -178,7 +178,7 @@ def build_run(corpus: str = "acme") -> dict[str, Any]:
             g, tgt, patch, swarm["review_requests"][0]["review_request_id"], receipt["receipt_id"])
 
     return {
-        "kind": "baltor.demo-run.v1", "corpus": corpus, "corpus_label": meta["label"],
+        "kind": "baltor.demo-run", "corpus": corpus, "corpus_label": meta["label"],
         "live": False, "seam": False,
         "headline": demo["headline"],
         "stages": stages,
@@ -204,14 +204,14 @@ def _version_pair(g: ContextGraph, oid: str, patch: dict, review_request_id: str
     chash = (o.get("provenance") or {}).get("content_hash") or f"sha256:demo-{oid}"
     created = o.get("created_at", "1970-01-01T00:00:00Z")
     v1 = {
-        "kind": "baltor.context-version.v1", "context_version_id": f"{oid}-v1",
+        "kind": "baltor.context-version", "context_version_id": f"{oid}-v1",
         "context_object_id": oid, "content_hash": chash, "source_revision": "v1",
         "observed_at": created, "created_at": created, "valid_from": created, "valid_to": None,
         "source_handle": handle, "value": patch["from_value"],
         "status": "stale", "applied": True, "candidate_promoted": True, "is_current": True,
     }
     v2 = {
-        "kind": "baltor.context-version.v1", "context_version_id": f"{oid}-v2",
+        "kind": "baltor.context-version", "context_version_id": f"{oid}-v2",
         "context_object_id": oid, "content_hash": f"sha256:proposed-{oid}", "source_revision": "v2-proposed",
         "observed_at": "1970-01-01T00:00:00Z", "created_at": "1970-01-01T00:00:00Z",
         # no valid_from/valid_to: the proposed version is not yet valid (pending review).
@@ -241,7 +241,7 @@ def build_version_timeline() -> dict[str, Any]:
             "versions": versions,
         })
     return {
-        "kind": "baltor.version-timeline.v1", "timelines": timelines,
+        "kind": "baltor.version-timeline", "timelines": timelines,
         "note": "append-only; current is a POINTER (still v1); v2 is a candidate pending review — NOT "
                 "promoted, NOT applied (promotion boundary); receipts immutable",
         "created_at": "1970-01-01T00:00:00Z",
@@ -264,7 +264,7 @@ def build_review_queue() -> dict[str, Any]:
                 "proposed_patch": patch,             # applied=false — approval gates the apply
             })
     return {
-        "kind": "baltor.review-queue.v1",
+        "kind": "baltor.review-queue",
         "reviews": reviews,
         "open_count": sum(1 for r in reviews if r["request"].get("status") == "open"),
         "note": "steward reviews routed by the context-object swarm; decisions are demo-local (no "

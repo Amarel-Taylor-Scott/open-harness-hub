@@ -47,7 +47,7 @@ class VerificationResult:
                                     "ev": json.dumps(self.evidence, sort_keys=True)})
 
     def to_dict(self) -> dict:
-        return {"schema_version": "VerificationResult.v1", "result_id": self.result_id, "task_id": self.task_id,
+        return {"schema_version": "VerificationResult", "result_id": self.result_id, "task_id": self.task_id,
                 "fact_id": self.fact_id, "scope": self.scope, "new_status": self.new_status,
                 "applied": self.applied, "verified_at": self.verified_at, "evidence": dict(self.evidence),
                 "next_verify_at": self.next_verify_at, "reason": self.reason}

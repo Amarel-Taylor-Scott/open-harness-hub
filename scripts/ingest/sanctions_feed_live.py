@@ -78,7 +78,7 @@ OFAC_NULL = "-0-"
 POSITIONAL_CSV_SOURCE = "ofac_sdn"
 
 #: Parser identity (bump if the positional layout interpretation changes).
-PARSER_ID = "sanctions_feed_live.sdn_csv.v1"
+PARSER_ID = "sanctions_feed_live.sdn_csv"
 
 
 @dataclass(frozen=True)

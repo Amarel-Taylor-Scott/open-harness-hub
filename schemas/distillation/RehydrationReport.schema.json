@@ -1,0 +1,20 @@
+{
+  "$id": "distillation/RehydrationReport", "title": "RehydrationReport", "type": "object", "additionalProperties": false,
+  "description": "The result of rehydrate(store, artifact_id, tenant): the proof that a derived artifact can be walked back to its raw + source layer, with the held-out items, rejected candidates, and receipts recovered alongside. A rehydration is only 'rehydrated:true' when it reaches at least one source artifact id (check enforces source_artifact_ids non-empty when rehydrated). Never crosses a tenant boundary — a rehydration for tenant A can only return tenant A (and global_public) artifacts; crossed_tenant_boundary MUST be false.",
+  "required": ["schema_version", "artifact_id", "tenant_id", "rehydrated", "raw_artifact_ids", "source_artifact_ids", "parent_artifact_ids", "held_out_artifact_ids", "rejected_candidate_ids", "receipts", "crossed_tenant_boundary"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["RehydrationReport"]},
+    "artifact_id": {"type": "string"},
+    "tenant_id": {"type": "string"},
+    "rehydrated": {"type": "boolean", "description": "true only when the source layer was reached"},
+    "raw_artifact_ids": {"type": "array", "items": {"type": "string"}},
+    "source_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "reachable source artifact ids; MUST be non-empty when rehydrated is true"},
+    "source_handles": {"type": "array", "items": {"type": "string"}},
+    "parent_artifact_ids": {"type": "array", "items": {"type": "string"}},
+    "held_out_artifact_ids": {"type": "array", "items": {"type": "string"}, "description": "held-out items recovered (e.g. FAQ-30, allegations) — present, not erased"},
+    "rejected_candidate_ids": {"type": "array", "items": {"type": "string"}},
+    "receipts": {"type": "array", "items": {"type": "string"}},
+    "crossed_tenant_boundary": {"type": "boolean", "description": "MUST be false; a true value is a tenant-leak and is rejected"},
+    "failure_reason": {"type": "string", "description": "set when rehydrated is false (e.g. source_unreachable, tenant_mismatch)"}
+  }
+}

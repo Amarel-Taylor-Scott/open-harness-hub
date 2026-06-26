@@ -1,0 +1,72 @@
+{
+  "valid": {
+    "schema_version": "SidecarOverlay",
+    "sidecar_id": "sc-2c624232cdd221771",
+    "source_hash": "9f2a1c7b4e0d8a36",
+    "tenant_id": "acme",
+    "source_id": "policy-faq-csv",
+    "artifact_ids": ["fact-faq-10", "fact-faq-30"],
+    "field_facts": [
+      {
+        "native_path": "/0/answer",
+        "value": "10 business days",
+        "claim_status": "verified",
+        "source_handle": "ctx://public/source/cfpb/reg-e/12-cfr-1005.11",
+        "artifact_id": "fact-faq-10",
+        "verification_receipt_id": "vr-0001"
+      }
+    ],
+    "held_out_claims": [
+      {
+        "claim": "30 days",
+        "reason": "superseded_by_verified_correction",
+        "artifact_id": "fact-faq-30",
+        "source_handle": "ctx://tenant/acme/source/policy-faq-csv/row/0",
+        "native_path": "/0/answer"
+      }
+    ],
+    "conflicts": [
+      {
+        "native_path": "/0/answer",
+        "detail": "source FAQ said 30 days; regulation says 10 business days",
+        "candidate_values": ["30 days", "10 business days"],
+        "source_handles": ["ctx://tenant/acme/source/policy-faq-csv/row/0", "ctx://public/source/cfpb/reg-e/12-cfr-1005.11"]
+      }
+    ],
+    "reconciliations": [
+      {
+        "native_path": "/0/answer",
+        "chosen_value": "10 business days",
+        "reason": "regulated authority outranks customer FAQ",
+        "rejected_values": ["30 days"],
+        "receipt_id": "rr-0001"
+      }
+    ],
+    "verification_receipts": [
+      {"receipt_id": "vr-0001", "native_path": "/0/answer", "method": "multi_source_corroboration", "result": "verified"}
+    ],
+    "warnings": [
+      {"native_path": "/0/answer", "message": "value differs from your source FAQ; see diff + receipt", "severity": "warning"}
+    ],
+    "field_map": [
+      {"native_path": "/0/answer", "source_handle": "ctx://public/source/cfpb/reg-e/12-cfr-1005.11", "artifact_id": "fact-faq-10", "claim_status": "verified"}
+    ],
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_missing_held_out_claims": {
+    "schema_version": "SidecarOverlay",
+    "source_hash": "9f2a1c7b4e0d8a36",
+    "field_map": [],
+    "created_at": "2026-06-05T00:00:00Z"
+  },
+  "invalid_field_fact_bad_claim_status": {
+    "schema_version": "SidecarOverlay",
+    "source_hash": "9f2a1c7b4e0d8a36",
+    "field_facts": [
+      {"native_path": "/0/answer", "claim_status": "definitely_true"}
+    ],
+    "held_out_claims": [],
+    "field_map": [],
+    "created_at": "2026-06-05T00:00:00Z"
+  }
+}

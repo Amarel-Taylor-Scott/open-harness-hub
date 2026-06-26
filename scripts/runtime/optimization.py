@@ -191,7 +191,7 @@ class OptimizationReceipt:
     regressions: list
     decision: str
     created_at: str
-    schema_version: str = "OptimizationReceipt.v1"
+    schema_version: str = "OptimizationReceipt"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "receipt_id": self.receipt_id, "pack_id": self.pack_id,
@@ -338,7 +338,7 @@ class ConsumptionReadinessReport:
     verification_receipt_id: str
     optimization_receipt_id: str
     created_at: str
-    schema_version: str = "ConsumptionReadinessReport.v1"
+    schema_version: str = "ConsumptionReadinessReport"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "report_id": self.report_id, "pack_id": self.pack_id,

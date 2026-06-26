@@ -1,0 +1,113 @@
+{
+  "$id": "contextops/VerifierProofResult",
+  "title": "VerifierProofResult",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The result of the PROOF GATE that stands between a drafted ExtractorSnippet / GeneratedWorkerSpec and any use. It REQUIRES sandbox_passed (the snippet ran in an isolated sandbox \u2014 temp dir, no secrets, no network unless allowed \u2014 and its unit test passed) AND proof_passed (the named proof_scripts all passed). gate_decision is derived: it may be 'approved' ONLY when both are true (and, for high-risk, human sign-off is present); otherwise 'rejected'/'needs_human_approval'. Generated code never executes as a production worker without an approved result here. Deterministic when evaluated_at is injected.",
+  "required": [
+    "schema_version",
+    "result_id",
+    "tenant_id",
+    "source_scope",
+    "subject_id",
+    "subject_type",
+    "sandbox_passed",
+    "proof_passed",
+    "gate_decision",
+    "proof_script_ids",
+    "evaluated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "VerifierProofResult"
+      ]
+    },
+    "result_id": {
+      "type": "string",
+      "description": "content-addressed over (subject_id, proof_script_ids, sandbox_passed, proof_passed); version in metadata, never in the id"
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "source_scope": {
+      "type": "string",
+      "enum": [
+        "global_public",
+        "tenant_private",
+        "tenant_shared",
+        "system_reference"
+      ]
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "the ExtractorSnippet or GeneratedWorkerSpec id this gate evaluated"
+    },
+    "subject_type": {
+      "type": "string",
+      "enum": [
+        "extractor_snippet",
+        "generated_worker_spec"
+      ]
+    },
+    "sandbox_passed": {
+      "type": "boolean",
+      "description": "REQUIRED \u2014 the snippet ran in an isolated sandbox and its unit test passed; false means the gate cannot approve"
+    },
+    "proof_passed": {
+      "type": "boolean",
+      "description": "REQUIRED \u2014 every named proof_script passed; false means the gate cannot approve"
+    },
+    "gate_decision": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "rejected",
+        "needs_human_approval"
+      ],
+      "description": "derived \u2014 'approved' ONLY when sandbox_passed AND proof_passed (and human sign-off for high-risk); else rejected/needs_human_approval"
+    },
+    "proof_script_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "the proofs that were run (lineage to the GeneratedWorkerSpec.proof_scripts)"
+    },
+    "sandbox_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "what the sandbox enforced + observed",
+      "required": [
+        "network_used",
+        "secrets_present",
+        "unit_test_passed"
+      ],
+      "properties": {
+        "network_used": {
+          "type": "boolean",
+          "description": "true only if the recipe explicitly allowed it; unexpected network fails the gate"
+        },
+        "secrets_present": {
+          "type": "boolean",
+          "enum": [
+            false
+          ],
+          "description": "pinned false \u2014 a sandbox run never carries secrets"
+        },
+        "unit_test_passed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "human_signoff_id": {
+      "type": "string",
+      "description": "the accountable human approval, required when subject is high_risk (gate_decision=needs_human_approval until present)"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "description": "injected time; deterministic when injected"
+    }
+  }
+}

@@ -49,7 +49,7 @@ from src.baltor.experiments import (  # noqa: E402
 # ── injected, deterministic fixtures (no wall-clock, no RNG) ────────────────────────────────────────────
 _NOW = "2026-06-06T00:00:00Z"
 _SLOT = RECONCILIATION_CAPABILITY_SLOT  # "reconciliation.answer"
-_OUTPUT_CONTRACT = "consumption/ContextResponse.v1"
+_OUTPUT_CONTRACT = "consumption/ContextResponse"
 _REG_HANDLE = "ctx://public/cfpb/reg-e/1005.11#10-business-days"
 #: the CFPB FAQ value the baseline deliberately HELD OUT — must never leak into a candidate output.
 _HELD_OUT_FAQ = "30 days"
@@ -69,10 +69,10 @@ _INPUT_SNAPSHOT = {
 def _path(path_id: str, mode: str, *, output_contract: str = _OUTPUT_CONTRACT) -> dict[str, Any]:
     """A minimal PathDefinition-shaped dict (the engine names contracts; the runner executes)."""
     return {
-        "schema_version": "PathDefinition.v1",
+        "schema_version": "PathDefinition",
         "path_id": path_id,
         "capability_slot": _SLOT,
-        "input_contract": "consumption/ConsumptionRequest.v1",
+        "input_contract": "consumption/ConsumptionRequest",
         "output_contract": output_contract,
         "mode": mode,
         "promotion_criteria": "criteria/recon-equivalence-cost-ceiling",
@@ -85,7 +85,7 @@ _BASELINE = _path("path-recon-baseline-llm-0099", "baseline")
 _CAND_GOOD = _path("path-recon-deterministic-1a2b3c4d", "candidate")  # equivalent + cheaper + handles kept
 _CAND_LEAK = _path("path-recon-leaky-9z8y7x", "candidate")            # leaks the held-out FAQ "30 days"
 _CAND_DROP = _path("path-recon-drophandle-77", "candidate")           # drops the baseline's source handle
-_CAND_DIFF = _path("path-recon-othercontract-88", "candidate", output_contract="consumption/Other.v1")
+_CAND_DIFF = _path("path-recon-othercontract-88", "candidate", output_contract="consumption/Other")
 
 
 def _make_runner() -> parallel_paths.Runner:
@@ -127,7 +127,7 @@ def _make_runner() -> parallel_paths.Runner:
             "contract_validation": "pass", "source_handles": [],
         },
         _CAND_DIFF["path_id"]: {  # declares a DIFFERENT output_contract
-            "output": dict(_SERVED_ANSWER), "output_contract": "consumption/Other.v1",
+            "output": dict(_SERVED_ANSWER), "output_contract": "consumption/Other",
             "cost": cand_cost, "latency_ms": 12.0, "error": None,
             "contract_validation": "pass", "source_handles": [_REG_HANDLE],
         },
@@ -252,20 +252,20 @@ def _self_test() -> int:
           and good_dec["decision_id"] == decisions2[_CAND_GOOD["path_id"]]["decision_id"])
 
     # ── (+) every emitted object validates against its Stage-1 schema; cost is config-driven. ───────────
-    check("(+) ParallelPathRun validates against experiments/ParallelPathRun.v1",
-          _sv.validate_ref(run, "experiments/ParallelPathRun.v1") == [])
-    check("(+) PathComparisonReport validates against experiments/PathComparisonReport.v1",
-          _sv.validate_ref(report, "experiments/PathComparisonReport.v1") == [])
+    check("(+) ParallelPathRun validates against experiments/ParallelPathRun",
+          _sv.validate_ref(run, "experiments/ParallelPathRun") == [])
+    check("(+) PathComparisonReport validates against experiments/PathComparisonReport",
+          _sv.validate_ref(report, "experiments/PathComparisonReport") == [])
     for cpid, dec in decisions.items():
-        check(f"(+) PathPromotionDecision for {cpid} validates against experiments/PathPromotionDecision.v1",
-              _sv.validate_ref(dec, "experiments/PathPromotionDecision.v1") == [])
+        check(f"(+) PathPromotionDecision for {cpid} validates against experiments/PathPromotionDecision",
+              _sv.validate_ref(dec, "experiments/PathPromotionDecision") == [])
     # cost report comes from the pricebook CONFIG and carries the per-entry confidence (placeholder = 'low').
     pb = path_costing.load_pricebook()
     cheap = path_costing.estimate(path_id=_CAND_GOOD["path_id"], capability_slot=_SLOT,
                                   backend_id="local_function_emulator@v1", estimated_duration_s=0.012,
                                   now=_NOW, baseline_cost=0.082, pricebook=pb)
-    check("(+) PathCostReport validates against experiments/PathCostReport.v1",
-          _sv.validate_ref(cheap, "experiments/PathCostReport.v1") == [])
+    check("(+) PathCostReport validates against experiments/PathCostReport",
+          _sv.validate_ref(cheap, "experiments/PathCostReport") == [])
     check("(+) PathCostReport pricebook_version mirrors the pricebook config (reproducible)",
           cheap["pricebook_version"] == pb.get("version"))
     check("(+) PathCostReport carries the pricebook entry's confidence ('high' for the offline emulator)",

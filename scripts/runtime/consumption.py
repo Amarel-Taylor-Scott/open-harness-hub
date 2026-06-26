@@ -47,7 +47,7 @@ class ConsumptionReceipt:
     consumption_readiness_id: str
     reasons: list
     created_at: str
-    schema_version: str = "ConsumptionReceipt.v1"
+    schema_version: str = "ConsumptionReceipt"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "receipt_id": self.receipt_id, "response_id": self.response_id,
@@ -76,7 +76,7 @@ class ContextResponse:
     reconciliations: list = field(default_factory=list)
     warnings: list = field(default_factory=list)
     metrics: dict = field(default_factory=dict)
-    schema_version: str = "ContextResponse.v1"
+    schema_version: str = "ContextResponse"
 
     def to_dict(self) -> dict:
         return {"schema_version": self.schema_version, "response_id": self.response_id, "tenant_id": self.tenant_id,

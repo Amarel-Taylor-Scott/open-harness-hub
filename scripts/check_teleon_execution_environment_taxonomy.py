@@ -24,8 +24,8 @@ _REPO = Path(__file__).resolve().parents[1]
 _A = _REPO / "architecture"
 _DOC = _REPO / "docs" / "architecture" / "teleon-execution-environment-taxonomy.md"
 _EGRESS_DOC = _REPO / "docs" / "architecture" / "teleon-egress-graph.md"
-_PROFILE_SCHEMA = _REPO / "schemas" / "runtime" / "ExecutionEnvironmentProfile.v1.schema.json"
-_ROUTE_SCHEMA = _REPO / "schemas" / "egress" / "EgressRoutePolicy.v1.schema.json"
+_PROFILE_SCHEMA = _REPO / "schemas" / "runtime" / "ExecutionEnvironmentProfile.schema.json"
+_ROUTE_SCHEMA = _REPO / "schemas" / "egress" / "EgressRoutePolicy.schema.json"
 
 _FORBIDDEN_AUTOTUNE_LOCKS = {
     "trust_boundary",
@@ -75,8 +75,8 @@ def _self_test() -> int:
     backend_ids = set(matrix["backends_enum"]) | {_bare_backend(b) for b in matrix["local_equivalents_built"]}
     template_ids = set(profiles_doc["autotuning_policy_templates"])
 
-    chk("schema file exists: ExecutionEnvironmentProfile.v1", _PROFILE_SCHEMA.exists())
-    chk("schema file exists: EgressRoutePolicy.v1", _ROUTE_SCHEMA.exists())
+    chk("schema file exists: ExecutionEnvironmentProfile", _PROFILE_SCHEMA.exists())
+    chk("schema file exists: EgressRoutePolicy", _ROUTE_SCHEMA.exists())
     chk("route taxonomy has unique route_policy_id values", len(route_ids) == len(routes_doc["routes"]))
     chk("profile taxonomy has unique runtime_class values", len(profile_by_class) == len(profiles_doc["profiles"]))
     chk("every runtime class has one profile", set(class_by_id) == set(profile_by_class),
@@ -93,7 +93,7 @@ def _self_test() -> int:
     for route in routes_doc["routes"]:
         rid = route["route_policy_id"]
         text = " ".join(route.get("allowed_for", []) + route.get("forbidden_for", [])).lower()
-        chk(f"route {rid} validates against EgressRoutePolicy.v1",
+        chk(f"route {rid} validates against EgressRoutePolicy",
             not list(route_validator.iter_errors(route)))
         chk(f"route {rid} captures decisions", route.get("capture_required") is True)
         chk(f"route {rid} requires decision receipt", route.get("decision_receipt_required") is True)
@@ -118,7 +118,7 @@ def _self_test() -> int:
         obs = profile["observability"]
         expected_local = _bare_backend(class_doc["local_equivalent"])
 
-        chk(f"{runtime_class}: validates against ExecutionEnvironmentProfile.v1",
+        chk(f"{runtime_class}: validates against ExecutionEnvironmentProfile",
             not list(profile_validator.iter_errors(profile)))
         chk(f"{runtime_class}: local backend matches capability_runtime_classes",
             profile["default_local_backend"] == expected_local,
@@ -137,8 +137,8 @@ def _self_test() -> int:
             set(req["trigger_models"]) <= set(profiles_doc["trigger_model_enum"]))
         chk(f"{runtime_class}: state model is in enum", req["state_model"] in profiles_doc["state_model_enum"])
         chk(f"{runtime_class}: surface family is in enum", profile["surface_family"] in profiles_doc["surface_family_enum"])
-        chk(f"{runtime_class}: receipt includes RuntimeClassBinding.v1",
-            "RuntimeClassBinding.v1" in obs.get("required_receipts", []))
+        chk(f"{runtime_class}: receipt includes RuntimeClassBinding",
+            "RuntimeClassBinding" in obs.get("required_receipts", []))
         chk(f"{runtime_class}: outbound egress observations required",
             obs.get("egress_observation_required_when_outbound") is True)
         chk(f"{runtime_class}: runtime profile never serves truth", obs.get("serves_truth") is False)

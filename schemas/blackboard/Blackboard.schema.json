@@ -1,0 +1,25 @@
+{
+  "$id": "blackboard/Blackboard",
+  "title": "Blackboard",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "The durable, typed analytical STATE for one stateful-swarm task: a shared workspace where bounded workers post signals, observations, gaps, calculations, analyses and a synthesis across iterations. Teleon runs the blackboard as a runtime substrate; Baltor governs what (if anything) becomes served truth. A Blackboard is NOT truth — it is working state. tenant_scope keeps one tenant's working state isolated (never cross-tenant). status moves open -> converged (gaps closed) -> compressed (lossless distillation that preserves source handles + held-out items). entry_count and iteration are projections of the entry stream, recorded for audit.",
+  "required": [
+    "blackboard_id",
+    "task",
+    "tenant_scope",
+    "created_at",
+    "status",
+    "entry_count",
+    "iteration"
+  ],
+  "properties": {
+    "blackboard_id": {"type": "string", "description": "unique id of this blackboard (stable across iterations)"},
+    "task": {"type": "string", "description": "the analytical task/question this blackboard is working on"},
+    "tenant_scope": {"type": "string", "description": "owning tenant; working state is tenant-isolated and never crosses tenants"},
+    "created_at": {"type": "string", "description": "ISO-8601 creation timestamp"},
+    "status": {"type": "string", "enum": ["open", "converged", "compressed"], "description": "open = still iterating; converged = gaps closed by ConvergenceReport; compressed = losslessly distilled (source handles + held-out items preserved)"},
+    "entry_count": {"type": "integer", "minimum": 0, "description": "number of BlackboardEntry rows posted (projection of the entry stream)"},
+    "iteration": {"type": "integer", "minimum": 0, "description": "current iteration/round of the swarm over this blackboard"}
+  }
+}

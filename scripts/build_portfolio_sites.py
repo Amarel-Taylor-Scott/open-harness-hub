@@ -57,7 +57,7 @@ def _ensure_website_source(site_id: str, s: dict) -> None:
 
 
 def build_all() -> dict:
-    results: dict = {"sites": {}, "external_script_refs": 0, "schema_version": "portfolio-sites-build.v1"}
+    results: dict = {"sites": {}, "external_script_refs": 0, "schema_version": "portfolio-sites-build"}
     for site_id in P.SITE_ORDER:
         s = P.SITES[site_id]
         _ensure_website_source(site_id, s)

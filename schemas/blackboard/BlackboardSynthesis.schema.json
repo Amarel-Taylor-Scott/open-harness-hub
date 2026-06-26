@@ -1,0 +1,25 @@
+{
+  "$id": "blackboard/BlackboardSynthesis",
+  "title": "BlackboardSynthesis",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "A SYNTHESIS entry: the swarm's consolidated answer for the task, with full lineage. supporting_entry_ids[] points to the analyses/observations it consolidates. held_out[] preserves items deliberately NOT folded into the answer (minority findings, rejected candidates, low-confidence observations) so the winner always carries lineage to the losers — omitted is never deleted (lossless distillation law). source_handles[] preserves the upstream provenance handles end-to-end. serves_truth is pinned const false — even the final synthesis is a CANDIDATE answer, never served truth; Baltor governs whether it (or any part) is promoted.",
+  "required": [
+    "entry_id",
+    "blackboard_id",
+    "answer",
+    "supporting_entry_ids",
+    "held_out",
+    "source_handles",
+    "serves_truth"
+  ],
+  "properties": {
+    "entry_id": {"type": "string", "description": "id of the BlackboardEntry (kind=synthesis) this body belongs to"},
+    "blackboard_id": {"type": "string", "description": "the blackboard this synthesis belongs to"},
+    "answer": {"type": "string", "description": "the consolidated candidate answer for the task"},
+    "supporting_entry_ids": {"type": "array", "items": {"type": "string"}, "description": "entry_ids of the analyses/observations this answer consolidates (lineage)"},
+    "held_out": {"type": "array", "items": {"type": "string"}, "description": "entry_ids/handles deliberately NOT folded into the answer (minority/rejected/low-confidence) — preserved so the winner has lineage to the losers; omitted != deleted"},
+    "source_handles": {"type": "array", "items": {"type": "string"}, "description": "upstream provenance handles (ctx:// or doc#section) carried end-to-end so the answer is never sourceless"},
+    "serves_truth": {"type": "boolean", "const": false, "description": "ALWAYS false — even the final synthesis is a candidate answer, never served truth; promotion is a separate Baltor-governed decision"}
+  }
+}

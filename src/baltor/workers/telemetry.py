@@ -7,7 +7,7 @@ Computes the seven metric tables from the DB task ledger (the source of truth), 
 
 These feed the policy recommender (ramp-up/ramp-down decisions) and a future /fleet projection. Pure
 reads — telemetry never mutates the ledger. Time is injected (`now`). Field lists are the single source
-for both the records here and schemas/workers/WorkerTelemetry.v1.schema.json.
+for both the records here and schemas/workers/WorkerTelemetry.schema.json.
 """
 from __future__ import annotations
 

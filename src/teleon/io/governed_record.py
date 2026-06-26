@@ -10,7 +10,7 @@ but minted ad hoc. This is that base: one helper to MINT and VALIDATE the govern
 OTel-correlatable, so new records adopt it by default and old ones migrate incrementally.
 
 THE ENVELOPE (a thin global shape that records EXTEND with their own payload keys):
-  schema_version : str  — "<Name>.v<N>" (the record's own contract id; the discriminator)
+  schema_version : str  — "<Name>" (the record's contract id / discriminator; version lives in metadata, NOT the name)
   is_truth       : bool — pinned False on model/agent/candidate output (the standing law); a
                           deterministic, verified, human-approved record MAY set True explicitly
   provenance     : {produced_by, produced_at, source_hash?, inputs?}  — who/when/from-what (lineage)
@@ -25,7 +25,7 @@ from __future__ import annotations
 
 from typing import Any
 
-ENVELOPE_VERSION = "GovernedRecord.v1"
+ENVELOPE_VERSION = "GovernedRecord"
 TRUTH_LAW_DEFAULT = False                 # model/agent/candidate output is NEVER truth (the standing law)
 _RESERVED = ("schema_version", "is_truth", "provenance", "trace", "created_at", "envelope")
 
@@ -37,8 +37,8 @@ def mint_record(schema_version: str, payload: dict | None = None, *, produced_by
                 extra_provenance: dict | None = None) -> dict:
     """Mint a governed runtime record: the shared envelope + the record's payload. Deterministic
     (created_at/ids injected). `payload` keys must not collide with the reserved envelope keys."""
-    if not schema_version or "." not in schema_version:
-        raise ValueError(f"schema_version must look like '<Name>.v<N>', got {schema_version!r}")
+    if not schema_version:
+        raise ValueError("schema_version (the record's contract name) is required")
     payload = dict(payload or {})
     clash = [k for k in payload if k in _RESERVED]
     if clash:
@@ -66,8 +66,8 @@ def validate_record(record: Any, *, require_truth_false: bool = False) -> list[s
     if not isinstance(record, dict):
         return [f"record must be a dict, got {type(record).__name__}"]
     sv = record.get("schema_version")
-    if not isinstance(sv, str) or "." not in sv:
-        problems.append("schema_version missing or not '<Name>.v<N>'")
+    if not isinstance(sv, str) or not sv:
+        problems.append("schema_version (the contract name) missing")
     if not isinstance(record.get("is_truth"), bool):
         problems.append("is_truth missing or not a bool")
     elif require_truth_false and record["is_truth"] is not False:
@@ -96,10 +96,10 @@ def _self_test() -> int:
     def ck(n, ok):
         checks.append((n, ok))
 
-    rec = mint_record("ModelInvocationReceipt.v1", {"selected_model": "gemma", "latency_ms": 12},
+    rec = mint_record("ModelInvocationReceipt", {"selected_model": "gemma", "latency_ms": 12},
                       produced_by="oips", created_at="epoch:1700000000",
                       source_hash="sha256:abc", trace_id="t1", span_id="s1")
-    ck("mints the envelope + payload", rec["schema_version"] == "ModelInvocationReceipt.v1"
+    ck("mints the envelope + payload", rec["schema_version"] == "ModelInvocationReceipt"
        and rec["selected_model"] == "gemma" and rec["envelope"] == ENVELOPE_VERSION)
     ck("is_truth defaults to False (the standing law)", rec["is_truth"] is False)
     ck("provenance carries produced_by/at + source_hash (lineage)",
@@ -110,14 +110,15 @@ def _self_test() -> int:
     ck("is_governed recognizes it", is_governed(rec))
 
     ck("deterministic: same inputs → identical record",
-       mint_record("X.v1", {"a": 1}, produced_by="p", created_at="t")
-       == mint_record("X.v1", {"a": 1}, produced_by="p", created_at="t"))
+       mint_record("X", {"a": 1}, produced_by="p", created_at="t")
+       == mint_record("X", {"a": 1}, produced_by="p", created_at="t"))
 
     # honesty + guards
     ck("a payload key colliding with the envelope is REJECTED (no silent overwrite of governance)",
-       _raises(lambda: mint_record("X.v1", {"is_truth": True}, produced_by="p", created_at="t")))
-    ck("a bad schema_version is REJECTED", _raises(lambda: mint_record("nodots", produced_by="p", created_at="t")))
-    truthy = mint_record("VerifiedFact.v1", {"fact": "x"}, produced_by="rail", created_at="t", is_truth=True)
+       _raises(lambda: mint_record("X", {"is_truth": True}, produced_by="p", created_at="t")))
+    ck("an empty schema_version is REJECTED", _raises(lambda: mint_record("", produced_by="p", created_at="t")))
+    ck("a clean version-free name is accepted", mint_record("CleanName", {"a": 1}, produced_by="p", created_at="t")["schema_version"] == "CleanName")
+    truthy = mint_record("VerifiedFact", {"fact": "x"}, produced_by="rail", created_at="t", is_truth=True)
     ck("an explicit verified record MAY set is_truth=True (a deterministic/verified class)",
        truthy["is_truth"] is True and validate_record(truthy) == [])
     ck("require_truth_false flags a truthy record for a never-truth class",
@@ -125,7 +126,7 @@ def _self_test() -> int:
        in validate_record(truthy, require_truth_false=True))
     ck("a record missing provenance fails validation (lineage is required)",
        "provenance missing produced_by/produced_at (lineage required)"
-       in validate_record({"schema_version": "X.v1", "is_truth": False, "created_at": "t"}))
+       in validate_record({"schema_version": "X", "is_truth": False, "created_at": "t"}))
 
     failed = [n for n, ok in checks if not ok]
     for n, ok in checks:
