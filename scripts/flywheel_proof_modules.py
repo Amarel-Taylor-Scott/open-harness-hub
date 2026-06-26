@@ -1013,4 +1013,9 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("src/teleon/monitoring/flywheel_queue.py", "flywheel_queue"),
     ("src/teleon/demos/byo_key_demo.py", "byo_key_demo"),
     ("scripts/byo_demo_server.py", "byo_demo_server"),
+    ("src/teleon/tuning/action_ledger.py", "action_ledger"),
+    ("src/teleon/tuning/tuner.py", "tuner"),
+    ("src/teleon/storage/git_record_store.py", "git_record_store"),
+    ("src/teleon/storage/sync_engine.py", "sync_engine"),
+    ("src/teleon/infra/scale_ports.py", "scale_ports"),
 ]
