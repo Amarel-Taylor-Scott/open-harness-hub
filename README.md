@@ -1,47 +1,39 @@
-# Open Harness Hub
+# AI Done Right
 
-> **Repository history note.** This project previously lived at
-> `github.com/taylor-s-amarel/open-harness-hub`. Its canonical home is now
-> [`github.com/Amarel-Taylor-Scott/open-harness-hub`](https://github.com/Amarel-Taylor-Scott/open-harness-hub).
-> All git history is preserved; the old URL may continue to resolve via
-> GitHub's automatic redirect but new pushes go to the new account.
+> **AI, done right.** This is the monorepo for the **AI Done Right** product family (the GitHub repo is named
+> `open-harness-hub` for historical reasons). The canonical references are: north star **`docs/BIBLE.md`**, agent
+> operating rules **`CLAUDE.md`** + **`AGENTS.md`**, design system **`docs/DESIGN-BIBLE.md`**, frontend/backend
+> integration **`docs/INTEGRATION-BIBLE.md`**.
+>
+> Repository history: this project previously lived at `github.com/taylor-s-amarel/open-harness-hub`; its canonical
+> home is now [`github.com/Amarel-Taylor-Scott/open-harness-hub`](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
+> (all history preserved; the old URL still redirects).
 
-> A **database-backed registry of reusable AI-pipeline components** — and a
-> **conversational builder** — whose one admission rule is **measurable capability
-> lift over a bare LLM**. The protocol + engine are open; the governed, measured, and
-> *fresh* content is the commercial layer (see the
-> [open-core model](docs/strategy/open-core-model.md)).
+## The product family: 5 surfaces, one design system
 
-**The headline interaction:** *paste a task → get back a working, costed, deployable
-flow built from existing components.* Everything else — the catalog, the governance, the
-generation foundry — exists to make that returned flow trustworthy, cheap, and current.
+A holding company, **AI Done Right** (`aidoneright.dev`), owns three product layers plus an open ecosystem, shipped as
+**5 surfaces** that share one design system. Each is a full React app under `web/<brand>/`, served by the showcase
+(`OH_PRODUCT=<brand> python3 -m scripts.showcase`), differing only by accent and copy:
 
-The open core runs from a clone and deploys unchanged to GitHub Pages, Hugging Face
-Spaces, Vercel, Netlify, or Cloudflare Pages; the live/governed layer runs as a queue +
-worker service ([cloud architecture](docs/architecture/cloud-architecture.md)).
+| Surface | What it is |
+|---|---|
+| **AI Done Right** | the parent / holding brand and the portfolio hub |
+| **Teleon** (`teleon.dev`) | the purpose-driven, eval-gated, self-adaptive compute runtime |
+| **Baltor** (`baltor.ai`) | managed, verified, provable context, powered by Teleon (governs TRUTH) |
+| **AIDevObserver** | reviews how a team uses AI coding agents (session review + intra-session coaching) |
+| **OpenHubForAI** (`openhubforai.io`) | the open store both products consume: the component, harness, and skill registries |
 
-## AI Done Right design family
+**Architectural law:** Baltor depends on Teleon depends on OpenHarnessHub, never the reverse
+(`architecture/portfolio_dependency_law.json`). Backends are reached through same-origin seams; see the INTEGRATION-BIBLE.
 
-This repo also carries the current high-fidelity AI Done Right portfolio design
-bundle in [`dist/sites/openharness-design/`](dist/sites/openharness-design/).
-That bundle is the Claude Code Max handoff for the parent brand, Baltor, Teleon,
-and the Open*Hub registry family. Start with
-[`START-HERE-CLAUDE-CODE.md`](dist/sites/openharness-design/START-HERE-CLAUDE-CODE.md),
-then read the bundle
-[`README.md`](dist/sites/openharness-design/README.md),
-[`CLAUDE-CODE.md`](dist/sites/openharness-design/CLAUDE-CODE.md), and
-[`HANDOFF.md`](dist/sites/openharness-design/HANDOFF.md).
+## Design and the Claude Design handoff
 
-Current design-family snapshot: AI Done Right parent + Baltor + Teleon + 22
-Open*Hubs. The Open*Hub set is 9 live open registries plus 13 private-bench
-registries, including the full Baltor method spine
-(OpenReconciliationHub, OpenHardeningHub, OpenEnrichmentHub,
-OpenOptimizationHub, OpenVerificationHub) and OpenRoutingHub
-(model-routing policy). Treat this as a reviewed handoff
-snapshot, not a hard-coded source of truth; the owning registry is
-`dist/sites/openharness-design/shared/products.js`.
-
-Run the focused design-family proof:
+The canonical design system is **`docs/DESIGN-BIBLE.md`**. The self-contained designer handoff (the design system,
+the verbatim source, the AIDevObserver build brief, and the whole-product context, all inlined so a designer needs no
+other repo files) is **[`docs/design/openharness-claude-design/`](docs/design/openharness-claude-design/)** (start at
+its `README.md`). The richer high-fidelity reference bundle lives in
+[`dist/sites/openharness-design/`](dist/sites/openharness-design/). The design-family count is computed, never
+hand-counted:
 
 ```bash
 python3 scripts/check_ai_done_right_surface_family.py --self-test
@@ -76,10 +68,10 @@ and is validated by:
 python3 scripts/check_local_dev_tunnel_auth_runtime.py --self-test
 ```
 
-## What this is
+## The open ecosystem layer (OpenHubForAI)
 
-The Open Harness Hub gives you a standard way to describe and combine the
-modular pieces of a real AI pipeline:
+The sections below describe **OpenHubForAI** (the open registry both products consume; historically "Open Harness
+Hub"). It gives a standard way to describe and combine the modular pieces of a real AI pipeline:
 
 Everything reduces to **seven primitives** — each catalog component is a subtype of
 exactly one of them (full mapping: `docs/concepts/component-taxonomy-and-stages.md`):
