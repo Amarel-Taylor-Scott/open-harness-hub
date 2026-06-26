@@ -4,12 +4,13 @@ You are the designer ("Claude Design"). **This folder is self-contained. You do 
 Everything you need (the design system, the actual source code, the backend contract, and the build spec with real
 data) is in the files below.
 
-## Upload this set (6 files, self-contained)
+## Upload this set (7 files, self-contained)
 
 | File | What it is |
 |---|---|
 | **`README.md`** (this) | the front door and read order |
-| **`AIDevObserver-BRIEF.md`** | THE BUILD SPEC: exact screens, states, the real API request/response JSON, the finding card, the deeper registry integrations, features, PMF, and your deliverable |
+| **`AIDevObserver-BRIEF.md`** | the AIDevObserver build spec: screens, states, the real API JSON, the finding card, registry integrations, features, PMF, the deliverable |
+| **`OpenHubForAI-BRIEF.md`** | the OpenHubForAI build spec: the record browsers (faceted table, card grid, browse-by-area, record detail), filters, search, over the real 242-record spine and facets |
 | **`ARCHITECTURE-AND-PAGES.md`** | the WHOLE-PRODUCT context: architecture, tech stack, user flows, design schemes, and the full page inventory (marketing, auth, account, billing, subscription, team) |
 | **`../../DESIGN-BIBLE.md`** | the design system guide: tokens, type, every component, the two layouts (marketing top-nav and the `OhAppShell` left-sidebar logged-in shell), routes, governance, copy rules |
 | **`DESIGN-ASSETS.md`** | the ACTUAL source, verbatim: the full shared kit CSS and React components plus one complete app. When a doc says "see `oh-tokens.css`", the code is here |
@@ -20,11 +21,12 @@ data) is in the files below.
 ## Read order
 
 1. **This README** (orientation + the deliverable).
-2. **`AIDevObserver-BRIEF.md`** (your main task, with the real data to render).
-3. **`ARCHITECTURE-AND-PAGES.md`** (the whole-product context: flows, tech stack, and every page to build, from auth to billing).
-4. **`DESIGN-BIBLE.md`** (the design system you build inside).
-5. **`DESIGN-ASSETS.md`** (the source you reuse; do not reinvent the kit).
-6. **`INTEGRATION-BIBLE.md`** (the API seams the app calls).
+2. **`AIDevObserver-BRIEF.md`** (a main build: the AIDevObserver app, with real data).
+3. **`OpenHubForAI-BRIEF.md`** (a main build: the OpenHubForAI record browsers, over the real spine and facets).
+4. **`ARCHITECTURE-AND-PAGES.md`** (the whole-product context: flows, tech stack, and every page to build, from auth to billing).
+5. **`DESIGN-BIBLE.md`** (the design system you build inside).
+6. **`DESIGN-ASSETS.md`** (the source you reuse; do not reinvent the kit).
+7. **`INTEGRATION-BIBLE.md`** (the API seams the app calls).
 
 ## Your deliverable (two things)
 
