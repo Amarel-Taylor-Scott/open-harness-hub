@@ -337,7 +337,7 @@ function OhAuth({ brand, mode }) {
       else { setErr((r && r.error) || 'Authentication failed (this brand may not have a live realm yet).'); }
     } catch (e) { setBusy(false); setErr('Service error — please try again.'); }
   }
-  const SEAM = 'Owner-gated seam (CredentialProviderPort) — not available in local preview';
+  const SEAM = 'Social sign-in is coming soon — use your email to continue.';
 
   return (
     <div className="ohs-auth">

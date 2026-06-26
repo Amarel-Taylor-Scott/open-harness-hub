@@ -338,6 +338,23 @@ function SimplePage({ title, eyebrow, sub, note }) {
   );
 }
 
+/* marketing chrome — shared so the info pages (cases/about/status/legal) keep the top-bar nav + footer (was lost) */
+function MarketingShell({ theme, onToggle, children }) {
+  return (
+    <div className={'oh dir-s theme-' + theme + ' oh-site tln'} style={{ '--accent': ACCENT }}>
+      <OhTopBar brand={BRAND} nav={MKT_NAV.map(([l, h]) => [l, h.replace('/#', '/')])}
+        cta={{ label: 'Start free', href: '/signup' }} signInHref="/signin" theme={theme} onToggle={onToggle} />
+      {children}
+      <OhFooter brand={BRAND} tagline={`${T.kind} · part of AI Done Right`} cols={[
+        ['Product', [['How it works', '/'], ['Lifecycle', '/'], ['Pricing', '/pricing'], ['Case studies', '/cases']]],
+        ['Developers', [['Docs', '/docs'], ['Library', '/registry']]],
+        ['Company', [['About', '/about'], ['Contact', '/contact'], ['Status', '/status'], ['Changelog', '/changelog']]],
+        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHarnessHub ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
+      ]} />
+    </div>
+  );
+}
+
 /* ===================== ROOT ===================== */
 function App() {
   const route = useHashRoute();
@@ -366,14 +383,14 @@ function App() {
       installCode: 'teleon login\nteleon build "summarize logs into a cited report"' }} /></div>;
   }
 
-  if (route === '/status') return <div className={rootCls} style={rootStyle}><OhStatus brand={BRAND} /></div>;
-  if (route === '/changelog') return <div className={rootCls} style={rootStyle}><OhChangelog /></div>;
-  if (route === '/terms') return <div className={rootCls} style={rootStyle}><OhLegal brand={BRAND} kind="terms" /></div>;
-  if (route === '/privacy') return <div className={rootCls} style={rootStyle}><OhLegal brand={BRAND} kind="privacy" /></div>;
-  if (route === '/about') return <div className={rootCls} style={rootStyle}><OhAbout brand={BRAND} /></div>;
+  if (route === '/status') return <MarketingShell theme={theme} onToggle={toggle}><OhStatus brand={BRAND} /></MarketingShell>;
+  if (route === '/changelog') return <MarketingShell theme={theme} onToggle={toggle}><OhChangelog /></MarketingShell>;
+  if (route === '/terms') return <MarketingShell theme={theme} onToggle={toggle}><OhLegal brand={BRAND} kind="terms" /></MarketingShell>;
+  if (route === '/privacy') return <MarketingShell theme={theme} onToggle={toggle}><OhLegal brand={BRAND} kind="privacy" /></MarketingShell>;
+  if (route === '/about') return <MarketingShell theme={theme} onToggle={toggle}><OhAbout brand={BRAND} /></MarketingShell>;
   const TELEON_CASES = (typeof window !== 'undefined' && window.CASES && window.CASES.teleon) || [];
-  if (route === '/cases') return <div className={rootCls} style={rootStyle}><OhCaseStudies brand={BRAND} cases={TELEON_CASES} /></div>;
-  if (route.startsWith('/cases/')) return <div className={rootCls} style={rootStyle}><OhCaseStudy brand={BRAND} cases={TELEON_CASES} id={route.slice(7)} cta={{ label: 'Start free →', href: '/signup' }} /></div>;
+  if (route === '/cases') return <MarketingShell theme={theme} onToggle={toggle}><OhCaseStudies brand={BRAND} cases={TELEON_CASES} /></MarketingShell>;
+  if (route.startsWith('/cases/')) return <MarketingShell theme={theme} onToggle={toggle}><OhCaseStudy brand={BRAND} cases={TELEON_CASES} id={route.slice(7)} cta={{ label: 'Start free →', href: '/signup' }} /></MarketingShell>;
 
   let page;
   if (route === '/dashboard') page = <OhDashboard
