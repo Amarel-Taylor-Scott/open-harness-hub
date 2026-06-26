@@ -304,6 +304,72 @@ function OhRollup({ items }) {
   );
 }
 
+// ---------- LAYOUT PRIMITIVE: the standardized page skeleton ----------
+// One skeleton for every page. `variant` picks the body layout; it composes the existing OhTopBar / OhAppShell /
+// OhFooter so there is exactly one place a page declares its shape.
+//   'sidebar'    -> the left-sidebar app shell (logged-in app); pass `sidebar` = the OhAppShell nav.
+//   'one-col'    -> centered single readable column (docs, settings, simple forms).
+//   'two-col'    -> main content + a sticky `aside` (content with a rail).
+//   'no-sidebar' -> full-width content (marketing, wide tables / browsers).
+function OhLayout({ variant = 'one-col', brand, nav, sidebar, cta, signInHref, theme, onToggle,
+                   footer = true, footerProps, aside, children }) {
+  if (variant === 'sidebar') {
+    return (
+      <OhAppShell brand={brand} nav={sidebar} cta={cta} theme={theme} onToggle={onToggle}>{children}</OhAppShell>
+    );
+  }
+  const cls = variant === 'two-col' ? 'ohl-two' : variant === 'no-sidebar' ? 'ohl-full' : 'ohl-one';
+  return (
+    <div className="ohl">
+      <OhTopBar brand={brand} nav={nav} cta={cta} signInHref={signInHref} theme={theme} onToggle={onToggle} />
+      <main className={'ohl-body ' + cls}>
+        <div className="ohs-wrap">
+          {variant === 'two-col'
+            ? <div className="ohl-two-grid"><div className="ohl-main">{children}</div><aside className="ohl-aside">{aside}</aside></div>
+            : children}
+        </div>
+      </main>
+      {footer && <OhFooter brand={brand} {...(footerProps || {})} />}
+    </div>
+  );
+}
+
+// ---------- DATA TABLE PRIMITIVE: standardized, optionally sortable, click-through rows ----------
+// cols: [ {key, label, render?(row), width?, align?, sortable?, sortValue?(row)} ]; rows: [obj];
+// rowKey?(row); onRow?(row); empty?; dense?.  Used by the OpenHubForAI record browsers and the AIDevObserver lists.
+function OhTable({ cols, rows, rowKey, onRow, empty = 'No records.', dense }) {
+  const [sort, setSort] = React.useState(null);
+  const sorted = React.useMemo(() => {
+    if (!sort) return rows || [];
+    const c = cols.find((x) => x.key === sort.key);
+    const get = (r) => (c && c.sortValue ? c.sortValue(r) : r[sort.key]);
+    return [...(rows || [])].sort((a, b) => {
+      const av = get(a), bv = get(b);
+      const r = av < bv ? -1 : av > bv ? 1 : 0;
+      return sort.dir === 'desc' ? -r : r;
+    });
+  }, [rows, sort, cols]);
+  const toggle = (key) => setSort((s) => (s && s.key === key ? (s.dir === 'asc' ? { key, dir: 'desc' } : null) : { key, dir: 'asc' }));
+  if (!rows || !rows.length) return <div className="ohl-empty">{empty}</div>;
+  return (
+    <div className="ohl-tablewrap">
+      <table className={'ohl-table' + (dense ? ' ohl-table--dense' : '')}>
+        <thead><tr>{cols.map((c) => (
+          <th key={c.key} style={{ width: c.width, textAlign: c.align }} className={c.sortable ? 'ohl-th-sort' : ''}
+              onClick={c.sortable ? () => toggle(c.key) : undefined}>
+            {c.label}{c.sortable && sort && sort.key === c.key && <span className="ohl-caret">{sort.dir === 'asc' ? ' ▲' : ' ▼'}</span>}
+          </th>
+        ))}</tr></thead>
+        <tbody>{sorted.map((r) => (
+          <tr key={rowKey ? rowKey(r) : r.id} className={onRow ? 'ohl-row-click' : ''} onClick={onRow ? () => onRow(r) : undefined}>
+            {cols.map((c) => <td key={c.key} style={{ textAlign: c.align }}>{c.render ? c.render(r) : r[c.key]}</td>)}
+          </tr>
+        ))}</tbody>
+      </table>
+    </div>
+  );
+}
+
 // ---------- PRIMITIVE PAGES ----------
 // mode: 'signin' | 'signup' | 'forgot' — self-navigating via the kit's hash router
 function OhAuth({ brand, mode }) {
@@ -1220,7 +1286,7 @@ function OhCommandK({ commands, placeholder, label }) {
 Object.assign(window, {
   useHashRoute, navigate, useSiteTheme,
   OhLogo, OhThemeToggle, OhTopBar, OhPortfolioMenu, OhHero, OhSection, OhFeatures, OhBand, OhFooter,
-  OhAppShell, OhPageHead, OhRollup,
+  OhAppShell, OhPageHead, OhRollup, OhLayout, OhTable,
   OhAuth, OhContact, OhPricing, OhBilling, OhUsage, OhSettings, OhSwitch,
   OhDashboard, OhApiKeys, OhTeam, OhAuditLog, OhDocs,
   OhOnboarding, OhNotifications, OhStatus, OhChangelog, OhLegal, OhNotFound, OhAbout,

@@ -473,3 +473,27 @@
   .ohs-docs-side { position: static; flex-direction: row; flex-wrap: wrap; border-right: none; border-bottom: 1px solid var(--line); }
   .ohs-top-nav { display: none; }
 }
+
+/* ---------- OhLayout: the standardized page skeleton (variant = sidebar | one-col | two-col | no-sidebar) ---------- */
+.ohl { display: flex; flex-direction: column; min-height: 100vh; }
+.ohl-body { flex: 1 0 auto; padding: 56px 0; }
+.ohl-body.ohl-one .ohs-wrap { max-width: 820px; }          /* centered, readable single column */
+/* .ohl-full uses the default .ohs-wrap site width (full width) */
+.ohl-two-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 44px; align-items: start; }
+.ohl-aside { position: sticky; top: 88px; }
+.ohl-empty { padding: 40px; text-align: center; color: var(--fg-muted); border: 1px dashed var(--line); border-radius: var(--r-lg); }
+@media (max-width: 900px) { .ohl-two-grid { grid-template-columns: 1fr; } .ohl-aside { position: static; } }
+
+/* ---------- OhTable: the standardized data table ---------- */
+.ohl-tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--bg); }
+.ohl-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ohl-table th { text-align: left; padding: 12px 16px; color: var(--fg-muted); font-weight: 600; white-space: nowrap;
+                border-bottom: 1px solid var(--line); background: var(--bg-subtle); }
+.ohl-th-sort { cursor: pointer; user-select: none; }
+.ohl-th-sort:hover { color: var(--fg); }
+.ohl-caret { color: var(--accent); }
+.ohl-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--fg); vertical-align: top; }
+.ohl-table tr:last-child td { border-bottom: 0; }
+.ohl-row-click { cursor: pointer; }
+.ohl-row-click:hover td { background: var(--bg-subtle); }
+.ohl-table--dense td, .ohl-table--dense th { padding: 7px 12px; }
