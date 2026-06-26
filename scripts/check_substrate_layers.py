@@ -19,7 +19,8 @@ _MAP = _REPO / "architecture" / "substrate_layers.json"
 _STATUS = {"live", "partial", "deferred", "gap"}
 _REQUIRED_LAYER_KEYS = {"id", "proposed_name", "owner_ref", "status", "existing_assets", "real_gap",
                         "law_justification", "priority"}
-_LAW_KEYS = {"system_filter", "execution_filter", "component_admission", "binding_constraint", "reconciliation"}
+_LAW_KEYS = {"system_filter", "execution_filter", "component_admission", "binding_constraint",
+             "recursive_improvement", "reconciliation"}
 # The Foundational Law reconciles with these PRE-EXISTING discipline anchors — they must exist (no dangling law).
 _DISCIPLINE_ANCHORS = ["docs/concepts/capability-valleys.md", "scripts/eval/reason_codes.py",
                        "scripts/proposal_backlog.py"]

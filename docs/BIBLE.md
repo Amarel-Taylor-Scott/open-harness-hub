@@ -15,12 +15,16 @@ Baltor governs its truth, the Open\*Hubs structure it, AIDevObserver watches its
 BEFORE BREADTH**: every layer must serve the ONE vertical being proven to a paying customer. Scale is the ambition
 (billions→trillions of components), but breadth without a revenue vertical is the failure mode.
 
-**The four reconciled filters that govern what we build** (single source: `architecture/substrate_layers.json`):
+**The five reconciled filters that govern what we build** (single source: `architecture/substrate_layers.json`):
 1. **System filter** — does this improve compiler intelligence? If no, don't build it.
 2. **Execution filter (descent)** — can intelligence be removed from this execution path? Descend toward that forever
    (make-it-work → make-it-cheap → deterministic-substitution).
 3. **Component admission** — must LIFT over the bare model AND the lift must be STRUCTURAL/durable.
 4. **Binding constraint** — depth before breadth (gated by `scripts/proposal_backlog.py`).
+5. **Recursive improvement** — *nothing is static.* Every object can be challenged, every architecture can mutate,
+   every distillation must rehydrate losslessly, every harness can evolve; every failure triggers diagnosis → a
+   versioned improvement. The system improves forever — but **governed** by filters 1–4 and the lossless clause (a
+   mutation is a new versioned layer, never a silent overwrite), so "improve forever" never becomes churn-forever.
 
 ---
 
@@ -178,7 +182,14 @@ Execution / Optimization / Verification). By name:
 8. **Thin flexible wrappers** — base/universal objects (`ObjectShell`, `RegistryObject`) are a STABLE envelope
    (id/type) with the **version in METADATA, never the name**, around a flexible `payload`/`component`. Domain records
    inherit thin-ness via `src/teleon/io/governed_record.mint_record` (envelope + payload; version in `schema_version`).
-   Never put a version in an object/schema NAME. Enforced: `scripts/check_object_wrapper_hygiene.py`.
+   Never put a version in an object/schema NAME — the portfolio-wide `.vN`-suffix elimination (2026-06-25) removed every
+   one (272 lossless renames; 0 `.vN` refs remain). Enforced: `scripts/check_object_wrapper_hygiene.py`.
+9. **Recursive improvement (nothing is static)** — every object can be challenged, every architecture can mutate, every
+   distillation must rehydrate losslessly, every harness can evolve; every failure → diagnosis → a versioned improvement,
+   never a silent patch. The system improves forever, but **governed** by laws 1–8 (a mutation is a new versioned layer,
+   not an overwrite). Engine = candidate views over existing assets: **OpenInterrogationHub** (challenge) /
+   **OpenMutationHub** (rewrite) / **OpenRehydrationHub** (prove lossless) / **OpenHarnessEvolutionHub** (evolve the
+   evals) — `architecture/candidate_open_hubs.json`. Pinned: `architecture/substrate_layers.json → foundational_law.recursive_improvement`.
 
 ---
 

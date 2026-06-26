@@ -785,6 +785,119 @@
     "Apply the DAG contract to prove type-compatibility + satisfiability",
     "Block an unverified pipeline from serving truth"
    ]
+  },
+  "OpenInterrogationHub": {
+   "status": "candidate",
+   "domain": "openinterrogationhub.io",
+   "layer": "candidate",
+   "kind": "challenge probes over any object",
+   "pulls": {
+    "rule_types": [
+     "5W1H probe ladder",
+     "first-principles decomposition",
+     "adversarial 'what would refute this?'"
+    ],
+    "context_types": [
+     "the object under challenge + its stated assumptions"
+    ],
+    "module_types": [
+     "interrogate",
+     "verify_ladder",
+     "alternatives_ladder"
+    ]
+   },
+   "substrate": "src/teleon/synthesis/intent_to_dag.py + reasoning_strategies / adversarial registries",
+   "example_pull": "interrogate a proposed DAG with the 5W1H + alternatives ladders before it is trusted",
+   "one_liner": "Challenge any object — design, claim, or pipeline — with structured probes before you trust it.",
+   "use_cases": [
+    "Probe a new architecture with first-principles questions before committing",
+    "Red-team a proposed component with adversarial 'what would refute this?' prompts",
+    "Run the 5W1H + alternatives ladder over a synthesized DAG"
+   ]
+  },
+  "OpenMutationHub": {
+   "status": "candidate",
+   "domain": "openmutationhub.io",
+   "layer": "candidate",
+   "kind": "regression-gated architecture rewrites",
+   "pulls": {
+    "rule_types": [
+     "optimization passes (prune-intelligence / substitute-determinism)",
+     "regression-gated rollback policy"
+    ],
+    "context_types": [
+     "the running DAG + its regression history"
+    ],
+    "module_types": [
+     "propose_mutation",
+     "apply_pass",
+     "rollback"
+    ]
+   },
+   "substrate": "src/teleon/tuning/{tuner,action_ledger}.py + the optimization_pass registry",
+   "example_pull": "rewrite a frontier-LLM step to a cheaper deterministic path, gated by regression + rollback",
+   "one_liner": "Rewrite a running architecture with versioned passes under regression-gated rollback — the descent applied to itself.",
+   "use_cases": [
+    "Propose a cheaper deterministic substitution for an expensive step",
+    "Apply an optimization pass and gate it on no accuracy regression",
+    "Roll a mutation back to its prior versioned layer losslessly"
+   ]
+  },
+  "OpenRehydrationHub": {
+   "status": "candidate",
+   "domain": "openrehydrationhub.io",
+   "layer": "candidate",
+   "kind": "lossless-distillation proofs",
+   "pulls": {
+    "rule_types": [
+     "rehydration / retention assertions",
+     "answer-critical-facts-survived checks"
+    ],
+    "context_types": [
+     "the compressed layer + its raw/intermediate lineage"
+    ],
+    "module_types": [
+     "rehydrate",
+     "retention_report",
+     "rollback_plan"
+    ]
+   },
+   "substrate": "src/baltor/distillation/{rehydration,retention_report,rollback}.py",
+   "example_pull": "reconstitute a distilled layer and prove source handles + held-out items survived before promotion",
+   "one_liner": "Prove a distillation lost nothing — reconstitute the raw layer from the compressed one and audit what survived.",
+   "use_cases": [
+    "Gate a promotion on a passing rehydration proof",
+    "Audit that answer-critical facts + source handles survived compression",
+    "Reconstitute an intermediate layer for rollback"
+   ]
+  },
+  "OpenHarnessEvolutionHub": {
+   "status": "candidate",
+   "domain": "openharnessevolutionhub.io",
+   "layer": "candidate",
+   "kind": "self-evolving evals / harnesses",
+   "pulls": {
+    "rule_types": [
+     "harness-mutation policy (diagnose-failure -> new versioned harness)",
+     "two-axis lift bar (re-measured per model)"
+    ],
+    "context_types": [
+     "execution patterns + benchmark history + failure diagnoses"
+    ],
+    "module_types": [
+     "evolve_harness",
+     "diagnose_failure",
+     "durable_gap_harness"
+    ]
+   },
+   "substrate": "src/teleon/monitoring/flywheel_queue.py + scripts/eval/durable_gap_harness.py + the supervisor ledger",
+   "example_pull": "diagnose a stale eval as the frontier moves and emit a new versioned harness that keeps the lift bar honest",
+   "one_liner": "Evolve the evals themselves as models shift, so 'structural lift' stays measured against today's frontier.",
+   "use_cases": [
+    "Diagnose a harness that no longer separates lift as a new model ships",
+    "Emit a new versioned eval from a failure diagnosis",
+    "Keep the two-axis admission bar honest over time"
+   ]
   }
  },
  "copy_provenance": "one_liner + use_cases are model_authored (Claude Code enrichment loop, 2026-06-24); descriptive copy, serves_truth=false; rendered by build_hub_sites."
