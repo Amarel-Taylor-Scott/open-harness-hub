@@ -244,9 +244,19 @@ gives the UI more to show:
 
 ## Your deliverable: the app PLUS an integration-handoff README
 
+**OUTPUT CONTRACT — read this first.** Produce ONE self-contained HTML file that renders the COMPLETE app: all
+**FIVE** screens (Review, Sessions, Findings, Agentic, Settings) hash-routed under `#/app...`, on the shared kit.
+This is a full working app, **NOT a single design comp and NOT a marketing page.** **Start from
+`AIDevObserver-app-STARTER.html` in this folder** — it is the complete app ALREADY WORKING (the shared kit + all
+five screens + a demo-data fetch shim so every screen renders populated; open it in a browser). Your job is to
+ELEVATE the visual design (spacing, hierarchy, the finding card, the tables, the empty/loading/populated states)
+while keeping ALL FIVE screens functional and the `/api/observer/*` calls intact. Do not remove screens, do not
+collapse to one view, do not invent a new CSS system. **Definition of done:** open your output HTML and click every
+sidebar item — each renders, populated, with **0 console errors**.
+
 Deliver two things:
 
-1. **The designed app** (the four screens, the demo, the elevated marketing home), in the shared kit, accent `#b25fd6`.
+1. **The designed app** (all FIVE screens, the demo, the elevated marketing home), in the shared kit, accent `#b25fd6`.
 2. **`INTEGRATION-HANDOFF.md`**: a README that explains how to merge your work into THIS codebase WITHOUT breaking it.
    It must cover, under these constraints:
    - **The app lives at `web/aidevobserver/`** (React 18 rendered in-browser via Babel, no build step, the shared kit

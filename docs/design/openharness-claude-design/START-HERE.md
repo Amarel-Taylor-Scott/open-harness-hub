@@ -32,10 +32,12 @@ Read these three, in order:
    stack (React 18 plus in-browser Babel), the hash-router contract (`useHashRoute()` returns the route,
    `navigate(to)` sets the hash), and how the showcase serves it. Section 9 (Scaffolding primitives) is the
    how-to-add-X recipes: a new surface, a new marketing page, a new logged-in view, a new shared component.
-2. **The kit itself.** `web/teleon/kit/oh-site.jsx` is the shared components and hooks (`OhTopBar`, `OhHero`,
-   `OhSection`, `OhFeatures`, `OhBand`, `OhFooter`, `OhAppShell`, `OhPageHead`, `OhRollup`, plus
-   `useHashRoute`/`navigate`/`useSiteTheme`); `web/teleon/kit/oh-tokens.css` is the token palette. The reference app
-   is `web/teleon/index.html` plus `web/teleon/teleon-main.jsx`.
+2. **The kit itself — inlined verbatim in `DESIGN-ASSETS.md`** (sections 1-6, nothing external): the shared
+   components + hooks (`OhTopBar`, `OhHero`, `OhSection`, `OhFeatures`, `OhBand`, `OhFooter`, `OhAppShell`,
+   `OhLayout`, `OhTable`, `OhPageHead`, `OhRollup`, plus `useHashRoute`/`navigate`/`useSiteTheme`), the token palette,
+   and one COMPLETE worked app (Teleon). **To BUILD AIDevObserver, open `AIDevObserver-app-STARTER.html` in this
+   folder** — the complete five-screen app, already working; elevate it (see `AIDevObserver-BRIEF.md` → OUTPUT
+   CONTRACT). Do not design a single comp.
 3. **`INTEGRATION-BIBLE.md`.** The frontend-to-backend seam: a page calls a same-origin path
    (`/api/<service>/...` or `/registry/...`) and the showcase routes it to the backend, so the page code is the same
    locally and in the cloud.

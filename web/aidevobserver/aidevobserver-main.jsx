@@ -354,6 +354,7 @@ const APP_NAV = [
   ['/app', '◉', 'Review'],
   ['/app/sessions', '≡', 'Sessions'],
   ['/app/findings', '⚑', 'Findings'],
+  ['/app/agentic', '⟳', 'Agentic'],
   ['/app/settings', '⚙', 'Settings'],
 ];
 
@@ -477,6 +478,64 @@ function AppSettings() {
   );
 }
 
+// a worked agentic loop (a thrashing, then footgun-ending, run) the Agentic screen supervises
+const AGENTIC_EXAMPLE = [
+  { action: 'run pytest tests/importer', ok: false, error: 'ImportError: no module named csvkit' },
+  { action: 'run pytest tests/importer', ok: false, error: 'ImportError: no module named csvkit' },
+  { action: 'run pytest tests/importer', ok: false, error: 'ImportError: no module named csvkit' },
+  { action: 'pip install csvkit && git push --force origin main', ok: true },
+];
+
+// /app/agentic → supervise an AUTONOMOUS agent loop (not a human session): POST it to the observer agentic
+// endpoint and render the verdict + loop-shape findings. On an unreachable backend, a client-side preview.
+function AppAgentic() {
+  const [run, setRun] = React.useState(null);
+  const [busy, setBusy] = React.useState(false);
+  const [source, setSource] = React.useState('live');
+
+  const supervise = React.useCallback(async () => {
+    setBusy(true);
+    try {
+      const res = await fetch('/api/observer/agentic', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ steps: AGENTIC_EXAMPLE, goal: 'fix the importer test suite', budget: { max_steps: 8 } }),
+      });
+      if (!res.ok) throw new Error('observer backend status ' + res.status);
+      setRun(await res.json()); setSource('live');
+    } catch (e) {
+      setRun({ report: [
+        { type: 'agentic_loop', confidence: 0.9, message: 'the same action ran 3 times in a row (thrash) starting at step 0', suggestion: 'break the loop: change the approach, or stop and surface the blocker' },
+        { type: 'footgun', confidence: 0.85, message: 'a force-push to a shared branch can destroy history', suggestion: 'use a protected push or a feature branch instead' },
+        { type: 'agentic_repeated_failure', confidence: 0.82, message: 'the same failure recurred 3 times: importerror', suggestion: 'stop retrying the same failing path; escalate or change strategy' },
+      ], summary: { steps: 4, failures: 3, findings: 3, verdict: 'stalled_or_runaway' }, serves_truth: false });
+      setSource('preview');
+    } finally { setBusy(false); }
+  }, []);
+
+  const findings = run ? (run.report || []).map(mapServerFinding).sort((a, b) => b.conf - a.conf) : [];
+  const s = run ? (run.summary || {}) : {};
+  return (
+    <>
+      <OhPageHead eyebrow="Agentic runs" title="Supervise an autonomous agent loop"
+        sub="AIDevObserver watches autonomous agent loops (a flywheel / worker / any agent runner), not just human sessions. It flags thrash, stalls, repeated failures, budget overruns, and goal drift — and recommends a halt on a runaway. Read only — it never kills a process." />
+      <div className="ado-demo-actions" style={{ marginBottom: 14 }}>
+        <button className="oh-btn oh-btn--primary" disabled={busy} onClick={supervise}>{busy ? 'Supervising…' : 'Supervise the example run →'}</button>
+      </div>
+      {run && (
+        <>
+          <OhRollup items={[
+            ['Verdict', s.verdict || '—'],
+            ['Steps', s.steps != null ? s.steps : '—'],
+            ['Failures', s.failures != null ? s.failures : '—'],
+            ['Source', source === 'live' ? 'live engine' : 'preview'],
+          ]} />
+          <div className="ado-findings">{findings.map((f, i) => <FindingRow f={f} key={f.type + '-' + i} />)}</div>
+        </>
+      )}
+    </>
+  );
+}
+
 function ObserverApp({ route, theme, onToggle }) {
   const [report, setReport] = React.useState(null);
   const [source, setSource] = React.useState('live');
@@ -508,6 +567,7 @@ function ObserverApp({ route, theme, onToggle }) {
   let screen;
   if (sub === 'sessions') screen = <AppSessions onReview={runReview} busyPath={busyPath} />;
   else if (sub === 'findings') screen = <AppFindings report={report} source={source} session={session} error={error} />;
+  else if (sub === 'agentic') screen = <AppAgentic />;
   else if (sub === 'settings') screen = <AppSettings />;
   else screen = <AppReview />;
 
