@@ -74,6 +74,10 @@ Both share the same tokens, type scale, and accent, so the transition feels like
 
 ## 6. Required pages inventory (design all of these)
 
+> **The COMPLETE, exhaustive inventory** — every auth / account / billing / subscription / reset-password /
+> team / developer / system page, each mapped to its kit component + layout + states — is
+> `SAAS-PAGE-INVENTORY.md`. The grouping below is the summary.
+
 Each page names its scheme (section 3), its data or seam, and its key states.
 
 ### Marketing (public)

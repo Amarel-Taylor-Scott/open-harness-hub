@@ -15,8 +15,9 @@ this order, then design.
    applies to all 5 surfaces.
 3. **`CONSISTENCY-CONTRACT.md`** (the cross-surface rulebook): the SAME header / footer / logged-in shell /
    layout skeletons / primitives for every surface — differ ONLY by accent + copy. Read it before building a second surface.
-4. **`INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
-5. **The 5 live URLs** (below): see it rendered.
+4. **`SAAS-PAGE-INVENTORY.md`** (EVERY SaaS page — login, sign-up, reset password, account, billing, subscription, team, developer, system — each mapped to its kit component + one of the three standard layouts). The complete checklist so no internal page is missed.
+5. **`INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
+6. **The 5 live URLs** (below): see it rendered.
 
 The live renderer is the showcase serving the full `web/<brand>/` apps over the shared kit. `scripts/surface_server.py`
 is a demoted fallback; do not design against it.
@@ -45,7 +46,7 @@ Read these three, in order:
    locally and in the cloud.
 
 **The canonical build stack (per `DESIGN-BIBLE.md` section 1).** The shipped product is the set of full apps
-under `web/<app>/` (`context-is-everything`, `teleon`, `baltor`, `harness-hub`, `aidevobserver`), served by
+under `web/<app>/` (`context-is-everything`, `teleon`, `baltor`, `openhubforai`, `aidevobserver`), served by
 `python3 -m scripts.showcase` (the `OH_PRODUCT` env picks `web/<product>/`), over the shared kit in `web/<app>/kit/`
 (`oh-site.jsx`, `oh-tokens.css`, `oh-components.css`, `oh-site.css`, `products.js`). Framework: React 18 plus ReactDOM
 plus in-browser Babel (all vendored at `/vendor/`), JSX as `<script type="text/babel">`, hash routing via the kit.
