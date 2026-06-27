@@ -48,6 +48,7 @@ _INSTALL = "Install cloudflared: https://developers.cloudflare.com/cloudflare-on
 #: The TARGETS keys are the tunnelled plane; ports are looked up in the registry.
 TARGETS: dict[str, dict] = {
     "harness_hub_app": {"share": "showcase-share-url-openhubforai.txt", "seam": None, "token_query": True},
+    "aidevobserver_app": {"share": "showcase-share-url-aidevobserver.txt", "seam": None},
     "teleon_app": {"share": "showcase-share-url-teleon.txt", "seam": None},
     "baltor_app": {"share": "showcase-share-url-baltor.txt", "seam": None, "token_query": True},
     "context_is_everything_app": {"share": "showcase-share-url-context-is-everything.txt", "seam": None},

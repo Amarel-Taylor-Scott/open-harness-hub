@@ -353,6 +353,49 @@
       "status": "active_local"
     },
     {
+      "service_id": "aidevobserver_app",
+      "display_name": "AIDevObserver product app (SPA + showcase backend)",
+      "owner": "aidevobserver",
+      "port": 8110,
+      "process_group": "aidevobserver_app",
+      "env": {
+        "OH_PRODUCT": "aidevobserver"
+      },
+      "start_command": [
+        "python3",
+        "-m",
+        "scripts.showcase",
+        "--port",
+        "8110"
+      ],
+      "stop_command": null,
+      "health_url": "http://127.0.0.1:8110/",
+      "ready_url": "http://127.0.0.1:8110/",
+      "public_routes": [
+        "/",
+        "#/signin",
+        "#/dashboard",
+        "#/review",
+        "#/sessions",
+        "#/findings",
+        "#/agentic"
+      ],
+      "private_routes": [],
+      "env_file": null,
+      "allowed_consumers": [
+        "browser_user",
+        "demo_reviewer"
+      ],
+      "auth_mode": "none_static_preview",
+      "data_classes": [
+        "public"
+      ],
+      "logs_path": "dist/local-services/aidevobserver_app.log",
+      "screenshot_required": true,
+      "trycloudflare_required": true,
+      "status": "active_local"
+    },
+    {
       "service_id": "baltor_app",
       "display_name": "Baltor product app (SPA + showcase backend)",
       "owner": "baltor",
