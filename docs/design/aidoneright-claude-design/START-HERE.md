@@ -13,8 +13,10 @@ this order, then design.
    `oh-components.css`, `oh-site.css`, `oh-site.jsx`, `products.js`) plus one COMPLETE app (Teleon). When the guide
    says "see `oh-tokens.css`" or names a component, the actual code is here. This is the thing you edit once and it
    applies to all 5 surfaces.
-3. **`INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
-4. **The 5 live URLs** (below): see it rendered.
+3. **`CONSISTENCY-CONTRACT.md`** (the cross-surface rulebook): the SAME header / footer / logged-in shell /
+   layout skeletons / primitives for every surface — differ ONLY by accent + copy. Read it before building a second surface.
+4. **`INTEGRATION-BIBLE.md`**: how a frontend talks to a backend (same-origin seams), local and cloud.
+5. **The 5 live URLs** (below): see it rendered.
 
 The live renderer is the showcase serving the full `web/<brand>/` apps over the shared kit. `scripts/surface_server.py`
 is a demoted fallback; do not design against it.
@@ -66,7 +68,7 @@ canonical one. The kit top bar has no portfolio dropdown and always shows a `Dem
 
 ## Your job
 
-Elevate the live `surface_server` pages toward the richness of the `dist/sites/openharness-design/` bundle —
+Elevate the live `surface_server` pages toward the richness of the `dist/sites/aidoneright-design/` bundle —
 **WHILE keeping the byte-identical-CSS law.** You never style a single surface. You edit `_CSS_TEMPLATE` once and the
 change propagates to all 5. After any change: `python3 scripts/check_surface_server.py --self-test` (122 assertions).
 
