@@ -1,16 +1,21 @@
 /* =============================================================================
    aidevobserver/aidevobserver.css: AIDevObserver-SPECIFIC styles only.
-   All chrome (top bar, hero, sections, cards, footer) comes from the SHARED kit:
-   kit/oh-site.css + kit/oh-components.css + kit/oh-tokens.css. Accent is set inline
-   on the root (--accent: #b25fd6); this file only adds the few bespoke bits the kit
-   does not cover (hero review card, where-it-runs grid, install lines, the live
-   review demo, findings list, trust items). Accent tints are derived from --accent
-   with color-mix so they track the violet brand color, not the house weak token.
+   All chrome (top bar, sidebar shell, hero, sections, cards, tables, footer, the
+   SaaS pages) comes from the SHARED kit: kit/oh-site.css + kit/oh-components.css +
+   kit/oh-tokens.css. Accent is set inline on the root (--accent: #b25fd6); this file
+   only adds the few bespoke bits the kit does not cover: the hero review card, the
+   where-it-runs grid, install lines, the live-review demo, the finding CARD (family
+   toned, with evidence / suggestion / source_ref / savings / triage), the agentic
+   advisory, the reports scope switcher, settings modes, and the app search bar.
+   Accent tints derive from --accent via color-mix so they track the violet brand.
    ============================================================================= */
 
 /* hero: let the long headline breathe; tint the highlighted span with the accent */
 .ado .ohs-hero h1 { max-width: none; text-wrap: pretty; }
 .ado .tint { color: var(--accent); }
+
+/* family tones, single source for the finding card + hero tags + dots */
+.ado { --fam-reinvention: var(--accent); --fam-waste: #c98a2e; --fam-footgun: #d6455f; --fam-agentic: #6e56cf; --fam-neutral: var(--fg-faint); }
 
 /* ---- hero review card (right-side aside) ---- */
 .ado-herocard { padding: 20px; box-shadow: var(--e2); }
@@ -20,9 +25,11 @@
 .ado-hc-list { display: flex; flex-direction: column; gap: 8px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .ado-hc-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .ado-hc-tag { font-size: 12.5px; font-weight: 600; color: var(--fg); display: inline-flex; align-items: center; gap: 8px; }
-.ado-hc-tag::before { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--accent); flex: 0 0 auto; }
-.ado-hc-tag.sev-high::before { background: #d6455f; }
-.ado-hc-tag.sev-medium::before { background: #c98a2e; }
+.ado-hc-tag::before { content: ""; width: 8px; height: 8px; border-radius: 999px; background: var(--fam-neutral); flex: 0 0 auto; }
+.ado-hc-tag.fam-reinvention::before { background: var(--fam-reinvention); }
+.ado-hc-tag.fam-waste::before { background: var(--fam-waste); }
+.ado-hc-tag.fam-footgun::before { background: var(--fam-footgun); }
+.ado-hc-tag.fam-agentic::before { background: var(--fam-agentic); }
 .ado-hc-conf { font-size: 11.5px; color: var(--fg-muted); }
 .ado-hc-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
 .ado-hc-foot .mono { font-size: 11px; color: var(--fg-faint); }
@@ -51,27 +58,95 @@
                background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px 14px; }
 .ado-demo-ta:focus { outline: none; border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); }
 .ado-demo-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.ado-demo-err { font-size: 12px; color: var(--fam-footgun); margin-top: 10px; }
 .ado-demo-out-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .ado-demo-out-t { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--fg); }
 .ado-demo-note { font-size: 11.5px; color: var(--fg-faint); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); line-height: 1.5; }
 
-/* ---- findings list ---- */
-.ado-findings { display: flex; flex-direction: column; gap: 10px; }
-.ado-finding { display: flex; gap: 12px; padding: 13px 15px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel); }
-.ado-finding-dot { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 999px; margin-top: 5px; background: var(--accent); }
-.ado-finding.sev-high { border-color: color-mix(in srgb, #d6455f 35%, var(--line)); }
-.ado-finding.sev-high .ado-finding-dot { background: #d6455f; }
-.ado-finding.sev-medium .ado-finding-dot { background: #c98a2e; }
+/* loading skeleton rows */
+.ado-skel-row { height: 46px; border-radius: var(--r-md); margin-bottom: 10px; background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--line) 37%, var(--bg-subtle) 63%); background-size: 400% 100%; animation: ado-shimmer 1.3s ease-in-out infinite; }
+.ado-skel-row.short { width: 62%; }
+@keyframes ado-shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+/* ---- the finding CARD (core component) ---- */
+.ado-findings { display: flex; flex-direction: column; gap: 12px; }
+.ado-finding { display: flex; gap: 12px; padding: 15px 16px; border: 1px solid var(--line); border-left-width: 3px; border-radius: var(--r-md); background: var(--panel); }
+.ado-finding-dot { flex: 0 0 auto; width: 9px; height: 9px; border-radius: 999px; margin-top: 5px; background: var(--fam-neutral); }
+.ado-finding.fam-reinvention { border-left-color: var(--fam-reinvention); }
+.ado-finding.fam-reinvention .ado-finding-dot { background: var(--fam-reinvention); }
+.ado-finding.fam-waste { border-left-color: var(--fam-waste); }
+.ado-finding.fam-waste .ado-finding-dot { background: var(--fam-waste); }
+.ado-finding.fam-footgun { border-left-color: var(--fam-footgun); }
+.ado-finding.fam-footgun .ado-finding-dot { background: var(--fam-footgun); }
+.ado-finding.fam-agentic { border-left-color: var(--fam-agentic); }
+.ado-finding.fam-agentic .ado-finding-dot { background: var(--fam-agentic); }
+.ado-finding.has-outcome.out-dismissed { opacity: .6; }
 .ado-finding-b { flex: 1; min-width: 0; }
-.ado-finding-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 5px; }
+.ado-finding-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
 .ado-finding-type { font-size: 13.5px; font-weight: 700; color: var(--fg); }
-.ado-finding-t { font-size: 13px; line-height: 1.55; color: var(--fg-muted); }
+.ado-finding-t { font-size: 13px; line-height: 1.55; color: var(--fg); }
+.ado-finding-ev { margin: 9px 0 0; padding: 9px 11px; font-size: 11.5px; line-height: 1.5; color: var(--fg-muted); background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-sm); overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.ado-finding-ev.redacted { color: var(--fam-footgun); background: color-mix(in srgb, var(--fam-footgun) 7%, var(--panel)); border-color: color-mix(in srgb, var(--fam-footgun) 28%, var(--line)); }
+.ado-finding-sg { margin-top: 9px; font-size: 12.5px; line-height: 1.55; color: var(--fg-muted); }
+.ado-finding-sg-k { display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-right: 8px; }
+.ado-finding-f { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 11px; }
+.ado-finding-refs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ado-src { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; padding: 3px 9px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--bg-subtle); color: var(--fg-muted); text-decoration: none; }
+a.ado-src:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); color: var(--accent); }
+.ado-src-k { font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-faint); }
+.ado-src--existing .ado-src-k { color: var(--fam-reinvention); }
+.ado-src--save .ado-src-k { color: var(--fam-waste); }
+.ado-finding-act { display: inline-flex; gap: 6px; }
+.ado-out { font-size: 11.5px; font-weight: 600; color: var(--fg-muted); padding: 4px 11px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--panel); cursor: pointer; transition: all .14s var(--ease, ease); }
+.ado-out:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); color: var(--fg); }
+.ado-out.on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink, #fff); }
+.ado-finding-gov { margin-top: 10px; font-size: 10.5px; color: var(--fg-faint); }
 
 /* confidence bar */
 .ado-conf { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto; }
 .ado-conf-track { width: 64px; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
 .ado-conf-fill { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
 .ado-conf-n { font-size: 11px; color: var(--fg-muted); min-width: 30px; text-align: right; }
+
+/* ---- agentic runaway advisory (Pause / Dismiss, never a kill) ---- */
+.ado-advisory { display: flex; align-items: center; gap: 13px; padding: 14px 16px; margin-bottom: 16px; border-radius: var(--r-md);
+                border: 1px solid color-mix(in srgb, var(--fam-agentic) 35%, var(--line)); background: color-mix(in srgb, var(--fam-agentic) 8%, var(--panel)); }
+.ado-advisory-i { flex: 0 0 auto; font-size: 18px; color: var(--fam-agentic); }
+.ado-advisory-b { flex: 1; min-width: 0; }
+.ado-advisory-t { font-size: 13.5px; font-weight: 700; color: var(--fg); }
+.ado-advisory-d { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+.ado-advisory-act { display: inline-flex; gap: 8px; flex: 0 0 auto; }
+
+/* ---- reports scope switcher ---- */
+.ado-scope { display: inline-flex; gap: 4px; padding: 3px; border-radius: var(--r-pill); border: 1px solid var(--line); background: var(--bg-subtle); }
+.ado-scope-b { font-size: 12px; font-weight: 600; color: var(--fg-muted); padding: 5px 13px; border-radius: var(--r-pill); border: 0; background: transparent; cursor: pointer; }
+.ado-scope-b.on { background: var(--panel); color: var(--accent); box-shadow: var(--e1); }
+
+/* ---- developer method badges ---- */
+.ado-mb { display: inline-block; font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; letter-spacing: .04em; padding: 2px 7px; border-radius: var(--r-sm); color: #fff; }
+.ado-mb--get { background: #1f6fb2; }
+.ado-mb--post { background: #1a7f37; }
+
+/* ---- settings modes ---- */
+.ado-modes { display: flex; flex-direction: column; gap: 2px; }
+.ado-mode { display: flex; align-items: flex-start; gap: 11px; text-align: left; padding: 11px 12px; border-radius: var(--r-md); border: 1px solid transparent; background: transparent; cursor: pointer; }
+.ado-mode:hover { background: var(--bg-subtle); }
+.ado-mode.on { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.ado-mode-dot { flex: 0 0 auto; width: 14px; height: 14px; margin-top: 2px; border-radius: 999px; border: 2px solid var(--line); }
+.ado-mode.on .ado-mode-dot { border-color: var(--accent); background: radial-gradient(circle, var(--accent) 0 4px, transparent 5px); }
+.ado-mode-b { display: flex; flex-direction: column; gap: 2px; }
+.ado-mode-t { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+.ado-mode-d { font-size: 12px; color: var(--fg-muted); }
+
+/* ---- app search / account bar (OhAppShell topbar slot) ---- */
+.ado-appbar { display: flex; align-items: center; gap: 12px; width: 100%; }
+.ado-search { display: inline-flex; align-items: center; gap: 9px; min-width: 260px; max-width: 420px; padding: 7px 11px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--bg-subtle); color: var(--fg-muted); cursor: pointer; font-size: 12.5px; }
+.ado-search:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.ado-search-i { color: var(--fg-faint); }
+.ado-search-t { flex: 1; text-align: left; }
+.ado-appbar-ic { width: 32px; height: 32px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--panel); color: var(--fg-muted); cursor: pointer; font-size: 15px; }
+.ado-appbar-ic:hover { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.ado-avatar { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--accent-ink, #fff); background: var(--accent); }
 
 /* ---- trust ---- */
 .ado-trust { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 30px; }
@@ -86,4 +161,5 @@
   .ado-runs { grid-template-columns: 1fr; }
   .ado-installs { grid-template-columns: 1fr; }
   .ado-trust { grid-template-columns: 1fr; }
+  .ado-search { min-width: 0; }
 }
