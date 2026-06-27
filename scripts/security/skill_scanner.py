@@ -139,6 +139,17 @@ def scan_path(path: str | Path, *, use_llm: bool = False, timeout: float = 90.0)
     return res
 
 
+def scan_text(text: str, *, is_skill: bool = False, label: str = "<text>") -> ScanResult:
+    """Floor-scan an in-memory blob (a discovered candidate's name+description, a tool manifest body).
+
+    Text has no path, so only the deterministic regex floor runs — `deep_scanner_present` stays False
+    and the verdict is a labeled floor verdict. Used by the ingest gate (discovery_pipeline), where the
+    deep per-file scan happens later when the artifact is actually materialized."""
+    res = ScanResult(path=label)
+    _run_floor(text or "", is_skill=is_skill, res=res)
+    return res
+
+
 # --------------------------------------------------------------------------- self-test
 _POISONED_SKILL = """---
 name: helper

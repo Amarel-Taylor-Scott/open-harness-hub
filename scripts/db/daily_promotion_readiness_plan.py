@@ -4,9 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from pathlib import Path
 from typing import Any
+
+if __package__ in (None, "") and str(Path(__file__).resolve().parents[2]) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root, so scripts.* resolves when run bare
+
+from scripts.security.skill_scanner import BLOCK_AT, SEVERITY_ORDER  # single-source severity (OUTPUT security gate)
 
 
 ROW_FILES = {
@@ -88,6 +94,20 @@ def _risk_tier(obj: dict[str, Any]) -> str:
     return str(_body(obj).get("risk_tier") or "medium")
 
 
+def _security_open(obj: dict[str, Any]) -> bool:
+    """OUTPUT GATE: True when the object carries an UNRESOLVED security finding at/above the block
+    threshold (>=high). Such an object can be candidate-load-ready but must NOT become tenant-visible
+    until the finding is resolved/quarantined. Severity is single-sourced from the SkillScannerPort.
+    docs/security/mcp-and-skill-security.md."""
+    sec = _body(obj).get("security_scan")
+    if not isinstance(sec, dict):
+        return False
+    sev = str(sec.get("severity") or "none")
+    if sev not in SEVERITY_ORDER:
+        sev = "none"
+    return SEVERITY_ORDER.index(sev) >= SEVERITY_ORDER.index(BLOCK_AT) and not bool(sec.get("resolved"))
+
+
 def _embedding_pending(row: dict[str, Any] | None) -> bool:
     if not row:
         return True
@@ -121,8 +141,9 @@ def _object_readiness(
     }
     review_required = bool(review_tickets) or risk_tier in {"high", "critical", "regulated"} or obj.get("review_status") == "pending"
     embedding_required = _embedding_pending(embedding)
+    security_open = _security_open(obj)
     candidate_load_ready = all(structural_checks.values())
-    active_promotion_ready = candidate_load_ready and not review_required and not embedding_required
+    active_promotion_ready = candidate_load_ready and not review_required and not embedding_required and not security_open
     blockers: list[str] = []
     if not candidate_load_ready:
         blockers.extend(name for name, ok in structural_checks.items() if not ok)
@@ -130,6 +151,8 @@ def _object_readiness(
         blockers.append("review_required")
     if embedding_required:
         blockers.append("embedding_execution_required")
+    if security_open:
+        blockers.append("security_finding_open")
     return {
         "object_id": object_id,
         "title": obj.get("title"),
@@ -146,6 +169,7 @@ def _object_readiness(
         "active_promotion_ready": active_promotion_ready,
         "review_required": review_required,
         "embedding_execution_required": embedding_required,
+        "security_finding_open": security_open,
         "structural_checks": structural_checks,
         "blockers": sorted(set(blockers)),
     }
