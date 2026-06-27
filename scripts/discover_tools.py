@@ -2,7 +2,7 @@
 """discover_tools — use Teleon's OWN source-search components to find more deterministic tools for the registry.
 
 Dogfoods src.teleon.research.source_search (PyPI + GitHub, the descent's cheap deterministic tier) to surface CANDIDATE
-tools, then governs them: classify the license from the single source (src/openharnesshub/licenses), dedupe against the
+tools, then governs them: classify the license from the single source (src/openhubforai/licenses), dedupe against the
 existing tool_registry, and append to a candidate feed. Discovery is NOT trust — nothing lands in tool_registry here; a
 human/verify step promotes (the promotion boundary). serves_truth=false. Dev-plane script (imports the product searcher,
 never the reverse).
@@ -17,7 +17,7 @@ import json
 import sys
 from pathlib import Path
 
-from src.openharnesshub.licenses import classify_license
+from src.openhubforai.licenses import classify_license
 from src.teleon.research.source_search import SourceSearchUnavailable, ToolHit, discover
 
 REPO = Path(__file__).resolve().parents[1]

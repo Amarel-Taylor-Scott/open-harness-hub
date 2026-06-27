@@ -11,7 +11,7 @@
 
 > **Self-contained handoff.** The full VERBATIM source of everything this doc references (the kit `oh-tokens.css`,
 > `oh-components.css`, `oh-site.css`, `oh-site.jsx`, `products.js`, plus one complete app) is inlined in
-> **`docs/design/openharness-claude-design/DESIGN-ASSETS.md`**. Upload that file alongside this one and
+> **`docs/design/aidoneright-claude-design/DESIGN-ASSETS.md`**. Upload that file alongside this one and
 > `INTEGRATION-BIBLE.md`, and a designer needs nothing else from the repo. Wherever this doc names a source file
 > ("see `oh-tokens.css`", "the `OhAppShell` component"), the actual code is in DESIGN-ASSETS.
 
@@ -59,7 +59,7 @@ whole per-surface contract: the `oh dir-s theme-light oh-site` scope pulls in th
 ### The canonical stack (four layers)
 
 1. **The apps.** Five full front-end apps live under `web/<app>/`: `context-is-everything` (AI Done Right),
-   `teleon`, `baltor`, `harness-hub` (OpenHubForAI), and `aidevobserver`. Each app is its own entry HTML plus a small
+   `teleon`, `baltor`, `openhubforai` (OpenHubForAI), and `aidevobserver`. Each app is its own entry HTML plus a small
    brand main file (for example `web/teleon/index.html` + `web/teleon/teleon-main.jsx` + `web/teleon/teleon.css`).
 2. **The showcase server.** `scripts/showcase/server.py` is the renderer. `OH_PRODUCT` picks the folder and
    `WEB_DIR = web/<OH_PRODUCT>` is served at the origin root. Run it with `python3 -m scripts.showcase --port <N>`.
@@ -82,7 +82,7 @@ whole per-surface contract: the `oh dir-s theme-light oh-site` scope pulls in th
   `.oh.dir-s.theme-light` (`--bg #fafaf8`), with the accent overridden per brand. The same conclusion is encoded in
   `architecture/surface_capability_spec.json`, whose `serving_rule` reads: "Launchers MUST serve each pillar's
   `canonical_surface` (the built-out `web/*` app)", and whose `canonical_surface` fields point at `web/context-is-everything`,
-  `web/teleon`, `web/baltor`, and `web/harness-hub`.
+  `web/teleon`, `web/baltor`, and `web/openhubforai`.
 - **`scripts/surface_server.py` is a lightweight FALLBACK only.** It can render a minimal standalone surface when the
   full app or the service plane is not available. It is not canonical and a designer never edits it to change the look.
 
@@ -101,7 +101,7 @@ copy (the raw spec strings are paraphrased per the copy rules in section 11).
 | Teleon | `teleon` | `#6d5ef0` (indigo) | The purpose-driven, eval-gated, self-adaptive compute runtime. | `/api/teleon/` (`teleon_local_runtime`) |
 | Baltor | `baltor` | `#0e7c86` (teal) | Managed, verified, provable context, powered by Teleon (governs truth). | the live-ops family (`/api/demo/`, `/api/context/`, `/api/pipeline/`, `/api/runtime/`) via `baltor_admin_demo_server` |
 | AIDevObserver | `aidevobserver` | `#b25fd6` (orchid) | Reviews how a team uses AI coding agents and turns each session into a clear, ranked report. | identity, registry, analytics (review engine: `src/teleon/observer`) |
-| OpenHubForAI | `harness-hub` | `#3b6fd4` (royal blue) | The open store of context, tools, skills, and harnesses that both products consume, plus the open CapabilityTask spec. | `/registry/` (`local_openhub_projection_api`) plus `/api/components` and `/api/primitives` |
+| OpenHubForAI | `openhubforai` | `#3b6fd4` (royal blue) | The open store of context, tools, skills, and harnesses that both products consume, plus the open CapabilityTask spec. | `/registry/` (`local_openhub_projection_api`) plus `/api/components` and `/api/primitives` |
 
 Notes. The `aidevobserver` accent (`#b25fd6`) lives only in `web/aidevobserver/kit/products.js`, the build-out target.
 The teal `#0e7c86` doubles as the family's `--verified` color (the "verified" read). Every surface shares the
@@ -425,7 +425,7 @@ A left sidebar plus a content area, the Control Tower and dashboard pattern. The
 `OhAppShell` (`web/teleon/kit/oh-site.jsx`), which `web/teleon/teleon-main.jsx` uses for its logged-in routes
 (`APP_NAV`). Existing logged-in surfaces in the same family: the Teleon Control Tower
 (`web/teleon/Teleon PurposeTask Control Tower.html`), the Baltor dashboards (`web/baltor/dashboard.html` and the
-guided demos), and the OpenHubForAI admin demo (`web/harness-hub/admin-demo.html`).
+guided demos), and the OpenHubForAI admin demo (`web/openhubforai/admin-demo.html`).
 
 ```jsx
 <OhAppShell brand={BRAND} nav={APP_NAV} route={route} cta={{ label: '+ New run', href: '/runs' }}
@@ -674,7 +674,7 @@ loaded from `/vendor/` at runtime.
   The root mounts with the React 18 API: `ReactDOM.createRoot(document.getElementById('root')).render(<App />)`.
 - **JSX compiled in the browser.** Each app file is a `<script type="text/babel">`, so there is no build step in the
   dev floor (a precompiled production build is a known gap, tracked in
-  `docs/design/openharness-claude-design/HANDOFF.md`).
+  `docs/design/aidoneright-claude-design/HANDOFF.md`).
 - **The shared kit** (`web/<app>/kit/`): `oh-site.jsx` (the React components and hooks, written onto `window` by an
   `Object.assign(window, { ... })` at the end of the file), the three stylesheets (`oh-tokens.css`,
   `oh-components.css`, `oh-site.css`), and the data modules. `products.js` runs first and publishes
@@ -717,7 +717,7 @@ the chosen page (see `App` in `web/teleon/teleon-main.jsx`).
 root, and `/vendor/` plus the `/api/*` and `/registry/` seams are mounted alongside it:
 
 ```python
-OH_PRODUCT = os.environ.get("OH_PRODUCT", "").strip() or "harness-hub"
+OH_PRODUCT = os.environ.get("OH_PRODUCT", "").strip() or "openhubforai"
 WEB_DIR = _REPO_DIR / "web" / OH_PRODUCT          # this product's front-end, served at /
 VENDOR_DIR = _REPO_DIR / "web" / "vendor"          # the pinned React + Babel runtime, served at /vendor/
 ```
@@ -925,7 +925,7 @@ the copy: read-only, suggestions not gates, nothing stored.
    its bespoke pieces).
 3. `web/teleon/teleon-main.jsx` (the reference for the `OhAppShell` left-sidebar logged-in app: `App`, `APP_NAV`).
 4. `web/teleon/kit/oh-site.jsx` (the kit components and `OhAppShell`) and `web/teleon/kit/oh-tokens.css` (the tokens).
-5. `web/harness-hub/admin-demo.html` and `web/teleon/Teleon PurposeTask Control Tower.html` (existing logged-in
+5. `web/openhubforai/admin-demo.html` and `web/teleon/Teleon PurposeTask Control Tower.html` (existing logged-in
    dashboards in the family).
 
 ---
@@ -947,5 +947,5 @@ the copy: read-only, suggestions not gates, nothing stored.
 | Existing design standards | `docs/standards/DESIGN.md`, `docs/standards/design-principles.md` |
 | Teleon marketing app | `web/teleon/index.html`, `web/teleon/teleon-main.jsx`, `web/teleon/teleon.css` |
 | AIDevObserver app (build-out target) | `web/aidevobserver/index.html`, `web/aidevobserver/aidevobserver-main.jsx`, `web/aidevobserver/aidevobserver.css` |
-| Logged-in dashboard references | `web/harness-hub/admin-demo.html`, `web/baltor/dashboard.html` |
+| Logged-in dashboard references | `web/openhubforai/admin-demo.html`, `web/baltor/dashboard.html` |
 | Context-freshness guard (this is 1 of the 5 canonical docs) | `scripts/check_context_freshness.py` |

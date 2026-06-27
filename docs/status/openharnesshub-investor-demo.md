@@ -2,7 +2,7 @@
 
 Status 2026-06-10: **live and verified end-to-end through the public URL.**
 
-- **Share URL (with access token):** `dist/showcase-share-url-harness-hub.txt`
+- **Share URL (with access token):** `dist/showcase-share-url-openhubforai.txt`
 - Tunnel hostname only: `dist/showcase-tunnel-url-harness-hub.txt`
 - Compute endpoints (`/api/build`, `/api/export`) are token-gated; the share link carries the
   token and the app remembers it per browser. Catalog/identity/registry/analytics reads are open.
@@ -51,5 +51,5 @@ OH_SHOWCASE_TOKEN=$(cat dist/showcase-token.txt) python3 scripts/start_local_ser
 setsid ~/.local/bin/cloudflared tunnel --no-autoupdate --url http://127.0.0.1:8000 \
   >> dist/local-services/cloudflared-harness-hub.log 2>&1 &
 # then re-verify the journey against the new URL:
-node e2e/ohh_public_gate.mjs "$(cat dist/showcase-share-url-harness-hub.txt)"
+node e2e/ohh_public_gate.mjs "$(cat dist/showcase-share-url-openhubforai.txt)"
 ```

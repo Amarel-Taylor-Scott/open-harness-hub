@@ -26,7 +26,7 @@ The archive contains three usable design tracks:
   design canvas, and app shell.
 
 The repo already carries the OpenHubForAI handoff under
-`web/harness-hub/design/`. That handoff remains the design source of truth for
+`web/openhubforai/design/`. That handoff remains the design source of truth for
 the open product surface.
 
 ## Adopted Decisions

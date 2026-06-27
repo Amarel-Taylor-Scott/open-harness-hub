@@ -1,4 +1,4 @@
-"""src.openharnesshub.hub_engine — ONE shared engine the 22 Open*Hubs each instantiate (thin, not 22 copies).
+"""src.openhubforai.hub_engine — ONE shared engine the 22 Open*Hubs each instantiate (thin, not 22 copies).
 
 Each Open*Hub gets its own orchestrator / models / flywheels / supervisor / agents to build out, rank, verify, improve,
 version, scrape, digest, ingest, and serve what it stores — WITHOUT 22 copies of code. A single ``HubEngine`` runs the
@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
-from src.openharnesshub.component_store import ComponentStore, GLOBAL_TENANT
+from src.openhubforai.component_store import ComponentStore, GLOBAL_TENANT
 
 _REPO = Path(__file__).resolve().parents[2]
 _CONN = _REPO / "architecture" / "portfolio_connection_map.json"

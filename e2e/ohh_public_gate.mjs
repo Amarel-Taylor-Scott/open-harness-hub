@@ -4,7 +4,7 @@
 // per-realm sign-up → signed-in workspace → analytics beacon accepted → registry seam answering.
 //
 // Run: node e2e/ohh_public_gate.mjs "<share-url-with-?token=...>"
-//      (default: contents of dist/showcase-share-url-harness-hub.txt)
+//      (default: contents of dist/showcase-share-url-openhubforai.txt)
 
 import { chromium } from 'playwright';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = join(HERE, 'artifacts', 'full-design');
-const share = (process.argv[2] || readFileSync(join(HERE, '..', 'dist', 'showcase-share-url-harness-hub.txt'), 'utf-8')).trim();
+const share = (process.argv[2] || readFileSync(join(HERE, '..', 'dist', 'showcase-share-url-openhubforai.txt'), 'utf-8')).trim();
 const base = new URL(share).origin;
 console.log(`public gate → ${base} (token ${/token=/.test(share) ? 'present' : 'MISSING'})`);
 

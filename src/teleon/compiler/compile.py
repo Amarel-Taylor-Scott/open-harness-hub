@@ -33,7 +33,7 @@ HONEST — ``is_truth`` is structurally false; a compiled unit is a deployable p
 FleetLedger / capability gate remain the source of truth. Demo-grade gaps are labelled in the doc, not hidden.
 
 ARCHITECTURAL LAW — Teleon-layer code: imports only stdlib + ``src.teleon`` siblings + ``scripts`` tooling
-(schema validator). It never imports ``src.baltor`` / ``src.openharnesshub`` (the portfolio dependency law).
+(schema validator). It never imports ``src.baltor`` / ``src.openhubforai`` (the portfolio dependency law).
 """
 from __future__ import annotations
 

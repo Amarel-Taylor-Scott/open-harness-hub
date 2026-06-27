@@ -2,7 +2,7 @@
 # Launch BOTH OpenHubForAI products on the shared backend, each pinned to its brand and fronted
 # by its OWN persistent trycloudflare.com tunnel (the two-services model — see
 # docs/strategy/two-services-shared-infrastructure.md):
-#   • OpenHubForAI    (build / monitor pipelines)  → :8000 → dist/showcase-share-url-harness-hub.txt
+#   • OpenHubForAI    (build / monitor pipelines)  → :8000 → dist/showcase-share-url-openhubforai.txt
 #   • Baltor   (content refinery / verified context)    → :8001 → dist/showcase-share-url-baltor.txt
 # Same code, same catalog, same token — two surfaces. OH_PRODUCT pins the brand (injected into
 # index.html by the server). Tunnels are left running on exit so their public URLs stay STABLE across
@@ -68,14 +68,14 @@ bring_up_tunnel(){ # port slug
 }
 
 say "── bringing up both products on the shared backend ──"
-bring_up_server harness-hub        8000 harness-hub
+bring_up_server openhubforai        8000 openhubforai
 bring_up_server baltor 8001 baltor
-bring_up_tunnel 8000 harness-hub
+bring_up_tunnel 8000 openhubforai
 bring_up_tunnel 8001 baltor
 
 say ""
 say "═══════════════════════════════════════════════════════════════"
-say "  OpenHubForAI    →  $(cat dist/showcase-share-url-harness-hub.txt 2>/dev/null)"
+say "  OpenHubForAI    →  $(cat dist/showcase-share-url-openhubforai.txt 2>/dev/null)"
 say "  Baltor  →  $(cat dist/showcase-share-url-baltor.txt 2>/dev/null)"
 say "  shared backend · stable tunnels · stop tunnels: pkill -f 'cloudflared tunnel'"
 say "═══════════════════════════════════════════════════════════════"

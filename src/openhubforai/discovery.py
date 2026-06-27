@@ -1,4 +1,4 @@
-"""src.openharnesshub.discovery — STATELESS OpenClaw (finder) + Hermes (router) that keep every Open*Hub fresh.
+"""src.openhubforai.discovery — STATELESS OpenClaw (finder) + Hermes (router) that keep every Open*Hub fresh.
 
 Two stateless engines that continuously add/append/update each hub's content:
   * **OpenClaw** — a stateless, PLUGIN-based finder. Each plugin targets one hub + content kind (repos, harnesses,

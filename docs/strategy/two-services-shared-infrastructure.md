@@ -108,7 +108,7 @@ is a stronger story than either alone: the acquirer gets the context-layer subst
 
 **Shipped:** this decision record; the Baltor product spec ([[context-enrichment-service.md]]); the
 schema-extensibility codex ([[../codex/schema-extensibility.md]]); **separate per-product front-end
-folders** — `web/harness-hub/` and `web/baltor/`, each self-contained, with the backend
+folders** — `web/openhubforai/` and `web/baltor/`, each self-contained, with the backend
 selecting the folder by `OH_PRODUCT` (`server.py`); both products live behind their own tunnels
 (`scripts/serve_two_products.sh`); the backend service layer ([[../architecture/backend-services-and-platform.md]]).
 

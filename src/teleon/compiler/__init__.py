@@ -21,7 +21,7 @@ self-tested), but for capabilities instead of services.
     the JSONL lives under ``dist/local-services-state/teleon-compiler/`` (the Fly volume mount).
 
 ARCHITECTURAL LAW: Teleon-layer code (the runtime compiler is a runtime concern). It imports only stdlib +
-``src.teleon`` siblings + ``scripts`` tooling; it must never import ``src.baltor`` / ``src.openharnesshub``.
+``src.teleon`` siblings + ``scripts`` tooling; it must never import ``src.baltor`` / ``src.openhubforai``.
 Doc: ``docs/architecture/teleon-capability-runtime-compiler.md``.
 """
 from .compile import (compile_capability, validate_unit, memory_to_mb, CompilerError, NotPromotedError,

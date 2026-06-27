@@ -1,7 +1,7 @@
-"""src.openharnesshub.licenses — the SINGLE source for license classification (permissive / copyleft / unstated).
+"""src.openhubforai.licenses — the SINGLE source for license classification (permissive / copyleft / unstated).
 
 One classifier used everywhere a governance decision depends on license: src/teleon/repo_strategy (repo intake),
-src/openharnesshub/browsing_registry (the browsing stack), and any future intake. Lives in the open layer so OHH
+src/openhubforai/browsing_registry (the browsing stack), and any future intake. Lives in the open layer so OHH
 modules use it WITHOUT importing Teleon (dependency law); Teleon may import it. The org-guardrail rule it encodes:
 COPYLEFT and UNSTATED licenses are NOT vendorable (technique-only — study behind a port, never vendor the code);
 only PERMISSIVE is vendorable. serves_truth=false (a classification is a candidate signal, not adjudicated truth).

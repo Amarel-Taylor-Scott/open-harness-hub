@@ -15,7 +15,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 HANDOFF = REPO / "docs" / "handoff"
 STATE = REPO / ".agent" / "aidoneright-current-state-verification.json"
-BUNDLE = REPO / "dist" / "sites" / "openharness-design"
+BUNDLE = REPO / "dist" / "sites" / "aidoneright-design"
 
 DOCS = {
     "freshness": HANDOFF / "handoff-freshness.md",

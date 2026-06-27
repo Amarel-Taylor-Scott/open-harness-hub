@@ -185,9 +185,9 @@ architecture/identity_realm_registry.json <check>.py` → empty), and the failin
 touch the migrated state engine:
 
 1. `check_events_beacon_wiring.py` — `2 FAILURES: ['A: index.html loads events.js', 'A: events.js
-   loads after data.js']`. `web/harness-hub/index.html` was rebuilt by the full-design transplant
+   loads after data.js']`. `web/openhubforai/index.html` was rebuilt by the full-design transplant
    (commit `5b17af2d`); the page the check describes lives on as `legacy.html`. HEAD's
-   `index.html` contains zero `events.js` references (`git show HEAD:web/harness-hub/index.html |
+   `index.html` contains zero `events.js` references (`git show HEAD:web/openhubforai/index.html |
    grep -c events.js` → 0). Sections C/D of the same check — the ones that exercise the events
    SERVICE live over HTTP — PASS.
 2. `check_harness_hub_auth_wiring.py` — `2 FAILURES: ['A: index.html loads identity.js',
@@ -198,7 +198,7 @@ touch the migrated state engine:
    (itself a no-magic-values violation in that check). Every other assertion in it — including its
    own UTF-8 hygiene scan over the identity state dir, which would have caught a binary db — PASSES.
 
-Fixing these requires edits to `web/harness-hub/index.html` or to the check scripts — both outside
+Fixing these requires edits to `web/openhubforai/index.html` or to the check scripts — both outside
 this work's ownership, and the index.html fix is a product/design decision (wiring the old beacon
 client into the transplanted React surface) that the change-verification contract reserves for
 clear owner intent. Flagged for their owners.

@@ -19,7 +19,7 @@ network LLM calls, fake URLs, or overclaims.
 
 ## Current State To Trust Only After Proof
 
-- Source of truth: `dist/sites/openharness-design/shared/products.js`
+- Source of truth: `dist/sites/aidoneright-design/shared/products.js`
 - Current count: 24 design-family surfaces
 - Parent/product split: AI Done Right parent + Baltor + Teleon
 - OpenHubForAI count: 21 prototype surfaces
@@ -48,14 +48,14 @@ network LLM calls, fake URLs, or overclaims.
 - `docs/handoff/openhub-surface-counts.md`
 - `docs/architecture/service-auth-and-consumption-model.md`
 - `architecture/service_auth_consumption_model.json`
-- `dist/sites/openharness-design/START-HERE-CLAUDE-CODE.md`
-- `dist/sites/openharness-design/HANDOFF.md`
-- `dist/sites/openharness-design/CLAUDE-CODE.md`
-- `dist/sites/openharness-design/MARKETING.md`
-- `dist/sites/openharness-design/POSITIONING-AUDIT.md`
-- `dist/sites/openharness-design/BACKEND-STACK.md`
-- `dist/sites/openharness-design/UX-BACKLOG.md`
-- `dist/sites/openharness-design/screens/INDEX.md`
+- `dist/sites/aidoneright-design/START-HERE-CLAUDE-CODE.md`
+- `dist/sites/aidoneright-design/HANDOFF.md`
+- `dist/sites/aidoneright-design/CLAUDE-CODE.md`
+- `dist/sites/aidoneright-design/MARKETING.md`
+- `dist/sites/aidoneright-design/POSITIONING-AUDIT.md`
+- `dist/sites/aidoneright-design/BACKEND-STACK.md`
+- `dist/sites/aidoneright-design/UX-BACKLOG.md`
+- `dist/sites/aidoneright-design/screens/INDEX.md`
 
 ## Checks
 

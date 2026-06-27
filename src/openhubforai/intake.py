@@ -1,4 +1,4 @@
-"""src.openharnesshub.intake — OWNER-PROVIDED intake: feed raw materials you supply straight into a hub's lifecycle.
+"""src.openhubforai.intake — OWNER-PROVIDED intake: feed raw materials you supply straight into a hub's lifecycle.
 
 Two ways content reaches a hub (both governed; both serves_truth=False until the hub's verify gate passes):
   1. DISCOVERY (autonomous) — OpenClaw/Hermes + Teleon's keep_hub_fresh search public sources on the hubs cadence.
@@ -18,8 +18,8 @@ import json
 import re
 from typing import Callable, Iterable
 
-from src.openharnesshub.component_store import GLOBAL_TENANT
-from src.openharnesshub.hub_engine import HubEngine
+from src.openhubforai.component_store import GLOBAL_TENANT
+from src.openhubforai.hub_engine import HubEngine
 
 
 # ── OKF (Open Knowledge Format) parsing — markdown + YAML frontmatter, LOSSLESS (raw is always kept) ──────────

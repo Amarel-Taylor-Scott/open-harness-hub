@@ -65,7 +65,7 @@ Current parent display brand: **AI Done Right** (`aidoneright.dev`), tagline
 **"AI, done right."** The prior ContextIsEverything language is preserved as
 founding thesis and legacy path context, not as the parent display brand. The
 high-fidelity Claude Code Max handoff lives in
-`dist/sites/openharness-design/`: start with `START-HERE-CLAUDE-CODE.md`, then
+`dist/sites/aidoneright-design/`: start with `START-HERE-CLAUDE-CODE.md`, then
 `README.md`, `CLAUDE-CODE.md`, and `HANDOFF.md`.
 
 Current design-family snapshot: parent + **Baltor** + **Teleon** + **22

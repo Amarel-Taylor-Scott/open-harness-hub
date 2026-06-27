@@ -26,7 +26,7 @@ checks belong on the dedicated pages.
 ## Front-End Structure
 
 The static frontend is split into small modules under
-`web/harness-hub/admin-demo-assets/`:
+`web/openhubforai/admin-demo-assets/`:
 
 - `app.js`: route and event orchestration
 - `api.js`: HTTP calls to the demo run API
@@ -34,7 +34,7 @@ The static frontend is split into small modules under
 - `renderers.js`: UI rendering functions
 - `sample.js`: synthetic demo context
 
-`web/harness-hub/admin-demo.js` is only a module loader. This keeps the page
+`web/openhubforai/admin-demo.js` is only a module loader. This keeps the page
 easy to evolve without rebuilding the whole frontend stack.
 
 ## Export Endpoints

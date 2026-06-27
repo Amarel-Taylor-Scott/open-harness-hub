@@ -2,7 +2,7 @@
 """check_tool_registry — the deterministic-replacement registry (the moat) is real, governed, and license-disciplined.
 
 Proves: every tool maps to a declared tool-plane; ids are unique; license_class/vendorable are DERIVED from the single
-source (src/openharnesshub/licenses.classify_license), never hand-stored; COPYLEFT/NON-COMMERCIAL/UNSTATED licenses are
+source (src/openhubforai/licenses.classify_license), never hand-stored; COPYLEFT/NON-COMMERCIAL/UNSTATED licenses are
 technique-only (not vendorable — spot-checked on real AGPL/GPL entries); the planes with a dedicated registry
 (ocr/browser/llm) are intentionally NOT duplicated here; every populated plane has real coverage. serves_truth=false
 (discovery≠trust — candidates, not adopted). Prints per-plane coverage + the vendorable vs technique-only split.
@@ -15,7 +15,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from src.openharnesshub.licenses import classify_license
+from src.openhubforai.licenses import classify_license
 
 REPO = Path(__file__).resolve().parents[1]
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """scripts.check_oh_states_kit — PROOF for the shared empty/loading/error UX primitives
 (UX-BACKLOG P1 #3). oh-states.js is the vanilla token-only primitive loaded by the PRESERVED legacy
-front-end (web/harness-hub/legacy.html — kept lossless when the kit React SPA became the current
+front-end (web/openhubforai/legacy.html — kept lossless when the kit React SPA became the current
 surface). Static contract: the primitive is loaded by its host, exposes the three functions, each
 carries the right ARIA role, uses DESIGN TOKENS not hardcoded colors (S1), and escapes interpolated
 text (no injection). node --check syntax-gates the file when node is available.
@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-WEB = REPO_ROOT / "web" / "harness-hub"
+WEB = REPO_ROOT / "web" / "openhubforai"
 KIT = WEB / "oh-states.js"
 
 

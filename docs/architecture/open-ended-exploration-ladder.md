@@ -177,5 +177,5 @@ the hook is deferred so it lands as one clean, owner-reviewed edit to the live g
 - **no magic values** — every threshold/bucket/runtime id is a named constant or read from the single source
   (the agent-runtime catalog, the adaptation ladder).
 - **dependency law** — Teleon-layer code; imports only stdlib + `src.teleon`; never `src.baltor` /
-  `src.openharnesshub`.
+  `src.openhubforai`.
 ```

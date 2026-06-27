@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """scripts.check_adversarial_auth_all_realms — ADVERSARIAL signup/auth validation across EVERY
-front end's realm (parent + Baltor + Teleon + every LIVE Open*Hub), not just harness-hub.
+front end's realm (parent + Baltor + Teleon + every LIVE Open*Hub), not just openhubforai.
 
 The identity service backs every realm declared in architecture/identity_realm_registry.json (the
 single source — never hand-count the realms here); this hammers each one with the happy path AND

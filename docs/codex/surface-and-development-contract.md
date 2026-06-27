@@ -9,13 +9,13 @@
 > the **standardized 5-surface server `scripts/surface_server.py`** — one config-driven renderer, one byte-identical
 > light-theme stylesheet (accent + copy are the only per-surface variables), enforced by
 > `scripts/check_surface_server.py`. Its full design reference is **`docs/DESIGN-BIBLE.md`**. The `web/` React apps and
-> the `dist/sites/openharness-design/` bundle remain the protected, richer references (rule 1 still applies to them);
+> the `dist/sites/aidoneright-design/` bundle remain the protected, richer references (rule 1 still applies to them);
 > the surface_server is the live floor a generator must never shadow with a basic regen. `serves_truth = false`.
 
 ## 1. Surface source-of-truth — serve the BUILT-OUT surface, never a basic replacement
 - **Canonical, expensive, protected surfaces (NEVER remove, regress, or shadow with a basic regen):**
-  `web/{teleon,baltor,harness-hub,context-is-everything}` (the functional React apps — logins, Control Towers,
-  30+ guided demos), `dist/sites/openharness-design/` (the 3.2 MB high-fidelity design handoff), `FULLDESIGNDETAILS/`.
+  `web/{teleon,baltor,openhubforai,context-is-everything}` (the functional React apps — logins, Control Towers,
+  30+ guided demos), `dist/sites/aidoneright-design/` (the 3.2 MB high-fidelity design handoff), `FULLDESIGNDETAILS/`.
 - `dist/portfolio-public/*` (the 8–32 KB landing pages from `build_portfolio_sites.py`) is a **secondary marketing
   landing layer**, NOT the product. When demoing/serving/tunneling, lead with the **built-out** surfaces + the app
   servers (`:8000/:8001/:8003`), not the landing sites.

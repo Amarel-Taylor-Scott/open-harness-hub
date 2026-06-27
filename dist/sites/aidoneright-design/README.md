@@ -55,7 +55,7 @@ bench hubs render a **muted** accent + a "Private preview" banner until they ope
 | OpenCompressionHub | live | `#9bd61f` | `opencompressionhub/OpenCompressionHub Prototype.html` |
 | OpenBenchmarkHub | live | `#e0556a` | `openbenchmarkhub/OpenBenchmarkHub Prototype.html` |
 | OpenReviewHub | live | `#9d4edd` | `openreviewhub/OpenReviewHub Prototype.html` |
-| OpenHarnessHub | live | `#d2542f` | `openharnesshub/OpenHarnessHub Prototype.html` |
+| OpenHarnessHub | live | `#d2542f` | `openharnesshub/OpenHubForAI Prototype.html` |
 | OpenTemplatesHub | **private** | `#6d6a86`→`#7c5cff` | `opentemplateshub/OpenTemplatesHub Prototype.html` |
 | OpenEndpointHub | **private** | `#5f7585`→`#1f8fd6` | `openendpointhub/OpenEndpointHub Prototype.html` |
 | OpenEnvHub | **private** | `#5f7a6e`→`#2f9e5a` | `openenvhub/OpenEnvHub Prototype.html` |

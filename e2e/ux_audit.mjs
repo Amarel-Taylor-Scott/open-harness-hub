@@ -23,7 +23,7 @@ const SURFACES = [
   { id: 'parent', url: 'http://127.0.0.1:9101/' },
   { id: 'baltor', url: 'http://127.0.0.1:8001/' },
   { id: 'teleon', url: 'http://127.0.0.1:9210/teleon/' + encodeURIComponent('Teleon Prototype.html') },
-  { id: 'harness-hub', url: 'http://127.0.0.1:8000/' },
+  { id: 'openhubforai', url: 'http://127.0.0.1:8000/' },
   { id: 'control-tower', url: 'http://127.0.0.1:9000/' },
   ...HUBS.map((h) => ({ id: 'hub:' + h, url: `http://127.0.0.1:9210/${h}/${encodeURIComponent(h.replace(/^open/, 'Open').replace(/hub$/, 'Hub') + ' Prototype.html')}` })),
 ];

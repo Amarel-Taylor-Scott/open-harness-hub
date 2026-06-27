@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""scripts.check_auth_kit_realm_isolation — PROOF for src/openharnesshub/auth_kit (shared kit, separate realms).
+"""scripts.check_auth_kit_realm_isolation — PROOF for src/openhubforai/auth_kit (shared kit, separate realms).
 
 Owner decision (2026-06-09): completely SEPARATE and INDEPENDENT login / register / onboarding per product,
 but a SHARED kit (similar UI / backend elements). Asserts:
@@ -24,7 +24,7 @@ import json
 import re
 import sys
 
-from src.openharnesshub.auth_kit import DEFAULT_ONBOARDING_STEPS, STANDARD_FLOW, make_realm
+from src.openhubforai.auth_kit import DEFAULT_ONBOARDING_STEPS, STANDARD_FLOW, make_realm
 
 # a FAKE passphrase assembled from fragments (not a real secret; keeps scanners quiet)
 _SECRET = "-".join(("demo", "passphrase", "fragment"))

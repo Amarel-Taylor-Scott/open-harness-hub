@@ -5,7 +5,7 @@ Each product has its **own self-contained front-end folder**. Only the **backend
 `docs/strategy/two-services-shared-infrastructure.md`.
 
 Since 2026-06-10 each front-end IS the **full-design surface** transplanted from the design
-handoff bundle (`dist/sites/openharness-design/` — the spec, final fidelity), wired to the real
+handoff bundle (`dist/sites/aidoneright-design/` — the spec, final fidelity), wired to the real
 local backends. The transplant is **generated**:
 
 ```
@@ -23,9 +23,9 @@ as `legacy.html` (lossless), and every legacy functional page keeps its URL
 web/
   context-is-everything/   AI Done Right — parent portfolio site (cie-main.jsx + kit) +
                            Demo Control Tower.html (operator index over every surface).
-  harness-hub/             OpenHubForAI — full proto surface (~40 routes; proto-*.jsx) with the
+  openhubforai/             OpenHubForAI — full proto surface (~40 routes; proto-*.jsx) with the
                            logged-out funnel wired live: landing task → /api/build → real assembled
-                           flow in the preview (ohh-live.js seam; no fixture lift claims on live builds).
+                           flow in the preview (openhub-live.js seam; no fixture lift claims on live builds).
   baltor/                  Baltor — full ce-* surface (marketing + docs + app console + 25+ guided
                            demo/deep-dive pages) + the legacy live-ops pages, now working on this
                            origin through the seam proxy.
@@ -37,8 +37,8 @@ web/
 ```
 
 **How a product is served:** one server instance per product, picked by env —
-`OH_PRODUCT=harness-hub | baltor | context-is-everything` selects `web/<product>/` as the document
-root (`scripts/showcase/server.py`; default `harness-hub`). The backend (`/api/*`) is identical
+`OH_PRODUCT=openhubforai | baltor | context-is-everything` selects `web/<product>/` as the document
+root (`scripts/showcase/server.py`; default `openhubforai`). The backend (`/api/*`) is identical
 regardless, and every origin additionally serves:
 
 - `/vendor/*` — the pinned runtime (above);
@@ -64,5 +64,5 @@ regardless, and every origin additionally serves:
 Do **not** cross-import between the three front-end folders — common code belongs to the backend
 or arrives via the generated `kit/` copies (each app keeps its own byte-identical copy of the kit
 so it stays independently shippable; the `--check` gate keeps them in sync with the bundle).
-`dist/sites/openharness-design/DESIGN-CONTRACT.md` governs all design changes — transplant, don't
+`dist/sites/aidoneright-design/DESIGN-CONTRACT.md` governs all design changes — transplant, don't
 re-create; copy is verbatim; tokens are the only source of color.

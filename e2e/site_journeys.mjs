@@ -1,6 +1,6 @@
 /* e2e/site_journeys.mjs — record a SEPARATE full-journey video for EVERY website.
    Each site gets a tailored journey by kind:
-     · product-spa (harness-hub): real signup → onboard → build → integrate(key) → run → govern.
+     · product-spa (openhubforai): real signup → onboard → build → integrate(key) → run → govern.
      · product (baltor): landing → engine → stages → consume → trust → pricing.
      · hub (22 design-bundle hubs): landing → browse → open an entry → cases → docs → pricing → about.
      · static (parent, teleon, control-tower): landing walkthrough + primary CTA + sections.
@@ -26,7 +26,7 @@ const HUBS = [
   ['openoptimizationhub', 'OpenOptimizationHub'], ['openverificationhub', 'OpenVerificationHub'],
 ];
 const SITES = [
-  { id: 'harness-hub', kind: 'product-spa', base: 'http://127.0.0.1:8000' },
+  { id: 'openhubforai', kind: 'product-spa', base: 'http://127.0.0.1:8000' },
   { id: 'baltor', kind: 'product', base: 'http://127.0.0.1:8001' },
   { id: 'ai-done-right-parent', kind: 'static', base: 'http://127.0.0.1:9210/context-is-everything/' + encodeURIComponent('Context is Everything.html') },
   { id: 'teleon', kind: 'static', base: 'http://127.0.0.1:9210/teleon/' + encodeURIComponent('Teleon Prototype.html') },

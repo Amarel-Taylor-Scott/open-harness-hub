@@ -12,7 +12,7 @@ Current parent display brand: **AI Done Right** (`aidoneright.dev`), tagline
 **"AI, done right."** The prior ContextIsEverything language is preserved as
 founding thesis and legacy path context, not as the parent display brand. The
 high-fidelity Claude Code Max handoff lives in
-`dist/sites/openharness-design/`: start with `START-HERE-CLAUDE-CODE.md`, then
+`dist/sites/aidoneright-design/`: start with `START-HERE-CLAUDE-CODE.md`, then
 `README.md`, `CLAUDE-CODE.md`, and `HANDOFF.md`.
 
 Current design-family snapshot: parent + **Baltor** + **Teleon** + **22
@@ -43,7 +43,7 @@ Canonical portfolio architecture remains:
 ## Surfaces: serve the BUILT-OUT apps, never a basic replacement (read before touching any web surface)
 
 The 5 product surfaces are the full apps in `web/{context-is-everything (AI Done Right), teleon, baltor,
-harness-hub (OpenHubForAI), aidevobserver}`, served by the **showcase** (`OH_PRODUCT=<brand> python3 -m
+openhubforai (OpenHubForAI), aidevobserver}`, served by the **showcase** (`OH_PRODUCT=<brand> python3 -m
 scripts.showcase --port N` → `WEB_DIR=web/<OH_PRODUCT>`) over the shared kit (`web/<app>/kit/`), wired to the
 service-plane backends through same-origin **seams** (`/api/identity/`, `/registry/`, `/api/teleon/`,
 `/api/observer/`, …). Design system: `docs/DESIGN-BIBLE.md`. Frontend↔backend + local/cloud: `docs/INTEGRATION-BIBLE.md`.

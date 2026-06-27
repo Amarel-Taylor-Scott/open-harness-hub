@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-DIAG = REPO / "dist" / "sites" / "openharness-design" / "diagrams" / "component-flow.html"
+DIAG = REPO / "dist" / "sites" / "aidoneright-design" / "diagrams" / "component-flow.html"
 
 
 def self_test() -> int:

@@ -25,7 +25,7 @@ Pick **one** live vertical — sanctions screening (`docs/strategy/first-live-ca
 
 **2 most serious risks**
 1. **Scaffolding epidemic.** Hundreds of modules are empty shells or stubs: `src/baltor/processors/*/__init__.py`, `src/baltor/llm_gateway/*/__init__.py`, `src/baltor/adapters/memory/supermemory_api.py` ("CONTRACT STUB"), and `src/baltor/adapters/memory/supermemory_mcp.py` ("CONTRACT STUB"). The `src/baltor/workers/execution_backend_selector.py` and most of `src/baltor/purpose_tasks/` are literally re-export shims from Teleon. This is scaffolding dressed as architecture.
-2. **Registry maintenance drag.** 198 JSON registries in `architecture/` require manual curation. `src/openharnesshub/hub_engine.py` can run a flywheel, but there is no evidence of automated, high-volume population; the system is optimized for catalog completeness over customer throughput.
+2. **Registry maintenance drag.** 198 JSON registries in `architecture/` require manual curation. `src/openhubforai/hub_engine.py` can run a flywheel, but there is no evidence of automated, high-volume population; the system is optimized for catalog completeness over customer throughput.
 
 **1 concrete recommendation**
 Declare a 90-day "surface freeze" and run a stub purge: delete or demote to `archive/` every module that contains only a docstring and an `__init__.py`, and consolidate the Teleon re-export shims in `src/baltor/` back to their canonical home in `src/teleon/`. Start with `src/baltor/processors/__init__.py`, `src/baltor/llm_gateway/__init__.py`, and `src/baltor/workers/execution_backend_selector.py`.

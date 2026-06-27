@@ -60,8 +60,8 @@ LOCAL_EMULATORS: dict[str, dict] = {
         "emulator": "postgres container (real local Postgres in deploy_topology.json)",
         "kind": "container", "service": "postgres", "runnable_via": _BASE_COMPOSE},
     "auth + tenancy (separate realms)": {
-        "emulator": "identity container + src.openharnesshub.auth_kit (separate-realm auth, run locally)",
-        "kind": "container", "service": "identity", "module": "src.openharnesshub.auth_kit",
+        "emulator": "identity container + src.openhubforai.auth_kit (separate-realm auth, run locally)",
+        "kind": "container", "service": "identity", "module": "src.openhubforai.auth_kit",
         "runnable_via": _BASE_COMPOSE},
     "hosting deploy executed + verified": {
         "emulator": "the local compose/Tilt stack from deploy_topology.json IS the local hosting (teleon-runtime)",

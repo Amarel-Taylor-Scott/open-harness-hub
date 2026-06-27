@@ -43,7 +43,7 @@ from scripts.registry_local_service import (  # noqa: E402
 
 REG_PATH = REPO / "architecture" / "local_service_registry.json"
 REALM_REG = REPO / "architecture" / "identity_realm_registry.json"
-BUNDLE = REPO / "dist" / "sites" / "openharness-design"
+BUNDLE = REPO / "dist" / "sites" / "aidoneright-design"
 CLIENT = BUNDLE / "shared" / "oh-registry.js"
 HUB = BUNDLE / "shared" / "oh-hub.jsx"
 

@@ -28,7 +28,7 @@ THE INVARIANTS (mirrors every Teleon agent/research/swarm port):
     ``select_backend`` delegation) — it is NOT a second worker/agent framework.
 
 ARCHITECTURAL LAW (architecture/portfolio_dependency_law.json): Teleon-layer code. Imports only the stdlib +
-``src.teleon`` siblings — NEVER ``src.baltor`` / ``src.openharnesshub``. Deterministic when ``now`` is injected
+``src.teleon`` siblings — NEVER ``src.baltor`` / ``src.openhubforai``. Deterministic when ``now`` is injected
 (content-addressed ids; no RNG / no wall-clock). Doc: docs/architecture/open-ended-exploration-ladder.md.
 """
 from .ladder import (

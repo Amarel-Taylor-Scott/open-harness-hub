@@ -65,7 +65,7 @@ for *market confusion / trademark* — so:
 ## Where these names must appear consistently
 Master build prompt `prompts/teleon-runtime-master.md` · build kit `prompts/teleon-build-kit.md` · portfolio
 `docs/strategy/teleon-baltor-openharnesshub-portfolio.md` · dependency law
-`architecture/portfolio_dependency_law.json` · the `src/teleon/` + `src/openharnesshub/` package boundaries.
+`architecture/portfolio_dependency_law.json` · the `src/teleon/` + `src/openhubforai/` package boundaries.
 Code identifiers (`PurposeTaskSpec`, `architecture/capability_*.json`) do **not** churn on a brand decision.
 
 ## Verification log

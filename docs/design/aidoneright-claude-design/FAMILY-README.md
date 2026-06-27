@@ -2,7 +2,7 @@
 
 > **The handoff is three self-contained files. Upload these and you need nothing else from the repo:**
 > 1. `DESIGN-BIBLE.md` (the guide: tokens, type, every component, layouts, routes, governance, copy rules, the designer task)
-> 2. `docs/design/openharness-claude-design/DESIGN-ASSETS.md` (the actual SOURCE, verbatim: the full shared kit CSS and React components plus one complete app)
+> 2. `docs/design/aidoneright-claude-design/DESIGN-ASSETS.md` (the actual SOURCE, verbatim: the full shared kit CSS and React components plus one complete app)
 > 3. `INTEGRATION-BIBLE.md` (how the frontends talk to backends, local and cloud)
 >
 > If the guide says "see `oh-tokens.css`" or "the kit components", the full verbatim content is in DESIGN-ASSETS.md. Last reconciled 2026-06-26. serves_truth=false (the surfaces render candidate output; only Baltor's governed source serves truth). A BYO key is used only for the request, never stored.

@@ -33,7 +33,7 @@ const HUBS = {
   openverificationhub: 'OpenVerificationHub',
 };
 const ALL_SURFACES = [
-  ...harnessRoutes.map((r) => ({ id: 'harness-hub' + r, url: 'http://127.0.0.1:8000/#' + r })),
+  ...harnessRoutes.map((r) => ({ id: 'openhubforai' + r, url: 'http://127.0.0.1:8000/#' + r })),
   ...baltorRoutes.map((r) => ({ id: 'baltor' + (r === '/' ? '' : r), url: 'http://127.0.0.1:8001' + r })),
   { id: 'parent-site', url: 'http://127.0.0.1:9101/' },
   { id: 'control-tower', url: 'http://127.0.0.1:9000/' },

@@ -127,7 +127,7 @@ test surfaces only on dedicated pages.
 - `scripts/showcase/server.py` still owns shared static/generic showcase routing,
   but admin-demo API internals have been split into
   `scripts/showcase/admin_demo/routes.py`.
-- `web/harness-hub/styles/admin-demo.css` is too broad.
+- `web/openhubforai/styles/admin-demo.css` is too broad.
 - `scripts/context_workers/tasks.py` is approaching a worker monolith.
 - Some older docs still lead with component-factory scale instead of Baltor
   product focus. Treat those as substrate/history unless this doc points to

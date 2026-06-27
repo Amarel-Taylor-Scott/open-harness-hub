@@ -24,7 +24,7 @@ NEVER imports, pip-installs, or executes OpenClaw / Hermes / any third-party age
 CATALOG REFERENCES only (``architecture/agent_runtime_catalog.json``). Deterministic when ``now`` is injected.
 
 ARCHITECTURAL LAW: Teleon-layer code — stdlib + ``src.teleon`` siblings only; never ``src.baltor`` /
-``src.openharnesshub``.
+``src.openhubforai``.
 """
 from __future__ import annotations
 

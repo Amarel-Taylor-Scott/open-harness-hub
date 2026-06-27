@@ -18,11 +18,11 @@ A holding brand, **AI Done Right** (`aidoneright.dev`), over three product layer
 | **AI Done Right** | parent / holding brand + landing | - | `web/context-is-everything/` |
 | **Teleon** (`teleon.dev`) | the eval-gated, self-adaptive compute **runtime** (the optimizing compiler for autonomous work) | `src/teleon/` | `web/teleon/` |
 | **Baltor** (`baltor.ai`) | the applied, customer-facing **context** product, powered by Teleon | `src/baltor/` | `web/baltor/` |
-| **OpenHubForAI** (`openhubforai.io`) | the open **store** both products consume + the open CapabilityTask spec; ~240 reconciled registries | `src/teleon/registry/` | `web/harness-hub/` |
+| **OpenHubForAI** (`openhubforai.io`) | the open **store** both products consume + the open CapabilityTask spec; ~240 reconciled registries | `src/teleon/registry/` | `web/openhubforai/` |
 | **AIDevObserver** | reviews how a team uses AI coding agents (the SESSION, not the code) | `src/teleon/observer/` | `web/aidevobserver/` |
 
 > Folder names are legacy and decoupled from display brands ON PURPOSE: `web/context-is-everything/` serves
-> "AI Done Right"; `web/harness-hub/` serves "OpenHubForAI". This is intentional, not rot. Do not "fix" it.
+> "AI Done Right"; `web/openhubforai/` serves "OpenHubForAI". This is intentional, not rot. Do not "fix" it.
 > **Architectural law** (enforced, see §5): Baltor depends on Teleon depends on OpenHubForAI, never the reverse.
 
 ## 2. The one command that says if it is healthy
@@ -73,7 +73,7 @@ Each row: the contract, where it is defined/enforced, and what a violation looks
 | **Change-verification warrant** | `docs/codex/change-verification-contract.md` (+ its decision ledger) | a change with no cited warrant; a design/brand/strategy/pricing change made unilaterally (those need clear user intent) |
 | **Dependency law** | `scripts/check_portfolio_dependency_law.py` over `architecture/portfolio_dependency_law.json` | Teleon importing Baltor, or OpenHubForAI importing either (the arrow only points down) |
 | **Move, never delete** | `scripts/archive_legacy_docs.py`; `archive/legacy/_manifest.jsonl` + README | a superseded file deleted/untracked instead of moved to `archive/legacy/` with a status marker |
-| **Design bundle -> web port** | `scripts/port_full_design_to_web.py --check` | a `web/` file hand-edited out of sync with `dist/sites/openharness-design/` (it must match byte-for-byte) |
+| **Design bundle -> web port** | `scripts/port_full_design_to_web.py --check` | a `web/` file hand-edited out of sync with `dist/sites/aidoneright-design/` (it must match byte-for-byte) |
 | **Codegraph change-audit** | `scripts/codegraph.py --audit <file\|symbol>`; `docs/codex/codegraph-change-audit-protocol.md` | a changed API whose load-bearing callers were not updated in the same change |
 | **Scope guards** | code + review | real PII/secrets in the tree; `_reference/` republished; new insurance-vertical work |
 

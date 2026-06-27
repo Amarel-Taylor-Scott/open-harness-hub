@@ -1,6 +1,6 @@
 /* e2e/oh_experiments_beacon_probe.mjs — REAL-JS proof that the kit's experiment + analytics
    wiring beacons to the governed events plane. Loads the ACTUAL shipped kit files
-   (dist/sites/openharness-design/shared/oh-identity.js + oh-experiments.js) in a tiny browser
+   (dist/sites/aidoneright-design/shared/oh-identity.js + oh-experiments.js) in a tiny browser
    stub, drives OHExp exactly as the React SPA does (useExperiment → define/variant/exposure, then
    an attributed .track), and captures every beacon the site would send. Prints the captured
    payloads as JSON on stdout so the Python gate (scripts/check_events_beacon_wiring.py) can POST
@@ -13,7 +13,7 @@ import { dirname, join } from "node:path";
 import vm from "node:vm";
 
 const REPO = dirname(dirname(fileURLToPath(import.meta.url)));
-const SHARED = join(REPO, "dist", "sites", "openharness-design", "shared");
+const SHARED = join(REPO, "dist", "sites", "aidoneright-design", "shared");
 
 // ---- minimal browser stub (only what the two kit files touch) -------------------------------
 const captured = [];                              // every beacon body the site emits, in order

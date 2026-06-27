@@ -16,16 +16,16 @@ Read in this order:
 4. `docs/handoff/handoff-freshness.md`
 5. `docs/handoff/openhub-surface-counts.md`
 6. `docs/architecture/service-auth-and-consumption-model.md`
-7. `dist/sites/openharness-design/START-HERE-CLAUDE-CODE.md`
-8. `dist/sites/openharness-design/README.md`
-9. `dist/sites/openharness-design/HANDOFF.md`
-10. `dist/sites/openharness-design/CLAUDE-CODE.md`
-11. `dist/sites/openharness-design/MARKETING.md`
-12. `dist/sites/openharness-design/POSITIONING-AUDIT.md`
-13. `dist/sites/openharness-design/BACKEND-STACK.md`
-14. `dist/sites/openharness-design/UX-BACKLOG.md`
-15. `dist/sites/openharness-design/shared/products.js`
-16. `dist/sites/openharness-design/screens/INDEX.md`
+7. `dist/sites/aidoneright-design/START-HERE-CLAUDE-CODE.md`
+8. `dist/sites/aidoneright-design/README.md`
+9. `dist/sites/aidoneright-design/HANDOFF.md`
+10. `dist/sites/aidoneright-design/CLAUDE-CODE.md`
+11. `dist/sites/aidoneright-design/MARKETING.md`
+12. `dist/sites/aidoneright-design/POSITIONING-AUDIT.md`
+13. `dist/sites/aidoneright-design/BACKEND-STACK.md`
+14. `dist/sites/aidoneright-design/UX-BACKLOG.md`
+15. `dist/sites/aidoneright-design/shared/products.js`
+16. `dist/sites/aidoneright-design/screens/INDEX.md`
 
 Then inspect the Control Tower, parent site, Baltor, Teleon, all live hubs, all
 private bench hubs, the method-spine docs, and the production-readiness gap.

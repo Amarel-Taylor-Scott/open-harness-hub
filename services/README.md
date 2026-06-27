@@ -10,7 +10,7 @@ concern); a service `owns` scripts packages, it doesn't duplicate them. Canonica
 services/
   registry.yaml                  single source of truth: every service + tier + owned scripts/ pkgs + command
   products/
-    harness_hub/entrypoint.py        OpenHubForAI (request) — serves web/harness-hub/ (OH_PRODUCT pin)
+    harness_hub/entrypoint.py        OpenHubForAI (request) — serves web/openhubforai/ (OH_PRODUCT pin)
     baltor/entrypoint.py Baltor / Baltor (request) — serves web/baltor/
   platform/_shared/telemetry.py  the cross-cutting telemetry contract (logs · metrics · traces)
   worker/celery_app.py           opt-in Celery adapter for the async + scheduled tiers

@@ -13,7 +13,7 @@
 - **"Scaffolding epidemic" in ports/adapters:** kimi points to `src/baltor/adapters/memory/supermemory_api.py` being a "CONTRACT STUB" as evidence of an epidemic. In a port/adapter architecture, contract stubs *are* the architecture. They define the interface before the implementation. Demoting them to `archive/` would break the import structure and the very proof gates kimi praises.
 
 **What they got factually WRONG (or likely hallucinated):**
-- **"198 JSON registries require manual curation":** kimi claims there is no automated population, but then immediately cites `src/openharnesshub/hub_engine.py` which "can run a flywheel." If the hub engine exists, the registries are likely generated or validated by it. Claiming they are manually curated is a contradiction kimi didn't resolve.
+- **"198 JSON registries require manual curation":** kimi claims there is no automated population, but then immediately cites `src/openhubforai/hub_engine.py` which "can run a flywheel." If the hub engine exists, the registries are likely generated or validated by it. Claiming they are manually curated is a contradiction kimi didn't resolve.
 - **`_UnwiredCloudStore` as a "scale facade":** kimi flags `src/teleon/storage/record_store.py` having unwired Postgres placeholders as a risk. In a deterministic core design, local/in-memory stores are intentional for testing and local dev. The presence of an `_UnwiredCloudStore` class suggests the interface is defined and the cloud implementation is pending, not that the system is a "facade." kimi is conflating "not yet implemented in this repo" with "fake."
 
 **What they MISSED:**

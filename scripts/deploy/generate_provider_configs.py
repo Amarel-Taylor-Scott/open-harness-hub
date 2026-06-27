@@ -589,7 +589,7 @@ def check() -> int:
 def self_test() -> int:
     topo = load_topology()
     rendered = render_all(topo)
-    web = rendered[FLY_DIR / f"{fly_app_name(topo, 'web-harness-hub')}.fly.toml"]
+    web = rendered[FLY_DIR / f"{fly_app_name(topo, 'web-openhubforai')}.fly.toml"]
     identity = rendered[FLY_DIR / f"{fly_app_name(topo, 'identity')}.fly.toml"]
     worker = rendered[FLY_DIR / f"{fly_app_name(topo, 'worker')}.fly.toml"]
     compose = rendered[COMPOSE_PATH]

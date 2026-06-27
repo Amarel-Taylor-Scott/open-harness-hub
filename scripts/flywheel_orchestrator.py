@@ -165,8 +165,8 @@ def _fw_hubs(state: dict) -> dict:
     chromium JS scrape) + the strategy. The descent makes discovery cheaper over time; governed (verify gate serves)."""
     try:
         from scripts.hub_engine_runner import _engines, _tools, hub_query
-        from src.openharnesshub.discovery import OpenClaw, default_plugins
-        from src.openharnesshub.hub_settings import load_settings
+        from src.openhubforai.discovery import OpenClaw, default_plugins
+        from src.openhubforai.hub_settings import load_settings
         from src.teleon.hub_freshness import keep_hub_fresh
         oc = OpenClaw(default_plugins())
         hubs = sorted({p.target_hub for p in oc.plugins})

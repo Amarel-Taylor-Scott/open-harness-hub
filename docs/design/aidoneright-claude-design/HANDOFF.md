@@ -13,11 +13,11 @@ ONE config-driven server — **`scripts/surface_server.py`** — renders all **5
 **byte-identical** stylesheet (`_CSS_TEMPLATE`, ~7959 chars rendered); only the per-surface `--accent` and the copy
 differ. Light theme, **Inter** UI font (+ `ui-monospace` for code/labels). Enforced by
 `scripts/check_surface_server.py` (**122 assertions** — run it; the count is computed, never typed). The richer
-aspirational REFERENCE the canonical tokens derive from is the high-fidelity bundle `dist/sites/openharness-design/`
-(`dir-a · theme-light` palette in `dist/sites/openharness-design/shared/oh-tokens.css`).
+aspirational REFERENCE the canonical tokens derive from is the high-fidelity bundle `dist/sites/aidoneright-design/`
+(`dir-a · theme-light` palette in `dist/sites/aidoneright-design/shared/oh-tokens.css`).
 
 **The designer's job:** *elevate the live `surface_server` pages toward the richness of the
-`dist/sites/openharness-design/` bundle — WHILE keeping the byte-identical-CSS law.* You never style one surface; you
+`dist/sites/aidoneright-design/` bundle — WHILE keeping the byte-identical-CSS law.* You never style one surface; you
 edit `_CSS_TEMPLATE` once and it propagates to all 5. Full SAFE-vs-LOCKED map: `DESIGN-BIBLE.md` §11.
 
 ### The 5 surfaces (single source: `architecture/surface_capability_spec.json` → `scripts/_surface_accents.py`)
@@ -39,7 +39,7 @@ edit `_CSS_TEMPLATE` once and it propagates to all 5. Full SAFE-vs-LOCKED map: `
 1. **`DESIGN-BIBLE.md`** — the design system (tokens, type, components, routes, governance, SAFE-vs-LOCKED).
 2. **`scripts/surface_server.py`** — THE live renderer (`_CSS_TEMPLATE` + the `render_*` helpers).
 3. The **5 live URLs** above (or run `python3 scripts/surface_server.py <surface-id>` locally).
-4. **`dist/sites/openharness-design/`** — the richer bundle to elevate toward, and the source of the production React
+4. **`dist/sites/aidoneright-design/`** — the richer bundle to elevate toward, and the source of the production React
    kit. Start at `START-HERE-CLAUDE-CODE.md`, then `README.md`, `CLAUDE-CODE.md`, `HANDOFF.md`,
    `IMPLEMENTATION-GUIDANCE.md`, `BACKEND-STACK.md` (the detailed port steps + backend stack live there).
 5. **`docs/architecture/service-auth-and-consumption-model.md`** — service-to-service auth + consumption model.
@@ -54,7 +54,7 @@ prose. Recompute before editing docs, screenshots, or Control Tower copy:
 python3 scripts/check_ai_done_right_surface_family.py --self-test
 ```
 
-The bundle's `dist/sites/openharness-design/shared/products.js` is the single source for the wider registry roster.
+The bundle's `dist/sites/aidoneright-design/shared/products.js` is the single source for the wider registry roster.
 
 ## Baltor method spine
 

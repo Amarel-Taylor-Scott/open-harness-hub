@@ -15,7 +15,7 @@ import json
 from pathlib import Path
 
 from scripts import discovery_pipeline as P
-from src.openharnesshub.licenses import classify_license
+from src.openhubforai.licenses import classify_license
 
 REPO = Path(__file__).resolve().parents[1]
 

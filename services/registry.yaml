@@ -6,12 +6,12 @@
 # in scripts/ but no single service entrypoint yet (migrates incrementally — non-breaking).
 
 products:
-  - id: harness-hub
+  - id: openhubforai
     brand: OpenHubForAI
     tier: request
     status: active
-    web_root: web/harness-hub
-    env: { OH_PRODUCT: harness-hub }
+    web_root: web/openhubforai
+    env: { OH_PRODUCT: openhubforai }
     command: ["python", "-m", "scripts.showcase", "--port", "8000"]
     owns: [scripts/showcase]
     comms: { sync_reads: [retrieval, identity], enqueues: [foundry] }
@@ -36,7 +36,7 @@ products:
     owns: [scripts/showcase]
     comms: {}
     scale: { by: rps, min: 1 }
-    note: parent-brand mission landing (static; shares the backend, links to baltor + harness-hub)
+    note: parent-brand mission landing (static; shares the backend, links to baltor + openhubforai)
 
 platform:
   - id: ingestion
@@ -87,7 +87,7 @@ platform:
   - id: identity
     tier: request
     status: active
-    owns: [scripts/identity_local_service, src/openharnesshub/auth_kit]
+    owns: [scripts/identity_local_service, src/openhubforai/auth_kit]
     command: ["python", "-m", "scripts.identity_local_service", "--serve"]
     comms: {}
     scale: { by: rps, min: 1 }

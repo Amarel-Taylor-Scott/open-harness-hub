@@ -3,11 +3,12 @@
 CHANGE-AUDIT PROTOCOL — before AND after editing a file/symbol, run `PYTHONPATH=. python3 scripts/codegraph.py --audit <path-or-symbol>` and review its STRONG connections: the importers/callers that break if its API changes (ranked by strength = call-sites × resolution-confidence) plus its blast radius. Update the load-bearing neighbors in the SAME change; a high in-strength symbol is shared infrastructure — touch it deliberately.
 
 roots: src, scripts, local_emulators
-file layer: 1717 modules · 2254 import edges
-symbol layer: {'module': 1717, 'function': 7132, 'class': 633, 'method': 1758} · 11678 call edges (all confidently resolved; 5890 ambiguous dropped) · 68 inherits
+file layer: 1757 modules · 2329 import edges
+symbol layer: {'module': 1757, 'function': 7382, 'class': 692, 'method': 2003} · 12635 call edges (all confidently resolved; 5909 ambiguous dropped) · 81 inherits
 
 ## Most load-bearing symbols (weighted call in-degree — change carefully)
-  scripts.baltor_admin_demo_server.esc  in-strength 143.0 (16 callers)
+  scripts.check_surface_server.ck  in-strength 3535.0 (293 callers)
+  scripts.baltor_admin_demo_server.esc  in-strength 137.0 (14 callers)
   scripts.baltor_admin_demo_server.Handler.send_bytes  in-strength 89.0 (5 callers)
   scripts.db.factory_jsonl_bulk_copy._str  in-strength 87.0 (11 callers)
   scripts.runtime.schema_validator.validate_ref  in-strength 62.0 (26 callers)
@@ -19,9 +20,10 @@ symbol layer: {'module': 1717, 'function': 7132, 'class': 633, 'method': 1758} �
   scripts.foundry.scrapers.content_hash  in-strength 45.0 (32 callers)
   scripts.context_workers.common.stable_hash  in-strength 45.0 (31 callers)
   scripts.security.tenant_catalog.TenantPolicy  in-strength 41.0 (21 callers)
+  scripts.registry_local_service._Handler._send  in-strength 41.0 (5 callers)
   scripts.db.factory_jsonl_bulk_copy._empty_to_null  in-strength 40.0 (1 callers)
-  scripts.registry_local_service._Handler._send  in-strength 39.0 (5 callers)
-  src.teleon.workers.durable_fleet_ledger.DurableFleetLedger  in-strength 36.0 (20 callers)
+  scripts.surface_server.esc  in-strength 39.0 (10 callers)
+  src.teleon.workers.durable_fleet_ledger.DurableFleetLedger  in-strength 37.0 (21 callers)
   scripts.db.component_cdc_plan._str  in-strength 36.0 (9 callers)
   scripts.foundry.contracts.FoundryContext  in-strength 36.0 (14 callers)
   scripts.db.content_approval_plan._str  in-strength 34.0 (6 callers)
@@ -35,11 +37,9 @@ symbol layer: {'module': 1717, 'function': 7132, 'class': 633, 'method': 1758} �
   scripts.portfolio_lib._esc  in-strength 29.0 (4 callers)
   src.baltor.workers.supervisor_store.SupervisorStore  in-strength 28.0 (19 callers)
   scripts.foundry.scrapers.CannedFetcher  in-strength 28.0 (11 callers)
-  scripts.db.approved_component_promotion_plan._str  in-strength 28.0 (8 callers)
-  src.teleon.research.source_search.ToolHit  in-strength 27.0 (9 callers)
 
 ## Most-depended-on modules (file in-degree — wide blast radius)
-  scripts._config  (59 dependents)
+  scripts._config  (65 dependents)
   scripts.runtime.schema_validator  (40 dependents)
   scripts.security.tenant_catalog  (26 dependents)
   scripts.context_workers.registry  (22 dependents)
@@ -48,11 +48,12 @@ symbol layer: {'module': 1717, 'function': 7132, 'class': 633, 'method': 1758} �
   scripts.foundry.contracts  (20 dependents)
   src.baltor.workers.fleet_ledger  (20 dependents)
   scripts.db.catalog_row_source  (19 dependents)
+  src.teleon.experiments.ids  (18 dependents)
   scripts.context_events  (17 dependents)
   scripts.durable_store  (17 dependents)
   src.teleon.evolution.descent_attempt_store  (17 dependents)
   src.baltor.workers.supervisor_store  (16 dependents)
-  src.teleon.experiments.ids  (15 dependents)
+  src.teleon.storage.record_store  (15 dependents)
   scripts.emit._lib  (14 dependents)
   scripts.ingest.decompose_structured  (13 dependents)
   scripts.pipeline_runtime.specs  (13 dependents)
@@ -68,4 +69,3 @@ symbol layer: {'module': 1717, 'function': 7132, 'class': 633, 'method': 1758} �
   scripts.eval.reason_codes  (11 dependents)
   scripts.processors.deliver.escalate_human  (11 dependents)
   scripts.runtime.consumption  (11 dependents)
-  scripts.runtime.envelopes  (11 dependents)

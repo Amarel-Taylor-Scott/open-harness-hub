@@ -17,7 +17,7 @@ import json
 import sys
 from pathlib import Path
 
-from src.openharnesshub.licenses import classify_license
+from src.openhubforai.licenses import classify_license
 
 REPO = Path(__file__).resolve().parents[1]
 STAGING = REPO / "data" / "dev-intel" / "tool_registry_staging.jsonl"

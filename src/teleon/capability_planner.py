@@ -21,7 +21,7 @@ import re
 from dataclasses import dataclass, field
 
 # the open layer (allowed: teleon may_depend_on openharnesshub)
-from src.openharnesshub.research_catalog import descent_plan as research_descent_plan
+from src.openhubforai.research_catalog import descent_plan as research_descent_plan
 
 _ITERATIVE_HINTS = ("additional", "more ", "keep ", "continuous", "continually", "ongoing", "expand", "grow",
                     "all ", "until", "populate", "as many", "every ", "regularly", "over time", "accumulate")

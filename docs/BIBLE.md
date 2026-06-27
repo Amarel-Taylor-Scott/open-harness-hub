@@ -44,7 +44,7 @@ Group* → AI Done Right, 2026-06-09.) Canonical portfolio architecture:
 | **Teleon** | teleon.dev | purpose-driven, eval-gated, self-adaptive compute **runtime** | `web/teleon` | EFFICIENCY |
 | **AIDevObserver** | aidevobserver.io | watches AI **usage** — post-session review + intra-session coaching (renamed from *Teleon Observer* 2026-06-25) | `src/teleon/observer` (web demo built) | the WEDGE |
 | **Baltor** | baltor.ai | managed, verified, provable **context**, powered by Teleon (a tenant) | `web/baltor` | TRUTH |
-| **OpenHubForAI** | **OpenHubForAI.io** (ONE site) | the open **store** both products consume + the open CapabilityTask spec | `web/harness-hub` | the COMMONS |
+| **OpenHubForAI** | **OpenHubForAI.io** (ONE site) | the open **store** both products consume + the open CapabilityTask spec | `web/openhubforai` | the COMMONS |
 
 **Naming law:** product = Teleon; staff dashboard = Teleon Control Tower; customer dashboard = Capability Assurance
 Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc: `docs/strategy/teleon-naming-and-domain.md`.
@@ -56,7 +56,7 @@ Portal; object = **PurposeTask** (formal synonym **CapabilityTask**). Brand doc:
 - **Architectural dependency law** (enforced by `scripts/check_portfolio_dependency_law.py` over
   `architecture/portfolio_dependency_law.json`): **Baltor → Teleon → OpenHarnessHub, NEVER the reverse.** Teleon must
   never import Baltor; OpenHarnessHub imports neither. PurposeTask is **Teleon**, not a Baltor subsystem.
-- **Component flow** (diagram: `dist/sites/openharness-design/diagrams/component-flow.html`): components are published
+- **Component flow** (diagram: `dist/sites/aidoneright-design/diagrams/component-flow.html`): components are published
   to the OpenHubForAI store → the Teleon runtime SELECTS + PROVES them on real examples → Baltor SERVES them as verified
   context. Consumption flows up; dependency points down. AIDevObserver watches the usage.
 - **Hosting:** Teleon + Baltor deploy same region/private network (low latency) but stay **separable** (separate

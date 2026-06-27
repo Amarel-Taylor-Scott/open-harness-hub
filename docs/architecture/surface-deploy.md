@@ -15,16 +15,16 @@ shipped product. Design reference: `docs/DESIGN-BIBLE.md` (the UI); FE/BE seams 
 | `teleon` | Teleon.dev | `#6d5ef0` | teleon.dev | |
 | `baltor` | Baltor.ai | `#0e7c86` | baltor.ai | |
 | `aidevobserver` | AIDevObserver | `#b25fd6` | aidevobserver.dev | |
-| `harness-hub` | OpenHubForAI | `#3b6fd4` | openhubforai.io | carries the faceted `/browse` |
+| `openhubforai` | OpenHubForAI | `#3b6fd4` | openhubforai.io | carries the faceted `/browse` |
 
 Each app is its own entry HTML + brand main file (for example `web/teleon/index.html` + `web/teleon/teleon-main.jsx`);
-the backend (`/api/*`, the engine, the catalog) is shared. `OH_PRODUCT` defaults to `harness-hub`.
+the backend (`/api/*`, the engine, the catalog) is shared. `OH_PRODUCT` defaults to `openhubforai`.
 
 ## Config (env or args)
 
 | Knob | Env | Arg | Default |
 |---|---|---|---|
-| surface | `OH_PRODUCT` | (none) | `harness-hub` |
+| surface | `OH_PRODUCT` | (none) | `openhubforai` |
 | port | (none) | `--port` | `8000` |
 | bind host | `OH_BIND_HOST` | (none) | `127.0.0.1` (set `0.0.0.0` in container deploys) |
 | seam backends | `OH_SEAM_*_BASE` | (none) | local service ports (see `docs/INTEGRATION-BIBLE.md`) |
@@ -34,7 +34,7 @@ the backend (`/api/*`, the engine, the catalog) is shared. `OH_PRODUCT` defaults
 ```bash
 OH_PRODUCT=baltor python3 -m scripts.showcase --port 8001     # one surface (the full web/baltor app)
 # all 5: run each on its own port, then tunnel each:
-for s in context-is-everything:8002 teleon:8003 baltor:8001 aidevobserver:8110 harness-hub:8130; do
+for s in context-is-everything:8002 teleon:8003 baltor:8001 aidevobserver:8110 openhubforai:8130; do
   OH_PRODUCT=${s%%:*} nohup python3 -m scripts.showcase --port ${s##*:} >/dev/null 2>&1 &
 done
 ```

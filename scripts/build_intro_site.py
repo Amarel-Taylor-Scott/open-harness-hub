@@ -36,8 +36,8 @@ def counts() -> dict:
         c["proofs"] = 0
     # the full 22-hub roster (id + slug) — the canonical list the hubs page links to (single-sourced from the engine)
     try:
-        from src.openharnesshub.hub_engine import hub_specs
-        from src.openharnesshub.hub_site import slugify
+        from src.openhubforai.hub_engine import hub_specs
+        from src.openhubforai.hub_site import slugify
         c["hub_list"] = [{"id": s.hub_id, "slug": slugify(s.hub_id), "kind": s.component_kind, "tier": s.tier}
                          for s in hub_specs()]
     except Exception:  # noqa: BLE001

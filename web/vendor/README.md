@@ -1,6 +1,6 @@
 # web/vendor — pinned front-end runtime (single copy, served at /vendor/)
 
-The full-design surfaces (ported from `dist/sites/openharness-design/`, see
+The full-design surfaces (ported from `dist/sites/aidoneright-design/`, see
 `scripts/port_full_design_to_web.py`) run exactly like the design prototypes:
 React UMD + in-browser Babel, **no build step**. The prototypes load these from
 unpkg; the web/ apps load them from `/vendor/` (served by
@@ -8,7 +8,7 @@ unpkg; the web/ apps load them from `/vendor/` (served by
 behind tunnels with no CDN dependency.
 
 Pinned files — versions and integrity MUST match the design bundle's `<script>`
-tags (`dist/sites/openharness-design/*/​*.html`); verified at download time:
+tags (`dist/sites/aidoneright-design/*/​*.html`); verified at download time:
 
 | File | Source | sha384 |
 |---|---|---|
@@ -21,4 +21,4 @@ Re-verify: `openssl dgst -sha384 -binary <file> | openssl base64 -A`
 Development (not production) React builds are intentional — they are what the
 design prototypes pin, and the parity gate compares against prototype behavior.
 Precompiled-JSX production tooling is a later, separate step
-(`dist/sites/openharness-design/IMPLEMENTATION-GUIDANCE.md` “judgment calls”).
+(`dist/sites/aidoneright-design/IMPLEMENTATION-GUIDANCE.md` “judgment calls”).

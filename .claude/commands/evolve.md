@@ -19,7 +19,7 @@ tunnels), and `/polish` (app), choosing among them by where the platform is weak
    (what you did last — the durable memory across runs) + recent `git log`.
 
 ## The platform you're evolving (two products, one backend)
-- **OpenHubForAI** — *bounded*: build + monitor governed pipelines (DAG + lift gate). `web/harness-hub/`, ember.
+- **OpenHubForAI** — *bounded*: build + monitor governed pipelines (DAG + lift gate). `web/openhubforai/`, ember.
 - **Baltor** — *unbounded*: governed **context enrichment + context management** for
   agents. **Enrichment is the novel wedge** (raw→compressed→hyper-efficient tiers · structural/learned
   compression · distillation · the *measured-fidelity-per-tier* guarantee). **Management** is the

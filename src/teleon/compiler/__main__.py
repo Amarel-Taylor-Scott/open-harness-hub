@@ -584,11 +584,11 @@ def self_test() -> int:  # noqa: C901 — a flat checklist is clearer here than 
     # temp dir so the real dist/local-services-state/teleon-compiler state is never touched by the self-test.
     _registry_checks(checks)
 
-    # 12. dependency law: this package imports nothing from src.baltor / src.openharnesshub. Scan only the IMPORT
+    # 12. dependency law: this package imports nothing from src.baltor / src.openhubforai. Scan only the IMPORT
     # directives (import/from lines), so a literal mention in a comment/string — like this very check — is not a
     # false positive. Branch on the forbidden layer roots, never on a brand display name. _r (registry) is included
     # so the new module's imports (it pulls scripts._jsonl_store — tooling, not a brand layer) are covered too.
-    forbidden_roots = ("src.baltor", "src.openharnesshub")
+    forbidden_roots = ("src.baltor", "src.openhubforai")
     pkg_init = importlib.import_module("src.teleon.compiler")
     import_lines: list[str] = []
     for m in (_c, _e, _f, _r, pkg_init, sys.modules[__name__]):
@@ -597,7 +597,7 @@ def self_test() -> int:  # noqa: C901 — a flat checklist is clearer here than 
             if s.startswith(("import ", "from ")):
                 import_lines.append(s)
     law_clean = not any(root in line for root in forbidden_roots for line in import_lines)
-    checks.append(("dependency law: no src.baltor / src.openharnesshub import directive anywhere in the package",
+    checks.append(("dependency law: no src.baltor / src.openhubforai import directive anywhere in the package",
                    law_clean))
 
     failed = [name for name, ok in checks if not ok]

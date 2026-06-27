@@ -1,4 +1,4 @@
-"""src.openharnesshub.auth_kit.realm — the SHARED auth/identity kit: separate, INDEPENDENT realms per product.
+"""src.openhubforai.auth_kit.realm — the SHARED auth/identity kit: separate, INDEPENDENT realms per product.
 
 Owner decision (2026-06-09): "completely separate and independent logins / register / onboarding, but we can
 have similar UI / backend elements." This kit is the SHARED building block — ONE set of flow shapes + object

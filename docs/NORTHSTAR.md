@@ -13,7 +13,7 @@ A holding company, **AI Done Right** (`aidoneright.dev`, "AI, done right."), ove
 | **Teleon.dev** | the purpose-driven, eval-gated, self-adaptive compute **runtime** | `web/teleon` |
 | **AIDevObserver** | watches AI **usage** — reviews the SESSION (post) + helps intra-session (renamed from *Teleon Observer* 2026-06-25) | `src/teleon/observer` (web surface + demo queued) |
 | **Baltor.ai** | managed, verified, provable **context**, powered by Teleon | `web/baltor` |
-| **OpenHubForAI** | the open **store** both products consume + the open CapabilityTask spec | `web/harness-hub` |
+| **OpenHubForAI** | the open **store** both products consume + the open CapabilityTask spec | `web/openhubforai` |
 
 **Architectural law** (enforced by `scripts/check_portfolio_dependency_law.py`): Baltor → Teleon → OpenHarnessHub,
 **never the reverse**. Naming/architecture detail: `docs/strategy/teleon-baltor-openharnesshub-portfolio.md` (canonical,
@@ -25,7 +25,7 @@ unchanged). Foundational law (the four filters): `architecture/substrate_layers.
   HTML / CSS / fonts — the shared kit (`shared/oh-site.jsx` + `oh-tokens/components/site.css`) — and differ ONLY in
   color scheme + copy. Enforced by `check_northstar_design` (kit-consistency). AIDevObserver still needs its shared-kit
   surface (today it has a standalone functional `/demo` only).
-- The high-fidelity **design source `dist/sites/openharness-design/` is now TRACKED in git** (was caught by `/dist/*`
+- The high-fidelity **design source `dist/sites/aidoneright-design/` is now TRACKED in git** (was caught by `/dist/*`
   ignore → root cause of recurring "the design is gone"). It is the source `port_full_design_to_web.py` ports → `web/`.
 - One launcher landing page: `scripts/landing_server.py` → reads live tunnel URLs per request → one URL, all pillars.
 - Every surface gets a guided **`/demo`** (owner-directed). Prototypes are hash-routed (`useHashRoute()`).

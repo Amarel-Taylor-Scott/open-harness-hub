@@ -33,13 +33,13 @@ def keep_hub_fresh(hub: str, intent: str, *, hub_engines: dict, openclaw, tools:
     """
     # 0. resolve the SETTINGS PLANE (enabled / tool allowlist / rate limit / auto-verify / freshness bar)
     if settings is None:
-        from src.openharnesshub.hub_settings import load_settings
+        from src.openhubforai.hub_settings import load_settings
         settings = load_settings(hub)
     if not settings.enabled:
         return {"hub": hub, "intent": intent, "skipped": True, "reason": "disabled in hub_settings",
                 "discovered": 0, "ingested": 0, "verified": 0, "unbounded_cost": 0, "bounded_tool": None,
                 "bounded_cost": 0, "pct_saved": 0.0, "serves_truth": False}
-    from src.openharnesshub.hub_settings import tools_for
+    from src.openhubforai.hub_settings import tools_for
     tools = tools_for(settings, tools)                       # honor the per-hub tool allowlist
     if freshness_floor is None:
         freshness_floor = settings.freshness_bar

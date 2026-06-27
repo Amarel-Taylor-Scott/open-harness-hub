@@ -3,7 +3,7 @@
 The open, free **funnel** product: build governed harnesses (composed pipelines of
 primitives) and consume Baltor's verified context. Hash-routed React SPA, ~43 routes.
 
-Entry: **`OpenHarnessHub Prototype.html`** → open in a browser.
+Entry: **`OpenHubForAI Prototype.html`** → open in a browser.
 
 ## Read these first
 - **`PAGES.md`** — the canonical route → purpose catalog (every page).

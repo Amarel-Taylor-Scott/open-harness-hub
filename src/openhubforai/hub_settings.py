@@ -1,4 +1,4 @@
-"""src.openharnesshub.hub_settings — the SETTINGS PLANE for populating each Open*Hub (typed per-hub settings objects).
+"""src.openhubforai.hub_settings — the SETTINGS PLANE for populating each Open*Hub (typed per-hub settings objects).
 
 Per hub, the OPERATIONAL policy (the knobs an operator sets): enabled · cadence · rate_limit_per_cycle · tool_allowlist
 · auto_verify · visibility. These MERGE with `architecture/hub_population_strategy.json` (sources + freshness/verify

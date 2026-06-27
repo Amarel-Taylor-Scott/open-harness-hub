@@ -1,4 +1,4 @@
-"""src.openharnesshub.hub_site — ONE standardized Open*Hub page template rendered for all 22 surfaces.
+"""src.openhubforai.hub_site — ONE standardized Open*Hub page template rendered for all 22 surfaces.
 
 Every Open*Hub gets the SAME branded layout + the SAME sections (so the surfaces are consistent, not 22 bespoke pages):
   1. hero          — Open*Hub eyebrow · hub name · what it stores · a governance badge
@@ -90,7 +90,7 @@ def render_hub_page(hub_id: str, *, content_kind: str = "components", one_liner:
         f"<h2>Substrate</h2><p class=muted>Opt-in contributions + the usage funnel (<b>{sig}</b> signals) feed "
         f"<b>{consumed}</b> — the hub imports neither (dependency law). Your private versions stay private until you contribute.</p>"
         "<p class=mono muted style='font-size:12px;margin-top:40px;color:#9aa'>One standardized template "
-        "(src/openharnesshub/hub_site.py) renders all 22 Open*Hub surfaces. Populated by OpenClaw/Hermes + "
+        "(src/openhubforai/hub_site.py) renders all 22 Open*Hub surfaces. Populated by OpenClaw/Hermes + "
         "keep_hub_fresh + generators + owner --ingest.</p>"
         "</div></body></html>\n")
 

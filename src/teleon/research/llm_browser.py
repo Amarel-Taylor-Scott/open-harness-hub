@@ -3,7 +3,7 @@
 The expensive tier of the research descent, made real: a low-cost LLM drives a headless browser EFFICIENTLY — render a
 page, ask the cheap model to extract the target field, and if it isn't there pick the single most-promising link and go
 one level deeper — STOPPING as soon as the field is found, with hard caps on steps and tokens. This is selected by
-``src/openharnesshub/research_catalog.select_component`` ONLY when a runner needs deep_detail/js_render/interaction that
+``src/openhubforai/research_catalog.select_component`` ONLY when a runner needs deep_detail/js_render/interaction that
 cheaper feed/api tiers can't get (and only when affordable + the runtime is present).
 
 Ports are INJECTED (so it's offline-testable + honest):

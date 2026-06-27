@@ -6,7 +6,7 @@
 > documented in **`docs/DESIGN-BIBLE.md`** — read those for current truth; the body below is the 2026-06-10 record
 > (its "Dark OK" columns describe that earlier transplant, not the current light-theme surfaces). `serves_truth = false`.
 
-Date: 2026-06-10 · Per `dist/sites/openharness-design/DESIGN-CONTRACT.md` Rule 7/9.
+Date: 2026-06-10 · Per `dist/sites/aidoneright-design/DESIGN-CONTRACT.md` Rule 7/9.
 Implementation: `scripts/port_full_design_to_web.py` (deterministic transplant + `--check` drift
 gate) · seams: `scripts/showcase/server.py` · verification: `e2e/full_design_apps.mjs`
 (27/27 checks green; screenshots in `e2e/artifacts/full-design/`).
@@ -23,7 +23,7 @@ cross-surface link in the verbatim code resolves; the Demo Control Tower indexes
 | AI Done Right (web/context-is-everything) | 01 + live prototype | ✓ (single-page + tower) | ✓ | ✓ (kit byte-identical) | ✓ (kit toggle) | ✓ | ✓ |
 | Demo Control Tower (served from parent origin) | 02 + live prototype | ✓ | ✓ | ✓ | n/a (dark surface) | ✓ | ✓ |
 | Baltor.ai (web/baltor) | 03 + live prototype | ✓ 12/12 sampled (marketing + console + kit pages) | ✓ | ✓ | ✓ (kit toggle) | ✓ | ✓ |
-| OpenHarnessHub (web/harness-hub) | 13 (broken — see D3) + live prototype | ✓ 8/8 sampled | ✓ | ✓ | ✓ (`ohp-mode` override, as prototype) | ✓ | ✓ |
+| OpenHarnessHub (web/openhubforai) | 13 (broken — see D3) + live prototype | ✓ 8/8 sampled | ✓ | ✓ | ✓ (`ohp-mode` override, as prototype) | ✓ | ✓ |
 
 Wired (REAL, with honest fallback when a service is down — the kit never fabricates state):
 
@@ -77,7 +77,7 @@ Wired (REAL, with honest fallback when a service is down — the kit never fabri
 
 - **OHH browse/detail wired to the REAL registry**: `/api/components` now carries the catalog
   YAMLs' real governance fields (license/lifecycle/industry/modality/provenance — 2,664 rows,
-  cached with a locked background pre-warm); `ohh-live.js` hydrates the design's
+  cached with a locked background pre-warm); `openhub-live.js` hydrates the design's
   COMPONENTS/BY_SLUG globals (2,411 rows, 1,771 components + pipelines) with recorded re-render
   patches. Honesty patches: live pipelines without measured lift render “— unproven” (the fixture
   default would have fabricated `+0.40`), provenance/cost cells show real values or “—”.

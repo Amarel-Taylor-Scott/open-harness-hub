@@ -12,7 +12,7 @@ dead links, expose no secrets/keys/customer-data/private-memory/raw-receipts. ST
 The literal `openharness/` tree referenced by the original spec is NOT in this working copy. The real surfaces are
 **`web/baltor/*.html`** (index, guided-demos, context-stages, reconciliation/optimization/receipts surfaces,
 determinism, inference-plane, temporal-graph, memory, native, hub, how-it-works, dashboard, …) with tokens at
-`web/baltor/kit/oh-tokens.css` and the canonical design spec at `docs/DESIGN-BIBLE.md` + `docs/design/openharness-claude-design/`. ADAPT here.
+`web/baltor/kit/oh-tokens.css` and the canonical design spec at `docs/DESIGN-BIBLE.md` + `docs/design/aidoneright-claude-design/`. ADAPT here.
 **No browser tool in the headless loop** → the mandated 1280/390 SCREENSHOT + console verification is NOT possible
 headless; new *visual* surfaces (increment A) are therefore **HELD** in headless runs (mark the reason). Do the
 STATICALLY-verifiable increments (audit/polish/copy-guardrail/link-resolution/token-usage) and run the existing

@@ -6,7 +6,7 @@ non-promoted candidate for the refusal test) that the self-test and the ``--comp
 is exercisable with no live runtime.
 
 Reading the LIVE runtime state lives in the sibling ``live_capability`` module (a *fixtures* module shouldn't do
-production live-state I/O). stdlib only; no ``src.baltor`` / ``src.openharnesshub`` import.
+production live-state I/O). stdlib only; no ``src.baltor`` / ``src.openhubforai`` import.
 """
 from __future__ import annotations
 

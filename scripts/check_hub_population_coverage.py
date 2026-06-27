@@ -75,7 +75,7 @@ def check(conn: Path = CONN, strat: Path = STRAT) -> list[str]:
     # settings must resolve for every roster hub (the settings plane covers all)
     try:
         sys.path.insert(0, str(REPO))
-        from src.openharnesshub.hub_settings import load_settings
+        from src.openhubforai.hub_settings import load_settings
         for hub in roster:
             st = load_settings(hub)
             if st.validate():
@@ -85,7 +85,7 @@ def check(conn: Path = CONN, strat: Path = STRAT) -> list[str]:
 
     # the wired set the check expects must match what generators actually wires (no drift)
     try:
-        from src.openharnesshub.generators import _WIRED
+        from src.openhubforai.generators import _WIRED
         if set(_WIRED) != _WIRED_EXPECTED:
             problems.append(f"generators._WIRED {sorted(_WIRED)} != expected {sorted(_WIRED_EXPECTED)} (update this check)")
     except Exception as e:  # noqa: BLE001

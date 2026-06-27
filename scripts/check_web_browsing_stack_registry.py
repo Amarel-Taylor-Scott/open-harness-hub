@@ -21,7 +21,7 @@ if str(REPO) not in sys.path:
 
 
 def _self_test() -> int:
-    from src.openharnesshub.browsing_registry import load_registry, browser_view, coverage, select_stack
+    from src.openhubforai.browsing_registry import load_registry, browser_view, coverage, select_stack
     fails = []
     def ck(n, ok, d=""):
         print(f"  [{'ok' if ok else 'FAIL'}] {n}{(': ' + d) if d and not ok else ''}")

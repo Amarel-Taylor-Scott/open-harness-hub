@@ -19,7 +19,7 @@ don't trace pixels from the PNGs (open the live HTML for exact spacing/interacti
 | 10 | `10-opencompressionhub.png` | OpenCompressionHub (live) | `opencompressionhub/OpenCompressionHub Prototype.html` |
 | 11 | `11-openbenchmarkhub.png` | OpenBenchmarkHub (live) | `openbenchmarkhub/OpenBenchmarkHub Prototype.html` |
 | 12 | `12-openreviewhub.png` | OpenReviewHub (live) | `openreviewhub/OpenReviewHub Prototype.html` |
-| 13 | `13-openharnesshub.png` | OpenHarnessHub (live · bespoke pt-*) | `openharnesshub/OpenHarnessHub Prototype.html` |
+| 13 | `13-openharnesshub.png` | OpenHarnessHub (live · bespoke pt-*) | `openharnesshub/OpenHubForAI Prototype.html` |
 | 14 | `14-opentemplateshub-private.png` | OpenTemplatesHub (**private bench**) | `opentemplateshub/OpenTemplatesHub Prototype.html` |
 | 15 | `15-openendpointhub-private.png` | OpenEndpointHub (**private bench**) | `openendpointhub/OpenEndpointHub Prototype.html` |
 | 16 | `16-openenvhub-private.png` | OpenEnvHub (**private bench**) | `openenvhub/OpenEnvHub Prototype.html` |

@@ -22,12 +22,12 @@ Claude Code Max, Codex, or another coding agent.
 
 Authoritative sources:
 
-- `dist/sites/openharness-design/shared/products.js`
-- `dist/sites/openharness-design/README.md`
-- `dist/sites/openharness-design/START-HERE-CLAUDE-CODE.md`
-- `dist/sites/openharness-design/HANDOFF.md`
-- `dist/sites/openharness-design/CLAUDE-CODE.md`
-- `dist/sites/openharness-design/screens/INDEX.md`
+- `dist/sites/aidoneright-design/shared/products.js`
+- `dist/sites/aidoneright-design/README.md`
+- `dist/sites/aidoneright-design/START-HERE-CLAUDE-CODE.md`
+- `dist/sites/aidoneright-design/HANDOFF.md`
+- `dist/sites/aidoneright-design/CLAUDE-CODE.md`
+- `dist/sites/aidoneright-design/screens/INDEX.md`
 - `.agent/aidoneright-current-state-verification.json`
 
 ## Required Transfer Contents

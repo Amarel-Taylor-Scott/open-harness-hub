@@ -32,7 +32,7 @@ def _exists(*rel: str) -> bool:
 
 
 def _probe_surfaces() -> tuple[bool, str, str]:
-    want = {"Teleon site": "web/teleon", "Baltor site": "web/baltor", "design bundle": "dist/sites/openharness-design"}
+    want = {"Teleon site": "web/teleon", "Baltor site": "web/baltor", "design bundle": "dist/sites/aidoneright-design"}
     missing = [name for name, p in want.items() if not (REPO / p).exists()]
     ok = not missing
     return ok, (f"{len(want) - len(missing)}/{len(want)} demo-able surfaces present"), \

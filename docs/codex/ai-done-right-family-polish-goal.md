@@ -43,10 +43,10 @@ architecture into a production-ready implementation brief:
 12. `docs/BIBLE.md` (north star)
 13. `docs/DESIGN-BIBLE.md` (the UI: shared kit `web/<brand>/kit` + the showcase renderer, light theme + Inter)
 14. `docs/INTEGRATION-BIBLE.md` (FE↔BE seams + deploy)
-15. `docs/design/openharness-claude-design/START-HERE.md`
-16. `docs/design/openharness-claude-design/README.md`
-17. `dist/sites/openharness-design/README.md` (the richer reference bundle)
-18. `dist/sites/openharness-design/Design Acceptance Scorecard.html` (the branded-house gate)
+15. `docs/design/aidoneright-claude-design/START-HERE.md`
+16. `docs/design/aidoneright-claude-design/README.md`
+17. `dist/sites/aidoneright-design/README.md` (the richer reference bundle)
+18. `dist/sites/aidoneright-design/Design Acceptance Scorecard.html` (the branded-house gate)
 
 Focused proof:
 
@@ -54,7 +54,7 @@ Focused proof:
 python3 scripts/check_ai_done_right_surface_family.py --self-test
 ```
 
-This reads `dist/sites/openharness-design/shared/products.js`, verifies the
+This reads `dist/sites/aidoneright-design/shared/products.js`, verifies the
 product/open/private layer split, confirms the 9 live OpenHubForAI registries, 12 private
 bench hubs, five Baltor method hubs, and checks that every referenced prototype
 HTML exists.

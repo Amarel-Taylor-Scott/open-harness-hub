@@ -191,7 +191,7 @@ Build or improve clear pages/guides for:
 
 1. Split monoliths:
    - `scripts/showcase/server.py`
-   - `web/harness-hub/styles/admin-demo.css`
+   - `web/openhubforai/styles/admin-demo.css`
    - `scripts/context_workers/tasks.py`
 2. Improve the admin demo, source sync pages, processing pages, output pages,
    and downloadable package flows.
@@ -232,9 +232,9 @@ Build or improve clear pages/guides for:
 Use the smallest meaningful check set:
 
 ```bash
-node --check web/harness-hub/admin-demo.js
-node --check web/harness-hub/admin-demo-assets/app.js
-node --check web/harness-hub/admin-demo-assets/renderers.js
+node --check web/openhubforai/admin-demo.js
+node --check web/openhubforai/admin-demo-assets/app.js
+node --check web/openhubforai/admin-demo-assets/renderers.js
 python3 -m py_compile scripts/showcase/server.py
 python3 -m py_compile scripts/context_workers/*.py
 python3 -m scripts.context_workers.runner --self-test

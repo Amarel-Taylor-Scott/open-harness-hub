@@ -135,7 +135,7 @@ python -m src.teleon.compiler --state-dir <dir>        # override the state dir 
   silently folding to a wrong unit.
 - **Dependency law:** Teleon-layer code — stdlib + `src.teleon` siblings + `scripts` tooling
   (`scripts._jsonl_store`, an offline durability engine, **not** a brand layer). It never imports `src.baltor` /
-  `src.openharnesshub` (proven by the compiler `--self-test` import scan **and**
+  `src.openhubforai` (proven by the compiler `--self-test` import scan **and**
   `scripts/check_portfolio_dependency_law.py --self-test`).
 
 ## Tests (run `python -m src.teleon.compiler --self-test` — `PASS — 62/62`)

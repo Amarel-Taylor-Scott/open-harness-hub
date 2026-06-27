@@ -46,7 +46,7 @@ LAWS:
 ARCHITECTURAL LAW — Teleon-layer code: imports only stdlib + ``src.teleon`` siblings + ``scripts`` tooling
 (``scripts._jsonl_store`` — an offline durability engine, NOT a brand layer; ``src/teleon`` already depends on
 ``scripts.*`` in ``compiler/live_capability.py`` and ``experiments/*``). It never imports ``src.baltor`` /
-``src.openharnesshub`` (the portfolio dependency law; proven by ``--self-test`` and
+``src.openhubforai`` (the portfolio dependency law; proven by ``--self-test`` and
 ``scripts/check_portfolio_dependency_law.py``).
 """
 from __future__ import annotations

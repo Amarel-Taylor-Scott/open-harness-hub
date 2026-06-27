@@ -25,16 +25,16 @@ from scripts.showcase.pages import BROWSE_HTML, HTML
 # the classic paste-to-flow UI stays reachable at /classic. See web/README.md.
 # A server instance serves ONE product's FRONT-END folder (web/<product>/). The front-end is fully
 # per-product; only the BACKEND (/api/*, the engine, the catalog) is shared. OH_PRODUCT picks the
-# folder (default harness-hub). See docs/strategy/two-services-shared-infrastructure.md.
-OH_PRODUCT = os.environ.get("OH_PRODUCT", "").strip() or "harness-hub"
+# folder (default openhubforai). See docs/strategy/two-services-shared-infrastructure.md.
+OH_PRODUCT = os.environ.get("OH_PRODUCT", "").strip() or "openhubforai"
 _REPO_DIR = Path(__file__).resolve().parents[2]
 WEB_DIR = _REPO_DIR / "web" / OH_PRODUCT
-ADMIN_DEMO_WEB_DIR = _REPO_DIR / "web" / "harness-hub"
+ADMIN_DEMO_WEB_DIR = _REPO_DIR / "web" / "openhubforai"
 # Shared pinned runtime (React/Babel UMD) for the full-design front-ends — one copy, every product.
 VENDOR_DIR = _REPO_DIR / "web" / "vendor"
 # Read-only mount of the design handoff bundle: every prototype surface (Demo Control Tower,
 # Teleon, the 21 Open*Hubs, screens/) stays reachable from any product origin at /design/.
-DESIGN_BUNDLE_DIR = _REPO_DIR / "dist" / "sites" / "openharness-design"
+DESIGN_BUNDLE_DIR = _REPO_DIR / "dist" / "sites" / "aidoneright-design"
 # The bundle's top-level folders are ALSO mounted at the origin root (/teleon/…, /opencontexthub/…,
 # /shared/…). The full-design surfaces ported into web/ keep their cross-surface links VERBATIM
 # (e.g. '../teleon/Teleon Prototype.html' in shared/products.js); resolved from '/', those links
@@ -300,7 +300,7 @@ class Handler(BaseHTTPRequestHandler):
     def _serve_admin_demo_static(self, rel: str) -> bool:
         """Serve the Baltor context-control demo from its canonical front-end bundle.
 
-        The demo currently lives under web/harness-hub because it was first built
+        The demo currently lives under web/openhubforai because it was first built
         with that static shell, but product-wise it is Baltor's backbone. Serving
         it from a fixed bundle keeps /admin-demo available on all three product
         servers while the front-end folders are being consolidated.

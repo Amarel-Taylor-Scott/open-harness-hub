@@ -47,7 +47,7 @@ _INSTALL = "Install cloudflared: https://developers.cloudflare.com/cloudflare-on
 #: service_id → (share-file the journey recorder reads | None, seam env var | None).
 #: The TARGETS keys are the tunnelled plane; ports are looked up in the registry.
 TARGETS: dict[str, dict] = {
-    "harness_hub_app": {"share": "showcase-share-url-harness-hub.txt", "seam": None, "token_query": True},
+    "harness_hub_app": {"share": "showcase-share-url-openhubforai.txt", "seam": None, "token_query": True},
     "teleon_app": {"share": "showcase-share-url-teleon.txt", "seam": None},
     "baltor_app": {"share": "showcase-share-url-baltor.txt", "seam": None, "token_query": True},
     "context_is_everything_app": {"share": "showcase-share-url-context-is-everything.txt", "seam": None},
@@ -204,7 +204,7 @@ def _self_test() -> int:
     check("every target resolves to a registry port", len(ports) == len(TARGETS), str(ports))
     check("no hand-typed ports (all from the registry)", all(isinstance(p, int) and p > 0 for p in ports.values()))
     check("journey-recorder share files covered",
-          {"showcase-share-url-harness-hub.txt", "showcase-share-url-teleon.txt"}
+          {"showcase-share-url-openhubforai.txt", "showcase-share-url-teleon.txt"}
           <= {spec.get("share") for spec in TARGETS.values() if spec.get("share")})
     check("seam env names match the deploy seams",
           {"OH_SEAM_IDENTITY_BASE", "OH_SEAM_REGISTRY_BASE", "OH_SEAM_ANALYTICS_BASE",

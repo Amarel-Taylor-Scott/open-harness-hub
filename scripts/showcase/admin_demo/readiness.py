@@ -51,9 +51,9 @@ def admin_demo_readiness() -> dict[str, Any]:
     """Return local and cloud readiness state for the six-tile demo."""
     worker_count = _worker_count()
     checks = [
-        _file_check("six_tile_ui", "web/harness-hub/admin-demo.html"),
-        _file_check("admin_demo_assets", "web/harness-hub/admin-demo-assets/app.js"),
-        _file_check("admin_demo_styles", "web/harness-hub/styles/admin-demo/base.css"),
+        _file_check("six_tile_ui", "web/openhubforai/admin-demo.html"),
+        _file_check("admin_demo_assets", "web/openhubforai/admin-demo-assets/app.js"),
+        _file_check("admin_demo_styles", "web/openhubforai/styles/admin-demo/base.css"),
         _module_check("admin_demo_api", "scripts.showcase.admin_demo.routes"),
         _module_check("export_packages", "scripts.showcase.admin_demo.exports"),
         _module_check("source_sync", "scripts.showcase.admin_demo.source_sync"),

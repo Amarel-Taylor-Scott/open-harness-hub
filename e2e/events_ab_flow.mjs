@@ -1,5 +1,5 @@
 /* e2e/events_ab_flow.mjs — record the analytics/A-B loop END-TO-END in a real browser:
-   the harness-hub app (:8000) beacons page + builder_cta exposure + conversion to the LIVE events
+   the openhubforai app (:8000) beacons page + builder_cta exposure + conversion to the LIVE events
    plane (:9420); we then read /api/events/summary and show the A/B readout populated by the real
    browse session. Video + stills for review. */
 import { join } from 'node:path';

@@ -94,7 +94,7 @@ def surface_href(target_id: str, current_id: str, urls: dict | None = None) -> s
 # This is THE standardization point: every surface embeds surface_css(accent), which is this template with the single
 # `__ACCENT__` token replaced by the per-surface hex. The accent appears EXACTLY once, so the rendered CSS is
 # byte-identical across all five surfaces except that one value (asserted by check_surface_server.py). Canonical
-# light/Inter tokens from dist/sites/openharness-design/shared/oh-tokens.css (dir-a, theme-light).
+# light/Inter tokens from dist/sites/aidoneright-design/shared/oh-tokens.css (dir-a, theme-light).
 _CSS_TEMPLATE = """
 :root{
   --bg:#faf7f0; --bg-subtle:#f3eee2; --surface:#fffdf8; --fg:#1c1b19;

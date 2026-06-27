@@ -10,7 +10,7 @@ LOCKED brand architecture (`docs/strategy/brand-architecture.md`).
 |---|---|---|---|---|
 | `context-is-everything` | **Context is Everything** — parent / mission landing | 8002 | `web/context-is-everything` | `Context is Everything` |
 | `baltor` | **Baltor** — verified-context SaaS | 8001 | `web/baltor` | `Baltor` |
-| `harness-hub` | **OpenHubForAI** — open builder funnel | 8000 | `web/harness-hub` | `OpenHubForAI` |
+| `openhubforai` | **OpenHubForAI** — open builder funnel | 8000 | `web/openhubforai` | `OpenHubForAI` |
 
 One backend (`scripts.showcase`); `OH_PRODUCT` pins which `web/<id>/` folder a server serves. Each site
 gets its own port → its own persistent tunnel → one shared access token.
@@ -70,5 +70,5 @@ the *right* product folder is served, not a stale one). The loop is **not done**
 ## Output artifacts (where the URLs land)
 
 `dist/showcase-share-url-<id>.txt` (URL **with** `?token=`) and `dist/showcase-tunnel-url-<id>.txt` (bare
-URL) for each of `harness-hub`, `baltor`, `context-is-everything`. The shared token is reused from
+URL) for each of `openhubforai`, `baltor`, `context-is-everything`. The shared token is reused from
 `dist/showcase-share-url.txt` when present, else minted once.

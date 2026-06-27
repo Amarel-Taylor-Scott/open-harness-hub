@@ -1,5 +1,5 @@
 /* e2e/register_login_portal.mjs — the END-TO-END account-flow recording for owner review:
-   real browser (Chrome) against the REAL local stack — harness-hub SPA (:8000) + the local
+   real browser (Chrome) against the REAL local stack — openhubforai SPA (:8000) + the local
    Identity & Access service (:9410, openharnesshub realm).
 
    Flow (one continuous VIDEO + a numbered screenshot per step):

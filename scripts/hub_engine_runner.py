@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """hub_engine_runner — the per-hub orchestrator / supervisor surface (run the 22 Open*Hub engines).
 
-Thin wrapper over src.openharnesshub.hub_engine: instantiate ONE shared HubEngine per registry hub, run its lifecycle
+Thin wrapper over src.openhubforai.hub_engine: instantiate ONE shared HubEngine per registry hub, run its lifecycle
 cycle (scrape→ingest→digest→verify→serve), and report served counts + the lead-gen/substrate funnel. In production,
 inject per-hub scraper + model ports (a real source poller + scripts._llm_client); here it runs over the durable store.
-DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/openharnesshub).
+DEVELOPMENT plane (the operator surface); the engines + store are PRODUCT (src/openhubforai).
 
   --hub <HubId>   run one hub's cycle      --all   run a cycle for every hub
   --ingest <HubId> [--links u1,u2] [--okf f1,f2] [--text '...'|@file] [--improve] [--llm]  OWNER intake of raw materials
@@ -29,8 +29,8 @@ if str(REPO) not in sys.path:
 
 
 def _engines(store=None, *, model=None):
-    from src.openharnesshub.component_store import ComponentStore
-    from src.openharnesshub.hub_engine import engines_for_all_hubs
+    from src.openhubforai.component_store import ComponentStore
+    from src.openhubforai.hub_engine import engines_for_all_hubs
     return engines_for_all_hubs(store or ComponentStore(), model=model)
 
 
@@ -107,7 +107,7 @@ def _js_scrape(q: str) -> list:
 def _tools(real: bool = True):
     """The TOOL REPOSITORY for OpenClaw — REAL, multi-tier (unbounded→bounded): api (github/HN-search) > search
     (HN Algolia) > scrape (chromium JS render). All already-generated/installed tools; deterministic stubs offline."""
-    from src.openharnesshub.discovery import Tool, stub_tools
+    from src.openhubforai.discovery import Tool, stub_tools
     if real:
         try:
             from scripts.research_radar import research
@@ -140,7 +140,7 @@ def hub_query(hub: str) -> str:
 def discover(query: str) -> int:
     """Stateless OpenClaw/Hermes discovery sweep across every hub (continuous append). Stub tools here; inject
     web-search / JS-scraping / research_radar-backed tools for live discovery."""
-    from src.openharnesshub.discovery import OpenClaw, Hermes, default_plugins
+    from src.openhubforai.discovery import OpenClaw, Hermes, default_plugins
     eng, oc, h = _engines(), OpenClaw(default_plugins()), Hermes()
     for r in h.sweep(query, openclaw=oc, hub_engines=eng, tools=_tools()):
         print(f"  {r['hub']:<22} discovered {r['discovered']} -> ingested {r['ingested']}")
@@ -150,7 +150,7 @@ def discover(query: str) -> int:
 
 def fresh(query: str) -> int:
     """Run Teleon's 'keep this hub fresh' capability per hub: plain text -> unbounded discovery -> descend to bounded."""
-    from src.openharnesshub.discovery import OpenClaw, default_plugins
+    from src.openhubforai.discovery import OpenClaw, default_plugins
     from src.teleon.hub_freshness import keep_hub_fresh
     eng, oc, tools = _engines(), OpenClaw(default_plugins()), _tools()
     for hub in sorted({p.target_hub for p in oc.plugins}):
@@ -163,7 +163,7 @@ def fresh(query: str) -> int:
 def ingest_cmd(hub: str, *, links=(), okf_files=(), texts=(), improve=False, tenant="_global", use_llm=False) -> int:
     """OWNER INTAKE: feed raw materials YOU provide (OKF docs / links / pasted text) into one hub's lifecycle
     (digest → optional improve → verify → version). The complement to autonomous --discover/--fresh."""
-    from src.openharnesshub.intake import ingest_materials
+    from src.openhubforai.intake import ingest_materials
     eng = _engines(model=_model_port(use_llm))
     if hub not in eng:
         print(f"unknown hub {hub!r} (one of {sorted(eng)[:6]}...)"); return 1
@@ -189,7 +189,7 @@ def _extra_generators() -> dict:
     gens: dict = {}
     try:
         from src.teleon.evolution.descent_attempt_store import DescentAttemptStore
-        from src.openharnesshub.generators import make_descent_brain_generator
+        from src.openhubforai.generators import make_descent_brain_generator
         gens["descent_brain"] = make_descent_brain_generator(lambda: DescentAttemptStore().all())
     except Exception:  # noqa: BLE001
         pass
@@ -199,7 +199,7 @@ def _extra_generators() -> dict:
 def generate_cmd(hub: str | None, *, tenant="_global", use_llm=False) -> int:
     """GENERATE channel: emit candidates from OUR systems (method catalog / descent brain / ...) -> ingest -> verify.
     The complement to --discover (public) and --ingest (owner). --generate with no hub runs every wired generator."""
-    from src.openharnesshub.generators import generate_for
+    from src.openhubforai.generators import generate_for
     eng = _engines(model=_model_port(use_llm))
     extra = _extra_generators()
     hubs = [hub] if hub else list(eng)
@@ -230,7 +230,7 @@ def generate_cmd(hub: str | None, *, tenant="_global", use_llm=False) -> int:
 
 def browsing_stack_cmd(needs_csv: str = "", *, allow_restricted: bool = False, vendorable_only: bool = True) -> int:
     """Show the web-browsing stack registry coverage + (optionally) compose a governed stack for the needed caps."""
-    from src.openharnesshub.browsing_registry import coverage, load_registry, select_stack
+    from src.openhubforai.browsing_registry import coverage, load_registry, select_stack
     cov = coverage(load_registry())
     b, dc = cov["browsers"], cov["driving_components"]
     print(f"browsers: {b['have']}/{b['target']} (target met={b['met']})")
@@ -259,8 +259,8 @@ def browse_cmd(url: str, *, goal: str = "the page's main content", steps: int = 
 def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, tenant: str = "_global") -> int:
     """Process an OPEN-ENDED capability ('scrape the internet for more skills for openskillshub.io'): the planner
     recognizes iterative/scheduled, resolves the hub, descends the research catalog, decomposes into steps, executes."""
-    from src.openharnesshub.discovery import OpenClaw, default_plugins
-    from src.openharnesshub.hub_engine import hub_specs
+    from src.openhubforai.discovery import OpenClaw, default_plugins
+    from src.openhubforai.hub_engine import hub_specs
     from src.teleon.capability_planner import plan as make_plan, execute as run_plan
     specs = hub_specs()
     hubs = [s.hub_id for s in specs]
@@ -301,7 +301,7 @@ def capability_cmd(intent: str, *, plan_only: bool = False, rounds: int = 5, ten
 
 def settings(hub: str | None) -> int:
     """View the resolved per-hub SETTINGS PLANE (operational policy merged with the strategy)."""
-    from src.openharnesshub.hub_settings import all_settings, load_settings
+    from src.openhubforai.hub_settings import all_settings, load_settings
     items = {hub: load_settings(hub)} if hub else all_settings()
     for h, s in items.items():
         allow = ",".join(s.tool_allowlist) or "all"
@@ -313,7 +313,7 @@ def settings(hub: str | None) -> int:
 
 def set_setting(hub: str, kvs: list[str]) -> int:
     """Set + validate one or more operational settings for a hub (the operator/UI write path)."""
-    from src.openharnesshub.hub_settings import save_settings
+    from src.openhubforai.hub_settings import save_settings
     updates = {}
     for kv in kvs:
         if "=" not in kv:
@@ -338,7 +338,7 @@ def set_setting(hub: str, kvs: list[str]) -> int:
 
 def _self_test() -> int:
     import tempfile
-    from src.openharnesshub.component_store import ComponentStore
+    from src.openhubforai.component_store import ComponentStore
     fails = []
     def ck(n, ok):
         print(f"  [{'ok' if ok else 'FAIL'}] {n}")
@@ -350,7 +350,7 @@ def _self_test() -> int:
         ck("runner runs a hub cycle (ingest+verify+serve)", s["ingested"] == 1 and s["served"] == 1)
         ck("runner exposes the substrate feed (Teleon/Baltor consume it)", "funnel" in eng["OpenToolsHub"].substrate_feed())
         # OWNER INTAKE: OKF + a raw dict -> digest -> improve (lossless new version) -> verify
-        from src.openharnesshub.intake import ingest_materials, parse_okf
+        from src.openhubforai.intake import ingest_materials, parse_okf
         okf = "---\nname: A Skill\ntype: skill\n---\n# A Skill\nDoes a thing.\n"
         b = parse_okf(okf)
         ck("parse_okf reads frontmatter + keeps the raw doc (lossless)", b["name"] == "A Skill" and b["raw_okf"] == okf)
@@ -358,7 +358,7 @@ def _self_test() -> int:
         ck("owner intake: OKF + dict ingested, verified, improved (lossless new versions)",
            r["ingested"] == 2 and r["verified"] >= 1 and r["improved"] == 2 and r["serves_truth"] is False)
         # GENERATE channel: real method primitives from the catalog; honest 'pending' for unwired generators
-        from src.openharnesshub.generators import generate_for
+        from src.openhubforai.generators import generate_for
         g = generate_for("OpenOptimizationHub")
         ck("generate channel emits real method primitives (method_catalog single source)",
            not g["pending"] and len(g["candidates"]) >= 3 and g["candidates"][0]["serves_truth"] is False)

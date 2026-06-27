@@ -4,7 +4,7 @@ Updated: 2026-06-09
 
 This page records the current AI Done Right OpenHubForAI design-family counts. Do
 not use it as the source of truth; recompute from
-`dist/sites/openharness-design/shared/products.js` with
+`dist/sites/aidoneright-design/shared/products.js` with
 `python3 scripts/check_ai_done_right_surface_family.py --self-test`.
 
 ## Summary

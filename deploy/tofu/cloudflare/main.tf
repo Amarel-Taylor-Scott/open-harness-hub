@@ -38,11 +38,11 @@ variable "fly_app_domain" {
 }
 
 # ---- public surfaces: a proxied CNAME per public service (the DNS step the Fly runbook leaves manual) ----
-resource "cloudflare_dns_record" "web_harness_hub" {
+resource "cloudflare_dns_record" "web_openhubforai" {
   zone_id = var.zone_id
-  name    = "web-harness-hub"
+  name    = "web-openhubforai"
   type    = "CNAME"
-  content = "aidr-web-harness-hub.${var.fly_app_domain}"
+  content = "aidr-web-openhubforai.${var.fly_app_domain}"
   proxied = true
   ttl     = 1  # automatic (required when proxied)
 }
@@ -127,7 +127,7 @@ resource "cloudflare_r2_bucket" "postgres_state_backup" {
 
 output "public_hostnames" {
   value = {
-    web_harness_hub = cloudflare_dns_record.web_harness_hub.name
+    web_openhubforai = cloudflare_dns_record.web_openhubforai.name
     web_baltor = cloudflare_dns_record.web_baltor.name
     web_context = cloudflare_dns_record.web_context.name
     web_teleon = cloudflare_dns_record.web_teleon.name

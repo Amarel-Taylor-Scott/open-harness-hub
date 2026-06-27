@@ -73,7 +73,7 @@ from src.teleon.registry.index import records as _spine_records  # noqa: E402
 SERVICE_ID = "local_openhub_projection_api"
 REGISTRY_PATH = REPO_ROOT / "architecture" / "local_service_registry.json"
 IDENTITY_REGISTRY_PATH = REPO_ROOT / "architecture" / "identity_realm_registry.json"
-BUNDLE_DIR = REPO_ROOT / "dist" / "sites" / "openharness-design"
+BUNDLE_DIR = REPO_ROOT / "dist" / "sites" / "aidoneright-design"
 VERSION = "1.0"
 
 MAX_BODY_BYTES = 256 * 1024

@@ -1,7 +1,7 @@
 # OpenHarnessHub — Implementation Handoff & Inventory
 
 > Single source of truth for building the product in one go. The prototype
-> (`OpenHarnessHub Prototype.html`) is the functional spec; the exploration
+> (`OpenHubForAI Prototype.html`) is the functional spec; the exploration
 > canvas (`index.html`) is the design-decision record (9 schemes × all artifacts).
 > Scheme **S · Harness House** is the recommended locked direction.
 

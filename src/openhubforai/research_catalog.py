@@ -1,4 +1,4 @@
-"""src.openharnesshub.research_catalog — research/web-browse as a DESCENT-SELECTABLE, GUARDED catalog of components.
+"""src.openhubforai.research_catalog — research/web-browse as a DESCENT-SELECTABLE, GUARDED catalog of components.
 
 The substrate behind "hundreds of shared research + web-browsing components": an agent runner enriching a hub names the
 DETAIL it needs (a capability) + what it has available (network/api_key/browser_runtime/llm) + a cost budget; the

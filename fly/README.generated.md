@@ -74,12 +74,12 @@ fly secrets set -a aidr-baltor-backend --stage OH_LLM_BASE_URL=<value> OH_LLM_MO
 fly deploy -c fly/aidr-baltor-backend.fly.toml --ha=false
 ```
 
-## 9. aidr-web-harness-hub
+## 9. aidr-web-openhubforai
 
 ```bash
-fly apps create aidr-web-harness-hub
-fly secrets set -a aidr-web-harness-hub --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> OH_SHOWCASE_TOKEN=<value>
-fly deploy -c fly/aidr-web-harness-hub.fly.toml --ha=false
+fly apps create aidr-web-openhubforai
+fly secrets set -a aidr-web-openhubforai --stage OH_LLM_BASE_URL=<value> OH_LLM_MODEL=<value> OH_LLM_API_KEY=<value> OH_EMBED_MODE=<value> OH_EMBED_MODEL=<value> OH_EMBED_BASE_URL=<value> OH_INFERENCE_ALLOW_NETWORK=<value> OH_SHOWCASE_TOKEN=<value>
+fly deploy -c fly/aidr-web-openhubforai.fly.toml --ha=false
 ```
 
 ## 10. aidr-web-baltor

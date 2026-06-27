@@ -31,7 +31,7 @@ TIMEOUT = 12  # seconds per request; tunnels add real latency, so be generous
 
 # fallback if the registry can't be read — the three known brand surfaces
 _FALLBACK = [
-    {"id": "harness-hub", "brand": "OpenHubForAI"},
+    {"id": "openhubforai", "brand": "OpenHubForAI"},
     {"id": "baltor", "brand": "Baltor"},
     {"id": "context-is-everything", "brand": "Context is Everything"},
 ]

@@ -2,7 +2,7 @@
 """scripts.identity_local_service — the LOCAL Identity & Access service for the AI Done Right portfolio.
 
 Runs the owner-locked auth model (docs/architecture/auth-identity-kit.md) as a WORKING local backend:
-ONE shared kit (src/openharnesshub/auth_kit), COMPLETELY SEPARATE + INDEPENDENT realms per product —
+ONE shared kit (src/openhubforai/auth_kit), COMPLETELY SEPARATE + INDEPENDENT realms per product —
 own accounts, own sessions, own registration; no cross-realm account; no SSO. Realms are DATA, declared
 in architecture/identity_realm_registry.json (parent + Baltor + Teleon + every LIVE Open*Hub; private
 bench hubs are excluded — they take internal service identity only, never public registration).
@@ -47,7 +47,7 @@ if str(REPO_ROOT) not in sys.path:
 # SQLite-WAL append-log behind audit-events + the migration suffix (SINGLE SOURCE — defined once
 # in scripts._jsonl_store, never re-typed here)
 from scripts._jsonl_store import AppendLog, MIGRATED_SUFFIX  # noqa: E402
-from src.openharnesshub.auth_kit import make_realm  # noqa: E402  (repo-root import, kit is the bottom layer)
+from src.openhubforai.auth_kit import make_realm  # noqa: E402  (repo-root import, kit is the bottom layer)
 
 REGISTRY_PATH = REPO_ROOT / "architecture" / "identity_realm_registry.json"
 MAX_BODY_BYTES = 64 * 1024          # local JSON bodies only; anything bigger is not an identity call

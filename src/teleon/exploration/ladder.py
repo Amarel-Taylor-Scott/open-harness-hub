@@ -34,7 +34,7 @@ thresholds are NAMED constants with a unit + rationale (no-magic-values). PURE +
 RNG, no I/O beyond reading the static adaptation-ladder JSON (cached) via the existing classifier.
 
 ARCHITECTURAL LAW: Teleon-layer code — imports only stdlib + ``src.teleon`` siblings (the adaptation-ladder
-classifier). Never ``src.baltor`` / ``src.openharnesshub``.
+classifier). Never ``src.baltor`` / ``src.openhubforai``.
 """
 from __future__ import annotations
 

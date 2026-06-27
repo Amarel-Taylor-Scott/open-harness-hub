@@ -2,7 +2,7 @@
 """build_hub_sites — render the standardized page for every Open*Hub (one template, 22 consistent surfaces) + an index.
 
 Pulls each hub's real data — roster (portfolio_connection_map), strategy (sources/mode/generator/bars), settings, and
-the served components + funnel from the ComponentStore — and renders src/openharnesshub/hub_site.render_hub_page into
+the served components + funnel from the ComponentStore — and renders src/openhubforai/hub_site.render_hub_page into
 dist/sites/<slug>/index.html, plus a dist/sites/index.html directory. Counts are COMPUTED. serves_truth=false.
 
   PYTHONPATH=. python3 scripts/build_hub_sites.py --all
@@ -50,8 +50,8 @@ def portfolio_hub_section(portfolio_id: str):
     if not rid:
         return None
     try:
-        from src.openharnesshub.hub_engine import hub_specs
-        from src.openharnesshub.hub_settings import load_settings
+        from src.openhubforai.hub_engine import hub_specs
+        from src.openhubforai.hub_settings import load_settings
         spec = next((s for s in hub_specs() if s.hub_id == rid), None)
         if not spec:
             return None
@@ -75,10 +75,10 @@ def portfolio_hub_section(portfolio_id: str):
 
 def render_all(out_dir: Path = SITE_DIR, store=None) -> list[tuple[str, str]]:
     """Render every roster hub. Returns [(hub_id, html)]; writes <slug>/index.html + an index page."""
-    from src.openharnesshub.component_store import ComponentStore
-    from src.openharnesshub.hub_engine import hub_specs
-    from src.openharnesshub.hub_settings import load_settings
-    from src.openharnesshub.hub_site import render_hub_page, slugify
+    from src.openhubforai.component_store import ComponentStore
+    from src.openhubforai.hub_engine import hub_specs
+    from src.openhubforai.hub_settings import load_settings
+    from src.openhubforai.hub_site import render_hub_page, slugify
     store = store or ComponentStore()
     strat = _strategy()
     profs = _profiles()
@@ -107,7 +107,7 @@ def render_all(out_dir: Path = SITE_DIR, store=None) -> list[tuple[str, str]]:
 
 
 def _write_index(out_dir: Path, hub_ids: list[str], profs: dict | None = None) -> None:
-    from src.openharnesshub.hub_site import slugify
+    from src.openhubforai.hub_site import slugify
     profs = profs or {}
 
     def esc(t: object) -> str:

@@ -7,7 +7,7 @@ runtime concepts being extracted out of `src/baltor/`.
 > **Architectural law** (`architecture/portfolio_dependency_law.json`, enforced by
 > `scripts/check_portfolio_dependency_law.py`):
 > - **Teleon MUST NOT import Baltor** (`src.baltor.*`). Teleon is reusable infrastructure; Baltor is a tenant.
-> - **Teleon MAY consume OpenHarnessHub** (`src.openharnesshub.*`) artifacts (harnesses, templates, skills, the spec).
+> - **Teleon MAY consume OpenHarnessHub** (`src.openhubforai.*`) artifacts (harnesses, templates, skills, the spec).
 > - Baltor depends on Teleon; OpenHarnessHub depends on neither.
 
 ## What Teleon owns

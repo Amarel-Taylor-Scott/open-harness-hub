@@ -20,10 +20,10 @@ if str(REPO) not in sys.path:
 
 
 def _self_test() -> int:
-    from src.openharnesshub.hub_settings import HubSettings, load_settings, all_settings, tools_for
-    from src.openharnesshub.component_store import ComponentStore
-    from src.openharnesshub.hub_engine import engines_for_all_hubs
-    from src.openharnesshub.discovery import OpenClaw, default_plugins, stub_tools
+    from src.openhubforai.hub_settings import HubSettings, load_settings, all_settings, tools_for
+    from src.openhubforai.component_store import ComponentStore
+    from src.openhubforai.hub_engine import engines_for_all_hubs
+    from src.openhubforai.discovery import OpenClaw, default_plugins, stub_tools
     from src.teleon.hub_freshness import keep_hub_fresh
     fails = []
     def ck(name, ok, detail=""):

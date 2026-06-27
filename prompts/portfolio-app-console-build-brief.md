@@ -10,7 +10,7 @@ multiple products**. Three OPEN decisions (§5) gate the rest.
   objects, receipts. The Shared I/O Spine (`architecture/shared_io_spine.json`) already gives us ObjectShell,
   CommandEnvelope, EventEnvelope, ResourceRef, ModelInvocationReceipt, work-I/O, etc.
 - **Many projection consoles exist but are UNAUTHENTICATED demos:** `web/baltor/{dashboard,reviews,fleet,
-  demo-console,consume,integrate,...}.html`, `web/harness-hub/pages/{admin,govern,build,catalog,auth}.js`,
+  demo-console,consume,integrate,...}.html`, `web/openhubforai/pages/{admin,govern,build,catalog,auth}.js`,
   and the admin server routes (`/admin-demo/*`, `/api/admin-dashboard/*`, `/api/context-gateway/*`).
 - **Greenfield (must build):** real identity/auth/session, organizations/workspaces, RBAC, invites, API keys
   (as secret_refs), billing/usage, audit log, the account module. There is no login/session/role system yet.

@@ -1,4 +1,4 @@
-"""src.openharnesshub.component_store — versioned, multi-tenant, GOVERNED store for Open*Hub components.
+"""src.openhubforai.component_store — versioned, multi-tenant, GOVERNED store for Open*Hub components.
 
 Every Open*Hub stores + serves components (context packs, tools, models, skills, reconciliation rules, ...). This is
 the shared store behind ALL of them:

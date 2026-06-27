@@ -23,7 +23,7 @@ credits (completions 402). Flip = 3 lines in .env, zero code.
 
 ## 1. OpenHarnessHub (:8000)
 
-Front-end `web/harness-hub` (full-design proto + `ohh-live.js` seam + legacy + admin-demo) →
+Front-end `web/openhubforai` (full-design proto + `openhub-live.js` seam + legacy + admin-demo) →
 `/api/build|export|components|primitives` (showcase backend: hybrid semantic search over the
 2,5xx-component catalog + LLM orchestration via `scripts/model_routes` + cost/recipe/flowchart +
 YAML governance cache) → registry/identity/events seams. The 21 hub sites render from ONE

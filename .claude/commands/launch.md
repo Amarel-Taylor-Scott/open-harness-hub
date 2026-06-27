@@ -8,15 +8,15 @@ immediately**. Goal: drive both products to launch quality and keep both public 
 ## The two products (one shared backend)
 
 - **OpenHubForAI** — *bounded*: assemble a governed pipeline, run it, monitor I/O rules. Pinned
-  brand `harness-hub`. Home `/`. Tunnel → `dist/showcase-share-url-harness-hub.txt`.
+  brand `openhubforai`. Home `/`. Tunnel → `dist/showcase-share-url-openhubforai.txt`.
 - **Baltor** — *unbounded* content refinery: ingest → raw/compressed/hyper-efficient
   tiers → host/download → serve corpora+tools into open agent loops. Pinned brand `baltor`.
   Home `/baltor`. Tunnel → `dist/showcase-share-url-baltor.txt`.
 
 Canonical: `docs/strategy/two-services-shared-infrastructure.md`, `docs/strategy/context-enrichment-service.md`,
 `docs/concepts/context-layer-and-the-desk.md`. Each product has its OWN self-contained front-end folder
-(`web/harness-hub/`, `web/baltor/`); only the backend is shared, and `server.py` serves
-`web/<OH_PRODUCT>/` (default harness-hub).
+(`web/openhubforai/`, `web/baltor/`); only the backend is shared, and `server.py` serves
+`web/<OH_PRODUCT>/` (default openhubforai).
 
 ## Standing contract (no terminal state)
 
@@ -31,7 +31,7 @@ corroboration, never a unilateral single-agent call.
 ## Launch + keep BOTH tunnels live
 
 Run `bash scripts/serve_all_sites.sh` at the start, and any time a tunnel is down. It brings up the
-pinned servers (:8000 harness-hub, :8001 baltor, :8002 context-is-everything) each behind its own
+pinned servers (:8000 openhubforai, :8001 baltor, :8002 context-is-everything) each behind its own
 **persistent** trycloudflare tunnel, sharing one token, and **heals until all are live** (gate:
 `python3 -m scripts.showcase.verify_tunnels`). Tunnels survive server restarts (URLs stay stable; the
 launcher reuses a live one). For the dedicated no-stop tunnel loop see `/sites-live`

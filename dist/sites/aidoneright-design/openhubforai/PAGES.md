@@ -1,6 +1,6 @@
 # OpenHarnessHub — Page map & purposes
 
-Hash-routed prototype (`OpenHarnessHub Prototype.html`). Marketing pages are
+Hash-routed prototype (`OpenHubForAI Prototype.html`). Marketing pages are
 light; app pages dark (overridable). Sidebar = **Build · Explore · Workspace ·
 Govern · Connect · Foundry · Account**. Logged-out users get a sidebar-free path.
 

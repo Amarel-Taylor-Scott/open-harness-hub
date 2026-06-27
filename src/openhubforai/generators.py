@@ -1,4 +1,4 @@
-"""src.openharnesshub.generators — the GENERATE channel: named producers that emit hub candidates from OUR systems.
+"""src.openhubforai.generators — the GENERATE channel: named producers that emit hub candidates from OUR systems.
 
 The third contribution channel, complementing DISCOVER (public search via OpenClaw) and INTAKE (owner-provided via
 --ingest). Some hubs store content that does NOT exist in the wild — method primitives, learned routing policies,

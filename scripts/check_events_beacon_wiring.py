@@ -36,7 +36,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts.events_local_service import start_service  # noqa: E402
 
-WEB = REPO_ROOT / "web" / "harness-hub"
+WEB = REPO_ROOT / "web" / "openhubforai"
 KIT = WEB / "kit"
 PROBE = REPO_ROOT / "e2e" / "oh_experiments_beacon_probe.mjs"
 

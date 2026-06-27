@@ -12,7 +12,7 @@ Asserts:
   D. CANONICAL PRIMITIVE + SCALE: oh-components.css carries the shared card surface (.oh-card + .pt-panel alias) and
      the canonical scale vars (--fs-h1, --pad-card, --maxw-site) — "change a primitive here → every site updates".
   E. PRESERVED: our Baltor-SPA additions survived the adoption (the .oh-prog build-checklist bars).
-  F. SPEC PERSISTED: the design spec is durable in-repo (docs/design/openharness-claude-design: FAMILY-README +
+  F. SPEC PERSISTED: the design spec is durable in-repo (docs/design/aidoneright-claude-design: FAMILY-README +
      HANDOFF + shared/oh-tokens.css).
   G. BRANDED-HOUSE RULE: proto.css declares NO hardcoded display font — it sizes/types via var(--font-*) tokens.
 
@@ -62,7 +62,7 @@ def _self_test() -> int:
     check("D: canonical card primitive + scale in oh-components",
           ".oh-card" in comp and ".pt-panel" in comp and "--fs-h1" in comp and "--pad-card" in comp and "--maxw-site" in comp)
     check("E: Baltor-SPA additions preserved (.oh-prog)", ".oh-prog" in comp)
-    DD = _REPO / "docs" / "design" / "openharness-claude-design"
+    DD = _REPO / "docs" / "design" / "aidoneright-claude-design"
     check("F: design spec persisted in-repo",
           (DD / "FAMILY-README.md").exists() and (DD / "HANDOFF.md").exists() and (DD / "shared" / "oh-tokens.css").exists())
     check("G: proto.css has no hardcoded display font (uses var(--font-*))",

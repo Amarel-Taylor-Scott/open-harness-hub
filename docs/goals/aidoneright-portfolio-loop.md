@@ -101,7 +101,7 @@ authorization is missing:
 
 Design canonical (read first for brand + UI): `docs/BIBLE.md` (north star), `docs/DESIGN-BIBLE.md` (the shared
 kit `web/<brand>/kit` + the showcase renderer, light theme + Inter), `docs/INTEGRATION-BIBLE.md` (FE↔BE seams +
-deploy), and `docs/design/openharness-claude-design/` (the design handoff). `dist/sites/openharness-design/` is the
+deploy), and `docs/design/aidoneright-claude-design/` (the design handoff). `dist/sites/aidoneright-design/` is the
 richer reference bundle.
 
 Then read these if present:

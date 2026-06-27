@@ -30,9 +30,9 @@ A holding company, **AI Done Right** (`aidoneright.dev`), owns three product lay
 
 The canonical design system is **`docs/DESIGN-BIBLE.md`**. The self-contained designer handoff (the design system,
 the verbatim source, the AIDevObserver build brief, and the whole-product context, all inlined so a designer needs no
-other repo files) is **[`docs/design/openharness-claude-design/`](docs/design/openharness-claude-design/)** (start at
+other repo files) is **[`docs/design/aidoneright-claude-design/`](docs/design/aidoneright-claude-design/)** (start at
 its `README.md`). The richer high-fidelity reference bundle lives in
-[`dist/sites/openharness-design/`](dist/sites/openharness-design/). The design-family count is computed, never
+[`dist/sites/aidoneright-design/`](dist/sites/aidoneright-design/). The design-family count is computed, never
 hand-counted:
 
 ```bash

@@ -3,7 +3,7 @@
 consume content from EVERY Open*Hub surface, with the Amazon strategy (internal infra -> public revenue) per hub.
 
 Single-sourced: the hub/product names are cross-checked against the authoritative family source
-(dist/sites/openharness-design/shared/products.js — the same file the surface-family check reads), so the map can
+(dist/sites/aidoneright-design/shared/products.js — the same file the surface-family check reads), so the map can
 NEVER silently omit a surface. Renders docs/architecture/portfolio-connection-map.md with a Mermaid diagram + tables.
 --self-test is the registered proof (coverage + counts + every hub connects to a core + Amazon stage + dependency law).
 serves_truth=false.
@@ -21,7 +21,7 @@ import sys
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _MAP = os.path.join(_ROOT, "architecture", "portfolio_connection_map.json")
-_PRODUCTS_JS = os.path.join(_ROOT, "dist", "sites", "openharness-design", "shared", "products.js")
+_PRODUCTS_JS = os.path.join(_ROOT, "dist", "sites", "aidoneright-design", "shared", "products.js")
 _OUT = os.path.join(_ROOT, "docs", "architecture", "portfolio-connection-map.md")
 
 

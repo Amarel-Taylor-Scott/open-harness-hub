@@ -2,7 +2,7 @@
 """Validate the AI Done Right prototype surface family.
 
 The design bundle's single source of truth is
-dist/sites/openharness-design/shared/products.js. This proof reads that file
+dist/sites/aidoneright-design/shared/products.js. This proof reads that file
 directly, checks the layer membership, verifies the live/private split, confirms
 the five Baltor method hubs, and checks that every referenced prototype HTML
 exists locally.
@@ -16,7 +16,7 @@ from typing import Any
 
 
 REPO = Path(__file__).resolve().parents[1]
-PRODUCTS_JS = REPO / "dist" / "sites" / "openharness-design" / "shared" / "products.js"
+PRODUCTS_JS = REPO / "dist" / "sites" / "aidoneright-design" / "shared" / "products.js"
 
 PRODUCT_LAYER = {"baltor", "teleon"}
 LIVE_OPEN_HUBS = {

@@ -6,7 +6,7 @@
 > boundaries) — NOT six separate files (single-source / no-magic-values) — plus
 > `architecture/portfolio_dependency_law.json` (import law), `architecture/domain_brand_risk_register.json`
 > (PART 7), and the proofs `scripts/check_company_portfolio_boundaries.py` + `check_portfolio_dependency_law.py`
-> (covering parts of PART 8/9). Boundary packages `src/teleon/` + `src/openharnesshub/` exist. Infra doc:
+> (covering parts of PART 8/9). Boundary packages `src/teleon/` + `src/openhubforai/` exist. Infra doc:
 > `docs/portfolio/infrastructure-topology.md`. **Queued:** PART 2 (`run_portfolio_local.sh` + local topology),
 > PART 5 (`PurposeTaskProviderPort` + Teleon adapters), PART 6 (website dirs), and the remaining PART 8 redteam
 > proofs. The big generic-runtime extraction (`src/baltor/` → `src/teleon/`) is tracked in the law file's

@@ -46,7 +46,7 @@ def _site_stub(name: str, one_liner: str, kind: str, *, mode: str = "discover", 
     """The new-hub site stub uses the SAME standardized template as build_hub_sites (single source of the hub UI), so
     a scaffolded hub looks identical to the live 22 from day one (then keep_hub_fresh fills in browse/served)."""
     try:
-        from src.openharnesshub.hub_site import render_hub_page
+        from src.openhubforai.hub_site import render_hub_page
         return render_hub_page(name, content_kind=kind, one_liner=one_liner, contribution_mode=mode,
                                sources=sources or {}, tier="new")
     except Exception:  # noqa: BLE001 — fall back to a minimal branded card if the renderer can't import

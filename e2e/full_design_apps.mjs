@@ -1,5 +1,5 @@
 // e2e/full_design_apps.mjs — verification walk of the three WIRED full-design apps
-// (web/ transplant of dist/sites/openharness-design — scripts/port_full_design_to_web.py).
+// (web/ transplant of dist/sites/aidoneright-design — scripts/port_full_design_to_web.py).
 //
 // Per app: load the full-design front page, fail on console errors (the in-browser Babel
 // transformer warning is expected and excluded), walk a sample of internal hash routes,
@@ -29,7 +29,7 @@ const APPS = [
   { app: 'context-is-everything', base: 'http://127.0.0.1:8002', routes: [], brand: 'AI Done Right', themed: 'toggle' },
   { app: 'baltor', base: 'http://127.0.0.1:8001', brand: 'Baltor', themed: 'toggle',
     routes: ['#/why', '#/docs', '#/pricing', '#/engine', '#/signin', '#/cases', '#/dashboard', '#/corpora', '#/serve', '#/verify', '#/governance', '#/audit'] },
-  { app: 'harness-hub', base: 'http://127.0.0.1:8000', brand: 'OpenHarnessHub', themed: 'ohp-mode',
+  { app: 'openhubforai', base: 'http://127.0.0.1:8000', brand: 'OpenHarnessHub', themed: 'ohp-mode',
     routes: ['#/pipelines', '#/compare', '#/pricing', '#/docs', '#/trust', '#/signin', '#/build', '#/flow'] },
 ];
 
@@ -76,8 +76,8 @@ for (const { app, base, brand, routes, themed } of APPS) {
   console.log(`\n=== ${app} (${base}) ===`);
   const { ctx, page } = await freshPage(browser, app);
 
-  // 1) front page renders the full design (token only matters on harness-hub's build seam)
-  await page.goto(base + '/' + (app === 'harness-hub' ? tokenQs : ''), { waitUntil: 'domcontentloaded' });
+  // 1) front page renders the full design (token only matters on openhubforai's build seam)
+  await page.goto(base + '/' + (app === 'openhubforai' ? tokenQs : ''), { waitUntil: 'domcontentloaded' });
   await settle(page, 2600);
   const rendered = await page.evaluate(() => document.body.innerText.length > 200);
   check(`${app}: front page renders`, rendered);
@@ -145,9 +145,9 @@ for (const { app, base, brand, routes, themed } of APPS) {
 
 // ---- seam exercises ----------------------------------------------------------------
 
-// A) REAL identity: signup → session stored per realm (harness-hub realm)
+// A) REAL identity: signup → session stored per realm (openhubforai realm)
 {
-  console.log('\n=== seam: identity (harness-hub #/signup) ===');
+  console.log('\n=== seam: identity (openhubforai #/signup) ===');
   const { ctx, page } = await freshPage(browser, 'identity-seam');
   await page.goto('http://127.0.0.1:8000/#/signup', { waitUntil: 'domcontentloaded' });
   await settle(page, 2600);
@@ -177,7 +177,7 @@ for (const { app, base, brand, routes, themed } of APPS) {
 
 // B) REAL build: landing task → preview wired to /api/build (live mode hides the fixture lift row)
 {
-  console.log('\n=== seam: /api/build live preview (harness-hub) ===');
+  console.log('\n=== seam: /api/build live preview (openhubforai) ===');
   const { ctx, page } = await freshPage(browser, 'build-seam');
   await page.goto('http://127.0.0.1:8000/' + tokenQs + '#/', { waitUntil: 'domcontentloaded' });
   await settle(page, 2600);

@@ -43,7 +43,7 @@ async function publicBase(shareFile, localUrl) {
   }
   return { url: localUrl, public: false, host: new URL(localUrl).host };
 }
-const ohhBase = () => publicBase('showcase-share-url-harness-hub.txt', `http://127.0.0.1:8000/?token=${encodeURIComponent(TOKEN)}`);
+const ohhBase = () => publicBase('showcase-share-url-openhubforai.txt', `http://127.0.0.1:8000/?token=${encodeURIComponent(TOKEN)}`);
 const teleonBase = () => publicBase('showcase-share-url-teleon.txt', 'http://127.0.0.1:8003/');
 
 async function launchRecorder() {
@@ -478,7 +478,7 @@ async function teleonJourney(page, h, base) {
 
 /* ============ per-site hub journey (click-only) ============ */
 function familySurfaces() {
-  const bundle = join(HERE, '..', 'dist', 'sites', 'openharness-design');
+  const bundle = join(HERE, '..', 'dist', 'sites', 'aidoneright-design');
   const folders = readdirSync(bundle, { withFileTypes: true })
     .filter((d) => d.isDirectory() && /^open.+hub$|^openskilltotool$/.test(d.name) && d.name !== 'openharnesshub')
     .map((d) => d.name).sort();

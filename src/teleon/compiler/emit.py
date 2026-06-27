@@ -17,7 +17,7 @@ EVERY emitter stamps the OTel attrs onto its env/labels/annotations so trace cor
 runtime, and NEVER writes a secret VALUE — only the secret-ref NAMES the unit declares.
 
 Pure + deterministic: a unit always renders to byte-identical text (json.dumps + a deterministic YAML writer,
-both with sorted keys). stdlib + PyYAML only; no ``src.baltor`` / ``src.openharnesshub`` import (dependency law).
+both with sorted keys). stdlib + PyYAML only; no ``src.baltor`` / ``src.openhubforai`` import (dependency law).
 """
 from __future__ import annotations
 

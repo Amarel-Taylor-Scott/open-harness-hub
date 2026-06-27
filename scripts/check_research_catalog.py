@@ -25,7 +25,7 @@ def _roster() -> set:
 
 
 def _self_test() -> int:
-    from src.openharnesshub.research_catalog import (load_catalog, load_guardrails, host_allowed,
+    from src.openhubforai.research_catalog import (load_catalog, load_guardrails, host_allowed,
                                                      select_component, descent_plan)
     fails = []
     def ck(n, ok, d=""):

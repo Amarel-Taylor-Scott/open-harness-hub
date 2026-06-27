@@ -10,7 +10,7 @@ browser (src.teleon.research.browser_port) is only the UNBOUNDED fallback for so
 
 Network-gated (OH_INFERENCE_ALLOW_NETWORK) + graceful: offline/blocked -> SourceSearchUnavailable (the caller falls back;
 self-tests stay deterministic via offline fixtures). Discovery is NOT trust: every ToolHit is a CANDIDATE carrying its raw
-license string for the governance layer to classify (src/openharnesshub/licenses) + dedupe + verify before anything is
+license string for the governance layer to classify (src/openhubforai/licenses) + dedupe + verify before anything is
 vendored. serves_truth=false. Teleon layer — never imports src.baltor.
 """
 from __future__ import annotations

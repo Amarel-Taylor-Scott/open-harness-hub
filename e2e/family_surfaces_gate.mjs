@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 
 const BASE = (process.argv[2] || 'http://127.0.0.1:8002').replace(/\/+$/, '');
 const HERE = dirname(fileURLToPath(import.meta.url));
-const BUNDLE = join(HERE, '..', 'dist', 'sites', 'openharness-design');
+const BUNDLE = join(HERE, '..', 'dist', 'sites', 'aidoneright-design');
 const OUT = join(HERE, 'artifacts', 'full-design');
 const EXPECTED = [/in-browser Babel transformer/i, /React DevTools/i];
 

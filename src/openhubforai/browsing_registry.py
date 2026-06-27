@@ -1,18 +1,18 @@
-"""src.openharnesshub.browsing_registry — load + compose + cover the web-browsing stack registry.
+"""src.openhubforai.browsing_registry — load + compose + cover the web-browsing stack registry.
 
 Web browsing is a COMPOSED stack (browser + driving logic + model). This loads architecture/web_browsing_stack_registry
 .json, derives license_class/vendorable (single-source classifier), composes a governed stack for a need, and computes
 COVERAGE vs the targets (>=20 browsers, >=100 driving components) — surfacing the gap honestly rather than padding with
 filler. Governance: 'evasion_restricted' browsers (stealth/anti-bot) are excluded unless explicitly authorized; the
 guardrail POLICY logic components (robots/rate/captcha-refuse/pii) are always kept. serves_truth=false. Open layer:
-stdlib + src.openharnesshub.licenses only (no teleon/baltor import).
+stdlib + src.openhubforai.licenses only (no teleon/baltor import).
 """
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from src.openharnesshub.licenses import classify_license
+from src.openhubforai.licenses import classify_license
 
 _REGISTRY = Path(__file__).resolve().parents[2] / "architecture" / "web_browsing_stack_registry.json"
 _STATUS_RANK = {"live": 0, "candidate": 1, "service": 2}

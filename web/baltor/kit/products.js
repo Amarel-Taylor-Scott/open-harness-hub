@@ -34,7 +34,7 @@
       tagline: 'Build & monitor governed pipelines',
       blurb: 'Describe a task; assemble a governed, cited pipeline from vetted ' +
              'components, then run and monitor it.',
-      home: '../openharnesshub/OpenHarnessHub Prototype.html',
+      home: '../openhubforai/OpenHubForAI Prototype.html',
       // house style = Direction S (ember). No extra scope class needed.
       dir: 'dir-s',
       brandScope: '',
@@ -93,7 +93,7 @@
       brandScope: '',
       glyph: '◳',
       // sister product — quiet footer link only
-      supportedBy: { name: 'OpenHubForAI', short: 'OpenHubForAI', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
+      supportedBy: { name: 'OpenHubForAI', short: 'OpenHubForAI', url: '../openhubforai/OpenHubForAI Prototype.html' },
     },
   };
 
@@ -147,7 +147,7 @@
     openHarnessHub: {
       name: 'OpenHarnessHub', wordmark: 'OpenHarnessHub', domain: 'OpenHubForAI.io', kind: 'Open harness ecosystem',
       blurb: 'Templates, skills and eval packs — the open harness ecosystem Teleon draws from.',
-      accent: '#d2542f', glyph: '⎔', url: '../openharnesshub/OpenHarnessHub Prototype.html', status: 'live',
+      accent: '#d2542f', glyph: '⎔', url: '../openhubforai/OpenHubForAI Prototype.html', status: 'live',
     },
     openMCPHub: {
       name: 'OpenMCPHub', wordmark: 'OpenMCPHub', domain: 'OpenHubForAI.io', kind: 'MCP server intelligence',

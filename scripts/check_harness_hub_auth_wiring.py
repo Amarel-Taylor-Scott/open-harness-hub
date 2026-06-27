@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""scripts.check_harness_hub_auth_wiring — PROOF that the harness-hub web app is wired to the LOCAL
+"""scripts.check_harness_hub_auth_wiring — PROOF that the openhubforai web app is wired to the LOCAL
 Identity & Access service (realm: openharnesshub) honestly.
 
 The web app is the kit-based SPA emitted by scripts/port_full_design_to_web.py (DESIGN-CONTRACT,
 proven byte-for-byte by that script's --check). The realm-aware identity CLIENT now lives in
-web/harness-hub/kit/oh-identity.js (exposes window.OHIdentity); the auth UI + API-key console are
-React components in web/harness-hub/kit/oh-site.jsx (OhAuth / OhApiKeys). The same-origin deploy
+web/openhubforai/kit/oh-identity.js (exposes window.OHIdentity); the auth UI + API-key console are
+React components in web/openhubforai/kit/oh-site.jsx (OhAuth / OhApiKeys). The same-origin deploy
 seam (window.OHH_IDENTITY_BASE) is injected by the generator, not hand-typed — so we single-source
 it from the generator module rather than re-asserting a literal here.
 
@@ -44,7 +44,7 @@ if str(REPO_ROOT) not in sys.path:
 # Single source for the same-origin identity seam the generator injects (don't re-type the literal).
 from scripts.port_full_design_to_web import _SEAM_SCRIPT  # noqa: E402
 
-WEB = REPO_ROOT / "web" / "harness-hub"
+WEB = REPO_ROOT / "web" / "openhubforai"
 # The kit-based SPA: the realm-aware identity client + the app that renders OhAuth/OhApiKeys.
 IDENTITY_JS = WEB / "kit" / "oh-identity.js"
 SITE_JSX = WEB / "kit" / "oh-site.jsx"
@@ -132,7 +132,7 @@ def _self_test() -> int:
     else:
         print("  [ok] E: node unavailable — syntax check skipped honestly (static checks above still gate)")
 
-    print("\n" + ("PASS — check_harness_hub_auth_wiring: the harness-hub kit SPA loads the realm-aware identity "
+    print("\n" + ("PASS — check_harness_hub_auth_wiring: the openhubforai kit SPA loads the realm-aware identity "
                   "client (window.OHIdentity) before the app, derives the openharnesshub realm from the "
                   "registry (drift-gated port, request-id correlation, generator-injected deploy seam), persists "
                   "only the opaque session handle + anon id, runs real register/onboard/login + API-key console "

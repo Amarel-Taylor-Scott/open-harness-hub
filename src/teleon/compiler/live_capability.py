@@ -8,7 +8,7 @@ receipt refs from its latest PROMOTING run. Honest: fields the live record never
 
 No magic values: the live STATE_DIR is imported (LAZILY, inside ``_state_dir``) from ``scripts.teleon_local_runtime``
 — its single definition, not re-typed. Keeping that import lazy means this product module carries NO top-level
-dev-tool dependency (plane separation stays green). stdlib only; no ``src.baltor`` / ``src.openharnesshub`` import.
+dev-tool dependency (plane separation stays green). stdlib only; no ``src.baltor`` / ``src.openhubforai`` import.
 """
 from __future__ import annotations
 

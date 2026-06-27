@@ -49,7 +49,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 # DEPENDENCY-LAW direction (verified before wiring): architecture/portfolio_dependency_law.json
-# forbids import edges only AMONG the three brand package roots (src/openharnesshub must not import
+# forbids import edges only AMONG the three brand package roots (src/openhubforai must not import
 # src/teleon, etc.). scripts/ is repo TOOLING, not a brand layer — the law file itself says so and
 # scripts/check_portfolio_dependency_law.py scans only the src/* roots; ~46 scripts already import
 # src.teleon. So the DIRECT shim (this module → src.teleon.inference) is legal, and the inverted

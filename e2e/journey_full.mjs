@@ -1,6 +1,6 @@
 /* e2e/journey_full.mjs — the FULL user journey, one continuous recording:
    landing → register → sign up/onboard → configure → integrate → ingestion → consumption.
-   Driven on the REAL running surfaces: harness-hub (8000, wired to the live identity service)
+   Driven on the REAL running surfaces: openhubforai (8000, wired to the live identity service)
    for register→onboard→configure→integrate→pipeline, then Baltor (8001) for the engine
    ingestion→consumption climax. Real actions throughout (real account, real session, real key —
    blurred); each stage gets a numbered still and the video keeps rolling. Honest: a stage probes

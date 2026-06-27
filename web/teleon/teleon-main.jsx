@@ -158,7 +158,7 @@ function Landing({ theme, onToggle }) {
         ['Product', [['How it works', '/'], ['Lifecycle', '/'], ['Pricing', '/pricing'], ['Case studies', '/cases']]],
         ['Developers', [['Docs', '/docs'], ['Library', '/registry']]],
         ['Company', [['About', '/about'], ['Contact', '/contact'], ['Status', '/status'], ['Changelog', '/changelog']]],
-        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHubForAI ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
+        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHubForAI ↗', '../openharnesshub/OpenHubForAI Prototype.html']]],
       ]} />
       <OhExperimentsPanel />
     </div>
@@ -349,7 +349,7 @@ function MarketingShell({ theme, onToggle, children }) {
         ['Product', [['How it works', '/'], ['Lifecycle', '/'], ['Pricing', '/pricing'], ['Case studies', '/cases']]],
         ['Developers', [['Docs', '/docs'], ['Library', '/registry']]],
         ['Company', [['About', '/about'], ['Contact', '/contact'], ['Status', '/status'], ['Changelog', '/changelog']]],
-        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHubForAI ↗', '../openharnesshub/OpenHarnessHub Prototype.html']]],
+        ['Group', [['AI Done Right ↗', '../context-is-everything/Context is Everything.html'], ['Baltor.ai ↗', '../context-enrichment/Context Enrichment Prototype.html'], ['OpenHubForAI ↗', '../openharnesshub/OpenHubForAI Prototype.html']]],
       ]} />
     </div>
   );

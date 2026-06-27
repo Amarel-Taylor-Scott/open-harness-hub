@@ -27,7 +27,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-BUNDLE = REPO / "dist" / "sites" / "openharness-design"
+BUNDLE = REPO / "dist" / "sites" / "aidoneright-design"
 IDENT = BUNDLE / "shared" / "oh-identity.js"
 SITE = BUNDLE / "shared" / "oh-site.jsx"
 REALM_REG = REPO / "architecture" / "identity_realm_registry.json"

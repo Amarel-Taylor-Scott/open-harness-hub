@@ -38,7 +38,7 @@ FLY_DIR = REPO / "fly"
 COMPOSE = REPO / "deploy" / "docker-compose.deploy.yml"
 DOCKERIGNORE = REPO / ".dockerignore"
 PROVIDER_GRAPH = REPO / "architecture" / "model_provider_graph.json"
-CATALOG_BUNDLE_MARKER = "dist/sites/openharness-design"
+CATALOG_BUNDLE_MARKER = "dist/sites/aidoneright-design"
 SECRET_VALUE_SIGNATURES = ("sk-or-v1-", "sk-ant-", "ghp_", "AKIA")  # never in committed configs
 
 

@@ -1,4 +1,4 @@
-"""src.openharnesshub.auth_kit — the SHARED auth/identity kit (separate, INDEPENDENT realms per product).
+"""src.openhubforai.auth_kit — the SHARED auth/identity kit (separate, INDEPENDENT realms per product).
 
 One kit (flow shapes + object shapes + primitives); each product instantiates its OWN realm via make_realm(),
 with its own accounts/sessions/registration — no cross-realm account, no single-sign-on. Open bottom-layer

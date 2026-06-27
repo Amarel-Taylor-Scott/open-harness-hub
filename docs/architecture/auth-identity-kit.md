@@ -6,7 +6,7 @@ can have similar UI, backend elements."* This is the standard.
 ## The model
 
 - **Shared KIT** — one set of flow shapes, object shapes, and primitives lives in
-  `src/openharnesshub/auth_kit/` (the open, bottom layer). Same UI components, same backend elements.
+  `src/openhubforai/auth_kit/` (the open, bottom layer). Same UI components, same backend elements.
 - **Separate, INDEPENDENT realms** — each product (Baltor, Teleon, every OpenHubForAI) calls `make_realm(...)` to
   get its **own** identity realm: its own accounts, its own sessions, its own registration. **There is no
   cross-realm account and no single-sign-on.** Logging in to Baltor has nothing to do with Teleon.
@@ -72,7 +72,7 @@ Run: `PYTHONPATH=. python3 scripts/identity_local_service.py --serve` (port from
 Proof: `scripts/check_identity_local_service_runtime.py` (in `PROOF_MODULES`). Still a **local dev
 equivalent** — blake2b refs are not production crypto; the owner-gated seams below are unchanged.
 
-**Also built (2026-06-09): the first wired product UI.** `web/harness-hub/identity.js` (realm client:
+**Also built (2026-06-09): the first wired product UI.** `web/openhubforai/identity.js` (realm client:
 drift-gated port, `OHH_IDENTITY_BASE` deploy override, request-id correlation, session-handle-only storage)
 + `pages/auth.js` rewired — real register→onboard→login→session, an `/account/keys` console (raw key shown
 once), SSO/Google rendered as **disabled owner-gated seams**, honest degradation when the service is down
@@ -81,7 +81,7 @@ Browser-session (DOM-level) verification still pending a browser run.
 
 ## Queued (not yet built; some owner-gated)
 
-- The shared **UI kit** — promote the now-wired harness-hub flow (`identity.js` + `pages/auth.js`) into the
+- The shared **UI kit** — promote the now-wired openhubforai flow (`identity.js` + `pages/auth.js`) into the
   shared design kit so every surface (Baltor, Teleon, each hub) renders one flow against its OWN realm.
 - **Real** `CredentialProvider` / session adapters (password hash, OAuth, SSO, passkey) — **owner-gated**,
   built when deploying; never with real secrets in this repo.

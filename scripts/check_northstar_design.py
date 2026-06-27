@@ -33,13 +33,13 @@ SURFACE_GLOBS = ("*.html", "*.jsx", "*.js")
 # consistency (owner 2026-06-25): the product surfaces share ONE design system — same layout / HTML / CSS / fonts,
 # differing only in color scheme + copy. Every design-system product loader must reference the shared kit.
 KIT_FILES = ("oh-site.jsx", "oh-tokens.css", "oh-components.css", "oh-site.css")
-DESIGN_PRODUCT_FOLDERS = ("teleon", "context-enrichment", "openharnesshub")  # context-enrichment = Baltor's folder
+DESIGN_PRODUCT_FOLDERS = ("teleon", "context-enrichment", "openhubforai")  # context-enrichment = Baltor's folder
 
 
 def _surface_roots() -> list[Path]:
     spec = json.loads(SPEC.read_text(encoding="utf-8"))
     roots = [REPO / p["canonical_surface"] for p in spec.get("pillars", []) if (REPO / p["canonical_surface"]).is_dir()]
-    design = REPO / "dist" / "sites" / "openharness-design"
+    design = REPO / "dist" / "sites" / "aidoneright-design"
     if design.is_dir():
         roots.append(design)
     return roots
@@ -90,7 +90,7 @@ def side_surfaces() -> list[str]:
 
 def kit_consistency() -> list[str]:
     """Each design-system product loader must reference the shared kit (one layout/CSS/fonts; differ only in color/copy)."""
-    bundle = REPO / "dist" / "sites" / "openharness-design"
+    bundle = REPO / "dist" / "sites" / "aidoneright-design"
     out: list[str] = []
     for folder in DESIGN_PRODUCT_FOLDERS:
         d = bundle / folder
@@ -107,7 +107,7 @@ def check() -> int:
         print(f"  [warn · side surface] {s} — not a registered pillar in surface_capability_spec")
     for kc in kit_consistency():
         print(f"  [warn · inconsistent] {kc} — products share one kit (differ only in color/copy)")
-    if not (REPO / "dist/sites/openharness-design/aidevobserver").is_dir():
+    if not (REPO / "dist/sites/aidoneright-design/aidevobserver").is_dir():
         print("  [note] AIDevObserver has no shared-kit surface yet (standalone demo only) — build one for consistency")
     for w in soft[:25]:
         print(f"  [warn · stub] {w}")

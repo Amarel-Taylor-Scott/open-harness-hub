@@ -43,7 +43,7 @@ const MATRIX = [
   { t: 'short', w: 1440, h: 360, k: 'edge' },            // landscape phone / split screen
 ];
 const KEY_STILLS = new Set(['iphone-se3', 'ipad-port', 'desktop']);
-const PORT_LABELS = { '8000': 'harness-hub', '8001': 'baltor', '8002': 'context-is-everything', '8003': 'teleon' };
+const PORT_LABELS = { '8000': 'openhubforai', '8001': 'baltor', '8002': 'context-is-everything', '8003': 'teleon' };
 const SURFACES = (process.env.SURFACES || '8000,8001,8002,8003').split(',').map((p) => p.trim());
 const TAP_MIN = 24;        // px — WCAG 2.2 AA minimum touch target (24x24); below this is a genuine a11y defect
                            // 24px floor; 38px tabs etc. are fine and shouldn't be flagged as defects)

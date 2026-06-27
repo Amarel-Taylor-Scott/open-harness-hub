@@ -20,7 +20,7 @@ from collections import Counter
 from pathlib import Path
 
 from scripts.discovery_pipeline import classify_plane
-from src.openharnesshub.licenses import classify_license
+from src.openhubforai.licenses import classify_license
 from src.teleon.research.source_search import SourceSearchUnavailable, discover
 
 REPO = Path(__file__).resolve().parents[1]

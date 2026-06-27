@@ -20,8 +20,8 @@ if str(REPO) not in sys.path:
 
 
 def _self_test() -> int:
-    from src.openharnesshub.component_store import ComponentStore, GLOBAL_TENANT
-    from src.openharnesshub.hub_engine import HubEngine, hub_specs, engines_for_all_hubs
+    from src.openhubforai.component_store import ComponentStore, GLOBAL_TENANT
+    from src.openhubforai.hub_engine import HubEngine, hub_specs, engines_for_all_hubs
     fails = []
     def ck(name, ok, detail=""):
         print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': '+detail) if detail and not ok else ''}")

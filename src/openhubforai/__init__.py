@@ -1,4 +1,4 @@
-"""src.openharnesshub — the OPEN HARNESS HUB ecosystem layer (neutral, open).
+"""src.openhubforai — the OPEN HARNESS HUB ecosystem layer (neutral, open).
 
 OpenHarnessHub is the open ecosystem around purpose-driven compute: eval harnesses, task templates,
 conformance tests, skills, runtime-adapter examples, example CapabilityTasks, and the OPEN CapabilityTask spec.

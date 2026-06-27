@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import re
 
-from src.openharnesshub.licenses import classify_license  # single-source license classifier (open layer)
+from src.openhubforai.licenses import classify_license  # single-source license classifier (open layer)
 
 #: disposition vocabulary (single source; mirrors the GitHub-signal intake).
 DISPOSITIONS = ("ADOPT-CANDIDATE", "CONSIDER", "WATCH", "AVOID")
