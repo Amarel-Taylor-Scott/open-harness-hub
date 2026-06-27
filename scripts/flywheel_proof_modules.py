@@ -18,6 +18,7 @@ PROOF_MODULES: list[tuple[str, str]] = [
     ("scripts/check_no_oracle_copy.py", "check_no_oracle_copy"),
     ("scripts/scan_mcp_manifests.py", "scan_mcp_manifests"),
     ("scripts/scan_agent_skills.py", "scan_agent_skills"),
+    ("scripts/security/skill_scanner.py", "skill_scanner"),
     ("scripts/validate_stages.py", "validate_stages"),
     ("scripts/validate_tool_evidence_cards.py", "validate_tool_evidence_cards"),
     ("scripts/validate_context_schemas.py", "validate_context_schemas"),

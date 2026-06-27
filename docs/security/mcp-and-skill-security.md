@@ -25,7 +25,69 @@ the MCP/tool boundary · agents act only inside a bounded `DecisionContext`. The
 (continuous + adversarial) and the Gold-Pack Contract are the runtime counterparts; this is the
 build-time guard.
 
+## The adopted deep scanner: NVIDIA **SkillSpector** (the "real scanner" SEAM)
+
+`scan_mcp_manifests.py` / `scan_agent_skills.py` were always the deterministic *floor* with a
+declared SEAM for "a real scanner ... when present." **SkillSpector** (github.com/nvidia/skillspector,
+**Apache-2.0**) is adopted as that scanner — it is the most complete for *skills + MCP* specifically:
+
+- **68 vulnerability patterns / 17 categories**: prompt injection + jailbreak, data exfiltration
+  (API keys, env vars, file enumeration), privilege escalation / credential theft, **supply chain**
+  (unpinned deps, live **OSV.dev** CVE lookup, obfuscation), **excessive agency** (unrestricted tool
+  access), dangerous code (**AST** detection of `exec`/`eval`/`subprocess`), **taint tracking**
+  (credential/input → sink), **MCP-specific** (tool poisoning, least-privilege), **YARA** malware /
+  webshell signatures.
+- **Static-first, local-first**: stage 1 is regex + Python AST + OSV.dev (no model); stage 2 LLM is
+  *optional* and supports **local Ollama** + `--no-llm` — so it satisfies the local-first / keyless law.
+- **Outputs SARIF + exit codes** (0 safe / 1 unsafe / 2 error); runs as CLI, Docker, Python API, **or
+  an MCP server for runtime install gating**. It fits behind a port exactly like every other adapter.
+
+It composes with — does not replace — the already-named scanners (Snyk Agent Scan / ex-Invariant
+`mcp-scan` with hash-pinning rug-pull defense; Cisco `mcp-scanner`). One `SkillScannerPort`, several
+backends, deterministic floor always on.
+
+## The descent ladder (deterministic-first, cost-ordered, honest-unavailable)
+
+The cost-ordered ladder, same shape as every capability in this repo (cheap/deterministic/local first;
+climb only when the cheaper rung can't resolve):
+
+0. **Regex floor** — `scan_mcp_manifests.find_poison` + `scan_agent_skills` (shared `POISON_PATTERNS`).
+   Always on, free, local, deterministic. Never skipped.
+1. **SkillSpector static (`--no-llm`)** — AST, the 68 patterns, OSV.dev CVE lookup, YARA. Local, no model.
+2. **SkillSpector + local Ollama** — context-aware semantic pass (~87% precision) to cut false positives.
+   Local-first: no cloud key.
+3. **SkillSpector + hosted LLM** (NVIDIA Build / Anthropic) — only for high-stakes artifacts the local
+   rungs can't resolve, and only with the honest note that file contents leave the machine.
+
+If SkillSpector is not installed, rung 0 still runs and the verdict is **labeled** "floor only, deep
+scanner absent" (real-or-labeled-seam; escalate-before-concluding-unavailable) — never silently "clean."
+
+## Two gates: what we INGEST and what we MAKE
+
+Scanning is wired as two gates, the security counterpart of the promotion boundary:
+
+- **Ingest gate (what we INGEST).** The discovery pipeline (`scripts/discovery_pipeline.py`: scrape
+  GitHub / governed sources → classify → govern) scans every harvested **skill / MCP manifest / repo**
+  *before* it becomes a candidate. A finding at/above **high** → the row is **quarantined**
+  (`status=quarantined`, candidate-only, **never promoted**) with the SARIF attached to its
+  `source_record`. Lossless: quarantined ≠ deleted — it stays with its finding for lineage + appeal.
+- **Output gate (what we MAKE).** The promotion boundary
+  (`scripts.db.daily_promotion_readiness_plan`) gains a security-scan gate alongside the existing
+  review-ticket gate: a component / pipeline / skill **we generate** cannot become tenant-visible with
+  an **open ≥high** security finding. The scan receipt joins the evidence ledger / audit log.
+
+Both emit SARIF receipts into the audit log — *governance is the product*: provenance + a signed
+"scanned, clean (or quarantined), here is the evidence" is the external moat, not a nice-to-have. The
+AIDevObserver **footgun** detector is the *runtime* counterpart (catching the risky command in a live
+session); these two gates are the *ingest-time* and *build-time* counterparts.
+
 ## Next (implementation)
-`scripts/scan_mcp_manifests.py` + `scripts/scan_agent_skills.py` (regex + LLM-as-judge fallback when
-a real scanner is absent — real-or-labeled-seam) + `.github/workflows/mcp-security.yml`, each with a
-self-test (a poisoned-description fixture must FAIL). Pair with the verified scanners where available.
+
+1. `scripts/security/skill_scanner.py` — the **`SkillScannerPort`**: runs the descent ladder (regex
+   floor → SkillSpector `--no-llm` → +local Ollama → +hosted), merges + normalizes findings to one
+   schema, returns `{verdict, severity, findings[], scanner, sarif}`, honest-labels when SkillSpector
+   is absent. `--self-test` with a poisoned fixture that MUST fail. Register in `run_proofs.py`.
+2. Wire the **ingest gate** into `discovery_pipeline.py` (quarantine ≥high) and the **output gate** into
+   `daily_promotion_readiness_plan` (block tenant-visibility on open ≥high).
+3. `.github/workflows/mcp-security.yml` — the CI lane (SARIF upload; ≥high fails the build).
+4. Pair with Snyk/Cisco where their licenses/keys are present (additional backends behind the port).
