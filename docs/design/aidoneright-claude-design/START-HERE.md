@@ -1,8 +1,14 @@
-# START HERE — Claude design (AI Done Right · one screen)
+# START HERE — Claude design (AI Done Right)
 
-You are the designer ("Claude design"). The handoff is **three self-contained files** (uploaded with this one); you
-do not need the repo. There is ONE shared kit: all 5 surfaces import it and differ ONLY by accent and copy. Read in
-this order, then design.
+You are the designer ("Claude design"). The handoff is **self-contained** (uploaded with this one); you do not need
+the repo. There is ONE shared kit: all 5 surfaces import it and differ ONLY by accent and copy. Read in this order,
+then design.
+
+> ## ⚡ To actually BUILD (paste this): **`BUILD-PROMPT.md`**
+> If the app keeps coming back with unwired buttons, missing pages, or stubs, paste the whole of **`BUILD-PROMPT.md`**
+> (in this folder) as your build instruction. It is the aggressive, non-negotiable spec: every page, every button
+> wired, built in complete batches across messages, with a self-audit you must pass before returning. Read the docs
+> below for context; paste `BUILD-PROMPT.md` to make it build everything.
 
 ## Read order (top to bottom)
 
