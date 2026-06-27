@@ -1751,7 +1751,7 @@ html, body { font-family: var(--font-sans, "Inter", -apple-system, "Segoe UI", s
       tagline: 'Build & monitor governed pipelines',
       blurb: 'Describe a task; assemble a governed, cited pipeline from vetted ' +
              'components, then run and monitor it.',
-      home: '../openharnesshub/OpenHarnessHub Prototype.html',
+      home: '../openharnesshub/OpenHubForAI Prototype.html',
       // house style = Direction S (ember). No extra scope class needed.
       dir: 'dir-s',
       brandScope: '',
@@ -1810,7 +1810,7 @@ html, body { font-family: var(--font-sans, "Inter", -apple-system, "Segoe UI", s
       brandScope: '',
       glyph: '◳',
       // sister product — quiet footer link only
-      supportedBy: { name: 'OpenHubForAI', short: 'OpenHubForAI', url: '../openharnesshub/OpenHarnessHub Prototype.html' },
+      supportedBy: { name: 'OpenHubForAI', short: 'OpenHubForAI', url: '../openharnesshub/OpenHubForAI Prototype.html' },
     },
   };
 
@@ -1869,7 +1869,7 @@ html, body { font-family: var(--font-sans, "Inter", -apple-system, "Segoe UI", s
     openHarnessHub: {
       name: 'OpenHarnessHub', wordmark: 'OpenHarnessHub', domain: 'OpenHubForAI.io', kind: 'Open harness ecosystem',
       blurb: 'Templates, skills and eval packs — the open harness ecosystem Teleon draws from.',
-      accent: '#d2542f', glyph: '⎔', url: '../openharnesshub/OpenHarnessHub Prototype.html', status: 'live',
+      accent: '#d2542f', glyph: '⎔', url: '../openharnesshub/OpenHubForAI Prototype.html', status: 'live',
     },
     openMCPHub: {
       name: 'OpenMCPHub', wordmark: 'OpenMCPHub', domain: 'OpenHubForAI.io', kind: 'MCP server intelligence',
@@ -3355,10 +3355,17 @@ const RUNS = [
     'Add one MCP server and Claude Code hands each session to AIDevObserver for review, inline with your run.'],
   ['❯_', 'Command line',
     'Prefer the terminal or CI? Run the review on the latest session and read the ranked findings as plain text or JSON.'],
+  ['⤓', 'Manual upload / paste',
+    'No editor integration? Upload a transcript file (.jsonl from Claude Code or Codex, or plain text) or paste it into the app and get the same ranked review.'],
+  ['◑', 'Live in-session hook',
+    'Add a Claude Code PreToolUse hook and AIDevObserver coaches the moment a tool call looks like a footgun, reinvention, or waste — non-blocking, read-only.'],
+  ['◎', 'Zero-install discovery',
+    'It already finds your local Claude Code / Codex sessions (under ~/.claude/projects) — no setup. Pick one in the app or CLI and review it.'],
 ];
 const INSTALL_LINES = [
   ['Add the MCP server to Claude Code', 'claude mcp add aidevobserver -- python3 scripts/aidevobserver_mcp_server.py'],
   ['Review the latest session from the CLI', 'python3 -m src.teleon.observer.cli review --latest'],
+  ['Coach live during a session (PreToolUse hook)', 'python3 scripts/aidevobserver_hook.py --install'],
 ];
 
 // ---- a worked example review (the live demo's preview output), ranked by confidence ----
@@ -3471,6 +3478,18 @@ function ReviewDemo() {
   const [busy, setBusy] = React.useState(false);
   const [findings, setFindings] = React.useState([]);
   const [source, setSource] = React.useState('live'); // 'live' = real backend · 'preview' = fallback
+  const fileRef = React.useRef(null);
+
+  // manual upload: read a transcript FILE (.jsonl/.json/.txt/.md, Claude Code or Codex) into the box; it then
+  // reviews exactly like a paste. Read-only, in-browser — the file is never uploaded anywhere.
+  const onUpload = React.useCallback((e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { setText(String(reader.result || '')); setReviewed(false); };
+    reader.readAsText(file);
+    e.target.value = '';   // allow re-selecting the same file
+  }, []);
 
   const runReview = React.useCallback(async () => {
     const messages = parseSession(text || SESSION_EXAMPLE);
@@ -3504,11 +3523,13 @@ function ReviewDemo() {
   return (
     <div className="ado-demo">
       <div className="oh-card oh-card--pad ado-demo-in">
-        <label className="ado-demo-label" htmlFor="ado-session">Paste an AI coding session</label>
+        <label className="ado-demo-label" htmlFor="ado-session">Paste or upload an AI coding session</label>
         <textarea id="ado-session" className="ado-demo-ta" rows={8} value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={'Paste a transcript of an AI coding session, or load the example to see a review.'} />
+          placeholder={'Paste a transcript (Claude Code or Codex), upload a .jsonl / .txt file, or load the example.'} />
+        <input ref={fileRef} type="file" accept=".jsonl,.json,.txt,.md,.log" style={{ display: 'none' }} onChange={onUpload} />
         <div className="ado-demo-actions">
+          <button className="oh-btn oh-btn--ghost" onClick={() => fileRef.current && fileRef.current.click()}>Upload a transcript</button>
           <button className="oh-btn oh-btn--ghost" onClick={() => { setText(SESSION_EXAMPLE); setReviewed(false); }}>Load the example</button>
           <button className="oh-btn oh-btn--primary" disabled={busy} onClick={runReview}>{busy ? 'Reviewing…' : 'Review the session →'}</button>
         </div>
@@ -3650,7 +3671,7 @@ function Landing({ theme, onToggle }) {
           ['AI Done Right ↗', '../context-is-everything/Context is Everything.html'],
           ['Teleon ↗', '../teleon/Teleon Prototype.html'],
           ['Baltor ↗', '../context-enrichment/Context Enrichment Prototype.html'],
-          ['OpenHubForAI ↗', '../openharnesshub/OpenHarnessHub Prototype.html'],
+          ['OpenHubForAI ↗', '../openharnesshub/OpenHubForAI Prototype.html'],
         ]],
       ]} />
     </div>

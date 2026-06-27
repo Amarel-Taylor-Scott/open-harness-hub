@@ -108,6 +108,22 @@ agent runner that decides and acts on its own). Design a screen for it:
   pausing." with Pause / Dismiss. It is a recommendation a human/orchestrator acts on - AIDevObserver never kills a
   process.
 
+## How sessions get IN — the integration surface (design "Where it runs" + the Settings card)
+
+AIDevObserver ingests a session through MANY paths; design the marketing **"Where it runs"** grid AND the Settings
+**integrations card** to show them all (the same card on both surfaces). Both **Claude Code AND Codex** transcripts
+are supported; everything is read-only and nothing is stored:
+
+- **Zero-install discovery** — finds local Claude Code / Codex sessions under `~/.claude/projects` (no setup).
+- **MCP server** — `claude mcp add aidevobserver -- python3 scripts/aidevobserver_mcp_server.py`.
+- **VS Code / Cursor extension** — watches the editor session, posts the report (`editor/aidevobserver-vscode/`).
+- **CLI** — `python3 -m src.teleon.observer.cli review --latest` (terminal / CI).
+- **PreToolUse hook** — live in-session coaching, non-blocking (`scripts/aidevobserver_hook.py --install`).
+- **Manual upload / paste** — upload a `.jsonl` / `.txt` transcript or paste it (the Review screen has BOTH a
+  "Upload a transcript" button + the paste box; the file is read in-browser, never uploaded).
+- **API** — `POST /api/observer/review` with `messages` OR a `transcript_path`.
+- **Agentic endpoint** — `POST /api/observer/agentic` to supervise an autonomous agent loop (not a human session).
+
 ## The API contract (REAL, captured from the live backend at `/api/observer/...`)
 
 **`POST /api/observer/review`** request: `{ "messages": [ {"role":"user|assistant", "content":"..."} ] }`
