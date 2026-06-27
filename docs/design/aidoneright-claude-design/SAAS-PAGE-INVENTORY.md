@@ -118,14 +118,50 @@ extend an existing kit component (add a mode/variant, never fork) · **○** com
 | Team usage + savings | `/team/usage` | `OhUsage` ✓ | aggregate |
 | Audit log | `/team/audit` | `OhAuditLog` ✓ | empty / list / filter |
 
-## H. Developer — layout 2 (sidebar + a **developer sub-nav**)
+## H. Developer · API · docs · MCP · integrations — layout 2 (sidebar + a **developer sub-nav**)
+
+This surface is FIRST-CLASS for this family, not an afterthought: **AIDevObserver** ships an MCP server + a VS Code/
+Cursor extension + a CLI + a PreToolUse hook, and **OpenHubForAI** literally IS a directory of MCP servers / tools /
+skills (the registry browser). Three sub-areas.
+
+### H1. Documentation & reference (`OhDocs` / `OhChangelog` — public docs use layout 3, in-app reference uses layout 2)
+
+| Page | route | kit | notes |
+|---|---|---|---|
+| Docs home / getting started | `/docs` | `OhDocs` ✓ | the doc landing + search |
+| Quickstart | `/docs/quickstart` | `OhDocs` ✓ | the 5-minute path |
+| Guides / tutorials | `/docs/guides/:id` | `OhDocs` ✓ | how-to articles |
+| **API reference** | `/docs/api` | `OhDocs` ✓ | endpoints + request/response schemas (generated from the seams) |
+| SDKs (Python / JS) | `/docs/sdk/:lang` | `OhDocs` ✓ | install + usage |
+| **CLI reference** | `/docs/cli` | `OhDocs` ✓ | commands (e.g. `python3 -m src.teleon.observer.cli`) |
+| Examples / recipes | `/docs/examples` | `OhDocs` ✓ | copy-paste snippets |
+| API changelog / versioning | `/docs/changelog` | `OhChangelog` ✓ | versioned API notes |
+
+### H2. API access & keys (`OhApiKeys` / `OhUsage`)
 
 | Page | route | kit | states |
 |---|---|---|---|
-| API keys | `/dev/keys` | `OhApiKeys` ✓ | create / reveal-once / revoke |
-| Webhooks | `/dev/webhooks` | `OhTable` ○ | add / test / delivery-log |
-| API docs / reference | `/dev/docs` | `OhDocs` ✓ | static |
-| Rate limits / quota | `/dev/limits` | `OhUsage` ○ | current usage vs limit |
+| **API keys** (create / list / revoke) | `/dev/keys` | `OhApiKeys` ✓ | empty / create(**reveal once**) / revoke |
+| Key scopes & permissions | `/dev/keys/:id` | `OhApiKeys` ✚ | scope toggles |
+| Per-key usage | `/dev/keys/:id` | `OhUsage` ✓ | calls this period |
+| **BYO inference key** | `/account/keys` | `OhSettings` ✓ | governed: used per request, NEVER stored or logged |
+| **Service accounts / OAuth apps** (service-to-service) | `/dev/apps` | `OhApiKeys`/`OhTable` ○ | client id/secret, rotate, scopes, delegated calls |
+| Rate limits / quotas | `/dev/limits` | `OhUsage` ○ | usage vs limit |
+| Request logs | `/dev/logs` | `OhAuditLog`/`OhTable` ○ | recent calls: status, latency, key |
+
+### H3. MCP · extensions · webhooks (the install / connect surface)
+
+| Page | route | kit | notes |
+|---|---|---|---|
+| **Install / connect** (the integrations card) | each surface's Settings + its marketing "Where it runs" | the install-line list ○ | VS Code · Cursor · **MCP server** (`claude mcp add aidevobserver -- …`) · CLI · the PreToolUse hook — the SAME card on every surface |
+| **MCP server / tool / skill directory** | `/registries` (OpenHubForAI) | the registry browser (`OhTable` + facet rail) ✓ | browse + filter + search — this IS OpenHubForAI's core surface |
+| **MCP server / record detail** | `/registries/:id` | record-detail + records `OhTable` ✓ | what it provides + how to install; status shown honestly (live/partial/gap — discovery ≠ trust) |
+| "Use via MCP" instructions | per server | a card with the copy-paste connect line ○ | how to add it to a client |
+| Webhooks (config + delivery log) | `/dev/webhooks` | `OhTable` + form ○ | add / test / delivery history |
+| Editor extensions (VS Code / Cursor) | marketing "Where it runs" + Settings | feature cards ○ | install links |
+
+> AIDevObserver is itself an MCP SERVER a user adds to Claude Code; OpenHubForAI is a DIRECTORY of MCP servers /
+> tools / skills (the registry browser). The "integrations card" (the install lines) is identical on every surface.
 
 ## I. System / utility (any layout / standalone)
 
