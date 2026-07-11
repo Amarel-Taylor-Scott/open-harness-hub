@@ -1,0 +1,15 @@
+MODULE src/teleon/ingest/csv_import.py
+## API signatures
+```python
+"""Reusable CSV import primitives for uploaded vendor files."""
+class CsvImportResult:
+    # Summary of a validated CSV import.
+def read_uploaded_csv_rows(path: Path) -> list[CsvRow]
+    # Read an uploaded CSV file into dictionaries keyed by header names.
+def validate_required_columns(rows: list[CsvRow], required_columns: tuple[str, ...]) -> CsvImportResult
+    # Validate required columns and return a deterministic import summary.
+def summarize_csv_import(result: CsvImportResult) -> dict[str, object]
+    # Convert a CSV import result into a JSON-compatible response packet.
+```
+## intra-module call edges
+src.teleon.ingest.csv_import.validate_required_columns -> src.teleon.ingest.csv_import.CsvImportResult

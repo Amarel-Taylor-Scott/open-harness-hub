@@ -1,0 +1,129 @@
+MODULE src/teleon/infra/scale_ports.py
+## API signatures
+```python
+"""src.teleon.infra.scale_ports — infra SCALE-DECISION ports: each heavy backend behind ONE agnostic seam."""
+REPO = ...
+SERVES_TRUTH = ...
+class InfraUnavailable:
+    # Raised by a REAL adapter when its backend isn't configured (client lib OR endpoint env absent) or
+    def __init__(self, role: str, reason: str)
+class _RoleSpec:
+def _norm(role: str) -> str
+class InfraPort:
+    def available(self) -> bool
+class OrchestratorPort:
+    # Durable workflow orchestration (Temporal). The local fallback runs ``fn`` in-process synchronously;
+    def start_workflow(self, name: str, fn: Callable[[dict], dict] | None, payload: dict, *, run_id: str | None=None) -> str
+    def result(self, run_id: str) -> dict
+    def signal(self, run_id: str, name: str, payload: dict) -> None
+class OltpPort:
+    # Transactional key/row store (PostgreSQL).
+    def put(self, table: str, key: str, row: dict) -> None
+    def get(self, table: str, key: str) -> dict | None
+    def query(self, table: str, predicate: Callable[[dict], bool] | None=None) -> list[dict]
+class OlapPort:
+    # Columnar analytics store (ClickHouse). ``aggregate`` op in {"count", "sum"}; group_by None -> {"_all": v}.
+    def insert(self, table: str, rows: list[dict]) -> int
+    def aggregate(self, table: str, *, group_by: str | None=None, measure: str | None=None, op: str='count') -> dict
+class VectorPort:
+    # ANN vector store (Vespa). ``search`` returns [{"id", "score", "payload"}, ...] best-first.
+    def upsert(self, id: str, vector: list[float], payload: dict | None=None) -> None
+    def search(self, vector: list[float], k: int=5) -> list[dict]
+class StreamPort:
+    # Append-only event log / CDC spine (Redpanda, Kafka API). ``consume`` advances a per-group offset.
+    def produce(self, topic: str, key: str, value: dict) -> int
+    def consume(self, topic: str, group: str, *, max_items: int=10) -> list[dict]
+class _Real:
+    # Shared probe for a real backend: ``available()`` iff a client lib is importable AND an endpoint
+    def __init__(self, spec: _RoleSpec)
+    def _lib(self) -> str | None
+    def _endpoint(self) -> str | None
+    def available(self) -> bool
+    def reason(self) -> str
+    def _require(self) -> None
+    def _fail(self, op: str, exc: Exception) -> InfraUnavailable
+class TemporalOrchestrator:
+    def start_workflow(self, name, fn, payload, *, run_id=None)
+    def result(self, run_id)
+    def signal(self, run_id, name, payload)
+class PostgresOltp:
+    def _conn(self)
+    def put(self, table, key, row)
+    def get(self, table, key)
+    def query(self, table, predicate=None)
+class ClickHouseOlap:
+    def _client(self)
+    def insert(self, table, rows)
+    def aggregate(self, table, *, group_by=None, measure=None, op='count')
+class VespaVector:
+    def _app(self)
+    def upsert(self, id, vector, payload=None)
+    def search(self, vector, k=5)
+class RedpandaStream:
+    def produce(self, topic, key, value)
+    def consume(self, topic, group, *, max_items=10)
+class LocalOrchestrator:
+    def __init__(self)
+    def available(self) -> bool
+    def start_workflow(self, name, fn, payload, *, run_id=None)
+    def result(self, run_id)
+    def signal(self, run_id, name, payload)
+class LocalOltp:
+    def __init__(self)
+    def available(self) -> bool
+    def put(self, table, key, row)
+    def get(self, table, key)
+    def query(self, table, predicate=None)
+class LocalOlap:
+    def __init__(self)
+    def available(self) -> bool
+    def insert(self, table, rows)
+    def aggregate(self, table, *, group_by=None, measure=None, op='count')
+class LocalVector:
+    def __init__(self)
+    def available(self) -> bool
+    def upsert(self, id, vector, payload=None)
+    def search(self, vector, k=5)
+class LocalStream:
+    def __init__(self)
+    def available(self) -> bool
+    def produce(self, topic, key, value)
+    def consume(self, topic, group, *, max_items=10)
+def real_adapter(role: str) -> InfraPort
+    # The REAL backend adapter for a role (honest-unavailable when its lib/endpoint is absent).
+def local_fallback(role: str) -> InfraPort
+    # The LOCAL in-memory fallback for a role (always available, deterministic).
+def select_infra(role: str, *, prefer: str='auto') -> InfraPort
+    # Pick the port for a role. ``prefer='auto'`` (default) returns the real adapter when it is
+def infra_status() -> dict
+    # Honest per-role status: backend, tier, purpose, whether the real backend is configured, which
+def available_infra() -> dict
+    # Compact registry view: each role -> {backend, tier, configured}. serves_truth=false.
+def _cosine(a: list[float], b: list[float]) -> float
+def _as_dict(value: Any) -> dict
+    # Coerce a stored payload (already-dict from jsonb, or a JSON string) to a dict — never fabricates.
+def _assert_refuses(label: str, fn: Callable[[], Any]) -> None
+def self_test() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.infra.scale_ports._app -> src.teleon.infra.scale_ports._Real._endpoint
+src.teleon.infra.scale_ports._client -> src.teleon.infra.scale_ports._Real._endpoint
+src.teleon.infra.scale_ports._conn -> src.teleon.infra.scale_ports._Real._endpoint
+src.teleon.infra.scale_ports._conn -> src.teleon.infra.scale_ports._Real._lib
+src.teleon.infra.scale_ports._fail -> src.teleon.infra.scale_ports.InfraUnavailable
+src.teleon.infra.scale_ports._require -> src.teleon.infra.scale_ports.InfraPort.available
+src.teleon.infra.scale_ports._require -> src.teleon.infra.scale_ports.InfraUnavailable
+src.teleon.infra.scale_ports._require -> src.teleon.infra.scale_ports._Real.reason
+src.teleon.infra.scale_ports._run -> src.teleon.infra.scale_ports._Real._endpoint
+src.teleon.infra.scale_ports.aggregate -> src.teleon.infra.scale_ports.ClickHouseOlap._client
+src.teleon.infra.scale_ports.aggregate -> src.teleon.infra.scale_ports._Real._fail
+src.teleon.infra.scale_ports.aggregate -> src.teleon.infra.scale_ports._Real._require
+src.teleon.infra.scale_ports.available -> src.teleon.infra.scale_ports._Real._endpoint
+src.teleon.infra.scale_ports.available -> src.teleon.infra.scale_ports._Real._lib
+src.teleon.infra.scale_ports.available_infra -> src.teleon.infra.scale_ports.real_adapter
+src.teleon.infra.scale_ports.consume -> src.teleon.infra.scale_ports._Real._endpoint
+src.teleon.infra.scale_ports.consume -> src.teleon.infra.scale_ports._Real._fail
+src.teleon.infra.scale_ports.consume -> src.teleon.infra.scale_ports._Real._require
+src.teleon.infra.scale_ports.consume -> src.teleon.infra.scale_ports._as_dict
+src.teleon.infra.scale_ports.get -> src.teleon.infra.scale_ports.PostgresOltp._conn

@@ -1,0 +1,1 @@
+../../../_shared/adr/0003-contract-first-module-communication.md

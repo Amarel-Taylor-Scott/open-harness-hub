@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/config/watch_policy.schema.json",
+  "$comment": "GENERATED from architecture/configuration_standards.json by scripts/check_configuration_standards.py --emit-schemas. The manifest is the single source of the required-field rules; do not hand-edit this file — regenerate it.",
+  "title": "watch_policy",
+  "description": "Minimal shape for Baltor config_type 'watch_policy'. Derived from its architecture/configuration_standards.json entry: `required` is the entry's required_fields; a property type is encoded ONLY where the entry's rules explicitly declare it (enum / integer / secret-ref / const). Fields without a declared type are required but unconstrained. Extra fields (e.g. notes) are allowed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema",
+    "version",
+    "owner",
+    "environment_scope",
+    "watch_interval_seconds",
+    "freshness_ttl_seconds",
+    "revocation_behavior"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "environment_scope": {
+      "type": "string",
+      "enum": [
+        "local",
+        "test",
+        "demo",
+        "staging",
+        "production",
+        "all"
+      ]
+    },
+    "watch_interval_seconds": {},
+    "freshness_ttl_seconds": {},
+    "revocation_behavior": {}
+  }
+}

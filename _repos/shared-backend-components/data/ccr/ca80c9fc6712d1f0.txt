@@ -1,0 +1,21 @@
+MODULE _repos/teleon/backend/src/teleon/components/adapter_factory.py
+## API signatures
+```python
+"""adapter_factory — the component-agnostic seam's force-multiplier. Don't onboard components one at a time; write
+FACTORIES that turn whole ecosystems into components. from_openapi(spec) emits one typed component per endpoint, with I/O
+types inferred from the schema — collapsing the N×M integration problem to N+M (ToolRegistry/MCP's thesis). The HTTP
+invoke is network-gated + honest offline (never a"""
+def py_function_src_teleon_components_adapter_factory___infer_in_types(py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__infer_in_types__op: dict) -> list
+    # Request → our type vocabulary: a body object is a `record`; query/path params alone are a `query`.
+def py_function_src_teleon_components_adapter_factory___infer_out_types(py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__infer_out_types__op: dict) -> list
+    # Response → our type vocabulary: JSON object/array is a `record`; a bare string is `text`; default `record`.
+def py_function_src_teleon_components_adapter_factory___op_id(py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__op_id__method: str, py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__op_id__path: str, py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__op_id__op: dict) -> str
+def py_function_src_teleon_components_adapter_factory__from_openapi(py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__from_openapi__spec: dict, *, py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__from_openapi__default_plane: str='external_api') -> list
+    # One typed component descriptor per operation in an OpenAPI spec. Each: {component_id, plane, method, path,
+def py_function_src_teleon_components_adapter_factory__http_invoke(py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__http_invoke__descriptor: dict, py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__http_invoke__inputs: dict, *, network_allowed=None, py_arg_src_teleon_components_adapter_factory__py_function_src_teleon_components_adapter_factory__http_invoke__timeout: int=20) -> dict
+    # Invoke an OpenAPI-derived component (the live path). Network-gated + honest: offline it returns an honest
+```
+## intra-module call edges
+src.teleon.components.adapter_factory.py_function_src_teleon_components_adapter_factory__from_openapi -> src.teleon.components.adapter_factory.py_function_src_teleon_components_adapter_factory___infer_in_types
+src.teleon.components.adapter_factory.py_function_src_teleon_components_adapter_factory__from_openapi -> src.teleon.components.adapter_factory.py_function_src_teleon_components_adapter_factory___infer_out_types
+src.teleon.components.adapter_factory.py_function_src_teleon_components_adapter_factory__from_openapi -> src.teleon.components.adapter_factory.py_function_src_teleon_components_adapter_factory___op_id

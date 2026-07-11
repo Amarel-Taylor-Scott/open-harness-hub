@@ -1,0 +1,1 @@
+../../../_shared/strategy/product-market-monetization-brief.md

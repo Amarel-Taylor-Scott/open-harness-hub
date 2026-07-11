@@ -1,0 +1,20 @@
+MODULE src/teleon/runtime/entitlements.py
+## API signatures
+```python
+"""src.teleon.runtime.entitlements — bridge the registries to the access policy: build resource dicts + filter by principal."""
+def py_function_src_teleon_runtime_entitlements___tool_planes() -> dict
+def py_function_src_teleon_runtime_entitlements__tool_resource(py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__tool_resource__tool_id: str, *, plane: str | None=None, governance: str | None=None) -> dict
+    # A resource dict for a tool: its plane, the governance in force (the rung's, or evasion/social inferred), and the
+def py_function_src_teleon_runtime_entitlements__credential_resource(py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__credential_resource__service_id: str) -> dict
+def py_function_src_teleon_runtime_entitlements__entitled_key(py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__entitled_key__principal, py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__entitled_key__service_id: str) -> bool
+def py_function_src_teleon_runtime_entitlements__entitled_tools(py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__entitled_tools__principal, py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__entitled_tools__tool_ids, *, plane: str | None=None, governance: str | None=None) -> list[str]
+    # The subset of tool ids the principal may use (plane/governance carry the rung's context).
+def py_function_src_teleon_runtime_entitlements__gate_options(py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__gate_options__principal, py_arg_src_teleon_runtime_entitlements__py_function_src_teleon_runtime_entitlements__gate_options__options, *, plane=None, governance=None) -> list[str]
+    # Filter a DAG node's options to the entitled ones; if NONE are entitled, return an HONEST blocked sentinel naming
+```
+## intra-module call edges
+src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__entitled_key -> src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__credential_resource
+src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__entitled_tools -> src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__tool_resource
+src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__gate_options -> src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__entitled_tools
+src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__gate_options -> src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__tool_resource
+src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements__tool_resource -> src.teleon.runtime.entitlements.py_function_src_teleon_runtime_entitlements___tool_planes

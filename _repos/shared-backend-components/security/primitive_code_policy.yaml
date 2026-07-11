@@ -1,0 +1,106 @@
+# primitive_code_policy.yaml — the PRESCRIPTIVE allow/deny policy for generated primitive code (2026-07-08).
+# The twin of the DESCRIPTIVE scan in scripts/primitive_package_contract.code_safety_scan: the contract
+# reports what a body touches (permission_manifest); THIS policy decides what is allowed and drives the
+# security gate's pass|fail|quarantine verdict. Grounded in OWASP LLM Top-10 (prompt injection, insecure
+# output handling, supply-chain, sensitive-info disclosure, excessive agency), Skill-Inject (80% ASR on skill
+# files), Snyk ClawHub (76 malicious payloads). Generated primitive bodies are UNTRUSTED until this passes.
+# Version in metadata, never in names. candidate policy; serves_truth: false.
+schema_version: 1
+policy_name: strict-generated-primitive-v1
+# CRITICAL findings -> quarantine (never auto-promotable); HIGH -> fail; MEDIUM -> fail unless waived.
+severity_of_flag:
+  dynamic_exec: critical          # eval/exec/compile/__import__ — arbitrary code execution
+  unsafe_deserialize: critical    # pickle/marshal/ctypes/cffi/shelve — RCE via crafted payload
+  secret_literal: critical        # a hardcoded credential in the body
+  subprocess: high                # shelling out — excessive agency
+  network: high                   # outbound egress — data exfiltration surface
+  filesystem_write: high          # writing outside a sandbox
+  environment_read: medium        # os.environ/getenv — may read secrets
+  unsafe_yaml_load: high          # yaml.load without SafeLoader — RCE
+  canary_leak: critical           # a system-prompt/canary token leaked into the body/output
+  oversize: medium                # body exceeds max_file_bytes (SkillReducer bloat / hidden payload room)
+  unparseable: high               # cannot be AST-parsed — cannot be reasoned about
+
+# module import roots that are BANNED in a deterministic primitive body (network/exec/deserialize surfaces)
+banned_imports:
+  - subprocess
+  - socket
+  - requests
+  - urllib
+  - http
+  - httpx
+  - aiohttp
+  - ftplib
+  - telnetlib
+  - pickle
+  - marshal
+  - ctypes
+  - cffi
+  - shelve
+  - pty
+# call names that are BANNED (dynamic execution / deserialization / shell)
+banned_calls:
+  - eval
+  - exec
+  - compile
+  - __import__
+  - system      # os.system
+  - popen
+# attribute/access patterns that are BANNED unless explicitly permitted in the primitive's manifest
+banned_env_access: true           # os.environ / os.getenv / getpass
+banned_network_access: true       # any network import root above
+banned_filesystem_writes: true    # open(...,'w'/'a'), write_text/bytes, shutil.move/copy/rmtree
+require_safe_yaml: true           # yaml.load must pass SafeLoader
+# stdlib modules a pure deterministic primitive may import (allowlist; anything else is reviewed, not banned)
+allowed_stdlib_modules:
+  - re
+  - json
+  - math
+  - decimal
+  - fractions
+  - datetime
+  - itertools
+  - functools
+  - collections
+  - typing
+  - dataclasses
+  - enum
+  - string
+  - statistics
+  - unicodedata
+  - bisect
+  - heapq
+  - textwrap
+  - difflib
+  - hashlib
+  - hmac
+  - base64
+  - uuid
+  - random
+  - ast
+  - argparse
+  - inspect
+  - sys
+  - pathlib
+# project modules a primitive body may import (the packs compose siblings)
+allowed_project_modules:
+  - scripts
+  - src
+# secret literals to reject if present verbatim in a body
+secret_patterns:
+  - "AKIA[0-9A-Z]{16}"                              # AWS access key id
+  - "-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"
+  - "xox[baprs]-[0-9A-Za-z-]{10,}"                  # Slack token
+  - "gh[pousr]_[0-9A-Za-z]{20,}"                    # GitHub token
+  - "(?i)(api[_-]?key|secret|passwd|password|token)\\s*[:=]\\s*['\"][^'\"]{8,}['\"]"
+# canary markers whose presence indicates a system-prompt / injection leak
+canary_patterns:
+  - "CANARY::"
+  - "IGNORE (ALL )?PREVIOUS INSTRUCTIONS"
+  - "SYSTEM PROMPT:"
+max_file_bytes: 200000
+# promotion requirements (checked by promote_primitive, recorded here as the single source of the bar)
+require_output_schema: true
+require_verifier: true
+require_run_proof: true
+require_canary_check: true

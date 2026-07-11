@@ -1,0 +1,24 @@
+MODULE src/baltor/facts/classifier.py
+## API signatures
+```python
+"""facts/classifier — a DETERMINISTIC fragility classifier (no model, no clock, no RNG)."""
+DAY = ...
+CADENCE_SECONDS = ...
+_HIGH_CUES = ...
+_MEDIUM_CUES = ...
+_IMMUTABLE_AUTHORITIES = ...
+_LAW_AUTHORITIES = ...
+_SUMMARY_AUTHORITIES = ...
+def _has_cue(text: str, cues) -> bool
+def classify_volatility(*, claim_type: str, source_authority: str, claim_text: str) -> tuple
+    # Return (volatility_class, no_refresh, conflict_prone, decay_signal). Pure + deterministic.
+def recommend_watch_policy(*, claim_type: str, source_authority: str, claim_text: str) -> WatchPolicy
+    # Pick the WatchPolicy a fact of this shape should be watched under (deterministic).
+def classify(*, fact_id: str, claim_type: str, source_authority: str, claim_text: str, last_verified_at: int) -> tuple
+    # Return (FragilityMetadata, WatchPolicy) for a fact. ``last_verified_at`` is INJECTED (no clock).
+```
+## intra-module call edges
+src.baltor.facts.classifier.classify -> src.baltor.facts.classifier.classify_volatility
+src.baltor.facts.classifier.classify -> src.baltor.facts.classifier.recommend_watch_policy
+src.baltor.facts.classifier.classify_volatility -> src.baltor.facts.classifier._has_cue
+src.baltor.facts.classifier.recommend_watch_policy -> src.baltor.facts.classifier.classify_volatility

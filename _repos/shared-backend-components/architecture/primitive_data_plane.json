@@ -1,0 +1,45 @@
+{
+  "purpose": "SINGLE SOURCE for the primitive data plane's flexible shapes (owner directive 2026-07-01): per-registry embedding COLUMN manifests (N columns, per-column dimensions/method), table-shape policy per storage tier (normalized truth / denormalized search projections / long-format staging+embeddings), and affinity-boost path policies. Consumers import these values; never re-type a dimension, column name, or path id elsewhere (no-magic-values law).",
+  "storage_tiers": {
+    "staging": {
+      "shape": "long_jsonl_append_only",
+      "notes": "lifecycle/foundry outputs; schema-flexible; lossless; the raw layer distillation law protects"
+    },
+    "operational": {
+      "shape": "normalized_core_plus_denormalized_projections",
+      "engine": "postgres_pgvector",
+      "normalized_tables": ["primitive", "primitive_family", "variation", "compatibility_route",
+                             "template", "template_slot", "known_chain", "receipt", "affinity_event",
+                             "negative_memory"],
+      "denormalized_projections": ["search_card_wide (materialized; rebuilt from normalized truth; carries hot attributes as typed columns + long-tail attributes as JSONB)"],
+      "embeddings_table": "object_embedding (LONG format: object_id, column_name, method, dimensions, vector) — one row per embedding column per primitive; matches the CLAUDE.md object_embedding row family"
+    },
+    "analytics": {
+      "shape": "long_format_warehouse",
+      "notes": "receipts/affinity/path-policy meta-ledger history; append-only"
+    }
+  },
+  "embedding_columns": {
+    "notes": "Per-registry manifest; a primitive may carry MULTIPLE embeddings, each over a different field with its own method + dimensions. Small dims for compact vocabularies (edges), larger for prose. Methods are pluggable; deterministic lexical-hash stays the keyless floor (local-first law).",
+    "default_manifest": [
+      {"column": "input_edge_vec", "source_field": "contract.input", "method": "lexical_hash_v1", "dimensions": 128},
+      {"column": "output_edge_vec", "source_field": "contract.output", "method": "lexical_hash_v1", "dimensions": 128},
+      {"column": "blackbox_vec", "source_field": "blackbox", "method": "nomic_embed_text_local", "dimensions": 768},
+      {"column": "keywords_vec", "source_field": "keywords", "method": "lexical_hash_v1", "dimensions": 256},
+      {"column": "domain_vec", "source_field": "domains+capability_tags", "method": "lexical_hash_v1", "dimensions": 64}
+    ],
+    "blocking": "semantic bucket keys (LSH-style) are derived PER COLUMN; blocking may key on any column combination"
+  },
+  "affinity_boost_paths": {
+    "notes": "W8 path-policy plane: multiple scorer paths; receipts pick the default per context; all boost-only.",
+    "paths": [
+      {"id": "affinity_seed_only", "signal": "group-card seed counts", "cost": "lowest", "freshness": "static"},
+      {"id": "affinity_ledger_live", "signal": "seed + decayed outcome fold at query time", "cost": "low", "freshness": "live"},
+      {"id": "affinity_batch_snapshot", "signal": "precomputed daily table snapshot", "cost": "lowest_at_query", "freshness": "daily"},
+      {"id": "affinity_tenant_blend", "signal": "global snapshot + tenant-local ledger overlay", "cost": "medium", "freshness": "live_local"}
+    ],
+    "default": "affinity_batch_snapshot",
+    "agreement_check": "when paths disagree beyond a rank-order threshold, record a path_divergence event to the meta-ledger (W8) instead of silently trusting one"
+  },
+  "recorded": "2026-07-01"
+}

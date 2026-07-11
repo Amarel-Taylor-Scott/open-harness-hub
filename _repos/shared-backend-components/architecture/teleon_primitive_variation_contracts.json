@@ -1,0 +1,61 @@
+{
+  "serves_truth": false,
+  "purpose": "Contract for deterministic/cheap primitive mutation. Teleon should mutate simple primitives into variants (batch input, output adapters, graph composition, cheaper model/provider swaps) through deterministic wrappers and contract records before asking an LLM to rewrite source.",
+  "library": "_repos/teleon/backend/src/teleon/synthesis/primitive_variations.py",
+  "checker": "scripts/check_teleon_primitive_variation_contracts.py",
+  "variation_record_law": "Every primitive variation stores variation_of, variant, mutation_kind, mutation_summary, base_contract, new_contract, proofs, status, created_at, and serves_truth=false.",
+  "io_contract_law": "Input/output is managed through primitive contracts: input_contract, output_contract, guardrails, dependencies, execution_surface, logs_schema. A graph edge maps one primitive output contract to the next primitive input contract.",
+  "supported_mutations_phase1": [
+    {
+      "id": "scalar-to-sequence",
+      "rule": "Wrap a scalar callable with normalize_to_sequence + map_sequence so one-item code accepts scalar_or_sequence input without rewriting business logic."
+    },
+    {
+      "id": "output-field-wrapper",
+      "rule": "Wrap a primitive output into a named object field when the next primitive expects an object contract."
+    },
+    {
+      "id": "linear-graph-composition",
+      "rule": "Compose ordered primitive contracts as a compact graph plan with maps_output_to_input edges."
+    },
+    {
+      "id": "structured-run-logging",
+      "rule": "Every primitive graph execution emits JSON-serializable logs with graph_id, primitive_id, status, timing fields, output shape, error, and serves_truth=false."
+    }
+  ],
+  "supported_mutations_later": [
+    {
+      "id": "model-cost-downshift",
+      "rule": "Replace an LLM-backed primitive with a cheaper model or deterministic parser only if guardrail pass rate stays above threshold."
+    },
+    {
+      "id": "browser-to-deterministic-extractor",
+      "rule": "Replace LLM/browser scraping with CSS/XPath/regex/table extraction after observed pages show stable structure."
+    },
+    {
+      "id": "local-vs-api-implementation-swap",
+      "rule": "Swap third-party API primitive with local/self-hosted implementation behind the same input/output contract when customer control requires it."
+    },
+    {
+      "id": "retry-cache-rate-limit-policy",
+      "rule": "Add retry, cache, timeout, proxy, rate-limit, or backoff adapters as graph nodes rather than rewriting primitive internals."
+    },
+    {
+      "id": "parallel-batch-execution",
+      "rule": "Turn sequence processing into bounded parallel batches only after the scalar->sequence contract is proven."
+    }
+  ],
+  "required_library_functions": [
+    "py_function_src_teleon_synthesis_primitive_variations__primitive_contract",
+    "py_function_src_teleon_synthesis_primitive_variations__infer_contract_from_callable",
+    "py_function_src_teleon_synthesis_primitive_variations__variation_record",
+    "py_function_src_teleon_synthesis_primitive_variations__lift_scalar_callable_to_sequence_variation",
+    "py_function_src_teleon_synthesis_primitive_variations__wrap_output_field_variation",
+    "py_function_src_teleon_synthesis_primitive_variations__linear_graph_contract",
+    "py_function_src_teleon_synthesis_primitive_variations__execute_linear_graph"
+  ],
+  "ci_cd_law": "A primitive variation may enter a customer repo as source code, package dependency, private service call, or third-party API call, but every form must carry the same contract, proof record, license/dependency metadata, SBOM/provenance hook, and rollback path.",
+  "byok_law": "Any LLM-backed primitive must support provider/model/key injection by policy (BYOK or platform key), record which model/provider executed, and permit cheaper/local substitutes when guardrails pass.",
+  "marketplace_law": "Marketplace primitives are allowed for specialized or proactively maintained capabilities, but they are governed as contract-compatible implementations, not opaque truth. Customers must see code/proof metadata for local primitives and dependency/security posture for hosted/API primitives.",
+  "control_vs_cost_tradeoff": "Lower token burn is not enough for enterprise adoption. Teleon must preserve control, auditability, patch posture, SSO/BYOK/compliance integration, and customer-owned deployment options."
+}

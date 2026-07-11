@@ -27,16 +27,16 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-docs.txt
+          pip install -r _repos/shared-backend-components/requirements-docs.txt
 
       - name: Validate manifests
-        run: python scripts/validate.py
+        run: python _repos/shared-backend-components/scripts/validate.py
 
       - name: Build catalog pages
-        run: python scripts/build_catalog_pages.py
+        run: python _repos/shared-backend-components/scripts/build_catalog_pages.py
 
       - name: Build site
-        run: mkdocs build --strict --site-dir site
+        run: mkdocs build --strict -f _repos/shared-backend-components/deploy/mkdocs.yml --site-dir "$GITHUB_WORKSPACE/site"
 
       - uses: actions/upload-pages-artifact@v3
         with:

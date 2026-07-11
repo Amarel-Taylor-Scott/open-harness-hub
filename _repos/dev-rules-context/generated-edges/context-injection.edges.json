@@ -1,0 +1,47 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "context-injection",
+  "repo": "aidoneright-context-injection",
+  "role": "DEV TOOL \u2014 reusable context assembly / packing / memory / prompt-composition tooling (context packs, headroom compression, retrieval-into-prompt). The 'context is everything' plumbing every agent surface uses.",
+  "exposes": [
+    "context-pack-builder",
+    "memory-store",
+    "prompt-composer",
+    "headroom-compressor",
+    "retrieval-injector"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "exposes": [
+        "registry",
+        "primitives",
+        "codegraph",
+        "eval-harness",
+        "storage-tiers",
+        "credential-plane"
+      ],
+      "role": "the SUBSTRATE every product consumes \u2014 the primitive/component/template registry + factory + catalog, codegraph, naming "
+    }
+  ],
+  "consumed_by": [
+    "aidevobserver",
+    "aidoneright",
+    "baltor",
+    "teleon"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

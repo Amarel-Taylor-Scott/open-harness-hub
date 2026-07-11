@@ -1,0 +1,19 @@
+MODULE src/teleon/synthesis/templates.py
+## API signatures
+```python
+"""templates — the template library (the biggest efficiency lever). Canonical typed DAG SKELETONS with named slots;
+composition RETRIEVES a matching template and MUTATES its slots (fill each slot's plane with a component, drop unused
+optional slots) instead of synthesizing from scratch. The honest reason: classical component synthesis scales poorly with
+library size, so templates carry the common cas"""
+def py_function_src_teleon_synthesis_templates__load_templates() -> list
+def py_function_src_teleon_synthesis_templates___tok(py_arg_src_teleon_synthesis_templates__tok__s: str) -> set
+def py_function_src_teleon_synthesis_templates__retrieve_template(py_arg_src_teleon_synthesis_templates__retrieve_template__query: str, *, py_arg_src_teleon_synthesis_templates__retrieve_template__capability_family: str | None=None) -> dict | None
+    # The best-matching template by keyword/family overlap, or None when nothing matches. Ties break by telemetry
+def py_function_src_teleon_synthesis_templates__mutate(py_arg_src_teleon_synthesis_templates__mutate__template: dict, py_arg_src_teleon_synthesis_templates__mutate__fills: dict, *, py_arg_src_teleon_synthesis_templates__mutate__drop_unfilled_optional: bool=True) -> dict
+    # Fill a template's slots into a concrete DAG. fills: {step: component_id}. An unfilled OPTIONAL slot is dropped (its
+def py_function_src_teleon_synthesis_templates__mine_template(py_arg_src_teleon_synthesis_templates__mine_template__nodes: list, py_arg_src_teleon_synthesis_templates__mine_template__edges: list, *, capability_family: str, keywords: list | None=None) -> dict
+    # Propose a NEW template from a winning trace — slots = the planes of the trace nodes. The library grows itself
+```
+## intra-module call edges
+src.teleon.synthesis.templates.py_function_src_teleon_synthesis_templates__retrieve_template -> src.teleon.synthesis.templates.py_function_src_teleon_synthesis_templates___tok
+src.teleon.synthesis.templates.py_function_src_teleon_synthesis_templates__retrieve_template -> src.teleon.synthesis.templates.py_function_src_teleon_synthesis_templates__load_templates

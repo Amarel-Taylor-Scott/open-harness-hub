@@ -1,0 +1,357 @@
+{
+  "schema_version": 1,
+  "record_type": "global_primitive_foundry_multimodel_lanes",
+  "status": "candidate_contract",
+  "serves_truth": false,
+  "purpose": "Define model, browser, and deterministic lanes for the global source-to-usable-primitive foundry.",
+  "model_resolution_policy": {
+    "rule": "Model tags are configuration, not code. Resolve Ollama Cloud or local Ollama model names from environment and provider registry at run time.",
+    "research_model_env": "OH_PRIMITIVE_RESEARCH_MODEL",
+    "default_research_model_id": "glm-5.2",
+    "code_model_env": "OH_PRIMITIVE_CODE_MODEL",
+    "default_code_model_id": "kimi-k2.7-code",
+    "fallback_chat_model_env": "OH_CHAT_MODEL",
+    "default_fallback_chat_model_id": "glm-5.2",
+    "required_secret_refs": [
+      "OLLAMA_API_KEY"
+    ],
+    "raw_secrets_allowed": false
+  },
+  "lanes": [
+    {
+      "lane_id": "lane.codex_orchestrator",
+      "lane_type": "agent_engineer",
+      "provider": "codex",
+      "primary_roles": [
+        "repo_patch_application",
+        "deterministic_test_execution",
+        "artifact_wiring",
+        "final_human_readable_summary"
+      ],
+      "allowed_inputs": [
+        "candidate_source_digest",
+        "primitive_contract",
+        "model_critiques",
+        "proof_failures"
+      ],
+      "allowed_outputs": [
+        "repo_patch_candidate",
+        "test_result",
+        "docs_update",
+        "implementation_notes"
+      ],
+      "candidate_only_output": true,
+      "promotion_allowed": false,
+      "serves_truth": false
+    },
+    {
+      "lane_id": "lane.glm_5_2_ollama_researcher",
+      "lane_type": "model_researcher",
+      "provider": "ollama_openai_compatible",
+      "model_env": "OH_PRIMITIVE_RESEARCH_MODEL",
+      "model_hint": "GLM 5.2 via Ollama Cloud or local Ollama when configured",
+      "primary_roles": [
+        "source_triage",
+        "capability_taxonomy_mapping",
+        "primitive_opportunity_extraction",
+        "contract_hypothesis",
+        "ranking_rationale"
+      ],
+      "allowed_inputs": [
+        "public_metadata",
+        "license_reviewed_excerpt",
+        "browser_capture_summary",
+        "existing_registry_search_cards"
+      ],
+      "allowed_outputs": [
+        "primitive_opportunity",
+        "candidate_contract_hypothesis",
+        "source_gap_report",
+        "ranking_feature"
+      ],
+      "candidate_only_output": true,
+      "promotion_allowed": false,
+      "serves_truth": false
+    },
+    {
+      "lane_id": "lane.kimi_code_2_7_ollama_implementer",
+      "lane_type": "model_code_reviewer",
+      "provider": "ollama_openai_compatible",
+      "model_env": "OH_PRIMITIVE_CODE_MODEL",
+      "model_hint": "Kimi Code 2.7 via Ollama Cloud or local Ollama when configured",
+      "primary_roles": [
+        "implementation_plan",
+        "test_plan",
+        "edge_case_enumeration",
+        "contract_mismatch_review",
+        "patch_critique"
+      ],
+      "allowed_inputs": [
+        "candidate_contract_hypothesis",
+        "existing_source_ref_candidate",
+        "proof_failure",
+        "repo_style_summary"
+      ],
+      "allowed_outputs": [
+        "candidate_implementation_plan",
+        "candidate_test_plan",
+        "patch_risk_report",
+        "contract_correction"
+      ],
+      "candidate_only_output": true,
+      "promotion_allowed": false,
+      "serves_truth": false
+    },
+    {
+      "lane_id": "lane.browser_capture_source_observer",
+      "lane_type": "browser_tool",
+      "provider": "cdp_browser_capture",
+      "primary_roles": [
+        "rendered_page_capture",
+        "clickable_inventory",
+        "screenshot_capture",
+        "html_digest_capture",
+        "source_provenance_capture"
+      ],
+      "required_provenance_fields": [
+        "url",
+        "captured_at",
+        "content_hash",
+        "publisher",
+        "license_status",
+        "robots_or_terms_status",
+        "redaction_status"
+      ],
+      "allowed_outputs": [
+        "source_candidate",
+        "browser_capture_artifact",
+        "source_change_event"
+      ],
+      "candidate_only_output": true,
+      "promotion_allowed": false,
+      "serves_truth": false
+    },
+    {
+      "lane_id": "lane.deterministic_gatekeeper",
+      "lane_type": "deterministic_runtime",
+      "provider": "teleon_openhubforai",
+      "primary_roles": [
+        "license_gate",
+        "privacy_gate",
+        "contract_gate",
+        "proof_gate",
+        "planlock_gate",
+        "promotion_gate"
+      ],
+      "allowed_inputs": [
+        "source_candidate",
+        "primitive_opportunity",
+        "primitive_draft",
+        "variation_record",
+        "proof_bundle"
+      ],
+      "allowed_outputs": [
+        "rejected_candidate",
+        "primitive_lifecycle_digest",
+        "primitive_implementation_backlog",
+        "primitive_search_card",
+        "primitive_vector_row",
+        "promotion_candidate"
+      ],
+      "candidate_only_output": false,
+      "promotion_allowed": true,
+      "serves_truth": false,
+      "promotion_requires_human_or_policy_approval": true
+    }
+  ],
+  "stages": [
+    {
+      "stage_id": "stage.source_discovery",
+      "owner_lane": "lane.browser_capture_source_observer",
+      "inputs": [
+        "source_surface_seed",
+        "demand_signal",
+        "registry_gap"
+      ],
+      "outputs": [
+        "source_candidate"
+      ],
+      "required_gates": [
+        "source_scope_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.source_normalization",
+      "owner_lane": "lane.deterministic_gatekeeper",
+      "inputs": [
+        "source_candidate"
+      ],
+      "outputs": [
+        "normalized_source_record"
+      ],
+      "required_gates": [
+        "license_and_attribution_gate",
+        "privacy_redaction_gate",
+        "raw_source_republish_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.primitive_opportunity_distillation",
+      "owner_lane": "lane.glm_5_2_ollama_researcher",
+      "inputs": [
+        "normalized_source_record",
+        "existing_registry_search_cards"
+      ],
+      "outputs": [
+        "primitive_opportunity",
+        "candidate_contract_hypothesis"
+      ],
+      "required_gates": [
+        "json_schema_gate",
+        "candidate_only_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.cross_model_critique",
+      "owner_lane": "lane.kimi_code_2_7_ollama_implementer",
+      "inputs": [
+        "primitive_opportunity",
+        "candidate_contract_hypothesis"
+      ],
+      "outputs": [
+        "contract_correction",
+        "candidate_test_plan",
+        "patch_risk_report"
+      ],
+      "required_gates": [
+        "disagreement_logged_gate",
+        "candidate_only_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.contract_authoring",
+      "owner_lane": "lane.deterministic_gatekeeper",
+      "inputs": [
+        "primitive_opportunity",
+        "contract_correction"
+      ],
+      "outputs": [
+        "primitive_draft"
+      ],
+      "required_gates": [
+        "contract_schema_gate",
+        "effect_memory_cache_gate",
+        "source_ref_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.implementation_candidate",
+      "owner_lane": "lane.codex_orchestrator",
+      "inputs": [
+        "primitive_draft",
+        "candidate_test_plan"
+      ],
+      "outputs": [
+        "repo_patch_candidate",
+        "implementation_notes"
+      ],
+      "required_gates": [
+        "repo_style_gate",
+        "no_unlicensed_source_copy_gate",
+        "candidate_only_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.proof_generation",
+      "owner_lane": "lane.codex_orchestrator",
+      "inputs": [
+        "repo_patch_candidate",
+        "primitive_draft"
+      ],
+      "outputs": [
+        "proof_bundle",
+        "test_result"
+      ],
+      "required_gates": [
+        "deterministic_replay_gate",
+        "contract_proof_gate",
+        "privacy_redaction_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.lifecycle_packaging",
+      "owner_lane": "lane.deterministic_gatekeeper",
+      "inputs": [
+        "primitive_draft",
+        "proof_bundle"
+      ],
+      "outputs": [
+        "primitive_lifecycle_digest",
+        "primitive_implementation_backlog",
+        "primitive_search_card",
+        "primitive_vector_row"
+      ],
+      "required_gates": [
+        "vector_staging_not_truth_gate",
+        "candidate_only_gate"
+      ]
+    },
+    {
+      "stage_id": "stage.promotion_queue",
+      "owner_lane": "lane.deterministic_gatekeeper",
+      "inputs": [
+        "primitive_draft",
+        "proof_bundle",
+        "human_or_policy_approval"
+      ],
+      "outputs": [
+        "promotion_candidate"
+      ],
+      "required_gates": [
+        "promotion_gate",
+        "serves_truth_flip_gate"
+      ]
+    }
+  ],
+  "required_gates": [
+    "source_scope_gate",
+    "license_and_attribution_gate",
+    "privacy_redaction_gate",
+    "raw_source_republish_gate",
+    "json_schema_gate",
+    "candidate_only_gate",
+    "disagreement_logged_gate",
+    "contract_schema_gate",
+    "effect_memory_cache_gate",
+    "source_ref_gate",
+    "repo_style_gate",
+    "no_unlicensed_source_copy_gate",
+    "deterministic_replay_gate",
+    "contract_proof_gate",
+    "vector_staging_not_truth_gate",
+    "promotion_gate",
+    "serves_truth_flip_gate"
+  ],
+  "usable_primitive_definition": {
+    "minimum_level": "R8_auto_compile_eligible",
+    "must_have": [
+      "canonical_identity",
+      "contract",
+      "effects",
+      "memory_policy",
+      "cache_policy",
+      "source_ref",
+      "proof_bundle",
+      "search_card",
+      "vector_row",
+      "promotion_status"
+    ],
+    "may_serve_truth_only_when": [
+      "proof_bundle_passes",
+      "license_and_attribution_gate_passes",
+      "privacy_redaction_gate_passes",
+      "promotion_record_approved",
+      "serves_truth_flip_gate_passes"
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+MODULE src/teleon/retrieval/embedding_port.py
+## API signatures
+```python
+"""src.teleon.retrieval.embedding_port — the EMBEDDING abstraction: any embedder behind ONE port (agnostic, registry-populated)."""
+class py_class_src_teleon_retrieval_embedding_port__EmbeddingPort:
+    def embed(self, py_arg_src_teleon_retrieval_embedding_port__py_class_src_teleon_retrieval_embedding_port__EmbeddingPort_embed__text: str) -> list[float]
+class py_class_src_teleon_retrieval_embedding_port__LexicalEmbedder:
+    # Deterministic lexical embedder (char-trigram hash, ALWAYS available — the wired baseline). No model, no network.
+    def embed(self, py_arg_src_teleon_retrieval_embedding_port__py_class_src_teleon_retrieval_embedding_port__LexicalEmbedder_embed__text: str) -> list[float]
+    def embed_batch(self, py_arg_src_teleon_retrieval_embedding_port__py_class_src_teleon_retrieval_embedding_port__LexicalEmbedder_embed_batch__texts: list[str]) -> list[list[float]]
+class py_class_src_teleon_retrieval_embedding_port__NotWiredEmbedder:
+    # A registry embedder whose model/key isn't present — honest, never fabricates a vector.
+    def __init__(self, name: str)
+    def embed(self, py_arg_src_teleon_retrieval_embedding_port__py_class_src_teleon_retrieval_embedding_port__NotWiredEmbedder_embed__text: str) -> list[float]
+class py_class_src_teleon_retrieval_embedding_port__LocalOllamaEmbedder:
+    # LOCAL semantic embedder via Ollama (nomic-embed-text) — NO API KEY, runs on localhost, private + free.
+    def embed(self, py_arg_src_teleon_retrieval_embedding_port__py_class_src_teleon_retrieval_embedding_port__LocalOllamaEmbedder_embed__text: str) -> list[float]
+    def available(self) -> bool
+def py_function_src_teleon_retrieval_embedding_port__register_embedder_adapter(py_arg_src_teleon_retrieval_embedding_port__py_function_src_teleon_retrieval_embedding_port__register_embedder_adapter__name: str, py_arg_src_teleon_retrieval_embedding_port__py_function_src_teleon_retrieval_embedding_port__register_embedder_adapter__factory) -> None
+    # Future-proofing hook: wire a real embedder by name; callers of select_embedder never change.
+def py_function_src_teleon_retrieval_embedding_port___embedding_plane() -> list[py_class_src_teleon_registry_plane__Candidate]
+def py_function_src_teleon_retrieval_embedding_port__select_embedder_by_policy(py_arg_src_teleon_retrieval_embedding_port__py_function_src_teleon_retrieval_embedding_port__select_embedder_by_policy__policy: str='local_first') -> py_class_src_teleon_retrieval_embedding_port__EmbeddingPort
+    # Pick an embedder by POLICY over the plane (local_first | keyless_first | cheapest | best_quality | …),
+def py_function_src_teleon_retrieval_embedding_port__best_embedder() -> py_class_src_teleon_retrieval_embedding_port__EmbeddingPort
+    # Back-compat alias: the local-first policy over the embedding plane (local-semantic if up, else lexical).
+def py_function_src_teleon_retrieval_embedding_port__available_embedders() -> dict
+def py_function_src_teleon_retrieval_embedding_port__select_embedder(py_arg_src_teleon_retrieval_embedding_port__py_function_src_teleon_retrieval_embedding_port__select_embedder__name: str='auto') -> py_class_src_teleon_retrieval_embedding_port__EmbeddingPort
+    # Resolve an embedder by name/registry-id. 'auto' -> the always-available lexical baseline; a model embedder not yet
+```
+## intra-module call edges
+src.teleon.retrieval.embedding_port.available -> src.teleon.retrieval.embedding_port.py_class_src_teleon_retrieval_embedding_port__EmbeddingPort.embed
+src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port___embedding_plane -> src.teleon.retrieval.embedding_port.py_class_src_teleon_retrieval_embedding_port__LocalOllamaEmbedder
+src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port__best_embedder -> src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port__select_embedder_by_policy
+src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port__select_embedder -> src.teleon.retrieval.embedding_port.py_class_src_teleon_retrieval_embedding_port__LexicalEmbedder
+src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port__select_embedder -> src.teleon.retrieval.embedding_port.py_class_src_teleon_retrieval_embedding_port__NotWiredEmbedder
+src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port__select_embedder_by_policy -> src.teleon.retrieval.embedding_port.py_class_src_teleon_retrieval_embedding_port__LexicalEmbedder
+src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port__select_embedder_by_policy -> src.teleon.retrieval.embedding_port.py_function_src_teleon_retrieval_embedding_port___embedding_plane

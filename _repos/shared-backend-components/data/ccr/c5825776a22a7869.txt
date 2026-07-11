@@ -1,0 +1,25 @@
+MODULE src/teleon/blackboard/token_economics.py
+## API signatures
+```python
+"""src.teleon.blackboard.token_economics — a DETERMINISTIC token-economics ESTIMATE for the stateful thesis."""
+def py_function_src_teleon_blackboard_token_economics__estimate_tokens(py_arg_src_teleon_blackboard_token_economics__estimate_tokens__text: str) -> int
+    # DETERMINISTIC token ESTIMATE for ``text``: ``ceil(len(text) / CHARS_PER_TOKEN)``.
+def py_function_src_teleon_blackboard_token_economics__load_cfpb_sample_docs(*, py_arg_src_teleon_blackboard_token_economics__load_cfpb_sample_docs__repo: Path | None=None) -> dict[str, str]
+    # Load the CFPB-sample source docs as ``{relpath: text}`` (deterministic key order).
+def py_function_src_teleon_blackboard_token_economics___distill_entries(py_arg_src_teleon_blackboard_token_economics__distill_entries__docs: Mapping[str, str]) -> list[dict[str, Any]]
+    # Distill the source docs into compact, source-backed blackboard entries (the STATEFUL state).
+def py_function_src_teleon_blackboard_token_economics___entry_chars(py_arg_src_teleon_blackboard_token_economics__entry_chars__entry: Mapping[str, Any]) -> int
+    # Estimated CHARACTER size of one compact blackboard entry as a question would read it.
+def py_function_src_teleon_blackboard_token_economics__build_blackboard_from_docs(py_arg_src_teleon_blackboard_token_economics__build_blackboard_from_docs__docs: Mapping[str, str], *, tenant_scope: str, now: str, db_path: str | None=None, py_arg_src_teleon_blackboard_token_economics__build_blackboard_from_docs__task: str='CFPB dispute knowledge base — stateful token-economics estimate') -> dict[str, Any]
+    # Run the STATEFUL first pass: read all ``docs`` and APPEND compact source-backed entries to a blackboard.
+def py_function_src_teleon_blackboard_token_economics__estimate_token_economics(py_arg_src_teleon_blackboard_token_economics__estimate_token_economics__docs: Mapping[str, str], py_arg_src_teleon_blackboard_token_economics__estimate_token_economics__questions: Sequence[str], *, py_arg_src_teleon_blackboard_token_economics__estimate_token_economics__tenant_scope: str='tenant-demo', now: str, py_arg_src_teleon_blackboard_token_economics__estimate_token_economics__db_path: str | None=None) -> dict[str, Any]
+    # Estimate STATELESS vs STATEFUL input-token cost over ``docs`` + a sequence of ``questions``.
+def py_function_src_teleon_blackboard_token_economics___crossover_n(*, doc_tokens: int, shell_tokens: int, per_question_stateful: int, first_pass: int) -> int | None
+    # Smallest integer N >= 1 at which the STATEFUL total drops below the STATELESS total.
+```
+## intra-module call edges
+src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__build_blackboard_from_docs -> src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics___distill_entries
+src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__estimate_token_economics -> src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics___crossover_n
+src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__estimate_token_economics -> src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics___entry_chars
+src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__estimate_token_economics -> src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__build_blackboard_from_docs
+src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__estimate_token_economics -> src.teleon.blackboard.token_economics.py_function_src_teleon_blackboard_token_economics__estimate_tokens

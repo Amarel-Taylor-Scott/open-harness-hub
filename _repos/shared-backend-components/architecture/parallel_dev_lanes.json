@@ -1,0 +1,50 @@
+{
+  "schema_version": "parallel-dev-lanes",
+  "isolation": "git-worktree",
+  "principle": "Faster dev cycles via PARALLEL agents that never edit the same file at once. Two guarantees: (1) every lane runs in its OWN git worktree (a separate working directory + branch), so it is physically impossible for two agents to write the same file in the same tree; (2) lanes own DISJOINT file globs, so even at merge time their diffs do not overlap. Results merge back via PR. Heterogeneous brains: cheap Ollama agents (GLM-5.2 / Kimi via the default brain) take the narrow/deterministic/templated lanes; Claude Code agents take the ambiguous/design lanes — the unbounded->bounded brain policy applied to the dev fleet itself.",
+  "brains": {
+    "claude": {"command_env": "CLAUDE_CODE_CMD", "default_command": "claude -p", "use_for": "ambiguous / design / cross-cutting reasoning"},
+    "ollama": {"command_env": "OLLAMA_AGENT_CMD", "default_command": "", "use_for": "narrow / deterministic / templated lanes; OpenAI-compatible agent pointed at the local Ollama endpoint (GLM-5.2 / Kimi via OLLAMA_API_KEY)"}
+  },
+  "shared_serialized": {
+    "why": "these files are touched by EVERY increment (the proof registry + the computed proof-count token), so they are the #1 source of parallel-edit conflicts. They are owned by NO lane; a lane's proof registration + token bump are applied by the coordinator at MERGE time, one lane at a time (serialized), never concurrently.",
+    "files": ["_repos/shared-backend-components/scripts/flywheel_proof_modules.py", "_repos/shared-backend-components/docs/strategy/yc-master-current-state-business-plan-and-pitch.md"]
+  },
+  "lanes": [
+    {
+      "id": "extraction-cascade",
+      "surface": "document extraction cascade + the write-in demo",
+      "brain": "claude",
+      "why_brain": "ambiguous design + UX decisions",
+      "owns": ["_repos/teleon/backend/src/teleon/extraction/**", "_repos/shared-backend-components/scripts/check_cascade_measurement.py", "_repos/shared-backend-components/scripts/check_input_acquire.py", "_repos/shared-backend-components/scripts/check_schema_templates.py", "_repos/shared-backend-components/scripts/serve_document_cascade_demo.py"]
+    },
+    {
+      "id": "profession-calculators",
+      "surface": "deterministic profession calculators",
+      "brain": "ollama",
+      "why_brain": "narrow clean-room rule coding over public rules (cheap-brain floor)",
+      "owns": ["_repos/teleon/backend/src/teleon/seeds/profession_calculators.py", "_repos/shared-backend-components/scripts/check_profession_calculators.py"]
+    },
+    {
+      "id": "portfolio-sites",
+      "surface": "three-site portfolio surfaces",
+      "brain": "claude",
+      "why_brain": "design + brand copy",
+      "owns": ["_repos/shared-backend-components/scripts/build_portfolio_sites.py", "_repos/shared-backend-components/scripts/portfolio_checks.py", "_repos/shared-backend-components/scripts/portfolio_lib.py", "_repos/shared-backend-components/scripts/check_portfolio_*.py", "_repos/aidoneright/websites/**"]
+    },
+    {
+      "id": "gtm-sales-docs",
+      "surface": "GTM / sales offline artifacts",
+      "brain": "ollama",
+      "why_brain": "templated prose generated from a spec",
+      "owns": ["_repos/shared-backend-components/docs/sales/**"]
+    },
+    {
+      "id": "descent-engine",
+      "surface": "self-optimizing descent engine",
+      "brain": "claude",
+      "why_brain": "cross-axis reasoning over the optimization graph",
+      "owns": ["_repos/teleon/backend/src/teleon/evolution/**"]
+    }
+  ]
+}

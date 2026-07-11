@@ -1,0 +1,7 @@
+{"role":"user","content":"Build a document extraction pipeline that turns uploaded invoices into standardized JSON with vendor, invoice number, due date, total, line items, and source spans."}
+{"role":"assistant","content":"I normalized this as DocumentArtifact to InvoiceJsonArtifact and found template document_extract_validate_emit."}
+{"role":"assistant","content":"CandidateBundle: parse DocumentArtifact>ParsedDocument, extract ParsedDocument>RawInvoiceFields, normalize RawInvoiceFields>NormalizedInvoice, validate NormalizedInvoice>ValidatedInvoice, emit ValidatedInvoice>InvoiceJsonArtifact."}
+{"role":"assistant","content":"I should not write my own PDF parser from scratch or ask a model to validate arbitrary JSON manually. The registry has parse_pdf_text, extract_invoice_fields_bounded, normalize_invoice_fields, and validate_invoice_schema_and_spans."}
+{"role":"assistant","content":"PlanDelta {\"v\":1,\"p\":\"dense\",\"t\":0,\"b\":[0,0,0,0,0],\"r\":[],\"g\":[]}"}
+{"role":"assistant","content":"Compiler rejects generic_json because it lacks the invoice contract and rejects schema_only validation because it lacks source-span validation."}
+{"role":"assistant","content":"Runtime uses artifact refs for documents, bounded extraction only, schema and span proof requirements, and JSONL ledger redaction."}

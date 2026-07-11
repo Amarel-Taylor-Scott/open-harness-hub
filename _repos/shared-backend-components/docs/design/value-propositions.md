@@ -1,0 +1,1 @@
+../../../_shared/design/value-propositions.md

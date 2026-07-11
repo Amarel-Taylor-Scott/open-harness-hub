@@ -1,0 +1,63 @@
+{
+  "registry": "qlora_adapters",
+  "serves_truth": false,
+  "description": "QLoRA (Quantized LoRA) adapters — LoRA trained on top of a base quantized to 4-bit (NF4) with paged optimizers, so a large base fine-tunes on commodity / single-GPU hardware. A registry of QLoRA SPECS (quantization + adapter shape + footprint + intent), not weights; pointers, never truth. The cost-down tier of lora_adapters: same task lift at a fraction of the VRAM. Records are synthetic/public metadata only.",
+  "stage": "model",
+  "adapters": [
+    {
+      "id": "qlora_7b_instruct_4bit",
+      "name": "7B instruct QLoRA (4-bit NF4)",
+      "base_model_family": "instruction LLM (7B-class)",
+      "quantization": "4-bit NF4 + double-quant", "compute_dtype": "bf16",
+      "rank": 16, "alpha": 32, "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
+      "approx_train_vram_gb": 10, "approx_infer_vram_gb": 6,
+      "when_to_use": "fine-tune a 7B on a single consumer GPU; the default cost-down adapter tier",
+      "tradeoff": "tiny quality delta vs fp16 LoRA for most tasks; verify on the held-out set before promotion",
+      "license": "adapter-author-defined; base license governs"
+    },
+    {
+      "id": "qlora_13b_domain_4bit",
+      "name": "13B domain QLoRA (4-bit NF4)",
+      "base_model_family": "instruction LLM (13B-class)",
+      "quantization": "4-bit NF4 + double-quant", "compute_dtype": "bf16",
+      "rank": 32, "alpha": 64, "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+      "approx_train_vram_gb": 18, "approx_infer_vram_gb": 11,
+      "when_to_use": "a 13B domain adapter where a 7B under-fits but full fine-tune is unaffordable",
+      "tradeoff": "more target modules = more capacity, more VRAM; output still passes the verification rail",
+      "license": "adapter-author-defined"
+    },
+    {
+      "id": "qlora_reasoning_4bit",
+      "name": "Reasoning QLoRA (4-bit NF4)",
+      "base_model_family": "instruction LLM",
+      "quantization": "4-bit NF4", "compute_dtype": "bf16",
+      "rank": 32, "alpha": 64, "target_modules": ["q_proj", "v_proj", "gate_proj", "up_proj"],
+      "approx_train_vram_gb": 12, "approx_infer_vram_gb": 7,
+      "when_to_use": "the cheap model-side enforcer for chain_of_thought_contracts — trains the required CoT structure into a small base",
+      "tradeoff": "pair with a deterministic contract gate; the adapter biases toward the structure, the gate guarantees it",
+      "license": "adapter-author-defined"
+    },
+    {
+      "id": "qlora_function_calling_4bit",
+      "name": "Function-calling QLoRA (4-bit NF4)",
+      "base_model_family": "instruction LLM",
+      "quantization": "4-bit NF4", "compute_dtype": "bf16",
+      "rank": 16, "alpha": 32, "target_modules": ["q_proj", "v_proj"],
+      "approx_train_vram_gb": 9, "approx_infer_vram_gb": 5,
+      "when_to_use": "reliable tool-call JSON from a small quantized base; the cheapest rung of the tool-use ladder",
+      "tradeoff": "schema-validate downstream; the adapter raises the hit-rate, the validator enforces correctness",
+      "license": "adapter-author-defined"
+    },
+    {
+      "id": "qlora_edge_3b_4bit",
+      "name": "Edge 3B QLoRA (4-bit NF4)",
+      "base_model_family": "small LLM (1-3B)",
+      "quantization": "4-bit NF4", "compute_dtype": "fp16",
+      "rank": 8, "alpha": 16, "target_modules": ["q_proj", "v_proj"],
+      "approx_train_vram_gb": 5, "approx_infer_vram_gb": 3,
+      "when_to_use": "on-device / batch-CPU narrow tasks where latency + cost dominate and scope is bounded",
+      "tradeoff": "small base needs a narrow task + a deterministic harness around it (small-models-need-narrow-scope)",
+      "license": "adapter-author-defined"
+    }
+  ]
+}

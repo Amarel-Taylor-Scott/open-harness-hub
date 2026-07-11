@@ -1,0 +1,26 @@
+MODULE src/teleon/registry/browse.py
+## API signatures
+```python
+"""registry.browse — the FACETED BROWSE for OpenHubForAI.io (owner 2026-06-25)."""
+def py_function_src_teleon_registry_browse___ontology() -> dict
+def py_function_src_teleon_registry_browse___kind_map(py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__kind_map__onto: dict) -> dict
+def py_function_src_teleon_registry_browse__hub_to_category(py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__hub_to_category__hub: str | None) -> str | None
+def py_function_src_teleon_registry_browse__categories(py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__categories__reg: dict, py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__categories__kind: str | None=None) -> list[str]
+    # Flexible multi-category for a registry/record. PRIMARY = its hub; plus kind, layer, and cross-cutting tags —
+def py_function_src_teleon_registry_browse___item(py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__item__reg: dict, py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__item__kmap: dict) -> dict
+def py_function_src_teleon_registry_browse__facets() -> dict
+    # Every facet dimension + its values, computed from the RECONCILED SPINE (ontology ∪ live catalogs).
+def py_function_src_teleon_registry_browse__browse(query: str='', filters: dict | None=None, *, py_arg_src_teleon_registry_browse__py_function_src_teleon_registry_browse__browse__limit: int=300) -> dict
+    # Faceted browse over the catalog. Filters by any of category/type/kind/layer/status (combine freely) + a
+def py_function_src_teleon_registry_browse__self_test() -> int
+def main(py_arg_src_teleon_registry_browse__main__argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.registry.browse.main -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__facets
+src.teleon.registry.browse.main -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__self_test
+src.teleon.registry.browse.py_function_src_teleon_registry_browse___item -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__categories
+src.teleon.registry.browse.py_function_src_teleon_registry_browse__categories -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__hub_to_category
+src.teleon.registry.browse.py_function_src_teleon_registry_browse__self_test -> src.teleon.registry.browse.py_function_src_teleon_registry_browse___ontology
+src.teleon.registry.browse.py_function_src_teleon_registry_browse__self_test -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__browse
+src.teleon.registry.browse.py_function_src_teleon_registry_browse__self_test -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__categories
+src.teleon.registry.browse.py_function_src_teleon_registry_browse__self_test -> src.teleon.registry.browse.py_function_src_teleon_registry_browse__facets

@@ -1,0 +1,14 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-21",
+  "serves_truth": false,
+  "note": "Single source for research/browse GUARDRAILS, enforced by _repos/openhubforai/backend/src/openhubforai/research_catalog.py BEFORE any component is selected. Honors robots/ToS + official APIs first; login-walled sources are REFUSED (use scripts/hub_engine_runner.py --ingest with owner-provided material instead of scraping them); per-host rate + per-cycle cost ceilings; jurisdiction allow/deny; PII redaction. Everything stays a candidate (serves_truth=false).",
+  "policies": {
+    "default_api": {"respect_robots": true, "max_per_host_per_cycle": 30, "timeout_s": 10, "login_walled": "refuse", "max_cost_per_cycle": 12, "pii": "redact"},
+    "default_search": {"respect_robots": true, "max_per_host_per_cycle": 20, "timeout_s": 12, "login_walled": "refuse", "max_cost_per_cycle": 12, "pii": "redact"},
+    "browse_strict": {"respect_robots": true, "max_per_host_per_cycle": 5, "timeout_s": 40, "login_walled": "refuse", "max_cost_per_cycle": 20, "require_low_cost_llm": true, "max_steps": 12, "pii": "redact"}
+  },
+  "login_walled_hosts": ["facebook.com", "www.facebook.com", "instagram.com", "www.instagram.com", "linkedin.com", "www.linkedin.com", "x.com", "twitter.com"],
+  "jurisdiction": {"deny_hosts": [], "allow_default": true},
+  "global": {"serves_truth": false, "candidates_only": true, "respect_official_apis_first": true, "discovery_not_trust": true}
+}

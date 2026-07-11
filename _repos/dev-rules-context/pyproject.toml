@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aidoneright-devkit"
+version = "0.1.0"
+description = "AI Done Right shared devkit — the standards, contracts, and portable gates every repo installs (instead of copying). One source of truth for naming, multi-path, verification, the surface registry, and the cross-repo/interface checkers. This repo IS the devkit; it depends on nothing."
+requires-python = ">=3.11"
+
+# Every other repo depends on this package, so its laws + contracts + gates are inherited, not forked.
+# Installed editable in local dev (pip install -e path/to/dev-rules-context) and pinned by version in each
+# project's manifest. Version lives HERE in metadata — never in a name — per GLOBALLY-UNIQUE-NAMING.
+
+[project.scripts]
+aidr-check-cross-repo = "tools.check_cross_repo_dependency_law:main"
+aidr-generate-edges   = "tools.generate_repo_edges:main"
+aidr-check-interfaces = "tools.interface_manifests:main"
+
+[tool.setuptools]
+packages = ["tools"]
+
+[tool.aidoneright]
+# the single sources of truth inside this package (read, never re-declare elsewhere):
+surface_registry = "contracts/surface-registry.json"
+interface_spec   = "contracts/INTERFACE-MANIFEST-SPEC.md"
+standards_index  = "standards/README.md"
+shared_context   = "_shared/"

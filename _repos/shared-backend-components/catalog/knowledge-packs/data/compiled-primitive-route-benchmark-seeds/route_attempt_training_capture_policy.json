@@ -1,0 +1,43 @@
+{
+  "candidate": true,
+  "captured_records": [
+    "comparison_receipt",
+    "model_route_receipt",
+    "proof_receipt",
+    "execution_receipt",
+    "negative_memory_record",
+    "telemetry_trace_span",
+    "human_review_outcome"
+  ],
+  "every_route_attempt_becomes_training_data": true,
+  "isolation": {
+    "experimental_sprouts": "experiment lane only; excluded from production truth and promoted-route serving until the promotion gate passes",
+    "privacy": "cache source refs, never raw private payloads; tenant-private lineage never becomes global"
+  },
+  "lineage_fields": [
+    "dataset_id",
+    "dataset_version",
+    "source_snapshot_hash",
+    "schema_hash",
+    "row_count",
+    "sample_policy",
+    "privacy_boundary",
+    "license_or_terms_status",
+    "freshness_timestamp",
+    "run_date",
+    "commit_sha",
+    "producer_strategy",
+    "validation_receipts"
+  ],
+  "lossless_distillation_clause": "raw receipts, intermediates, held-out items, and rejected candidates are preserved and versioned; distilled training sets carry lineage back to receipts and a rollback target",
+  "policy_id": "policy:route_attempt_training_capture",
+  "record_type": "compiled_primitive_route_attempt_training_capture_policy",
+  "serves_truth": false,
+  "training_consumers": [
+    "cross_encoder_reranker_training",
+    "lora_adapter_training",
+    "route_ranking_model",
+    "negative_memory_classifier_training",
+    "decomposition_template_mining"
+  ]
+}

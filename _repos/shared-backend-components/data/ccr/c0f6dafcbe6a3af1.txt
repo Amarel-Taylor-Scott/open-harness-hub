@@ -1,0 +1,44 @@
+MODULE src/teleon/observer/consent.py
+## API signatures
+```python
+"""observer.consent — GATE #0 for the consented-session corpus flywheel."""
+SUBJECT_TYPES = ...
+PURPOSES = ...
+DEFAULT_RETENTION_DAYS = ...
+CONSENT_VERSION = ...
+_DAY = ...
+class ConsentRecord:
+    # One grant. `purposes` is a subset of PURPOSES; `scope` is a project glob ("*" = everything).
+    def expires_at(self) -> float
+    def active(self, now: float) -> bool
+    def to_json(self) -> dict
+    def from_json(d: dict) -> 'ConsentRecord'
+class Decision:
+    # The gate-#0 answer. `redaction_required` is ALWAYS True when allowed — retention is never raw.
+def _scope_covers(grant_scope: str, session_scope: str) -> bool
+    # Does a grant's scope cover a session's scope? "*" covers all; "acme/*" covers "acme" + "acme/…".
+class ConsentStore:
+    # Append-only consent ledger with a DEFAULT-DENY decision view. JSON-backed when a path is given
+    def __init__(self, path: str | Path | None=None) -> None
+    def grant(self, record: ConsentRecord) -> ConsentRecord
+    def revoke(self, subject_id: str, *, purpose: str | None=None, now: float | None=None) -> int
+        # Revoke all of a subject's consent (or just one purpose). Returns how many records it closed.
+    def may_retain(self, subject_id: str, *, purpose: str, scope: str='*', now: float | None=None) -> Decision
+    def active_records(self, now: float | None=None) -> list[ConsentRecord]
+    def _persist(self) -> None
+    def _load(self) -> None
+def gate_retention(store: ConsentStore, subject_id: str, *, purpose: str, scope: str='*', now: float | None=None) -> Decision
+    # GATE #0 — may this session be retained for the corpus flywheel? Default-deny; on allow, the caller
+def _self_test() -> int
+```
+## intra-module call edges
+src.teleon.observer.consent.__init__ -> src.teleon.observer.consent.ConsentStore._load
+src.teleon.observer.consent._self_test -> src.teleon.observer.consent.ConsentRecord
+src.teleon.observer.consent._self_test -> src.teleon.observer.consent.ConsentStore
+src.teleon.observer.consent._self_test -> src.teleon.observer.consent.gate_retention
+src.teleon.observer.consent.active -> src.teleon.observer.consent.ConsentRecord.expires_at
+src.teleon.observer.consent.from_json -> src.teleon.observer.consent.ConsentRecord
+src.teleon.observer.consent.grant -> src.teleon.observer.consent.ConsentStore._persist
+src.teleon.observer.consent.may_retain -> src.teleon.observer.consent.Decision
+src.teleon.observer.consent.may_retain -> src.teleon.observer.consent._scope_covers
+src.teleon.observer.consent.revoke -> src.teleon.observer.consent.ConsentStore._persist

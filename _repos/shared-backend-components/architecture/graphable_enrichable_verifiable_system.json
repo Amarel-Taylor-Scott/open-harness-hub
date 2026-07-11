@@ -1,0 +1,123 @@
+{
+  "serves_truth": false,
+  "purpose": "System contract for Graphable, Enrichable, Verifiable (GEV) code intelligence. Every code object, generated artifact, review packet, and graph edge should maximize context while limiting confusion, hidden blast radius, and unsupported promotion.",
+  "methodology_doc": "_repos/shared-backend-components/docs/codex/graphable-enrichable-verifiable-system.md",
+  "checker": "scripts/check_graphable_enrichable_verifiable_system.py",
+  "principle": "Names carry context; graphs carry structure; deterministic tools carry evidence; nondeterministic tools carry candidate enrichment; proofs carry acceptance.",
+  "object_contract": {
+    "graphable": [
+      "stable meaningful id or long source name",
+      "kind",
+      "file",
+      "line",
+      "scope",
+      "dependencies",
+      "edges",
+      "operation nodes when applicable"
+    ],
+    "enrichable": [
+      "purpose",
+      "problem_solved",
+      "input_shape",
+      "output_shape",
+      "ui_ux_impact",
+      "product_impact",
+      "risk_notes",
+      "candidate_llm_annotations"
+    ],
+    "verifiable": [
+      "deterministic_evidence",
+      "proof_to_run",
+      "proof_status",
+      "source_refs",
+      "confidence",
+      "serves_truth_false_until_promoted"
+    ],
+    "blast_radius": [
+      "direct_callers",
+      "direct_callees",
+      "imports",
+      "exported_symbols",
+      "operation_def_use_edges",
+      "ui_to_backend_paths",
+      "dynamic_unresolved_markers"
+    ]
+  },
+  "lanes": [
+    {
+      "id": "deterministic",
+      "role": "Evidence authority",
+      "tools": ["pyprefix", "repo_line_review_loop", "codegraph", "symbol_graph", "opgraph", "required_functionality", "proof_gate"],
+      "may_promote": true
+    },
+    {
+      "id": "hybrid",
+      "role": "Reconciliation and packetization",
+      "tools": ["hybrid_repo_review_pipeline", "review_packets", "artifact-fed pipelines"],
+      "may_promote": false
+    },
+    {
+      "id": "nondeterministic",
+      "role": "Candidate understanding, purpose, UX/product impact, and fix ideas",
+      "tools": ["OpenAI-compatible LLMs", "multi-model review"],
+      "may_promote": false
+    },
+    {
+      "id": "human_or_owner_review",
+      "role": "Risk acceptance and policy judgment",
+      "tools": ["review packet", "change warrant"],
+      "may_promote": false
+    }
+  ],
+  "rules": [
+    {
+      "id": "maximize_context_in_source",
+      "rule": "Prefer long meaningful source names, purpose docstrings, explicit input/output contracts, and candidate envelopes over terse names and hidden assumptions."
+    },
+    {
+      "id": "graph_everything_possible",
+      "rule": "Definitions, references, imports, calls, contains, inherits, assignments, operators, control flow, data flow, UI seams, backend handlers, and requirement edges should be graph nodes or edges where feasible."
+    },
+    {
+      "id": "enrichment_is_candidate",
+      "rule": "LLM, model, and human interpretation enrich packets but do not replace deterministic evidence."
+    },
+    {
+      "id": "verification_promotes",
+      "rule": "Only deterministic checks, proof gates, or explicit governed review can promote a candidate finding/fix."
+    },
+    {
+      "id": "blast_radius_before_fix",
+      "rule": "Every nontrivial change should include direct graph context and a blast-radius hint before implementation."
+    },
+    {
+      "id": "unresolved_is_explicit",
+      "rule": "Dynamic refs, monkey-patching, string dispatch, reflection, framework hooks, external entrypoints, and generated templates must be marked unresolved or shimmed until modeled."
+    },
+    {
+      "id": "teleon_codegen_obeys_gev",
+      "rule": "Teleon-generated code uses long pyprefix names, scalar-or-sequence primitives, bounded loops, dispatch tables, candidate envelopes, and proof-before-promotion."
+    },
+    {
+      "id": "packets_are_resumable",
+      "rule": "Full-repo review pipelines should be artifact-fed and resumable rather than one monolithic recomputation."
+    }
+  ],
+  "packet_required_fields": [
+    "id",
+    "serves_truth",
+    "status",
+    "path",
+    "line",
+    "kind",
+    "severity",
+    "message",
+    "deterministic_evidence",
+    "graph_context",
+    "blast_radius",
+    "verification_lanes",
+    "context_policy",
+    "contracts",
+    "llm_prompt"
+  ]
+}

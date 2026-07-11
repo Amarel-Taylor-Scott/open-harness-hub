@@ -26,19 +26,19 @@ jobs:
           pip install pyyaml jsonschema
 
       - name: Validate manifests
-        run: python scripts/validate.py
+        run: python _repos/shared-backend-components/scripts/validate.py
 
       - name: Build catalog index
-        run: python scripts/build_catalog_index.py
+        run: python _repos/shared-backend-components/scripts/build_catalog_index.py
 
       - name: Run all emitters
-        run: python scripts/emit/all.py
+        run: python _repos/shared-backend-components/scripts/emit/all.py
 
       - name: Upload dist/ as workflow output bundle
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist/
+          path: _repos/shared-backend-components/dist/
           retention-days: 30
 
       - name: Publish dist/ to dist-published branch
@@ -48,7 +48,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # Save dist/ before checkout
-          mv dist /tmp/dist-snapshot
+          mv _repos/shared-backend-components/dist /tmp/dist-snapshot
 
           # Switch to (or create) the published branch
           git fetch origin dist-published || true

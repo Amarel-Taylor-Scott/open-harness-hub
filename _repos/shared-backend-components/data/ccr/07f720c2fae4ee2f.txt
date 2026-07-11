@@ -1,0 +1,15 @@
+MODULE src/baltor/workers/spawn_decision.py
+## API signatures
+```python
+"""src.baltor.workers.spawn_decision — the SPAWN DECISION ENGINE (C-FLEET-2)."""
+ACTIONS = ...
+_HIGH_PRIORITIES = ...
+_SAFETY_MARGIN_MS = ...
+def _decision(action: str, reason: str, **extra) -> dict
+def _free_workers(workers: list[dict], capability_id: str) -> list[dict]
+def decide(*, capability_id: str, queued: list[dict], workers: list[dict], now: str, lifecycle: dict, batch: dict, sla: dict, estimated_runtime_ms: int, max_concurrency_per_worker: int=1, known_capabilities: set | None=None, tenant_active: int=0, tenant_limit: int | None=None, domain_active: int=0, domain_limit: int | None=None, circuit_open: bool=False, has_fallback: bool=False) -> dict
+    # Decide the single best action for `capability_id`'s queued work right now.
+```
+## intra-module call edges
+src.baltor.workers.spawn_decision.decide -> src.baltor.workers.spawn_decision._decision
+src.baltor.workers.spawn_decision.decide -> src.baltor.workers.spawn_decision._free_workers

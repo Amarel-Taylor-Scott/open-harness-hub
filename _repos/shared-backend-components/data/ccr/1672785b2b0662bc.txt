@@ -1,0 +1,31 @@
+MODULE src/teleon/objectives/telemetry.py
+## API signatures
+```python
+"""src.teleon.objectives.telemetry — OBSERVED measurement: turn real run outcomes into a MetricVector per impl."""
+class TelemetryError:
+    # Raised on a malformed observation or a query for an impl with no recorded runs — never a silent guess.
+class RunObservation:
+    # One recorded run of an implementation. ``cost`` = relative units; ``latency_ms``; ``llm_calls`` = model
+class RunLedger:
+    # Accumulates RunObservations per implementation and derives an OBSERVED MetricVector + a blended prior.
+    def __init__(self) -> None
+    def record(self, obs: RunObservation) -> None
+    def count(self, impl_id: str) -> int
+    def observations(self, impl_id: str) -> list[RunObservation]
+        # The retained, ordered observation trace for one impl (telemetry, never discarded).
+    def token_usage(self, impl_id: str) -> dict
+        # Observed TOKEN CONSUMPTION (in + out) for one impl — the mean input/output tokens per run, the metric
+    def observed_metrics(self, impl_id: str) -> MetricVector
+        # The MetricVector derived purely from this impl's recorded runs (see module docstring for methods).
+    def candidates(self) -> list[tuple[str, MetricVector]]
+        # All impls with observations as (impl_id, observed MetricVector), sorted by impl_id — feeds ``select()``
+    def blend(self, impl_id: str, prior: MetricVector, *, prior_weight: float=1.0) -> MetricVector
+        # Blend a declared ``prior`` with observed evidence: a weighted mean where the prior counts as
+```
+## intra-module call edges
+src.teleon.objectives.telemetry.blend -> src.teleon.objectives.telemetry.RunLedger.count
+src.teleon.objectives.telemetry.blend -> src.teleon.objectives.telemetry.RunLedger.observed_metrics
+src.teleon.objectives.telemetry.candidates -> src.teleon.objectives.telemetry.RunLedger.observed_metrics
+src.teleon.objectives.telemetry.observed_metrics -> src.teleon.objectives.telemetry.TelemetryError
+src.teleon.objectives.telemetry.record -> src.teleon.objectives.telemetry.TelemetryError
+src.teleon.objectives.telemetry.token_usage -> src.teleon.objectives.telemetry.TelemetryError

@@ -1,0 +1,618 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "chunk_count": 1,
+    "chunks": [
+      {
+        "char_count": 120,
+        "id": "chunk-001-c60e178e",
+        "text": "Runtime infrastructure proof. Vendors must review access every 90 days. The current threshold is 25000 as of 2026-06-01."
+      }
+    ],
+    "claim_count": 2,
+    "claims": [
+      {
+        "claim": "Vendors must review access every 90 days.",
+        "id": "claim-001-b13b187a",
+        "polarity": "positive",
+        "source_chunk": "chunk-001-c60e178e",
+        "subject": "Vendors"
+      },
+      {
+        "claim": "The current threshold is 25000 as of 2026-06-01.",
+        "id": "claim-002-4259669f",
+        "polarity": "neutral",
+        "source_chunk": "chunk-001-c60e178e",
+        "subject": "the current threshold"
+      }
+    ],
+    "edges": [
+      {
+        "from": "entity-001-c4740e4c",
+        "to": "chunk-001-c60e178e",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-002-634d8941",
+        "to": "chunk-001-c60e178e",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "claim-001-b13b187a",
+        "to": "chunk-001-c60e178e",
+        "type": "supported_by"
+      },
+      {
+        "from": "claim-001-b13b187a",
+        "to": "entity-002-634d8941",
+        "type": "mentions"
+      },
+      {
+        "from": "claim-002-4259669f",
+        "to": "chunk-001-c60e178e",
+        "type": "supported_by"
+      }
+    ],
+    "entities": [
+      {
+        "id": "entity-001-c4740e4c",
+        "label": "Runtime",
+        "type": "entity"
+      },
+      {
+        "id": "entity-002-634d8941",
+        "label": "Vendors",
+        "type": "entity"
+      }
+    ],
+    "entity_edges": [
+      {
+        "from": "entity-001-c4740e4c",
+        "to": "chunk-001-c60e178e",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-002-634d8941",
+        "to": "chunk-001-c60e178e",
+        "type": "mentioned_in"
+      }
+    ],
+    "fragile_facts": [
+      {
+        "authoritative_source_count": 0,
+        "claim": "Vendors must review access every 90 days.",
+        "fact_id": "claim-001-b13b187a",
+        "independent_source_count": 1,
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 0,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "reasons": [
+          "refreshable via search/tool worker"
+        ],
+        "source_chunk": "chunk-001-c60e178e",
+        "state": "needs_second_source",
+        "subject": "Vendors"
+      },
+      {
+        "authoritative_source_count": 0,
+        "claim": "The current threshold is 25000 as of 2026-06-01.",
+        "fact_id": "claim-002-4259669f",
+        "independent_source_count": 1,
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 24,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "reasons": [
+          "refreshable via search/tool worker"
+        ],
+        "source_chunk": "chunk-001-c60e178e",
+        "state": "needs_second_source",
+        "subject": "the current threshold"
+      }
+    ],
+    "keywords": [
+      {
+        "count": 1,
+        "term": "runtime"
+      },
+      {
+        "count": 1,
+        "term": "infrastructure"
+      },
+      {
+        "count": 1,
+        "term": "proof"
+      },
+      {
+        "count": 1,
+        "term": "vendors"
+      },
+      {
+        "count": 1,
+        "term": "review"
+      },
+      {
+        "count": 1,
+        "term": "access"
+      },
+      {
+        "count": 1,
+        "term": "every"
+      },
+      {
+        "count": 1,
+        "term": "days"
+      },
+      {
+        "count": 1,
+        "term": "current"
+      },
+      {
+        "count": 1,
+        "term": "threshold"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "entity-001-c4740e4c",
+        "label": "Runtime",
+        "type": "entity"
+      },
+      {
+        "id": "entity-002-634d8941",
+        "label": "Vendors",
+        "type": "entity"
+      },
+      {
+        "id": "chunk-001-c60e178e",
+        "label": "chunk-001-c60e178e",
+        "type": "chunk",
+        "weight": 120
+      },
+      {
+        "id": "claim-001-b13b187a",
+        "label": "Vendors",
+        "type": "claim"
+      },
+      {
+        "id": "claim-002-4259669f",
+        "label": "the current threshold",
+        "type": "claim"
+      }
+    ],
+    "refresh_jobs": [
+      {
+        "budget_policy": {
+          "action": "allow",
+          "budget_used_pct": 14.0,
+          "reason_codes": [
+            "within_budget"
+          ],
+          "task_budget_ceiling_usd": 0.25
+        },
+        "cost_estimate": {
+          "currency": "USD",
+          "estimate_kind": "task_planning",
+          "estimated_browser_seconds": 45,
+          "estimated_ceiling_usd": 0.063,
+          "estimated_floor_usd": 0.0228,
+          "estimated_gpu_seconds": 0,
+          "estimated_search_calls": 1,
+          "estimated_total_usd": 0.035,
+          "estimated_worker_seconds": 20,
+          "line_items": [
+            {
+              "amount_usd": 0.0123,
+              "basis": "verify.second_source.find queue worker",
+              "key": "worker_lane",
+              "label": "Worker lane execution"
+            },
+            {
+              "amount_usd": 0.0228,
+              "basis": "1 planned search/tool call(s)",
+              "key": "search_or_model",
+              "label": "Search/model/tool allowance"
+            }
+          ]
+        },
+        "fact_id": "claim-001-b13b187a",
+        "job_id": "cw-2739c8604838",
+        "lane": "research",
+        "parent_job_id": "cw-runtime-proof-001",
+        "pass_index": 2,
+        "payload": {
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "fact_id": "claim-001-b13b187a",
+          "priority": "normal",
+          "query": "Vendors authoritative verification source",
+          "queue_policy": {
+            "backoff": "exponential",
+            "budget_policy": {
+              "action": "allow",
+              "budget_used_pct": 14.0,
+              "reason_codes": [
+                "within_budget"
+              ],
+              "task_budget_ceiling_usd": 0.25
+            },
+            "cost_estimate": {
+              "currency": "USD",
+              "estimate_kind": "task_planning",
+              "estimated_browser_seconds": 45,
+              "estimated_ceiling_usd": 0.063,
+              "estimated_floor_usd": 0.0228,
+              "estimated_gpu_seconds": 0,
+              "estimated_search_calls": 1,
+              "estimated_total_usd": 0.035,
+              "estimated_worker_seconds": 20,
+              "line_items": [
+                {
+                  "amount_usd": 0.0123,
+                  "basis": "verify.second_source.find queue worker",
+                  "key": "worker_lane",
+                  "label": "Worker lane execution"
+                },
+                {
+                  "amount_usd": 0.0228,
+                  "basis": "1 planned search/tool call(s)",
+                  "key": "search_or_model",
+                  "label": "Search/model/tool allowance"
+                }
+              ]
+            },
+            "dedupe_key": "local|verify.second_source.find|claim-001-b13b187a|-|-",
+            "lane": "research",
+            "max_attempts": 3,
+            "priority": "normal",
+            "priority_score": 0.45,
+            "reason_codes": [
+              "needs_second_independent_source"
+            ]
+          }
+        },
+        "priority": "normal",
+        "queue_policy": {
+          "backoff": "exponential",
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "dedupe_key": "local|verify.second_source.find|claim-001-b13b187a|-|-",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "run_id": "run-runtime-proof-001",
+        "source_record_id": "",
+        "state": "queued",
+        "task": "context.search.verify",
+        "task_id": "rt-65c3cd55d2647a7a",
+        "task_type": "verify.second_source.find",
+        "tenant_id": "local"
+      },
+      {
+        "budget_policy": {
+          "action": "allow",
+          "budget_used_pct": 14.0,
+          "reason_codes": [
+            "within_budget"
+          ],
+          "task_budget_ceiling_usd": 0.25
+        },
+        "cost_estimate": {
+          "currency": "USD",
+          "estimate_kind": "task_planning",
+          "estimated_browser_seconds": 45,
+          "estimated_ceiling_usd": 0.063,
+          "estimated_floor_usd": 0.0228,
+          "estimated_gpu_seconds": 0,
+          "estimated_search_calls": 1,
+          "estimated_total_usd": 0.035,
+          "estimated_worker_seconds": 20,
+          "line_items": [
+            {
+              "amount_usd": 0.0123,
+              "basis": "verify.second_source.find queue worker",
+              "key": "worker_lane",
+              "label": "Worker lane execution"
+            },
+            {
+              "amount_usd": 0.0228,
+              "basis": "1 planned search/tool call(s)",
+              "key": "search_or_model",
+              "label": "Search/model/tool allowance"
+            }
+          ]
+        },
+        "fact_id": "claim-002-4259669f",
+        "job_id": "cw-8690867447a3",
+        "lane": "research",
+        "parent_job_id": "cw-runtime-proof-001",
+        "pass_index": 2,
+        "payload": {
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "fact_id": "claim-002-4259669f",
+          "priority": "normal",
+          "query": "the current threshold authoritative verification source",
+          "queue_policy": {
+            "backoff": "exponential",
+            "budget_policy": {
+              "action": "allow",
+              "budget_used_pct": 14.0,
+              "reason_codes": [
+                "within_budget"
+              ],
+              "task_budget_ceiling_usd": 0.25
+            },
+            "cost_estimate": {
+              "currency": "USD",
+              "estimate_kind": "task_planning",
+              "estimated_browser_seconds": 45,
+              "estimated_ceiling_usd": 0.063,
+              "estimated_floor_usd": 0.0228,
+              "estimated_gpu_seconds": 0,
+              "estimated_search_calls": 1,
+              "estimated_total_usd": 0.035,
+              "estimated_worker_seconds": 20,
+              "line_items": [
+                {
+                  "amount_usd": 0.0123,
+                  "basis": "verify.second_source.find queue worker",
+                  "key": "worker_lane",
+                  "label": "Worker lane execution"
+                },
+                {
+                  "amount_usd": 0.0228,
+                  "basis": "1 planned search/tool call(s)",
+                  "key": "search_or_model",
+                  "label": "Search/model/tool allowance"
+                }
+              ]
+            },
+            "dedupe_key": "local|verify.second_source.find|claim-002-4259669f|-|-",
+            "lane": "research",
+            "max_attempts": 3,
+            "priority": "normal",
+            "priority_score": 0.45,
+            "reason_codes": [
+              "needs_second_independent_source"
+            ]
+          }
+        },
+        "priority": "normal",
+        "queue_policy": {
+          "backoff": "exponential",
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "dedupe_key": "local|verify.second_source.find|claim-002-4259669f|-|-",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "run_id": "run-runtime-proof-001",
+        "source_record_id": "",
+        "state": "queued",
+        "task": "context.search.verify",
+        "task_id": "rt-b96baf13d3fa95ab",
+        "task_type": "verify.second_source.find",
+        "tenant_id": "local"
+      }
+    ],
+    "summary": {
+      "chunks": 1,
+      "claims": 2,
+      "entities": 2,
+      "fragile_facts": 2,
+      "keywords": 10,
+      "pass_index": 1,
+      "refresh_jobs": 2
+    },
+    "updates": [
+      {
+        "fact_id": "claim-001-b13b187a",
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 0,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "state": "needs_second_source",
+        "target": "Vendors",
+        "worker": "verify.second_source.find"
+      },
+      {
+        "fact_id": "claim-002-4259669f",
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 24,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "state": "needs_second_source",
+        "target": "the current threshold",
+        "worker": "verify.second_source.find"
+      }
+    ]
+  }
+}

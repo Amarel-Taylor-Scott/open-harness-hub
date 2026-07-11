@@ -1,0 +1,23 @@
+MODULE _repos/teleon/backend/src/teleon/context/compressor.py
+## API signatures
+```python
+"""src.teleon.context.compressor — content-aware, REVERSIBLE context compression for what Teleon sends to models."""
+_REPO = ...
+_CCR = ...
+_TEXT_HEADTAIL = ...
+_JSON_ARRAY_SAMPLE = ...
+_JSON_STR_CAP = ...
+def _detect_kind(text: str) -> str
+def _dedup_lines(s: str) -> str
+def _compress_code(text: str) -> str
+def _compress_json(text: str) -> str
+def _compress_text(text: str) -> str
+def compress(text: str, *, kind: str='auto', store: bool=True) -> dict
+    # Compress ``text`` content-aware + reversibly. Returns {compressed, handle, kind, raw_chars, compressed_chars,
+def rehydrate(handle: str) -> str
+    # Return the RAW context byte-for-byte for a ccr:// handle (the lossless recall). Raises if unknown.
+```
+## intra-module call edges
+src.teleon.context.compressor._compress_code -> src.teleon.context.compressor._dedup_lines
+src.teleon.context.compressor._compress_text -> src.teleon.context.compressor._dedup_lines
+src.teleon.context.compressor.compress -> src.teleon.context.compressor._detect_kind

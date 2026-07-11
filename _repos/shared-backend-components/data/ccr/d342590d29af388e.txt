@@ -1,0 +1,23 @@
+MODULE _repos/teleon/backend/src/teleon/economics/observation_store.py
+## API signatures
+```python
+"""observation_store — System 20 substrate + the telemetry write-back (§10→§1)."""
+_STREAM = ...
+_CDC_STREAM = ...
+_RECENT = ...
+_REL_CHANGE_CDC = ...
+_FIELDS = ...
+def now_iso() -> str
+def _open(shard: str='000')
+def current_economics(resource_id: str, *, shard: str='000', store=None) -> dict
+    # Rolling current economics for a resource: the mean of the most-recent N non-null observations per field (None when
+def record_observation(resource_id: str, *, source: str, observed_at: str | None=None, cost=None, latency_ms=None, quality=None, success=None, availability=None, shard: str='000', emit_cdc: bool=True) -> dict
+    # Append one observation; emit a price-change CDC if the current cost moved >= 10%. Idempotent on
+def _emit_price_cdc(resource_id: str, prev_cost: float, new_cost: float, observed_at: str, *, shard: str='000') -> None
+```
+## intra-module call edges
+src.teleon.economics.observation_store.current_economics -> src.teleon.economics.observation_store._open
+src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store._emit_price_cdc
+src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store._open
+src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store.current_economics
+src.teleon.economics.observation_store.record_observation -> src.teleon.economics.observation_store.now_iso

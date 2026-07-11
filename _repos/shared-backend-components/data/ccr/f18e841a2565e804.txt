@@ -1,0 +1,16 @@
+MODULE src/teleon/runtime/execution_providers/gcp_cloud_run_function_candidate.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate — CANDIDATE cloud-function
+execution backend (GCP Cloud Run function). No live cloud call without credentials + owner approval; when
+unconfigured it returns ProviderUnavailableResult so the selector falls back to the local emulator. The
+real GCP SDK is imported ONLY inside this adapter (never in domain/selector code). Catalog-"""
+class py_class_src_teleon_runtime_execution_providers_gcp_cloud_run_function_candidate__GcpCloudRunFunctionCandidate:
+    def configured(self) -> bool
+    def describe(self) -> dict
+    def health(self) -> dict
+    def invoke(self, py_arg_src_teleon_runtime_execution_providers_gcp_cloud_run_function_candidate__py_class_src_teleon_runtime_execution_providers_gcp_cloud_run_function_candidate__GcpCloudRunFunctionCandidate_invoke__task: dict)
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.health -> src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.py_class_src_teleon_runtime_execution_providers_gcp_cloud_run_function_candidate__GcpCloudRunFunctionCandidate.configured
+src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.invoke -> src.teleon.runtime.execution_providers.gcp_cloud_run_function_candidate.py_class_src_teleon_runtime_execution_providers_gcp_cloud_run_function_candidate__GcpCloudRunFunctionCandidate.configured

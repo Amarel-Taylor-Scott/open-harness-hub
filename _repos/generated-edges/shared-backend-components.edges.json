@@ -1,0 +1,47 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "shared-backend-components",
+  "repo": "aidoneright-shared-backend-components",
+  "role": "the SUBSTRATE every product consumes \u2014 the primitive/component registry + factory + catalog, codegraph, naming planes, eval, storage tiers, pipelines, credential plane. Reusable infrastructure, product-neutral.",
+  "exposes": [
+    "registry",
+    "primitives",
+    "codegraph",
+    "eval-harness",
+    "storage-tiers",
+    "credential-plane"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    }
+  ],
+  "consumed_by": [
+    "aidevobserver",
+    "api-endpoint-wrappers",
+    "baltor",
+    "context-injection",
+    "openhubforai",
+    "scraping",
+    "teleon"
+  ],
+  "forbidden_from_me": [
+    {
+      "to": "teleon",
+      "why": "the substrate is product-neutral; products consume it, not the reverse"
+    },
+    {
+      "to": "baltor",
+      "why": "substrate must not depend on a product"
+    }
+  ],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

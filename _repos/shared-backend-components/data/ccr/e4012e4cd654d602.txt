@@ -1,0 +1,33 @@
+MODULE src/teleon/registry/enrich.py
+## API signatures
+```python
+"""registry.enrich — the registry maintenance / ENRICHMENT worker (Baltor 'Enhance' on the registries)."""
+def py_function_src_teleon_registry_enrich___text(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__text__record: dict) -> str
+def py_function_src_teleon_registry_enrich___tokens(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__tokens__text: str) -> list[str]
+def py_function_src_teleon_registry_enrich__keywords(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__keywords__record: dict) -> list[str]
+def py_function_src_teleon_registry_enrich__embedding(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__embedding__record: dict) -> list[float]
+    # Deterministic lexical hash embedding (L2-normalized); a learned embedder drops in behind this signature.
+def py_function_src_teleon_registry_enrich__labels(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__labels__record: dict) -> list[str]
+def py_function_src_teleon_registry_enrich__description(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__description__record: dict) -> str
+def py_function_src_teleon_registry_enrich__long_description(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__long_description__record: dict) -> str
+def py_function_src_teleon_registry_enrich__use_cases(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__use_cases__record: dict) -> list[str]
+def py_function_src_teleon_registry_enrich__enrich_record(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__enrich_record__record: dict) -> dict
+    # Return the record with a derived `_enrichment` block (embedding/description/use_cases/labels/keywords).
+def py_function_src_teleon_registry_enrich__enrich_catalog(py_arg_src_teleon_registry_enrich__py_function_src_teleon_registry_enrich__enrich_catalog__name: str) -> list[dict]
+    # Enrich every record in a registered catalog (via the RegistryPort menu).
+def py_function_src_teleon_registry_enrich__enrich_all() -> dict[str, list[dict]]
+```
+## intra-module call edges
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__embedding -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich___text
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__embedding -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich___tokens
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_all -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_catalog
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_catalog -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__description
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__embedding
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__keywords
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__labels
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__long_description
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__enrich_record -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__use_cases
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__keywords -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich___text
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__keywords -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich___tokens
+src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__long_description -> src.teleon.registry.enrich.py_function_src_teleon_registry_enrich__description

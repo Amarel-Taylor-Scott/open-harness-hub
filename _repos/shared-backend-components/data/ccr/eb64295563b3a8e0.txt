@@ -1,0 +1,27 @@
+MODULE src/baltor/distillation/retention_report.py
+## API signatures
+```python
+"""src.baltor.distillation.retention_report — the InformationRetentionReport builder."""
+TRUTH_CLAIM_STATUSES = ...
+NON_TRUTH_CLAIM_STATUSES = ...
+def _aid(a: Mapping) -> str
+    # Stable identity of an artifact: ``artifact_id`` then ``fact_id``.
+def _handles(a: Mapping) -> list
+    # All source handles on an artifact (list form or single ``source_handle``).
+def _is_truth(a: Mapping) -> bool
+    # A truth-bearing fact: claim_status/claim_type marks it a fact AND it is not an allegation type.
+class InformationRetentionReport:
+    # The verdict that one transform kept everything the law requires.
+    def to_dict(self) -> dict
+class InformationRetentionReportBuilder:
+    # Build an :class:`InformationRetentionReport` for ONE transform from its in/out artifacts + signals.
+    def build(self, *, transform_type: str, inputs: Iterable[Mapping], outputs: Iterable[Mapping], served: Iterable[Mapping] | None=None, held_out: Iterable[Mapping] | None=None, rejected: Iterable[Mapping] | None=None, superseded: Iterable[Mapping] | None=None, raw_rehydration_passed: bool=True, lineage_complete: bool=True, lossy_transform_declared: bool=False, lossy_transform_allowed: bool=False) -> InformationRetentionReport
+def build_retention_report(**kwargs) -> InformationRetentionReport
+    # Module-level convenience wrapper around :meth:`InformationRetentionReportBuilder.build`.
+```
+## intra-module call edges
+src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report.InformationRetentionReport
+src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._aid
+src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._handles
+src.baltor.distillation.retention_report.build -> src.baltor.distillation.retention_report._is_truth
+src.baltor.distillation.retention_report.build_retention_report -> src.baltor.distillation.retention_report.InformationRetentionReportBuilder

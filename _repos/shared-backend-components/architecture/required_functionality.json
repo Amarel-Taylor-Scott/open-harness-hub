@@ -1,0 +1,43 @@
+{
+  "purpose": "REQUIRED-FUNCTIONALITY GRAPH (owner-directed 2026-06-27). Each requirement is a NODE that says 'surface/page X requires functionality Y'; its `check` is a deterministic EDGE to the code that must satisfy it (a pattern in a file, resolved against the code/grep graph with zero LLM). The checker (scripts/check_required_functionality.py) verifies every edge: a `satisfied` requirement is REGRESSION-GUARDED (if its code disappears the gate fails); a `gap` requirement is the live remediation backlog (reported, not failing, until implemented). This is how we can say 'this page requires this functionality' and CHECK it against the structure. Seeded from the wiring-review (wf_52602c56-586). serves_truth=false.",
+  "checker": "scripts/check_required_functionality.py",
+  "north_star_doc": "_repos/_shared/north-star/portfolio-functionality-and-wiring-spec.md",
+  "check_types": {
+    "regex_in_file": "{file, pattern, expect:present|absent} — pattern present/absent in the file",
+    "all_regex_in_file": "{file, patterns[], expect} — ALL patterns present/absent"
+  },
+  "requirements": [
+    {"id": "parent-no-login", "surface": "ai_done_right", "page": "/ (overview)",
+     "requires": "the parent holding-company overview has NO login portal",
+     "check": {"type": "regex_in_file", "file": "dist/sites/aidoneright-design/context-is-everything/cie-main.jsx", "pattern": "signInHref|OhAuth|>Sign in<", "expect": "absent"},
+     "status": "satisfied", "rationale": "owner: AI Done Right is an overview site, not an app"},
+    {"id": "social-login-disabled", "surface": "identity", "page": "/signup, /signin",
+     "requires": "social login (Google/GitHub) is commented out until OAuth is live (no fake or half-wired SSO button)",
+     "check": {"type": "regex_in_file", "file": "dist/sites/aidoneright-design/shared/oh-site.jsx", "pattern": "ohs-oauth-btn", "expect": "absent"},
+     "status": "satisfied", "rationale": "owner: comment out social login until fully live"},
+    {"id": "teleon-no-ab-toggle", "surface": "teleon", "page": "/ (landing)",
+     "requires": "Teleon shows no A/B experiment toggles or floating experiment panel",
+     "check": {"type": "regex_in_file", "file": "dist/sites/aidoneright-design/teleon/teleon-main.jsx", "pattern": "OhExperimentsPanel />|tln-abpill", "expect": "absent"},
+     "status": "satisfied", "rationale": "owner: real product, not an experiment surface"},
+    {"id": "ops-keys-redaction", "surface": "ops_console", "page": "#keys",
+     "requires": "the Ops Console API-keys view reads the credential plane (env-names only) and never exposes secret values",
+     "check": {"type": "all_regex_in_file", "file": "scripts/ops_console_service.py", "patterns": ["_collect_keys", "env_vars", "from src.teleon.runtime import credentials"], "expect": "present"},
+     "status": "satisfied", "rationale": "redaction-safe; gate-verified"},
+    {"id": "aidevobserver-realm", "surface": "identity", "page": "AIDevObserver /signup",
+     "requires": "the aidevobserver identity realm exists so accounts can register (no 'unknown realm')",
+     "check": {"type": "regex_in_file", "file": "architecture/identity_realm_registry.json", "pattern": "\"realm_id\": \"aidevobserver\"", "expect": "present"},
+     "status": "satisfied", "rationale": "wiring review + owner: signup hit 'unknown realm aidevobserver'; realm added"},
+    {"id": "id-register-persists", "surface": "identity", "page": "/signup",
+     "requires": "registration dispatches to a real per-realm account create + persist",
+     "check": {"type": "all_regex_in_file", "file": "scripts/identity_local_service.py", "patterns": ["register", "save"], "expect": "present"},
+     "status": "satisfied", "rationale": "wiring review: real acct_* rows persisted to dist/identity/realm-*.json"},
+    {"id": "id-keys-list-on-mount", "surface": "identity", "page": "/keys",
+     "requires": "the API-keys page loads the account's REAL keys from the server on mount (no hardcoded fake keys)",
+     "check": {"type": "regex_in_file", "file": "dist/sites/aidoneright-design/shared/oh-site.jsx", "pattern": "listKeys", "expect": "present"},
+     "status": "gap", "rationale": "wiring review: OHIdentity.listKeys + the backend exist but the UI never calls it on mount; three fake keys always show. FIX: add a useEffect in OhApiKeys that calls listKeys()."},
+    {"id": "teleon-new-account-empty", "surface": "teleon", "page": "/dashboard, /team, /billing",
+     "requires": "a brand-new account shows EMPTY state (seeded demo data like the Ada Lovelace team belongs to demo/test accounts only)",
+     "check": {"type": "regex_in_file", "file": "dist/sites/aidoneright-design/teleon/teleon-main.jsx", "pattern": "Ada Lovelace", "expect": "absent"},
+     "status": "gap", "rationale": "wiring review + owner: demo fixtures leak into new accounts; gate them behind a demo/test account, default new accounts to empty."}
+  ]
+}

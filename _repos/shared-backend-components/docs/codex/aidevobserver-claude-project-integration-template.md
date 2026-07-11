@@ -1,0 +1,1 @@
+../../../aidevobserver/context/codex/aidevobserver-claude-project-integration-template.md

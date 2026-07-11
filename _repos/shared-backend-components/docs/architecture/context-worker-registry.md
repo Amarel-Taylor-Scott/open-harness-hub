@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/context-worker-registry.md

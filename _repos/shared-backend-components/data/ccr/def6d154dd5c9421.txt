@@ -1,0 +1,21 @@
+MODULE src/teleon/exploration/dispatch.py
+## API signatures
+```python
+"""src.teleon.exploration.dispatch — the GOVERNED dispatch wrapper for a T3 (open-ended exploration) decision."""
+DEFAULT_EXPLORATION_RUNTIME_ID = ...
+EXPLORATION_WORKER_BUCKET = ...
+DEFAULT_BOUNDS = ...
+EXPLORATION_PRODUCES = ...
+class ExplorationProposal:
+    # The CANDIDATE outcome of a bounded exploration dispatch. ``serves_truth`` is pinned False — this proposal
+def _bounds_to_request_caps(bounds: dict) -> dict
+    # Project the ladder's bounds onto the AgentRuntimeRequest fields the port understands (it caps steps; the
+def _receipt(decision: EscalationDecision, request: py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeRequest, runtime_id: str, status: str, backend: str | None, now: str) -> dict
+    # A content-addressed dispatch RECEIPT — deterministic (no clock/RNG; ``now`` is provenance only). This is
+def dispatch_exploration(decision: EscalationDecision, *, intent: str, now: str, tenant_id: str='unknown', runtime_id: str | None=None, catalog: dict | None=None, policy_matrix: dict | None=None, pricebook: dict | None=None, provider_health: dict | None=None, available_creds: set | None=None, policy_override: dict | None=None) -> ExplorationProposal
+    # Dispatch a BOUNDED exploration run for a T3 ``decision`` and return a CANDIDATE :class:`ExplorationProposal`.
+```
+## intra-module call edges
+src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.exploration.dispatch.ExplorationProposal
+src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.exploration.dispatch._bounds_to_request_caps
+src.teleon.exploration.dispatch.dispatch_exploration -> src.teleon.exploration.dispatch._receipt

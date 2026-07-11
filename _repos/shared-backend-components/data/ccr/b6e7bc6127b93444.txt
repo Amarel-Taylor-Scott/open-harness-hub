@@ -1,0 +1,22 @@
+MODULE src/teleon/experiments/path_promotion.py
+## API signatures
+```python
+"""_repos/teleon/backend/src/teleon/experiments/path_promotion — the ONLY object that may authorize promoting a candidate."""
+SCHEMA_VERSION = ...
+DECISION_PROMOTE = ...
+DECISION_KEEP = ...
+GATES = ...
+def _find_verdict(report: dict[str, Any], candidate_path_id: str) -> dict[str, Any]
+def _cost_acceptable(verdict: dict[str, Any], criteria: dict[str, Any], override: bool | None) -> bool
+    # Decide the cost gate.
+def decide(report: dict[str, Any], criteria: dict[str, Any], *, candidate_path_id: str, now: str, cost_acceptable: bool | None=None, validate: bool=True) -> dict[str, Any]
+    # Authorize (or refuse) promoting ``candidate_path_id`` to baseline; return a ``PathPromotionDecision``.
+def is_promote_authorized(decision: dict[str, Any]) -> bool
+    # Re-derive whether ``decision`` actually authorizes PROMOTING a candidate — from its OWN fields, not
+def authorized_promoted_path_id(decision: dict[str, Any]) -> str | None
+    # The path_id a serve layer may switch the baseline to — ONLY when :func:`is_promote_authorized`.
+```
+## intra-module call edges
+src.teleon.experiments.path_promotion.authorized_promoted_path_id -> src.teleon.experiments.path_promotion.is_promote_authorized
+src.teleon.experiments.path_promotion.decide -> src.teleon.experiments.path_promotion._cost_acceptable
+src.teleon.experiments.path_promotion.decide -> src.teleon.experiments.path_promotion._find_verdict

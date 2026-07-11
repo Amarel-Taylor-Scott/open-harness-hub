@@ -1,0 +1,31 @@
+MODULE _repos/teleon/backend/src/teleon/components/registry.py
+## API signatures
+```python
+"""registry — the uniform Component model + the plane-invoker registry (seam 1: one invoke shape over bespoke ports)."""
+class py_class_src_teleon_components_registry__ComponentUnavailable:
+    # The plane has no wired invoker, or its lane/provider is offline — an HONEST 'cannot run', not a fake result.
+def py_function_src_teleon_components_registry__register_component_invoker(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__register_component_invoker__plane: str, py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__register_component_invoker__fn: Callable[[dict], dict]) -> None
+    # Wire (or override) the uniform invoker for a plane. The future-proofing hook — callers of make_component/invoke
+def py_function_src_teleon_components_registry__available_invokers() -> list
+def py_function_src_teleon_components_registry___tool_index() -> dict
+def py_function_src_teleon_components_registry___plane_of(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__plane_of__component_id: str) -> str | None
+class py_class_src_teleon_components_registry__Component:
+    # A registry component behind the uniform interface: invoke(typed_inputs) -> typed_outputs. consumes/produces are
+    def invoke(self, py_arg_src_teleon_components_registry__py_class_src_teleon_components_registry__Component_invoke__inputs: dict) -> dict
+def py_function_src_teleon_components_registry__make_component(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__make_component__component_id: str, *, plane: str | None=None) -> py_class_src_teleon_components_registry__Component
+    # Resolve a component id (or a bare plane) to the uniform Component, typed from plane_io_contracts.
+def py_function_src_teleon_components_registry___llm_invoker(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__llm_invoker__inputs: dict) -> dict
+def py_function_src_teleon_components_registry___embedding_invoker(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__embedding_invoker__inputs: dict) -> dict
+def py_function_src_teleon_components_registry___reranker_invoker(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__reranker_invoker__inputs: dict) -> dict
+def py_function_src_teleon_components_registry___search_invoker(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__search_invoker__inputs: dict) -> dict
+def py_function_src_teleon_components_registry___ocr_invoker(py_arg_src_teleon_components_registry__py_function_src_teleon_components_registry__ocr_invoker__inputs: dict) -> dict
+```
+## intra-module call edges
+src.teleon.components.registry.invoke -> src.teleon.components.registry.py_class_src_teleon_components_registry__ComponentUnavailable
+src.teleon.components.registry.py_function_src_teleon_components_registry___llm_invoker -> src.teleon.components.registry.py_class_src_teleon_components_registry__ComponentUnavailable
+src.teleon.components.registry.py_function_src_teleon_components_registry___ocr_invoker -> src.teleon.components.registry.py_class_src_teleon_components_registry__ComponentUnavailable
+src.teleon.components.registry.py_function_src_teleon_components_registry___plane_of -> src.teleon.components.registry.py_function_src_teleon_components_registry___tool_index
+src.teleon.components.registry.py_function_src_teleon_components_registry___search_invoker -> src.teleon.components.registry.py_class_src_teleon_components_registry__ComponentUnavailable
+src.teleon.components.registry.py_function_src_teleon_components_registry__make_component -> src.teleon.components.registry.py_class_src_teleon_components_registry__Component
+src.teleon.components.registry.py_function_src_teleon_components_registry__make_component -> src.teleon.components.registry.py_function_src_teleon_components_registry___plane_of
+src.teleon.components.registry.py_function_src_teleon_components_registry__make_component -> src.teleon.components.registry.py_function_src_teleon_components_registry___tool_index

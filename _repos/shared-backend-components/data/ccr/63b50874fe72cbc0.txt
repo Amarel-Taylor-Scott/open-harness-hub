@@ -1,0 +1,26 @@
+MODULE src/teleon/synthesis/type_system.py
+## API signatures
+```python
+"""type_system — System 6 / the representation-agnostic seam: the type LATTICE (subtyping) + coercion graph."""
+def py_function_src_teleon_synthesis_type_system___lattice() -> dict
+def py_function_src_teleon_synthesis_type_system__supertype_chain(py_arg_src_teleon_synthesis_type_system__supertype_chain__t: str) -> list
+    # [t, supertype(t), ...] up to the root, cycle-safe.
+def py_function_src_teleon_synthesis_type_system__is_subtype(py_arg_src_teleon_synthesis_type_system__is_subtype__a: str, py_arg_src_teleon_synthesis_type_system__is_subtype__b: str) -> bool
+    # a <: b — a value of type a is usable where b is expected (a == b, or b is a supertype of a).
+def py_function_src_teleon_synthesis_type_system__types_compatible(py_arg_src_teleon_synthesis_type_system__types_compatible__produced, py_arg_src_teleon_synthesis_type_system__types_compatible__consumed) -> bool
+    # A producer (any of `produced`) can feed a consumer (any of `consumed`) iff some produced type IS-A some consumed
+def py_function_src_teleon_synthesis_type_system___coercion_adj() -> dict
+def py_function_src_teleon_synthesis_type_system__coercion_path(py_arg_src_teleon_synthesis_type_system__coercion_path__from_t: str, py_arg_src_teleon_synthesis_type_system__coercion_path__to_t: str) -> list | None
+    # Shortest sequence of converter components turning from_t into something IS-A to_t (subtyping is free). [] if
+def py_function_src_teleon_synthesis_type_system__bridge(py_arg_src_teleon_synthesis_type_system__bridge__produced, py_arg_src_teleon_synthesis_type_system__bridge__consumed) -> list | None
+    # [] if already type-compatible; the shortest converter sequence if a coercion bridges some produced→consumed pair;
+```
+## intra-module call edges
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system___coercion_adj -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system___lattice
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__bridge -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__coercion_path
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__bridge -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__types_compatible
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__coercion_path -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system___coercion_adj
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__coercion_path -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__is_subtype
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__is_subtype -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__supertype_chain
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__supertype_chain -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system___lattice
+src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__types_compatible -> src.teleon.synthesis.type_system.py_function_src_teleon_synthesis_type_system__is_subtype

@@ -1,0 +1,27 @@
+MODULE _repos/teleon/backend/src/teleon/environments/reward_runner.py
+## API signatures
+```python
+"""src.teleon.environments.reward_runner — the deterministic local REWARD scorer (RewardProviderPort)."""
+LOCAL_REWARD_PROVIDER_ID = ...
+SUPPORTED_KIND = ...
+CHECK_TYPES = ...
+def _norm_text(value: Any) -> str
+    # Whitespace-collapsed, case-folded text for robust deterministic comparison.
+def _answer_text(run_result: dict) -> str
+    # Pull the candidate answer text out of an EnvironmentRunResult's ``output``.
+def _output_dict(run_result: dict) -> dict
+    # The output as a dict for ``key_present`` checks (empty dict when the output is not a mapping).
+def _eval_check(check: dict, run_result: dict) -> tuple[bool, str]
+    # Evaluate one check against the run result. Returns ``(passed, detail)``. Unknown types fail closed.
+class RewardRunner:
+    # The deterministic local scorer (RewardProviderPort). ``deterministic=True``; output is never truth.
+    def describe(self) -> dict
+        # RewardProviderNode-shaped card for this scorer.
+    def score(self, run_result: dict, reward_spec: dict, *, now: str) -> dict
+        # Score ``run_result`` against ``reward_spec`` (kind=deterministic_check). RewardResult dict; is_truth=False.
+```
+## intra-module call edges
+src.teleon.environments.reward_runner._eval_check -> src.teleon.environments.reward_runner._answer_text
+src.teleon.environments.reward_runner._eval_check -> src.teleon.environments.reward_runner._norm_text
+src.teleon.environments.reward_runner._eval_check -> src.teleon.environments.reward_runner._output_dict
+src.teleon.environments.reward_runner.score -> src.teleon.environments.reward_runner._eval_check

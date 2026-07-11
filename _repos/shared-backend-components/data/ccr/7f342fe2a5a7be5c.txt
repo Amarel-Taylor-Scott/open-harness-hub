@@ -1,0 +1,41 @@
+MODULE src/teleon/registry/port.py
+## API signatures
+```python
+"""registry.port — the universal Registry<T> menu (realizes the ontology's universal_interface)."""
+class py_class_src_teleon_registry_port__RegistryPort:
+    # The uniform menu every registry exposes (the load-bearing subset of the Registry<T> contract).
+    def list(self) -> list[dict]
+    def lookup(self, py_arg_src_teleon_registry_port__py_class_src_teleon_registry_port__RegistryPort_lookup__record_id: str) -> dict | None
+    def search(self, py_arg_src_teleon_registry_port__py_class_src_teleon_registry_port__RegistryPort_search__query: str, *, limit: int=py_var_src_teleon_registry_port___DEFAULT_LIMIT) -> list[dict]
+    def explain(self, py_arg_src_teleon_registry_port__py_class_src_teleon_registry_port__RegistryPort_explain__record_id: str) -> dict | None
+class py_class_src_teleon_registry_port__JsonCatalogRegistry:
+    # A RegistryPort over one JSON source catalog: {<list_key>: [{<id_field>: ..., ...}, ...]}.
+    def __init__(self, path: Path, list_key: str, id_field: str='id') -> None
+    def _records(self) -> list[dict]
+    def list(self) -> list[dict]
+    def lookup(self, py_arg_src_teleon_registry_port__py_class_src_teleon_registry_port__JsonCatalogRegistry_lookup__record_id: str) -> dict | None
+    def explain(self, py_arg_src_teleon_registry_port__py_class_src_teleon_registry_port__JsonCatalogRegistry_explain__record_id: str) -> dict | None
+    def search(self, py_arg_src_teleon_registry_port__py_class_src_teleon_registry_port__JsonCatalogRegistry_search__query: str, *, limit: int=py_var_src_teleon_registry_port___DEFAULT_LIMIT) -> list[dict]
+        # Deterministic lexical match: a record matches if ANY query token appears in its flattened text; ranked
+def py_function_src_teleon_registry_port__discover_catalogs() -> dict[str, dict[str, str]]
+    # AUTO-DISCOVER catalog-shaped registries: scan architecture/*.json for a list-of-records with a usable id
+def py_function_src_teleon_registry_port__all_catalogs() -> dict[str, dict[str, str]]
+    # Curated + auto-discovered catalogs (curated keys take precedence).
+def py_function_src_teleon_registry_port__available() -> list[str]
+    # Curated registry ids on the menu (stable; the facets + proofs key off these).
+def py_function_src_teleon_registry_port__available_all() -> list[str]
+    # EVERY searchable catalog (curated + auto-discovered) — the full federated-search surface.
+def py_function_src_teleon_registry_port__catalog(py_arg_src_teleon_registry_port__py_function_src_teleon_registry_port__catalog__name: str) -> py_class_src_teleon_registry_port__JsonCatalogRegistry
+    # Return the RegistryPort adapter for a registered/discovered registry id (raises KeyError if unknown).
+CATALOGS = ...
+```
+## intra-module call edges
+src.teleon.registry.port.explain -> src.teleon.registry.port.py_class_src_teleon_registry_port__RegistryPort.lookup
+src.teleon.registry.port.list -> src.teleon.registry.port.py_class_src_teleon_registry_port__JsonCatalogRegistry._records
+src.teleon.registry.port.lookup -> src.teleon.registry.port.py_class_src_teleon_registry_port__JsonCatalogRegistry._records
+src.teleon.registry.port.py_function_src_teleon_registry_port__all_catalogs -> src.teleon.registry.port.py_function_src_teleon_registry_port__discover_catalogs
+src.teleon.registry.port.py_function_src_teleon_registry_port__available_all -> src.teleon.registry.port.py_function_src_teleon_registry_port__all_catalogs
+src.teleon.registry.port.py_function_src_teleon_registry_port__catalog -> src.teleon.registry.port.py_class_src_teleon_registry_port__JsonCatalogRegistry
+src.teleon.registry.port.py_function_src_teleon_registry_port__catalog -> src.teleon.registry.port.py_function_src_teleon_registry_port__all_catalogs
+src.teleon.registry.port.py_function_src_teleon_registry_port__catalog -> src.teleon.registry.port.py_function_src_teleon_registry_port__available_all
+src.teleon.registry.port.search -> src.teleon.registry.port.py_class_src_teleon_registry_port__JsonCatalogRegistry._records

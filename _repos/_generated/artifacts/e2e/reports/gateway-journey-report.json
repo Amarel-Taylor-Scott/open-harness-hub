@@ -1,0 +1,29 @@
+{
+  "generated_at": "2026-06-09T20:28:02.227Z",
+  "gate": "gateway_journey",
+  "gateway": "http://127.0.0.1:8080",
+  "ok": true,
+  "steps": [
+    {
+      "n": 1,
+      "name": "gateway-serves-bundle",
+      "ok": true,
+      "detail": "gateway :8080 serves the static design bundle"
+    },
+    {
+      "n": 2,
+      "name": "core-health-through-gateway",
+      "ok": true,
+      "detail": "platform-core via /api/core/* — ok (llm anthropic=false, openai=false)"
+    },
+    {
+      "n": 3,
+      "name": "core-llm-501-no-bypass",
+      "ok": true,
+      "detail": "LLM plane returns 401 with no key set (no fake completion — honesty rule)"
+    }
+  ],
+  "page_errors": [],
+  "video": "videos/gateway-journey.mp4",
+  "note": "Through-the-gateway proof: one /api/<plane>/* namespace (handoff services.json). identity-through-gateway pending G-12 (host networking / authorized bind); core + sites proven here."
+}

@@ -1,0 +1,29 @@
+asyncapi: 3.0.0
+info:
+  title: Baltor Runtime Events
+  version: "1.0.0"
+  description: >
+    Queue/event contract between processors, the durable worker, and consumers. Commands are
+    CommandEnvelope on durable queues; events are EventEnvelope (CloudEvents 1.0). The bus is the
+    in-process scripts.context_events + the durable event log (scripts.durable_store) — not a new broker.
+channels:
+  pipeline.commands:
+    description: Durable work queue (lease/ack/nack→DLQ); payload is a CommandEnvelope.
+    messages:
+      runStep:
+        name: pipeline.run_step
+        payload: { $ref: "../../schemas/envelopes/CommandEnvelope.schema.json" }
+  pipeline.events:
+    description: Facts about what happened (CloudEvents-compatible EventEnvelopes).
+    messages:
+      stepStarted: { name: baltor.pipeline.step.started, payload: { $ref: "../../schemas/envelopes/EventEnvelope.schema.json" } }
+      stepCompleted: { name: baltor.pipeline.step.completed, payload: { $ref: "../../schemas/envelopes/EventEnvelope.schema.json" } }
+      artifactCreated: { name: baltor.artifact.created, payload: { $ref: "../../schemas/envelopes/EventEnvelope.schema.json" } }
+      processorFailed: { name: baltor.processor.failed, payload: { $ref: "../../schemas/envelopes/ErrorEnvelope.schema.json" } }
+operations:
+  sendRunStep:
+    action: send
+    channel: { $ref: "#/channels/pipeline.commands" }
+  receiveStepCompleted:
+    action: receive
+    channel: { $ref: "#/channels/pipeline.events" }

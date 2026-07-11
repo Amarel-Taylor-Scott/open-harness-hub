@@ -1,0 +1,46 @@
+{
+  "surface": "shared-backend-components",
+  "repo": "aidoneright-shared-backend-components",
+  "interface_version": "0.1.0",
+  "exposes": [
+    {
+      "id": "registry",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The federated component/primitive/template registry behind one Registry<T> port (uniform list/lookup/search/explain): primitives, primitive templates, task/pipeline templates, harnesses, skills, adapters, datasets, source/provenance rows, embeddings, and metadata records."
+    },
+    {
+      "id": "primitives",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The seven canonical primitives (Input, Knowledge Corpus, If Statement, Action, Loop, Stop/End, Output), their composition edges, and reusable primitive templates/cards derived from real artifacts."
+    },
+    {
+      "id": "codegraph",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The tree-sitter AST symbol/edge graph over the codebase (callers, callees, impact, change-audit)."
+    },
+    {
+      "id": "eval-harness",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The two-axis lift+durability gap harness that admits a component only if it lifts over the bare model AND the lift is structural."
+    },
+    {
+      "id": "storage-tiers",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The tiered record store: config JSON, operational Postgres+pgvector, and history warehouse."
+    },
+    {
+      "id": "credential-plane",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The single-source credential registry \u2014 env-var names only, deny-by-default reachability."
+    }
+  ],
+  "consumes": {
+    "dev-rules-context": []
+  }
+}

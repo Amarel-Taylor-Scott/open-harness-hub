@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taedri · This already exists. Don't rebuild it.</title>
+<style>
+html{--bg:#0d1117;--sf:#161b22;--sf2:#1f242c;--bd:#30363d;--tx:#e6edf3;--mut:#8b949e;--lnk:#539bf5;--blu:#1f6feb;--grn:#2ea043;--grnH:#238636;--grnT:#3fb950;--amb:#9e6a03;--ambT:#d29922;--dng:#da3633;--dngT:#f85149;color-scheme:dark}
+html[data-theme="light"]{--bg:#ffffff;--sf:#f6f8fa;--sf2:#eef1f5;--bd:#d0d7de;--tx:#1f2328;--mut:#59636e;--lnk:#1f6feb;--blu:#1f6feb;--grn:#2ea043;--grnH:#238636;--grnT:#1a7f37;--amb:#9e6a03;--ambT:#9a6700;--dng:#da3633;--dngT:#cf222e;color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;transition:background .15s ease-out,color .15s ease-out}
+a{color:var(--lnk);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blu);outline-offset:2px;border-radius:4px}
+::placeholder{color:var(--mut);opacity:.8}
+@keyframes retrieve{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes shimmer{0%{background-position:-320px 0}100%{background-position:320px 0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</helmet>
+
+<header data-screen-label="Header" style="position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--bd)">
+  <div style="max-width:1140px; margin:0 auto; padding:0 24px; height:60px; display:flex; align-items:center; gap:18px">
+    <a href="/" aria-label="Taedri home" style="display:flex; align-items:center; gap:9px; color:var(--tx); text-decoration:none; flex-shrink:0">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--grn)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.6 20.1 7.3v9.4L12 21.4 3.9 16.7V7.3Z"></path><path d="m8.5 12.2 2.4 2.4 4.6-4.9"></path></svg>
+      <span style="font-weight:650; font-size:17px; letter-spacing:-0.01em">taedri</span>
+    </a>
+    <nav aria-label="Primary" style="display:flex; gap:22px; font-size:14px; flex:1 1 0; min-width:0; overflow-x:auto; scrollbar-width:none; white-space:nowrap">
+      <a href="#how" style="color:var(--mut); text-decoration:none" style-hover="color:var(--tx)">Product</a>
+      <a href="/browse" style="color:var(--mut); text-decoration:none" style-hover="color:var(--tx)">Browse</a>
+      <a href="/pricing" style="color:var(--mut); text-decoration:none" style-hover="color:var(--tx)">Pricing</a>
+      <a href="/docs" style="color:var(--mut); text-decoration:none" style-hover="color:var(--tx)">Docs</a>
+      <a href="/blog" style="color:var(--mut); text-decoration:none" style-hover="color:var(--tx)">News</a>
+      <a href="#status" style="color:var(--mut); text-decoration:none" style-hover="color:var(--tx)">Status</a>
+    </nav>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:12px">
+      <sc-if value="{{ loggedOut }}" hint-placeholder-val="{{ true }}">
+        <a href="/login" style="color:var(--tx); text-decoration:none; font-size:14px; font-weight:600; padding:7px 12px; border-radius:6px" style-hover="background:var(--sf)">Log in</a>
+        <a href="/signup" style="background:var(--grn); color:#ffffff; text-decoration:none; font-size:14px; font-weight:600; padding:8px 16px; border-radius:6px" style-hover="background:var(--grnH)">Get a key</a>
+      </sc-if>
+      <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+        <div title="Requests today · Free plan, 200/day" style="display:flex; align-items:center; gap:8px">
+          <div style="width:72px; height:6px; border-radius:999px; background:var(--sf2); border:1px solid var(--bd); overflow:hidden"><div style="width:69%; height:100%; background:var(--grn)"></div></div>
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:var(--mut)">137 / 200</span>
+        </div>
+        <div style="position:relative">
+          <button onClick="{{ toggleMenu }}" aria-label="Account menu" aria-expanded="{{ menuOpen }}" style="display:flex; align-items:center; gap:8px; background:var(--sf); border:1px solid var(--bd); border-radius:999px; padding:4px 12px 4px 5px; color:var(--tx); font-size:13px; font-weight:600" style-hover="background:var(--sf2)">
+            <span style="width:22px; height:22px; border-radius:50%; background:var(--grn); color:#ffffff; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700">a</span>
+            <span>account</span>
+          </button>
+          <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeMenu }}" style="position:fixed; inset:0; z-index:60"></div>
+            <div style="position:absolute; right:0; top:calc(100% + 8px); z-index:61; background:var(--sf); border:1px solid var(--bd); border-radius:8px; min-width:184px; padding:6px; display:flex; flex-direction:column; gap:1px; box-shadow:0 8px 24px rgba(1,4,9,0.45)">
+              <a href="/dashboard" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Dashboard</a>
+              <a href="/workbench" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Workbench</a>
+              <a href="/keys" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Keys</a>
+              <a href="/billing" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Billing</a>
+              <a href="/logs" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Logs</a>
+              <a href="/support" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Support</a>
+              <div style="height:1px; background:var(--bd); margin:5px 4px"></div>
+              <a href="/login" style="display:block; padding:7px 10px; border-radius:6px; color:var(--tx); font-size:13px; text-decoration:none" style-hover="background:var(--sf2)">Log out</a>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section data-screen-label="Hero" style="padding:84px 0 64px">
+    <div style="max-width:1140px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:52px; align-items:center">
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <h1 style="margin:0; font-size:clamp(36px, 5vw, 54px); line-height:1.06; font-weight:700; letter-spacing:-0.03em">This already exists.<br><span style="color:var(--grnT)">Don't rebuild it.</span></h1>
+        <p style="margin:0; font-size:16px; color:var(--mut); max-width:54ch; text-wrap:pretty">Taedri (This Already Exists, Don't Rebuild It) is the verified-capability retrieval layer for AI coding agents.</p>
+        <p style="margin:0; font-size:16px; color:var(--tx); max-width:50ch; text-wrap:pretty">Your agents waste millions of tokens rebuilding solutions to solved problems every day. Taedri returns the verified capability instead, ready to integrate for minimal tokens.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:6px">
+          <a href="/signup" style="background:var(--grn); color:#ffffff; text-decoration:none; font-size:15px; font-weight:600; padding:11px 20px; border-radius:6px" style-hover="background:var(--grnH)">Get a key</a>
+          <a href="/docs" style="background:transparent; color:var(--tx); text-decoration:none; font-size:15px; font-weight:600; padding:11px 20px; border-radius:6px; border:1px solid var(--bd)" style-hover="background:var(--sf)">Read the docs</a>
+          <a href="/demo" style="display:inline-flex; align-items:center; gap:9px; color:var(--tx); text-decoration:none; font-size:15px; font-weight:600; padding:11px 6px" style-hover="color:var(--grnT)"><span aria-hidden="true" style="color:var(--grnT); font-size:12px">▶</span> Watch it in action</a>
+        </div>
+      </div>
+      <div style="min-width:0">
+        <div style="background:#0d1117; border:1px solid #30363d; border-radius:10px; overflow:hidden; box-shadow:0 16px 40px rgba(1,4,9,0.35)">
+          <div style="display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid #21262d">
+            <span style="width:10px; height:10px; border-radius:50%; background:#30363d"></span>
+            <span style="width:10px; height:10px; border-radius:50%; background:#30363d"></span>
+            <span style="width:10px; height:10px; border-radius:50%; background:#30363d"></span>
+            <span style="flex:1; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:#8b949e; text-align:center">shell</span>
+            <button onClick="{{ copyCmd }}" aria-label="Copy the claude mcp add command" style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; background:transparent; border:1px solid #30363d; color:#e6edf3; border-radius:6px; padding:3px 10px" style-hover="background:#161b22">copy</button>
+          </div>
+          <div style="padding:18px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; line-height:1.75; color:#e6edf3; overflow-x:auto">
+            <div style="white-space:pre"><span style="color:#8b949e">$</span> claude mcp add --transport http taedri \</div>
+            <div style="white-space:pre; padding-left:26px"><span style="color:#539bf5">https://taedri.fly.dev/mcp</span> \</div>
+            <div style="white-space:pre; padding-left:26px">--header <span style="color:#a5d6ff">"Authorization: Bearer YOUR_KEY"</span></div>
+            <div style="white-space:pre"><span style="color:#3fb950">✓</span> <span style="color:#8b949e">server added · 7 tools available</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="status" data-screen-label="Corpus counter" style="border-top:1px solid var(--bd); border-bottom:1px solid var(--bd); background:var(--sf)">
+    <div style="max-width:1140px; margin:0 auto; padding:36px 24px; display:flex; flex-wrap:wrap; align-items:center; gap:32px; justify-content:space-between">
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <sc-if value="{{ counterOn }}" hint-placeholder-val="{{ false }}">
+          <span id="corpus-counter" style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:44px; font-weight:650; letter-spacing:-0.02em; line-height:1">0</span>
+        </sc-if>
+        <sc-if value="{{ counterWaiting }}" hint-placeholder-val="{{ true }}">
+          <div aria-label="Loading corpus count" style="width:236px; height:44px; border-radius:8px; background:linear-gradient(90deg, var(--sf2) 25%, var(--bd) 37%, var(--sf2) 63%); background-size:320px 100%; animation:shimmer 1.4s linear infinite"></div>
+        </sc-if>
+        <sc-if value="{{ corpusJsOff }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:20px; font-weight:600; color:var(--mut)">Live numbers unavailable</span>
+        </sc-if>
+        <span style="font-size:14px; color:var(--mut)">governed, labeled primitives, ready to retrieve</span>
+      </div>
+      <div aria-label="Domain partitions" style="display:flex; flex-wrap:wrap; gap:8px; max-width:520px; align-content:center">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">database</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">auth</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">http</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">etl</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">ml</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">cloud</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">messaging</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">observability</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">algorithms</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">geo/time</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">testing</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">files</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">frontend</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">nlp</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">scraping</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">finance</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">healthcare</span>
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid var(--bd); border-radius:999px; padding:3px 12px; color:var(--mut)">general</span>
+        <a href="/browse" style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; border:1px solid color-mix(in srgb, var(--grnT) 45%, var(--bd)); border-radius:999px; padding:3px 12px; color:var(--grnT); text-decoration:none" style-hover="background:var(--sf2)">browse all →</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="start" data-screen-label="Three steps" style="padding:76px 0 8px">
+    <div style="max-width:1140px; margin:0 auto; padding:0 24px; display:flex; flex-direction:column; gap:28px">
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h2 style="margin:0; font-size:clamp(26px, 3vw, 32px); font-weight:650; letter-spacing:-0.02em">Zero to retrieval in three steps</h2>
+        <p style="margin:0; color:var(--mut); font-size:15px">About sixty seconds on broadband.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:16px">
+        <div style="background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:10px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; color:var(--grnT)">01</span>
+          <span style="font-size:16px; font-weight:600">Sign up with an email</span>
+          <span style="font-size:13.5px; color:var(--mut); text-wrap:pretty">Email in, key out. No SSO, by design. Your account secret is shown once and stored only as a hash.</span>
+        </div>
+        <div style="background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:10px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; color:var(--grnT)">02</span>
+          <span style="font-size:16px; font-weight:600">Get your key</span>
+          <span style="font-size:13.5px; color:var(--mut); text-wrap:pretty">Free plan: 200 requests a day, all seven MCP tools, receipts included. Upgrade only when the meter says so.</span>
+        </div>
+        <div style="background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:22px; display:flex; flex-direction:column; gap:10px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; color:var(--grnT)">03</span>
+          <span style="font-size:16px; font-weight:600">Connect your terminal or harness</span>
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; color:var(--mut); background:var(--bg); border:1px solid var(--bd); border-radius:6px; padding:8px 10px; overflow-x:auto; white-space:nowrap">claude mcp add --transport http taedri …</span>
+          <span style="font-size:12px; color:var(--mut)">Claude Code, Hermes, OpenClaw, or any MCP harness.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" data-screen-label="How it works" style="padding:76px 0">
+    <div style="max-width:1140px; margin:0 auto; padding:0 24px; display:flex; flex-direction:column; gap:30px">
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h2 style="margin:0; font-size:clamp(26px, 3vw, 32px); font-weight:650; letter-spacing:-0.02em">Search → edges → compose → receipts</h2>
+        <p style="margin:0; color:var(--mut); font-size:15px; max-width:60ch">Four deterministic moves between your agent and the corpus.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:24px">
+        <div style="border-top:1px solid var(--bd); padding-top:18px; display:flex; flex-direction:column; gap:8px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:var(--grnT)">01</span>
+          <span style="font-size:16px; font-weight:650">Search</span>
+          <p style="margin:0; font-size:14px; color:var(--mut); text-wrap:pretty">Ranked, scored primitives. Not code dumps.</p>
+        </div>
+        <div style="border-top:1px solid var(--bd); padding-top:18px; display:flex; flex-direction:column; gap:8px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:var(--grnT)">02</span>
+          <span style="font-size:16px; font-weight:650">Typed edges</span>
+          <p style="margin:0; font-size:14px; color:var(--mut); text-wrap:pretty">Every primitive declares <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px">input → output</span>. Matched by shape, phrasing, purpose: the problem and its solution.</p>
+        </div>
+        <div style="border-top:1px solid var(--bd); padding-top:18px; display:flex; flex-direction:column; gap:8px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:var(--grnT)">03</span>
+          <span style="font-size:16px; font-weight:650">Compose</span>
+          <p style="margin:0; font-size:14px; color:var(--mut); text-wrap:pretty">Outcomes become chains of connected edges. Same request, same route.</p>
+        </div>
+        <div style="border-top:1px solid var(--bd); padding-top:18px; display:flex; flex-direction:column; gap:8px">
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px; color:var(--grnT)">04</span>
+          <span style="font-size:16px; font-weight:650">Receipts</span>
+          <p style="margin:0; font-size:14px; color:var(--mut); text-wrap:pretty">Every call leaves a trail you can export. Never raw prompt bodies.</p>
+        </div>
+      </div>
+      <a href="/docs#how-retrieval-works" style="align-self:flex-start; font-size:14px; font-weight:600">See the full anatomy in the docs →</a>
+    </div>
+  </section>
+
+  <section data-screen-label="Honesty section" style="border-top:1px solid var(--bd); border-bottom:1px solid var(--bd); background:var(--sf)">
+    <div style="max-width:1140px; margin:0 auto; padding:64px 24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:44px; align-items:center">
+      <div style="display:flex; flex-direction:column; gap:14px">
+        <h2 style="margin:0; font-size:clamp(26px, 3vw, 32px); font-weight:650; letter-spacing:-0.02em">Verified, or experimental.<br>Never mystery code.</h2>
+        <p style="margin:0; color:var(--mut); font-size:15px; max-width:56ch; text-wrap:pretty">Every result carries one of two labels. Verified means it survived full adversarial validation. Experimental means it works and holds up in most situations while validation finishes. A setting decides how much of the shelf your agents see.</p>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:18px">
+        <div style="display:flex; flex-direction:column; gap:7px">
+          <span style="display:inline-flex; width:fit-content; align-items:center; gap:8px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; border:1px solid color-mix(in srgb, var(--grnT) 50%, var(--bd)); background:var(--bg); color:var(--grnT); border-radius:999px; padding:6px 14px">✓ verified</span>
+          <span style="font-size:13px; color:var(--mut)">Fully adversarially validated. Retrieve with your eyes closed.</span>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:7px">
+          <span style="display:inline-flex; width:fit-content; align-items:center; gap:8px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13px; border:1px solid color-mix(in srgb, var(--ambT) 50%, var(--bd)); background:var(--bg); color:var(--ambT); border-radius:999px; padding:6px 14px"><span style="width:9px; height:9px; border:1.5px solid var(--ambT); border-radius:50%; display:inline-block"></span>experimental</span>
+          <span style="font-size:13px; color:var(--mut)">Working and dependable for most uses; final validation in progress.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" data-screen-label="Pricing teaser" style="padding:76px 0">
+    <div style="max-width:1140px; margin:0 auto; padding:0 24px; display:flex; flex-direction:column; gap:28px">
+      <div style="display:flex; flex-direction:column; gap:6px">
+        <h2 style="margin:0; font-size:clamp(26px, 3vw, 32px); font-weight:650; letter-spacing:-0.02em">Pricing that reads like a meter</h2>
+        <p style="margin:0; color:var(--mut); font-size:15px">Plans are request budgets.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:16px">
+        <div style="background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:24px; display:flex; flex-direction:column; gap:12px">
+          <span style="font-size:15px; font-weight:650">Free</span>
+          <div style="display:flex; align-items:baseline; gap:6px"><span style="font-size:34px; font-weight:700; letter-spacing:-0.02em">$0</span><span style="font-size:13px; color:var(--mut)">forever</span></div>
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; color:var(--tx)">200 requests / day</span>
+          <span style="font-size:13.5px; color:var(--mut); text-wrap:pretty">All seven MCP tools, agent actions, full receipts, the workbench.</span>
+          <a href="/signup" style="margin-top:auto; background:var(--grn); color:#ffffff; text-decoration:none; text-align:center; font-size:14px; font-weight:600; padding:9px 16px; border-radius:6px" style-hover="background:var(--grnH)">Get a key</a>
+        </div>
+        <div style="background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:24px; display:flex; flex-direction:column; gap:12px">
+          <span style="font-size:15px; font-weight:650">Pro</span>
+          <div style="display:flex; align-items:baseline; gap:6px"><span style="font-size:34px; font-weight:700; letter-spacing:-0.02em">$9</span><span style="font-size:13px; color:var(--mut)">/ month</span></div>
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; color:var(--tx)">20,000 requests / day</span>
+          <span style="font-size:13.5px; color:var(--mut); text-wrap:pretty">Everything in Free, plus room for fleets of agents and private primitives when they ship.</span>
+          <a href="/pricing" style="margin-top:auto; background:transparent; color:var(--tx); text-decoration:none; text-align:center; font-size:14px; font-weight:600; padding:9px 16px; border-radius:6px; border:1px solid var(--bd)" style-hover="background:var(--sf2)">See pricing</a>
+        </div>
+        <div style="background:var(--sf); border:1px solid var(--bd); border-radius:10px; padding:24px; display:flex; flex-direction:column; gap:12px">
+          <span style="font-size:15px; font-weight:650">Team</span>
+          <div style="display:flex; align-items:baseline; gap:6px"><span style="font-size:34px; font-weight:700; letter-spacing:-0.02em">$39</span><span style="font-size:13px; color:var(--mut)">/ month</span></div>
+          <span style="font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; color:var(--tx)">100,000 requests / day</span>
+          <span style="font-size:13.5px; color:var(--mut); text-wrap:pretty">Pooled across your org's keys: agent fleets, ledger exports, priority wake.</span>
+          <a href="/support" style="margin-top:auto; background:transparent; color:var(--tx); text-decoration:none; text-align:center; font-size:14px; font-weight:600; padding:9px 16px; border-radius:6px; border:1px solid var(--bd)" style-hover="background:var(--sf2)">Talk to us</a>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; border:1px solid color-mix(in srgb, var(--ambT) 40%, var(--bd)); background:color-mix(in srgb, var(--amb) 9%, var(--sf)); border-radius:8px; padding:12px 16px">
+        <span style="width:8px; height:8px; border-radius:50%; background:var(--ambT); flex-shrink:0"></span>
+        <span style="font-size:13.5px; color:var(--tx)">Payments are not enabled yet: plans are recorded, nothing is charged.</span>
+      </div>
+      <span style="font-size:14px; color:var(--mut)">Questions? <a href="/support">Read the FAQ</a>.</span>
+    </div>
+  </section>
+
+</main>
+
+<footer data-screen-label="Footer" style="border-top:1px solid var(--bd); background:var(--sf)">
+  <div style="max-width:1140px; margin:0 auto; padding:48px 24px 28px; display:flex; flex-direction:column; gap:36px">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:28px">
+      <div style="display:flex; flex-direction:column; gap:9px">
+        <span style="font-size:12px; font-weight:650; letter-spacing:0.06em; color:var(--tx); text-transform:uppercase">Product</span>
+        <a href="/workbench" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Search</a>
+        <a href="/workbench" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Console</a>
+        <a href="/browse" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Browse primitives</a>
+        <a href="/demo" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Live example</a>
+        <a href="/requests" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Requests</a>
+        <a href="#pricing" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Pricing</a>
+        <a href="#status" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Status</a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:9px">
+        <span style="font-size:12px; font-weight:650; letter-spacing:0.06em; color:var(--tx); text-transform:uppercase">Developers</span>
+        <a href="/docs" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Docs</a>
+        <a href="/docs#quickstart" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Quickstart</a>
+        <a href="/docs#quickstart" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">MCP setup</a>
+        <a href="/docs" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">API reference</a>
+        <a href="/blog" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Changelog</a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:9px">
+        <span style="font-size:12px; font-weight:650; letter-spacing:0.06em; color:var(--tx); text-transform:uppercase">Company</span>
+        <a href="/about" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">About</a>
+        <a href="/about#mission" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Mission</a>
+        <a href="/blog" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">News</a>
+        <a href="/support" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Support</a>
+        <a href="/contact" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Contact</a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:9px">
+        <span style="font-size:12px; font-weight:650; letter-spacing:0.06em; color:var(--tx); text-transform:uppercase">Legal</span>
+        <a href="/legal#terms" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Terms</a>
+        <a href="/legal#privacy" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Privacy</a>
+        <a href="/legal#aup" style="color:var(--mut); font-size:13.5px; text-decoration:none" style-hover="color:var(--tx)">Acceptable use</a>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--bd); padding-top:20px; display:flex; flex-wrap:wrap; align-items:center; gap:16px; justify-content:space-between">
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:14px; font-size:12.5px; color:var(--mut)">
+        <span>© 2026 AI Done Right</span>
+        <span style="color:var(--bd)">·</span>
+        <span>Taedri · This Already Exists, Don't Rebuild It.</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px">
+        <button onClick="{{ toggleTheme }}" aria-label="Switch color theme" style="display:inline-flex; align-items:center; gap:7px; background:transparent; border:1px solid var(--bd); color:var(--tx); border-radius:999px; padding:5px 13px; font-size:12.5px; font-weight:600" style-hover="background:var(--sf2)">
+          <span aria-hidden="true" style="font-size:13px">◐</span> {{ themeLabel }} theme
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:100; background:var(--sf); border:1px solid var(--bd); color:var(--tx); border-radius:8px; padding:9px 16px; font-size:13.5px; box-shadow:0 8px 24px rgba(1,4,9,0.45); animation:retrieve 0.15s ease-out both">{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;dark&quot;, &quot;light&quot;], &quot;default&quot;: &quot;dark&quot;, &quot;tsType&quot;: &quot;'dark'|'light'&quot;, &quot;section&quot;: &quot;Theme&quot;}, &quot;authState&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;logged-out&quot;, &quot;logged-in&quot;], &quot;default&quot;: &quot;logged-out&quot;, &quot;tsType&quot;: &quot;'logged-out'|'logged-in'&quot;, &quot;section&quot;: &quot;Header&quot;}, &quot;corpusState&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;live&quot;, &quot;skeleton&quot;, &quot;js-off&quot;], &quot;default&quot;: &quot;live&quot;, &quot;tsType&quot;: &quot;'live'|'skeleton'|'js-off'&quot;, &quot;section&quot;: &quot;States&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: null, menuOpen: false, toast: '', counterOn: false };
+    this.stored = null;
+    this.toastTimer = null;
+    this.counterTimer = null;
+  }
+
+  effTheme() {
+    return this.state.theme || this.props.theme || this.stored || 'dark';
+  }
+
+  applyTheme() {
+    document.documentElement.dataset.theme = this.effTheme();
+  }
+
+  corpusMode() {
+    return this.props.corpusState || 'live';
+  }
+
+  componentDidMount() {
+    try { this.stored = localStorage.getItem('taedri-theme'); } catch (e) {}
+    this.applyTheme();
+    this.forceUpdate();
+    this.startCounter();
+  }
+
+  componentDidUpdate(prevProps) {
+    this.applyTheme();
+    if (prevProps.corpusState !== this.props.corpusState) {
+      clearTimeout(this.counterTimer);
+      this.setState({ counterOn: false });
+      if (this.corpusMode() === 'live') this.startCounter();
+    }
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.toastTimer);
+    clearTimeout(this.counterTimer);
+  }
+
+  startCounter() {
+    if (this.corpusMode() !== 'live') return;
+    this.counterTimer = setTimeout(() => {
+      this.setState({ counterOn: true });
+      this.runCounter();
+    }, 650);
+  }
+
+  runCounter() {
+    const target = 557392, dur = 1200;
+    let t0 = null, tries = 0;
+    const tick = (now) => {
+      const el = document.getElementById('corpus-counter');
+      if (!el) {
+        if (tries++ < 90) requestAnimationFrame(tick);
+        return;
+      }
+      if (t0 === null) t0 = now;
+      const p = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * e).toLocaleString('en-US');
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  copy(text) {
+    const done = () => this.showToast('Copied to clipboard');
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      done();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else fallback();
+  }
+
+  showToast(msg) {
+    clearTimeout(this.toastTimer);
+    this.setState({ toast: msg });
+    this.toastTimer = setTimeout(() => this.setState({ toast: '' }), 2200);
+  }
+
+  renderVals() {
+    const eff = this.effTheme();
+    const authed = (this.props.authState || 'logged-out') === 'logged-in';
+    const corpus = this.corpusMode();
+    return {
+      themeLabel: eff === 'dark' ? 'Light' : 'Dark',
+      toggleTheme: () => {
+        const next = this.effTheme() === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem('taedri-theme', next); } catch (e) {}
+        this.stored = next;
+        this.setState({ theme: next });
+      },
+      loggedIn: authed,
+      loggedOut: !authed,
+      menuOpen: this.state.menuOpen,
+      toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })),
+      closeMenu: () => this.setState({ menuOpen: false }),
+      counterOn: corpus === 'live' && this.state.counterOn,
+      counterWaiting: corpus !== 'js-off' && !(corpus === 'live' && this.state.counterOn),
+      corpusJsOff: corpus === 'js-off',
+      copyCmd: () => this.copy('claude mcp add --transport http taedri https://taedri.fly.dev/mcp --header "Authorization: Bearer YOUR_KEY"'),
+      toast: this.state.toast,
+      hasToast: !!this.state.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+MODULE src/teleon/blackboard/local_sqlite_blackboard.py
+## API signatures
+```python
+"""src.teleon.blackboard.local_sqlite_blackboard — the OFFLINE local SQLite blackboard (the correctness invariant)."""
+def py_function_src_teleon_blackboard_local_sqlite_blackboard___content_hash(py_arg_src_teleon_blackboard_local_sqlite_blackboard__content_hash__value: Any) -> str
+    # A ``sha256:<hex>`` content hash over the canonical bytes of ``value`` (tamper-evident; deterministic).
+class py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard:
+    # The offline correctness-invariant blackboard store. APPEND-ONLY, tenant-isolated, source-backed, and
+    def __init__(self, db_path: str | None=None) -> None
+    def _init_schema(self) -> None
+    def _next_seq(self, *, autocommit: bool=True) -> int
+        # A monotonic per-store insertion counter (deterministic ordering key). Not wall-clock, not RNG.
+    def _transaction(self)
+        # Return the underlying sqlite3 connection as a context manager for one atomic transaction.
+    def describe(self) -> dict
+        # Local-first golden-path card: append-only, no network, IS its own local_equivalent, never truth.
+    def status(self) -> dict
+        # Always available — it needs nothing external (the honest local-first golden path).
+    def create_blackboard(self, task: str, tenant_scope: str, *, now: str) -> dict
+        # Open a new tenant-scoped Blackboard workspace (status=open, entry_count=0). REQUIRES a tenant_scope
+    def _blackboard_row(self, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard__blackboard_row__blackboard_id: str) -> dict
+    def append_entry(self, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_append_entry__blackboard_id: str, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_append_entry__entry: dict, *, worker_receipt: dict, now: str) -> dict
+        # APPEND one typed BlackboardEntry under a MANDATORY ``worker_receipt``; return the stored row dict.
+    def _record_receipt(self, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard__record_receipt__blackboard_id: str, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard__record_receipt__worker_receipt: dict, *, entry_ids: list[str], now: str, autocommit: bool=True) -> str
+        # Persist a BlackboardWorkerReceipt-shaped row and return its content-addressed receipt_id.
+    def _entry_row(self, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard__entry_row__entry_id: str) -> dict
+    def _row_to_entry(py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard__row_to_entry__row: sqlite3.Row) -> dict
+    def query(self, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_query__blackboard_id: str, *, kind: str | None=None, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_query__author_worker_id: str | None=None, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_query__iteration: int | None=None, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_query__limit: int | None=None) -> list[dict]
+        # Return stored entries in a DETERMINISTIC total order: insertion sequence, then entry_id as a
+    def get_receipts(self, py_arg_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard_get_receipts__blackboard_id: str) -> list[dict]
+        # Return the BlackboardWorkerReceipt rows for ``blackboard_id`` in deterministic (insertion) order.
+    def close(self) -> None
+        # Close the underlying connection (tests / short-lived stores).
+def py_function_src_teleon_blackboard_local_sqlite_blackboard__seed_demo_blackboard(*, db_path: str | None=None, now: str='2026-01-01T00:00:00Z', tenant_scope: str='tenant-demo') -> dict
+    # Build a deterministic 3-entry demo blackboard and return ``{provider, blackboard_id, entries}``.
+```
+## intra-module call edges
+src.teleon.blackboard.local_sqlite_blackboard.__init__ -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._init_schema
+src.teleon.blackboard.local_sqlite_blackboard._entry_row -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._row_to_entry
+src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._next_seq
+src.teleon.blackboard.local_sqlite_blackboard._record_receipt -> src.teleon.blackboard.local_sqlite_blackboard.py_function_src_teleon_blackboard_local_sqlite_blackboard___content_hash
+src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._blackboard_row
+src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._entry_row
+src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._next_seq
+src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._record_receipt
+src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._transaction
+src.teleon.blackboard.local_sqlite_blackboard.append_entry -> src.teleon.blackboard.local_sqlite_blackboard.py_function_src_teleon_blackboard_local_sqlite_blackboard___content_hash
+src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._blackboard_row
+src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._next_seq
+src.teleon.blackboard.local_sqlite_blackboard.create_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._transaction
+src.teleon.blackboard.local_sqlite_blackboard.py_function_src_teleon_blackboard_local_sqlite_blackboard__seed_demo_blackboard -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard
+src.teleon.blackboard.local_sqlite_blackboard.query -> src.teleon.blackboard.local_sqlite_blackboard.py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard._row_to_entry

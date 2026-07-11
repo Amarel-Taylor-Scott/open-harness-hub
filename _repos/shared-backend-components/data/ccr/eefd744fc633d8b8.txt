@@ -1,0 +1,24 @@
+MODULE src/teleon/lift/adoption.py
+## API signatures
+```python
+"""src.teleon.lift.adoption — the Teleon Lift adoption ladder + baseline preservation."""
+_ADOPTION_PLAN_SCHEMA = ...
+def _ladder_by_mode() -> dict[str, dict]
+def mode_record(mode: str) -> dict | None
+def next_mode(mode: str) -> str | None
+def baseline_implementation(workload: dict, purpose_draft: dict) -> dict[str, Any]
+    # The legacy workload as the imported BASELINE implementation candidate (the rollback target).
+def build_adoption_plan(workload: dict, purpose_draft: dict, *, human_confirmed_purpose: bool=False, current_mode: str=model.ENTRY_MODE) -> dict[str, Any]
+    # Build an AdoptionPlan for a freshly lifted workload. Defaults: read-only `discover`, purpose UNconfirmed,
+def set_mode(plan: dict, mode: str, *, human_confirmed_purpose: bool | None=None) -> dict[str, Any]
+    # Return a copy of the plan moved to `mode`. ENFORCED: a managed mode (level >= MANAGED_MIN_LEVEL, which can
+def may_manage(plan: dict) -> bool
+    # True iff the plan is at a managed level with a human-confirmed purpose.
+```
+## intra-module call edges
+src.teleon.lift.adoption.build_adoption_plan -> src.teleon.lift.adoption.baseline_implementation
+src.teleon.lift.adoption.build_adoption_plan -> src.teleon.lift.adoption.mode_record
+src.teleon.lift.adoption.build_adoption_plan -> src.teleon.lift.adoption.next_mode
+src.teleon.lift.adoption.mode_record -> src.teleon.lift.adoption._ladder_by_mode
+src.teleon.lift.adoption.set_mode -> src.teleon.lift.adoption.mode_record
+src.teleon.lift.adoption.set_mode -> src.teleon.lift.adoption.next_mode

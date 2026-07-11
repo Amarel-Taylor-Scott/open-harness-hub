@@ -1,0 +1,37 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "pitch-decks",
+  "repo": "aidoneright-pitch-decks",
+  "role": "CONTEXT repo \u2014 investor pitch decks, investment narrative, one-pagers, traction/metrics evidence. The outward-facing fundraising STORY every investor conversation draws from, separate from product code and internal business memory.",
+  "exposes": [
+    "pitch-deck",
+    "investor-narrative",
+    "one-pager",
+    "traction-metrics"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "aidoneright",
+      "repo": "aidoneright-parent",
+      "exposes": [
+        "portfolio-site",
+        "brand"
+      ],
+      "role": "the PARENT BRAND / portfolio umbrella (aidoneright.dev). References every surface's PUBLIC interface for the portfolio s"
+    }
+  ],
+  "consumed_by": [],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

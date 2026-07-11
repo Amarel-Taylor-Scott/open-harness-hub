@@ -47,3 +47,8 @@ archive
 # bundle (incl. its images) is re-included here AFTER the *.png/*.jpg excludes.
 !dist/sites/aidoneright-design
 !dist/sites/aidoneright-design/**
+
+# SOPS+age secrets vault — NEVER ship encrypted-secret ciphertext into a published image.
+# Single source of this exclusion: _repos/shared-backend-components/scripts/deploy/publish_exclude.json
+# (enforced by scripts/check_sops_secrets.py EXCLUSION check).
+_repos/shared-backend-components/secrets/

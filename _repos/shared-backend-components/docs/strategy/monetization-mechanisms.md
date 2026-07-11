@@ -1,0 +1,1 @@
+../../../_shared/strategy/monetization-mechanisms.md

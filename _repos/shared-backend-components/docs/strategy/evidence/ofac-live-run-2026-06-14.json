@@ -1,0 +1,24 @@
+{
+  "receipt_type": "live_ofac_run",
+  "run_date": "2026-06-14",
+  "what_this_is": "A dated RECEIPT/attestation of a real --live run of the OFAC SDN connector against the production list — lineage + the single caught would-be violation ONLY. This is NOT a republication of the SDN feed. The always-green proof is the deterministic offline conformance test (`--self-test`); this file is the dated production confirmation that makes the deck's 'caught a real would-be violation' claim truthful.",
+  "lineage": {
+    "content_hash": "e30f607781ae806b40fc593821e142c136de31170284a099211b6e4cf169fc27",
+    "list_date": "2026-06-14",
+    "list_version": "OFAC-SDN-LIVE-2026-06-14+e30f6077",
+    "parser": "sanctions_feed_live.sdn_csv",
+    "source_url": "https://www.treasury.gov/ofac/downloads/sdn.csv",
+    "source_handle": "ctx://ofac/sdn",
+    "rows_parsed": 5,
+    "rows_skipped": 0,
+    "list_rows_in_source": 19065
+  },
+  "caught": {
+    "claim_id": "internal-OFAC-36-clearance",
+    "would_be_violation": "An internal document asserts entity 'OFAC-36' is CLEAR, but the live OFAC SDN list (OFAC-SDN-LIVE-2026-06-14+e30f6077) DESIGNATES it (program 'CUBA').",
+    "engine_action": "held out of the served corpus; 1 of 2 internal claims served, 1 would-be sanctions violation caught and routed to review",
+    "served_as_truth": false
+  },
+  "reproduce": "PYTHONPATH=. python3 -m scripts.ingest.sanctions_feed_live --live --demo",
+  "offline_always_green_proof": "PYTHONPATH=. python3 scripts/ingest/sanctions_feed_live.py --self-test"
+}

@@ -12,10 +12,10 @@ AGENTS.md
 README.md
 taxonomy/SPEC.md
 docs/codex/no-magic-values.md
-docs/codex/baltor-database-backed-context-current-state.md
-docs/codex/baltor-perpetual-parallel-improvement-runbook.md
+_repos/baltor/context/codex/baltor-database-backed-context-current-state.md
+_repos/baltor/context/codex/baltor-perpetual-parallel-improvement-runbook.md
 docs/architecture/database-backed-context-catalog.md
-docs/architecture/baltor-business-object-governance-standard.md
+_repos/baltor/context/architecture/baltor-business-object-governance-standard.md
 db/postgres/schema.sql
 ```
 

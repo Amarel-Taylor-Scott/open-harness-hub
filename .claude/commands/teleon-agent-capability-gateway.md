@@ -18,10 +18,10 @@ Teleon EXECUTES, Baltor GOVERNS truth.** One NEW proof-backed increment per cycl
   (BoundaryExpansionRequest stays pending, never auto-applied). Pricing metric = cost per successful capability run.
 
 ## VERIFIED FOUNDATIONS (reuse; re-verify each cycle)
-- src/teleon/runtime/capability_binding.py (CapabilityTaskBindingProvider: local_function@v1 active; cloud/K8s by
+- _repos/teleon/backend/src/teleon/runtime/capability_binding.py (CapabilityTaskBindingProvider: local_function@v1 active; cloud/K8s by
   policy via execution_backend_selector) + check_capability_binding_provider.
-- src/teleon/agents/agent_runtime_provider.py (+ redteam), src/teleon/inference/* (token ladder / OIPS / receipts),
-  src/teleon/environments/baltor_cfpb_context_governance.py (the compact governed-result shape: "10 business days"
+- _repos/teleon/backend/src/teleon/agents/agent_runtime_provider.py (+ redteam), _repos/teleon/backend/src/teleon/inference/* (token ladder / OIPS / receipts),
+  _repos/teleon/backend/src/teleon/environments/baltor_cfpb_context_governance.py (the compact governed-result shape: "10 business days"
   + held-out "30 days" + source handle + receipt). schemas/agents/* (P1A run contracts). flywheel ~396+.
 
 ## TARGET LADDER (first incomplete; mark VERIFIED_DONE + advance)
@@ -30,7 +30,7 @@ Teleon EXECUTES, Baltor GOVERNS truth.** One NEW proof-backed increment per cycl
   check_teleon_agent_gateway_contracts. (AgentCapabilityCard: capability_id,purpose,input_contract,output_contract,
   allowed_use,forbidden_use,expected_cost,expected_latency,freshness_policy,policy_notes,deterministic_first,
   llm_fallback_allowed,receipt_required.)
-- P1 local gateway: src/teleon/agent_gateway/ — list/describe/quote/run local DETERMINISTIC capabilities
+- P1 local gateway: _repos/teleon/backend/src/teleon/agent_gateway/ — list/describe/quote/run local DETERMINISTIC capabilities
   (utility.hash, cfpb.deadline.verify [reuse the CFPB env], json.schema.validate, tariff.hs.classify.reference,
   source.fetch.official[stub], context.pack.optimize, document.atomic_facts.extract) returning a compact
   AgentCapabilityRunResult + AgentCapabilityReceipt; deterministic-first; LLM fallback gated (NOT used in self-test);

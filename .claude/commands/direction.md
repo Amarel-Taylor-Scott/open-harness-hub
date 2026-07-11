@@ -4,7 +4,7 @@ description: Resilient operating loop for OpenHubForAI — never stop early, bra
 
 Load the resilience engine and apply it to the current autonomous run. Read and
 follow `.codex/prompts/direction.md` (paired with `.codex/prompts/goal.md` and
-`docs/codex/master-goal.md`).
+`_repos/_shared/codex/master-goal.md`).
 
 Operate under the **no-stop contract**: there is no terminal state. "Task done"
 → next menu item. "Phase complete" → next phase. "Blocked / error / red

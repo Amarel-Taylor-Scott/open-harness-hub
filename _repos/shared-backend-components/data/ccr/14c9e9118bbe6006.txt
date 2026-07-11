@@ -1,0 +1,35 @@
+MODULE src/teleon/observer/agentic.py
+## API signatures
+```python
+"""observer.agentic — AIDevObserver for AUTONOMOUS agent loops (not just human sessions)."""
+_LOOP_REPEAT = ...
+_STALL_WINDOW = ...
+_FAILURE_REPEAT = ...
+_DRIFT_WINDOW = ...
+_DRIFT_MIN_OVERLAP = ...
+_HALT_SIGNALS = ...
+def _norm(action: str) -> str
+    # Normalize an action for repeat/loop comparison (whitespace-collapsed, lowercased).
+def _step_events(steps: list[dict]) -> list[dict]
+    # Project agentic steps onto the engine's message shape so route_session can spot content risks per step.
+def _finding(kind: str, step_index: int, confidence: float, message: str, suggestion: str) -> dict
+    # An agentic loop-shape finding, in the engine's governed-candidate shape (composes with route_session).
+def loop_signals(steps: list[dict], *, goal: str='', budget: dict | None=None) -> list[dict]
+    # The deterministic loop-shape signals over the step SEQUENCE. budget: {max_steps?, max_cost?}.
+def monitor_step(steps_so_far: list[dict], *, goal: str='', budget: dict | None=None, mode: str='advisory') -> dict
+    # INTRA-RUN: call after each iteration. Returns {alerts, recommend_halt, mode, serves_truth}. recommend_halt
+def review_agentic_run(steps: list[dict], *, goal: str='', budget: dict | None=None) -> dict
+    # POST-RUN: the full governed report over a finished agentic loop = per-step content risks (route_session)
+def _self_test() -> int
+def main(argv: list[str] | None=None) -> int
+```
+## intra-module call edges
+src.teleon.observer.agentic._self_test -> src.teleon.observer.agentic.loop_signals
+src.teleon.observer.agentic._self_test -> src.teleon.observer.agentic.monitor_step
+src.teleon.observer.agentic._self_test -> src.teleon.observer.agentic.review_agentic_run
+src.teleon.observer.agentic.loop_signals -> src.teleon.observer.agentic._finding
+src.teleon.observer.agentic.loop_signals -> src.teleon.observer.agentic._norm
+src.teleon.observer.agentic.main -> src.teleon.observer.agentic._self_test
+src.teleon.observer.agentic.monitor_step -> src.teleon.observer.agentic.loop_signals
+src.teleon.observer.agentic.review_agentic_run -> src.teleon.observer.agentic._step_events
+src.teleon.observer.agentic.review_agentic_run -> src.teleon.observer.agentic.loop_signals

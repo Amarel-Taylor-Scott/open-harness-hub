@@ -1,0 +1,14 @@
+MODULE _repos/teleon/backend/src/teleon/digestion/open_hub_outputs.py
+## API signatures
+```python
+"""src.teleon.digestion.open_hub_outputs — turn a SkillDigestRun into CANDIDATE records for the portfolio:
+a SkillArtifact candidate (OpenSkillsHub) composed from the canonical object shell, and a Teleon PurposeTask /
+runtime candidate. Everything is a candidate (never active); the original skill stays the fallback. Pure +
+deterministic. Composes the Template Registry (canonical shell) + the digester"""
+_REPO = ...
+def _skill_mixins() -> list[str]
+def emit_open_hub_candidates(digest: dict, *, now: str) -> dict[str, Any]
+    # From a SkillDigestRun, emit candidate records. Unsafe digests emit NO candidate (quarantined).
+```
+## intra-module call edges
+src.teleon.digestion.open_hub_outputs.emit_open_hub_candidates -> src.teleon.digestion.open_hub_outputs._skill_mixins

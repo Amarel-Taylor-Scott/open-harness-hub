@@ -1,0 +1,1 @@
+../../../_shared/strategy/design-partner-pilot-program.md

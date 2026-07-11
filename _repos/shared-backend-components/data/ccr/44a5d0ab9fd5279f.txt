@@ -1,0 +1,89 @@
+MODULE src/teleon/compiler/registry.py
+## API signatures
+```python
+"""src.teleon.compiler.registry — the durable, append-only REGISTRY of compiled runtime units."""
+_REPO = ...
+REGISTRY_RECORD_VERSION = ...
+KIND_REGISTER = ...
+KIND_DEMOTE = ...
+RECORD_KINDS = ...
+DEFAULT_STATE_DIR = ...
+DEFAULT_LOG_NAME = ...
+_UNIT_ID = ...
+_CAP_ID = ...
+_CAP_VERSION = ...
+_ROLLBACK_TARGET = ...
+_COMPILED_AT = ...
+class RegistryError:
+    # Base for registry refusals — a clear, actionable reason, never a silently-wrong answer.
+class RegistryIntegrityError:
+    # The append-only log is structurally broken / tampered (a record missing its kind, a register event with no
+def _get_path(unit: dict, path: tuple[str, ...]) -> Any
+def _compiled_at(unit: dict) -> str
+    # The unit's caller-supplied compile timestamp (provenance.compiled_at). '' when absent — a deterministic
+def _order_key(unit: dict) -> tuple[Any, str, str]
+    # Deterministic TOTAL order for a capability's units: by capability_version, then the stamped compiled_at,
+class CompiledUnitRegistry:
+    # An append-only registry of compiled runtime units — the per-capability deploy_topology analog.
+    def __init__(self, log_path: Path | str | None=None, *, db_path: Path | None=None) -> None
+    def rebuild(self) -> None
+        # (Re)compute the in-memory projection from the FULL append-only log. Called on construction
+    def _validate_log(records: list[dict]) -> None
+        # Structural integrity check over the whole log (HONEST: refuse a broken log, don't guess).
+    def _unit_records(self) -> list[dict]
+        # The ``register`` records, in log (append) order — the source for the per-unit projection. The LAST
+    def _active_ids(self) -> set[str]
+        # The set of unit_ids currently ACTIVE = registered AND not subsequently demoted. Folded in log order so
+    def register(self, unit: dict, *, make_active: bool=True) -> dict
+        # Register a compiled unit. IDEMPOTENT by ``unit_id`` (a pure hash of the compile inputs): re-registering
+    def supersede(self, unit_id: str, *, demoted_by: str='', reason: str='manual supersede') -> dict
+        # Demote a unit by id WITHOUT deleting it (lossless supersession). The unit stays in ``history``; it is
+    def mark_active(self, unit_id: str) -> dict
+        # Re-activate a previously-demoted unit (a manual rollback/activate), DEMOTING whatever is currently
+    def rollback_to(self, capability_id: str) -> dict
+        # REAL rollback: re-activate the rollback target (the predecessor) of the capability's current active
+    def _append(self, record: dict) -> None
+        # Append one event to the durable log AND refold (keep the projection in sync). The AppendLog write is the
+    def get(self, unit_id: str) -> dict | None
+        # The current registry record for a unit_id (active flag reflects the latest fold), or None if unknown.
+    def history(self, capability_id: str) -> list[dict]
+        # EVERY compiled unit ever registered for a capability — active AND demoted (lossless: superseded units
+    def latest_for(self, capability_id: str) -> dict | None
+        # The NEWEST compiled unit for a capability by ``(capability_version, compiled_at, unit_id)``, regardless
+    def latest_active_for(self, capability_id: str) -> dict | None
+        # The currently-ACTIVE compiled unit for a capability (the live runtime). Exactly one active unit exists
+    def rollback_target(self, capability_id: str) -> dict | None
+        # The unit to roll back TO for a capability = the predecessor of the current active unit (the prior
+    def list_active(self) -> list[dict]
+        # Every currently-ACTIVE compiled unit (one per capability with a live runtime), ordered by
+    def all_records(self) -> list[dict]
+        # Every register/demote event in the raw append-only log, in append order — the lossless audit trail
+    def capability_ids(self) -> list[str]
+        # Every capability that has at least one registered unit, sorted (deterministic).
+    def close(self) -> None
+def open_registry(log_path: Path | str | None=None, *, db_path: Path | None=None) -> CompiledUnitRegistry
+    # Convenience constructor mirroring the repo's ``open(...)``-style factories (``_jsonl_store.open_log``).
+def register_units(units: Iterable[dict], log_path: Path | str | None=None) -> list[dict]
+    # Register a batch of compiled units into the registry at ``log_path`` (or the default), in order, returning
+```
+## intra-module call edges
+src.teleon.compiler.registry.__init__ -> src.teleon.compiler.registry.CompiledUnitRegistry.rebuild
+src.teleon.compiler.registry._append -> src.teleon.compiler.registry.CompiledUnitRegistry.rebuild
+src.teleon.compiler.registry._compiled_at -> src.teleon.compiler.registry._get_path
+src.teleon.compiler.registry._order_key -> src.teleon.compiler.registry._compiled_at
+src.teleon.compiler.registry._validate_log -> src.teleon.compiler.registry.RegistryIntegrityError
+src.teleon.compiler.registry.capability_ids -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
+src.teleon.compiler.registry.get -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
+src.teleon.compiler.registry.get -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
+src.teleon.compiler.registry.history -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
+src.teleon.compiler.registry.history -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
+src.teleon.compiler.registry.history -> src.teleon.compiler.registry._order_key
+src.teleon.compiler.registry.latest_active_for -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
+src.teleon.compiler.registry.latest_active_for -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
+src.teleon.compiler.registry.latest_for -> src.teleon.compiler.registry.CompiledUnitRegistry.history
+src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
+src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry.CompiledUnitRegistry._unit_records
+src.teleon.compiler.registry.list_active -> src.teleon.compiler.registry._order_key
+src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry._active_ids
+src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry._append
+src.teleon.compiler.registry.mark_active -> src.teleon.compiler.registry.CompiledUnitRegistry.get

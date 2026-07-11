@@ -1,0 +1,187 @@
+# primitive-atlas-axes-role-matrix.yaml — the MULTI-AXIS addressability facets (2026-07-08). The owner's
+# primitive-atlas insight: a primitive is addressable across persona × industry × geography × standard ×
+# datatype × process-stage × system-of-record (the cross-product IS the moat). This is a pure DATA seam:
+# primitive_multi_index auto-derives one facet COLUMN per facet below by globbing vocabularies/*-role-matrix.
+# yaml — so adding this file EXTENDS the advanced multi-column/LSH/blocking search with these axes WITHOUT any
+# change to the index core. Existing facet files (ml-engineer, ai-assisted-engineer, data-structures,
+# primitive-governance) are untouched; `runtime_target` (compiled target) already lives in the governance file
+# and is NOT redefined here (no magic values). "standards are primitive factories": the standard facet is the
+# seed for a future standards-factory minter (each standard -> parser/validator/mapper/conformance/crosswalk/
+# version-resolver primitives). Facet names are DISTINCT from existing files so nothing merges/collides.
+# candidate-taxonomy; serves_truth: false.
+schema_version: 1
+source: owner primitive-atlas brief 2026-07-08 (persona/industry/geography/standard/datatype/process/system
+  axes; ISO/HL7/X12/GS1/XBRL/Peppol/ISA-95/OPC-UA/O*NET/ACORD/NCPDP anchors)
+facets:
+  persona:
+    - cfo
+    - controller
+    - treasury analyst
+    - ciso
+    - general counsel
+    - legal ops
+    - chro
+    - people ops
+    - cpo
+    - procurement analyst
+    - coo
+    - plant manager
+    - field service lead
+    - data steward
+    - ai governance lead
+    - auditor
+    - regulator
+    - compliance officer
+    - customer success
+    - revops
+    - caseworker
+    - claims examiner
+  industry:
+    - healthcare
+    - banking
+    - payments
+    - capital markets
+    - insurance
+    - manufacturing
+    - aerospace
+    - energy
+    - utilities
+    - retail
+    - consumer goods
+    - pharma
+    - life sciences
+    - logistics
+    - supply chain
+    - public sector
+    - government
+    - telecom
+    - education
+    - agriculture
+    - food
+    - construction
+    - mining
+    - travel
+    - hospitality
+    - media
+  geography:
+    - global
+    - united states
+    - european union
+    - united kingdom
+    - ireland
+    - india
+    - brazil
+    - latam
+    - japan
+    - korea
+    - gcc
+    - middle east
+    - africa
+    - cross border
+  standard:
+    - iso 8601
+    - iso 3166
+    - iso 4217
+    - iso 20022
+    - bcp 47
+    - cldr
+    - iso 19160
+    - iso 19115
+    - ogc api features
+    - hl7 fhir
+    - hl7 v2
+    - x12
+    - loinc
+    - snomed ct
+    - dicom
+    - cdisc
+    - ncpdp script
+    - gs1
+    - epcis
+    - wco harmonized system
+    - un cefact
+    - xbrl
+    - fix protocol
+    - fpml
+    - ifrs taxonomy
+    - peppol bis
+    - en 16931
+    - ubl
+    - isa-95
+    - opc ua
+    - iso 10303 step
+    - ipc
+    - acord
+    - iso 9001
+    - iso 27001
+    - iso 42001
+    - iso 31000
+    - iso 14064
+    - iso 50001
+    - iso 8000
+    - ghg protocol
+    - gri
+    - o*net
+    - iso 30414
+  datatype:
+    - date value
+    - money amount
+    - quantity with unit
+    - percent value
+    - postal address
+    - person name
+    - organization name
+    - legal entity
+    - identifier
+    - code value
+    - event
+    - claim
+    - invoice
+    - remittance advice
+    - asset
+    - shipment
+    - work order
+    - contract
+    - case
+    - free text
+  process_stage:
+    - ingest
+    - normalize
+    - validate
+    - match
+    - reconcile
+    - route
+    - approve
+    - post
+    - report
+    - audit
+    - monitor
+    - conformance check
+    - entity resolution
+  system_of_record:
+    - erp
+    - crm
+    - ehr
+    - emr
+    - hris
+    - payroll
+    - wms
+    - tms
+    - oms
+    - mes
+    - scada
+    - plm
+    - qms
+    - clm
+    - grc
+    - iam
+    - clearinghouse
+    - data warehouse
+    - lakehouse
+aliases:
+  usa: united states
+  us: united states
+  eu: european union
+  uk: united kingdom
+  po: work order
+  gl: erp

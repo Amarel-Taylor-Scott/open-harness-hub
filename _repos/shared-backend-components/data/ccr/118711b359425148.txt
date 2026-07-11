@@ -1,0 +1,34 @@
+MODULE src/baltor/ports/research_agent_provider.py
+## API signatures
+```python
+"""src.baltor.ports.research_agent_provider — the BOUNDED-RESEARCH-AGENT capability interfaces."""
+RESEARCH_PRODUCES = ...
+CODEGEN_PRODUCES = ...
+AGENT_SERVES_TRUTH = ...
+RESEARCH_AGENT_SLOT = ...
+SOURCE_DISCOVERY_SLOT = ...
+CODEGEN_AGENT_SLOT = ...
+DISCOVERY_REPORT_REQUIRED_FIELDS = ...
+EXTRACTOR_SNIPPET_REQUIRED_FIELDS = ...
+class ResearchAgentProviderPort:
+    # One bounded research agent. ``research`` runs a bounded DISCOVERY loop for a ``ResearchTask`` and
+    def describe(self) -> dict[str, Any]
+        # Return the static capability card WITHOUT running anything: provider_id, role (stub|candidate),
+    def research(self, task: dict[str, Any], *, now: str) -> dict[str, Any]
+        # Run the bounded research loop for ``task`` (a ResearchTask dict) inside task.bounds and return a
+    def status(self) -> dict[str, Any]
+        # Report provider liveness WITHOUT raising: {provider_id, status: active|candidate|unavailable,
+class SourceDiscoveryProviderPort:
+    # A provider that, given a ``ResearchTask``, RANKS discovered source candidates by authority/reliability
+    def discover(self, task: dict[str, Any], *, existing_handles: list[str], now: str) -> dict[str, Any]
+        # Search ``existing_handles`` FIRST, then rank candidates by authority_rank (a FAQ can never outrank a
+class CodegenAgentProviderPort:
+    # A provider that drafts a DETERMINISTIC extractor snippet (+ unit tests) for a SourceRecipe. Its output
+    def draft_extractor(self, recipe: dict[str, Any], *, now: str) -> dict[str, Any]
+        # Draft an ExtractorSnippet dict for ``recipe`` (a SourceRecipe). MUST set
+    def status(self) -> dict[str, Any]
+        # Report liveness WITHOUT raising, same shape as ResearchAgentProviderPort.status.
+class ResearchAgentUnavailable:
+    # A research/codegen agent provider's runtime / credential is not present in this repo. Carries the
+    def __init__(self, provider_id: str, credential_ref: str, detail: str='') -> None
+```

@@ -1,0 +1,44 @@
+MODULE src/teleon/synthesis/pipeline_object_api.py
+## API signatures
+```python
+"""Object-first Python facade for deterministic Teleon primitive pipelines."""
+SERVES_TRUTH = ...
+class Primitive:
+    # Inspectable callable-backed primitive object.
+    def primitive_id(self) -> str
+    def record(self) -> dict[str, Any]
+    def llm_view(self) -> dict[str, Any]
+    def label(self) -> str
+    def __call__(self, *args: Any, **kwargs: Any) -> Any
+    def __rshift__(self, other: 'Primitive | Pipeline') -> 'Pipeline'
+    def with_options(self, *, state_mode: str | None=None, input_path: str | None=None, output_path: str | None=None, input_bindings: dict[str, str] | None=None, output_storage: str | None=None, max_attempts: int | None=None, required: bool | None=None) -> 'Primitive'
+        # Return a new primitive object with deterministic handle overrides.
+    def artifact_output(self) -> 'Primitive'
+class Pipeline:
+    # Composable primitive sequence that compiles to the existing runtime.
+    def __rshift__(self, other: Primitive | 'Pipeline') -> 'Pipeline'
+    def then(self, other: Primitive | 'Pipeline') -> 'Pipeline'
+    def to_teleon_primitives(self) -> list[dict[str, Any]]
+    def compile(self, template_id: str, purpose: str | None=None) -> dict[str, Any]
+    def run(self, task: Any, *, template_id: str='object_pipeline', run_id: str | None=None) -> dict[str, Any]
+    def compact_view(self) -> str
+def primitive(fn: Callable[..., Any] | None=None, *, primitive_id: str | None=None, state_mode: str=_runtime.py_const_src_teleon_synthesis_pipeline_templates__STATE_MODE_TASK_VALUE, input_path: str='$task', output_path: str='$task', input_bindings: dict[str, str] | None=None, output_storage: str=_runtime.py_const_src_teleon_synthesis_pipeline_templates__OUTPUT_STORAGE_INLINE, max_attempts: int=_runtime.py_const_src_teleon_synthesis_pipeline_templates__DEFAULT_MAX_ATTEMPTS, required: bool=True) -> Primitive | Callable[[Callable[..., Any]], Primitive]
+    # Decorate or wrap a callable as an object-first Teleon primitive.
+def pipeline(*steps: Primitive | Pipeline) -> Pipeline
+def discover_primitives(namespace: ModuleType | Mapping[str, Any] | object) -> list[Primitive]
+    # Discover explicit primitive objects from a module, mapping, class, or object.
+def compact_alias_lines(primitives: Iterable[Primitive], *, prefix: str='P') -> list[str]
+    # Return standardized compact line records for LLM planning context.
+```
+## intra-module call edges
+src.teleon.synthesis.pipeline_object_api.__rshift__ -> src.teleon.synthesis.pipeline_object_api.Pipeline
+src.teleon.synthesis.pipeline_object_api.__rshift__ -> src.teleon.synthesis.pipeline_object_api.Pipeline.then
+src.teleon.synthesis.pipeline_object_api.artifact_output -> src.teleon.synthesis.pipeline_object_api.Primitive.with_options
+src.teleon.synthesis.pipeline_object_api.compile -> src.teleon.synthesis.pipeline_object_api.Pipeline.to_teleon_primitives
+src.teleon.synthesis.pipeline_object_api.discover_primitives -> src.teleon.synthesis.pipeline_object_api.Primitive
+src.teleon.synthesis.pipeline_object_api.pipeline -> src.teleon.synthesis.pipeline_object_api.Pipeline
+src.teleon.synthesis.pipeline_object_api.primitive -> src.teleon.synthesis.pipeline_object_api.Primitive
+src.teleon.synthesis.pipeline_object_api.run -> src.teleon.synthesis.pipeline_object_api.Pipeline.compile
+src.teleon.synthesis.pipeline_object_api.then -> src.teleon.synthesis.pipeline_object_api.Pipeline
+src.teleon.synthesis.pipeline_object_api.with_options -> src.teleon.synthesis.pipeline_object_api.Primitive
+src.teleon.synthesis.pipeline_object_api.wrap -> src.teleon.synthesis.pipeline_object_api.Primitive

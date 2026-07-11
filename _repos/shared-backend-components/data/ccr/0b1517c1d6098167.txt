@@ -1,0 +1,54 @@
+MODULE src/teleon/llm_port.py
+## API signatures
+```python
+"""src.teleon.llm_port — the LLM ABSTRACTION LAYER: any LLM behind ONE uniform port."""
+_MODEL_INDEX = ...
+_SYSTEM = ...
+class LLMPort:
+    def available(self) -> bool
+    def complete(self, system: str, user: str, *, max_tokens: int=400) -> str
+class CallableLLM:
+    # Wrap any (prompt)->str callable (tests / custom integrations).
+    def __init__(self, fn: Callable[[str], str], *, name: str='callable')
+    def available(self) -> bool
+    def complete(self, system: str, user: str, *, max_tokens: int=400) -> str
+class ProviderLLM:
+    # Wrap a named _llm_client lane (ollama / cloudflare / …) + an optional model_id. available iff the lane key is set.
+    def __init__(self, provider: str='ollama', model: str | None=None)
+    def _prov(self) -> dict
+    def available(self) -> bool
+    def complete(self, system: str, user: str, *, max_tokens: int=400) -> str
+class GatewayLLM:
+    # Route via the Teleon inference plane (lane selection) → the chosen provider lane. Degrades to the default lane.
+    def __init__(self, objective: str='cheapest')
+    def _delegate(self) -> ProviderLLM
+    def available(self) -> bool
+    def complete(self, system: str, user: str, *, max_tokens: int=400) -> str
+class DeterministicLLM:
+    # Honest no-LLM port — never fabricates; signals unavailable so callers fall back to their deterministic path.
+    def available(self) -> bool
+    def complete(self, system: str, user: str, *, max_tokens: int=400) -> str
+def register_llm_adapter(name: str, factory: Callable[[], LLMPort]) -> None
+    # Register a new LLM adapter by name (the future-proofing hook — components consuming select_llm() never change).
+def _model_index() -> list[dict]
+def _lanes() -> dict
+def available_llms() -> dict
+    # The selectable LLMs, POPULATED FROM the registries: model-index model_ids + provider lanes + adapters.
+def select_llm(name: str='auto', **kw) -> LLMPort
+    # Resolve a name to an LLMPort. Accepts: a registered adapter; a model_id from the model index (→ its provider
+def as_callable(port) -> Callable[[str], str] | None
+    # Adapt an LLMPort / a (prompt)->str callable / a name / None to a (prompt)->str callable, or None when no LLM is
+```
+## intra-module call edges
+src.teleon.llm_port._delegate -> src.teleon.llm_port.ProviderLLM
+src.teleon.llm_port.as_callable -> src.teleon.llm_port.select_llm
+src.teleon.llm_port.available -> src.teleon.llm_port.GatewayLLM._delegate
+src.teleon.llm_port.available -> src.teleon.llm_port.ProviderLLM._prov
+src.teleon.llm_port.available_llms -> src.teleon.llm_port._lanes
+src.teleon.llm_port.available_llms -> src.teleon.llm_port._model_index
+src.teleon.llm_port.complete -> src.teleon.llm_port.GatewayLLM._delegate
+src.teleon.llm_port.complete -> src.teleon.llm_port.ProviderLLM._prov
+src.teleon.llm_port.select_llm -> src.teleon.llm_port.GatewayLLM
+src.teleon.llm_port.select_llm -> src.teleon.llm_port.ProviderLLM
+src.teleon.llm_port.select_llm -> src.teleon.llm_port._lanes
+src.teleon.llm_port.select_llm -> src.teleon.llm_port._model_index

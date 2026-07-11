@@ -1,0 +1,28 @@
+MODULE src/teleon/storage/capability_pr.py
+## API signatures
+```python
+"""src.teleon.storage.capability_pr — the GitHub-FAMILIAR layer over a capability unit: branches, pull requests,
+and "checks" — where the eval/lift gate IS the CI check."""
+_LIFT_FLOOR = ...
+_ACCURACY_FLOOR = ...
+class CapabilityPullRequest:
+    def code_diff(self) -> str
+    def behavior_diff(self) -> dict
+class CapabilityRepo:
+    # A capability unit presented in familiar git terms (branches / PRs / checks / merge) on any backend.
+    def __init__(self, backend: GitBackendPort | None=None, *, accuracy_floor: float=_ACCURACY_FLOOR) -> None
+    def main_head(self, unit: str)
+    def commit_main(self, unit: str, code: str, *, message: str, now: str)
+    def open_pr(self, unit: str, *, branch: str, head_code: str, eval_result: dict, title: str='', governance: dict | None=None) -> CapabilityPullRequest
+    def checks(self, pr: CapabilityPullRequest) -> dict
+        # The 'CI' status check: the governed eval/lift gate. A fork passes only if it provably does not regress,
+    def merge(self, pr: CapabilityPullRequest, *, now: str) -> dict
+        # Merge the PR — ONLY if its checks pass (a fork that doesn't lift within policy cannot merge).
+    def pr_view(self, pr: CapabilityPullRequest) -> dict
+        # Everything a familiar PR page would show.
+```
+## intra-module call edges
+src.teleon.storage.capability_pr.merge -> src.teleon.storage.capability_pr.CapabilityRepo.checks
+src.teleon.storage.capability_pr.open_pr -> src.teleon.storage.capability_pr.CapabilityPullRequest
+src.teleon.storage.capability_pr.open_pr -> src.teleon.storage.capability_pr.CapabilityRepo.main_head
+src.teleon.storage.capability_pr.pr_view -> src.teleon.storage.capability_pr.CapabilityRepo.checks

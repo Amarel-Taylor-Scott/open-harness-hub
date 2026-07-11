@@ -1,0 +1,1 @@
+../../../teleon/context/architecture/purpose-task-self-adapting-execution.md

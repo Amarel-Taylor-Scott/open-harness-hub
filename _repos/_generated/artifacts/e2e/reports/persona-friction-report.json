@@ -1,0 +1,428 @@
+{
+  "generated_at": "2026-06-09T20:05:16.464Z",
+  "gate": "persona_journeys",
+  "personas": 6,
+  "total_frictions": 0,
+  "results": [
+    {
+      "id": "compliance-lead-fintech",
+      "name": "Dana — Head of Compliance, mid-size fintech",
+      "goal": "Needs AI answers her auditors can trust: verified sources, receipts, freshness. Evaluating Baltor.",
+      "steps": [
+        {
+          "step": 1,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9103/",
+          "ok": true
+        },
+        {
+          "step": 2,
+          "op": "expect_text",
+          "arg": "Baltor",
+          "ok": true
+        },
+        {
+          "step": 3,
+          "op": "probe_text",
+          "arg": "verif|receipt|provenance|governed",
+          "ok": true
+        },
+        {
+          "step": 4,
+          "op": "probe_text",
+          "arg": "pricing|plans|contact|demo|talk to",
+          "ok": true
+        },
+        {
+          "step": 5,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8001/",
+          "ok": true
+        },
+        {
+          "step": 6,
+          "op": "expect_text",
+          "arg": "context|Baltor",
+          "ok": true
+        },
+        {
+          "step": 7,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8001/#/engine",
+          "ok": true
+        },
+        {
+          "step": 8,
+          "op": "pause",
+          "arg": "1500",
+          "ok": true
+        },
+        {
+          "step": 9,
+          "op": "probe_text",
+          "arg": "Source|Reconcil|Consumption",
+          "ok": true
+        },
+        {
+          "step": 10,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9103/",
+          "ok": true
+        },
+        {
+          "step": 11,
+          "op": "probe_text",
+          "arg": "OFAC|sanction|CFPB",
+          "ok": true
+        }
+      ],
+      "frictions": [],
+      "page_errors": [],
+      "console_errors": 1,
+      "video": "persona-compliance-lead-fintech.mp4"
+    },
+    {
+      "id": "platform-engineer-agents",
+      "name": "Marco — AI platform engineer running agent fleets",
+      "goal": "Burns tokens on flaky agent tool calls; wants deterministic receipt-backed capabilities. Evaluating Teleon.",
+      "steps": [
+        {
+          "step": 1,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9102/",
+          "ok": true
+        },
+        {
+          "step": 2,
+          "op": "expect_text",
+          "arg": "Teleon",
+          "ok": true
+        },
+        {
+          "step": 3,
+          "op": "probe_text",
+          "arg": "deterministic|receipt|capabilit",
+          "ok": true
+        },
+        {
+          "step": 4,
+          "op": "probe_text",
+          "arg": "docs|API|quickstart|sdk",
+          "ok": true
+        },
+        {
+          "step": 5,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9210/teleon/Teleon%20PurposeTask%20Control%20Tower.html",
+          "ok": true
+        },
+        {
+          "step": 6,
+          "op": "pause",
+          "arg": "2000",
+          "ok": true
+        },
+        {
+          "step": 7,
+          "op": "expect_text",
+          "arg": "PurposeTask|Teleon",
+          "ok": true
+        },
+        {
+          "step": 8,
+          "op": "probe_text",
+          "arg": "receipt|evidence|promotion",
+          "ok": true
+        }
+      ],
+      "frictions": [],
+      "page_errors": [],
+      "console_errors": 1,
+      "video": "persona-platform-engineer-agents.mp4"
+    },
+    {
+      "id": "agent-developer-builder",
+      "name": "Priya — solo developer building an agent product",
+      "goal": "Wants to paste a task and get a governed pipeline; will sign up if the first 5 minutes feel real.",
+      "steps": [
+        {
+          "step": 1,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8000/",
+          "ok": true
+        },
+        {
+          "step": 2,
+          "op": "expect_text",
+          "arg": "pipeline|harness|flow",
+          "ok": true
+        },
+        {
+          "step": 3,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8000/#/build",
+          "ok": true
+        },
+        {
+          "step": 4,
+          "op": "pause",
+          "arg": "1500",
+          "ok": true
+        },
+        {
+          "step": 5,
+          "op": "probe_selector",
+          "arg": "textarea, input[type=text]",
+          "ok": true
+        },
+        {
+          "step": 6,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8000/#/catalog",
+          "ok": true
+        },
+        {
+          "step": 7,
+          "op": "pause",
+          "arg": "1500",
+          "ok": true
+        },
+        {
+          "step": 8,
+          "op": "probe_text",
+          "arg": "harness|corpus|component",
+          "ok": true
+        },
+        {
+          "step": 9,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8000/#/signup",
+          "ok": true
+        },
+        {
+          "step": 10,
+          "op": "probe_selector",
+          "arg": "button[disabled][title*='Owner-gated']",
+          "ok": true
+        },
+        {
+          "step": 11,
+          "op": "probe_text",
+          "arg": "free|plan|pricing",
+          "ok": true
+        }
+      ],
+      "frictions": [],
+      "page_errors": [],
+      "console_errors": 1,
+      "video": "persona-agent-developer-builder.mp4"
+    },
+    {
+      "id": "oss-hub-publisher",
+      "name": "Wei — OSS maintainer considering publishing to the hubs",
+      "goal": "Wants to publish a component and see fair review/provenance treatment; allergic to pay-to-play registries.",
+      "steps": [
+        {
+          "step": 1,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9104/",
+          "ok": true
+        },
+        {
+          "step": 2,
+          "op": "expect_text",
+          "arg": "OpenHarnessHub|OpenHubForAI",
+          "ok": true
+        },
+        {
+          "step": 3,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9210/openharnesshub/OpenHarnessHub%20Prototype.html",
+          "ok": true
+        },
+        {
+          "step": 4,
+          "op": "pause",
+          "arg": "2500",
+          "ok": true
+        },
+        {
+          "step": 5,
+          "op": "probe_text",
+          "arg": "discovery is not trust|candidate",
+          "ok": true
+        },
+        {
+          "step": 6,
+          "op": "probe_text",
+          "arg": "provenance|trust",
+          "ok": true
+        },
+        {
+          "step": 7,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9104/",
+          "ok": true
+        },
+        {
+          "step": 8,
+          "op": "probe_text",
+          "arg": "publish|submit",
+          "ok": true
+        },
+        {
+          "step": 9,
+          "op": "probe_text",
+          "arg": "review queue|never.*automatically|candidate is not active",
+          "ok": true
+        }
+      ],
+      "frictions": [],
+      "page_errors": [],
+      "console_errors": 0,
+      "video": "persona-oss-hub-publisher.mp4"
+    },
+    {
+      "id": "investor-demo-reviewer",
+      "name": "Sam — investor doing diligence from one link",
+      "goal": "Has 10 minutes; needs the whole portfolio story from the Demo Control Tower without hitting anything fake.",
+      "steps": [
+        {
+          "step": 1,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9000/",
+          "ok": true
+        },
+        {
+          "step": 2,
+          "op": "expect_text",
+          "arg": "Demo everything|Control Tower",
+          "ok": true
+        },
+        {
+          "step": 3,
+          "op": "expect_text",
+          "arg": "active",
+          "ok": true
+        },
+        {
+          "step": 4,
+          "op": "probe_text",
+          "arg": "candidate|internal",
+          "ok": true
+        },
+        {
+          "step": 5,
+          "op": "probe_text",
+          "arg": "demo script|start here",
+          "ok": true
+        },
+        {
+          "step": 6,
+          "op": "probe_text",
+          "arg": "TEMPORARY|not production",
+          "ok": true
+        },
+        {
+          "step": 7,
+          "op": "click_text",
+          "arg": "AI Done Right",
+          "ok": true
+        },
+        {
+          "step": 8,
+          "op": "pause",
+          "arg": "1500",
+          "ok": true
+        }
+      ],
+      "frictions": [],
+      "page_errors": [],
+      "console_errors": 1,
+      "video": "persona-investor-demo-reviewer.mp4"
+    },
+    {
+      "id": "security-reviewer",
+      "name": "Alex — security engineer reviewing before procurement",
+      "goal": "Pokes the auth surfaces: wants gates to fail closed, no data leaks, honest disclosures.",
+      "steps": [
+        {
+          "step": 1,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8000/#/account/keys",
+          "ok": true
+        },
+        {
+          "step": 2,
+          "op": "pause",
+          "arg": "1500",
+          "ok": true
+        },
+        {
+          "step": 3,
+          "op": "expect_text",
+          "arg": "Sign in first|valid realm session",
+          "ok": true
+        },
+        {
+          "step": 4,
+          "op": "goto",
+          "arg": "http://127.0.0.1:9410/api/identity/realms",
+          "ok": true
+        },
+        {
+          "step": 5,
+          "op": "expect_text",
+          "arg": "realm_id",
+          "ok": true
+        },
+        {
+          "step": 6,
+          "op": "probe_text",
+          "arg": "account_id|credential_ref|session_id",
+          "ok": true
+        },
+        {
+          "step": 7,
+          "op": "goto",
+          "arg": "http://127.0.0.1:8000/#/signin",
+          "ok": true
+        },
+        {
+          "step": 8,
+          "op": "fill",
+          "arg": "#signin-email",
+          "ok": true
+        },
+        {
+          "step": 9,
+          "op": "fill",
+          "arg": "#signin-pass",
+          "ok": true
+        },
+        {
+          "step": 10,
+          "op": "click_text",
+          "arg": "Continue →",
+          "ok": true
+        },
+        {
+          "step": 11,
+          "op": "pause",
+          "arg": "1200",
+          "ok": true
+        },
+        {
+          "step": 12,
+          "op": "probe_text",
+          "arg": "rejected",
+          "ok": true
+        }
+      ],
+      "frictions": [],
+      "page_errors": [],
+      "console_errors": 3,
+      "video": "persona-security-reviewer.mp4"
+    }
+  ]
+}

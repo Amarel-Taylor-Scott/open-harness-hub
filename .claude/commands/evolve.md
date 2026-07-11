@@ -11,20 +11,20 @@ tunnels), and `/polish` (app), choosing among them by where the platform is weak
 1. `.codex/prompts/direction.md` — resilience: no early stop, branch-on-block, safety-gates-are-not-stops.
 2. `.codex/prompts/goal.md` — active Baltor-first autonomous goal.
 3. `docs/codex/baltor-clean-context.md` and `docs/codex/baltor-autonomous-goal.md` — clean current context.
-4. `docs/codex/master-goal.md` — substrate/history for the long-horizon component program.
-4. Architecture: `docs/strategy/two-services-shared-infrastructure.md`,
-   `docs/architecture/backend-services-and-platform.md`, `docs/strategy/context-enrichment-service.md`,
-   `docs/strategy/recommended-stack-and-cloud.md`, `docs/codex/schema-extensibility.md`.
+4. `_repos/_shared/codex/master-goal.md` — substrate/history for the long-horizon component program.
+4. Architecture: `_repos/_shared/strategy/two-services-shared-infrastructure.md`,
+   `docs/architecture/backend-services-and-platform.md`, `_repos/baltor/context/strategy/context-enrichment-service.md`,
+   `docs/strategy/recommended-stack-and-cloud.md`, `_repos/shared-backend-components/context/codex/schema-extensibility.md`.
 5. Live state: `services/registry.yaml` (`active` vs `planned`) + `.research-notes/autonomous-session-ledger.md`
    (what you did last — the durable memory across runs) + recent `git log`.
 
 ## The platform you're evolving (two products, one backend)
-- **OpenHubForAI** — *bounded*: build + monitor governed pipelines (DAG + lift gate). `web/openhubforai/`, ember.
+- **OpenHubForAI** — *bounded*: build + monitor governed pipelines (DAG + lift gate). `_repos/openhubforai/frontend/`, ember.
 - **Baltor** — *unbounded*: governed **context enrichment + context management** for
   agents. **Enrichment is the novel wedge** (raw→compressed→hyper-efficient tiers · structural/learned
   compression · distillation · the *measured-fidelity-per-tier* guarantee). **Management** is the
   established surround (memory · retrieval · freshness/CDC · caching · window budget — the OS-memory /
-  what-stays-on-the-desk lifecycle). Lead with enrichment; deliver both. `web/baltor/`, teal.
+  what-stays-on-the-desk lifecycle). Lead with enrichment; deliver both. `_repos/baltor/frontend/`, teal.
 - **Shared backend**: engine, catalog, foundry, measurement, ingestion, governance, data plane
   (`scripts/` libraries; `services/` thin service layer). Both products live behind their own tunnels:
   `bash scripts/serve_two_products.sh`.

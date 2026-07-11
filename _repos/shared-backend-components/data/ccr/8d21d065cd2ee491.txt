@@ -1,0 +1,9 @@
+MODULE _repos/teleon/backend/src/teleon/evolution/external_outcomes.py
+## API signatures
+```python
+"""src.teleon.evolution.external_outcomes — record an EXTERNAL run's result+metadata into the descent brain."""
+def record_external_outcome(store: DescentAttemptStore, *, unit_id: str, before: dict, after: dict, provider: str, strategy: str='external_run', receipt_ref: str='', outcome: str | None=None) -> dict
+    # Record an externally-executed run (e.g. on Cloudflare/customer compute) into the brain. ``before``/``after`` are
+def guide_next(store: DescentAttemptStore, before_state: dict) -> dict
+    # Teleon's improvement guidance from TRACKED results — no run required. The brain's empirically-best next descent
+```

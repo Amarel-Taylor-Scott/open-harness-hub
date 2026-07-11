@@ -1,0 +1,132 @@
+{
+  "serves_truth": false,
+  "id": "teleon-primitive-capability-assembly-thesis",
+  "purpose": "Persist the owner thesis: most AI-generated application code is re-generation of already-known primitives, loops, data structures, adapters, logging, and execution patterns. Teleon should let users define capability + context + guardrails, then assemble registered primitives into a verified graph instead of spending tokens rewriting solved code.",
+  "essence": {
+    "claim": "Future AI programming should mostly organize proven primitives and abstractions by input/output contract, not write fresh code from scratch.",
+    "token_thesis": "The model output should shrink from large source-code dumps to compact graph plans such as Input -> Primitive A -> Primitive B -> Primitive C -> Output.",
+    "developer_experience": "The user defines a capability and the surrounding context. Teleon searches primitive registries, selects compatible blocks, connects edges, verifies contracts, runs, logs, tunes, and stores versions.",
+    "why_it_matters": "99% of ordinary loops, structures, retries, scrapers, JSON logs, adapters, transforms, and control patterns have already been solved. Regenerating them wastes tokens and increases defects."
+  },
+  "primitive_record_required_fields": [
+    "id",
+    "version",
+    "purpose",
+    "problem_solved",
+    "input_contract",
+    "output_contract",
+    "side_effects",
+    "dependencies",
+    "execution_surface",
+    "latency_cost_profile",
+    "license",
+    "guardrails",
+    "failure_modes",
+    "proofs",
+    "logs_schema",
+    "examples",
+    "search_terms",
+    "embedding_text",
+    "graph_edges"
+  ],
+  "assembly_loop": [
+    {
+      "id": "capability-intake",
+      "rule": "Capture capability, domain context, input surfaces, output surfaces, guardrails, success metrics, infrastructure constraints, and privacy/license limits before selecting primitives."
+    },
+    {
+      "id": "hybrid-primitive-retrieval",
+      "rule": "Search primitive registries by semantic text, exact contract fields, tags, graph neighborhood, proof history, cost/latency, and license/deployment constraints."
+    },
+    {
+      "id": "contract-first-planning",
+      "rule": "Plan with primitive input/output contracts first. The generated plan should be a graph of primitive calls and adapters, not full rewritten primitive source."
+    },
+    {
+      "id": "edge-management",
+      "rule": "Most novel work should be edge adaptation: mapping outputs to inputs, validating shapes, adding retry/cache/rate-limit policies, and wiring execution surfaces."
+    },
+    {
+      "id": "minimal-new-code",
+      "rule": "Only generate fresh code when no primitive exists or when an adapter/glue layer is strictly needed. New code starts candidate-only and follows the Teleon generated-code contract."
+    },
+    {
+      "id": "execution-and-json-logging",
+      "rule": "Every run emits structured JSON logs: primitive ids, graph version, input contract hash, output contract hash, timings, costs, errors, retries, and proof status."
+    },
+    {
+      "id": "self-tuning-under-guardrails",
+      "rule": "Optimization may replace primitives, change order, lower model cost, add batching, or tune retries only if guardrails and success metrics remain satisfied."
+    },
+    {
+      "id": "git-like-variation-store",
+      "rule": "Baseline graph, tuned graph variants, forks, regressions, and promoted versions are stored as a versioned graph repository with diffs and rollback."
+    },
+    {
+      "id": "primitive-promotion",
+      "rule": "A newly generated primitive enters the global/private library only after deterministic proofs, contract checks, execution evidence, license metadata, and owner/human approval where needed."
+    }
+  ],
+  "graph_node_types": [
+    "capability",
+    "primitive",
+    "adapter",
+    "input_contract",
+    "output_contract",
+    "guardrail",
+    "execution_surface",
+    "log_event",
+    "proof",
+    "version",
+    "fork",
+    "failure_mode",
+    "third_party_api"
+  ],
+  "graph_edge_types": [
+    "requires",
+    "satisfies",
+    "accepts_input",
+    "emits_output",
+    "maps_output_to_input",
+    "depends_on",
+    "runs_on",
+    "guarded_by",
+    "proved_by",
+    "logged_by",
+    "forked_from",
+    "optimized_from",
+    "replaces",
+    "falls_back_to",
+    "calls_external_api"
+  ],
+  "generated_output_policy": {
+    "preferred_output": "A compact capability graph plan plus contract references.",
+    "example": "Input -> primitive.web.fetch_with_retry -> primitive.scrape.extract_tables -> primitive.normalize.country_subjurisdiction_rates -> primitive.validate.maximum_interest_rate_schema -> Output",
+    "avoid": "Large regenerated source for primitives that already exist in the registry."
+  },
+  "teleon_codegen_relationship": {
+    "contract": "architecture/teleon_codegen_contracts.json",
+    "primitive_blocks": "_repos/teleon/backend/src/teleon/synthesis/primitive_blocks.py",
+    "principle": "Generated code should be born as candidate primitives or adapters with long meaningful names, purpose/input/output metadata, scalar-or-sequence flexibility, bounded loops, and proof-before-promotion."
+  },
+  "external_api_policy": {
+    "allowed": "Third-party APIs can be primitives or execution surfaces.",
+    "requirement": "Each external primitive must expose the same contract envelope: input, output, cost, dependency, privacy, license, failure modes, and local/self-hosted fallback when available.",
+    "customer_preference": "Some users will prefer installable/integratable code over many external APIs; Teleon should model both as interchangeable primitive implementations behind the same contract."
+  },
+  "benefits": [
+    "Lower token use because models emit graph plans and adapter deltas instead of full primitive source.",
+    "Lower defect rate because proven primitives retain tests, logs, contracts, and known failure modes.",
+    "Better blast-radius analysis because every primitive and edge is addressable in the graph.",
+    "Better tuning because variants can be compared by cost, latency, success rate, and guardrail pass rate.",
+    "Better reuse because new verified primitives can be promoted into private or public registries.",
+    "Better customer fit because primitives can be local code, private services, or third-party APIs under the same contract."
+  ],
+  "must_not": [
+    "Do not treat LLM-authored source as truth.",
+    "Do not regenerate a primitive when a verified primitive satisfies the input/output contract.",
+    "Do not optimize by breaking declared guardrails.",
+    "Do not promote a primitive without proof evidence and license/dependency metadata.",
+    "Do not hide external API dependency, cost, privacy, or failure-mode metadata."
+  ]
+}

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How OpenHubForAI works — assemble, gate on measured lift, run anywhere</title>
+<meta name="description" content="Describe a task; OpenHubForAI assembles a governed pipeline from seven primitives, admits each component only if it measurably beats the bare model, and runs it against the agent you already use." />
+<!-- Self-contained animated explainer. No external JS deps. Brand: context/aidoneright/strategy/brand-architecture.md (LOCKED). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#10211b; --ink-soft:#33493f; --muted:#6a8175; --line:#dfe8e3;
+    --paper:#f6faf8; --card:#ffffff; --accent:#127a52; --accent-ink:#0a4e34;
+    --warm:#c9803a; --bad:#d2544e; --gold:#b8862f; --max:1120px;
+  }
+  *{box-sizing:border-box} html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+  .mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+  .disp{font-family:'Space Grotesk',Inter,sans-serif}
+  header.top{position:sticky;top:0;z-index:9;background:rgba(246,250,248,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .top .wrap{display:flex;align-items:center;gap:16px;height:58px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:600}
+  .brand .dot{width:11px;height:11px;border-radius:3px;background:linear-gradient(140deg,#3bbd88,var(--accent));box-shadow:0 0 0 4px rgba(18,122,82,.12)}
+  .top nav{margin-left:auto;display:flex;gap:18px;font-size:14px;color:var(--ink-soft)}
+  .top nav a:hover{color:var(--ink)}
+  .intro{padding:46px 0 8px;text-align:center}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);background:rgba(18,122,82,.08);border:1px solid rgba(18,122,82,.18);padding:5px 11px;border-radius:999px;margin-bottom:16px}
+  h1{font-size:clamp(28px,4.4vw,44px);line-height:1.06;letter-spacing:-.025em;margin:0 0 12px;font-weight:600}
+  .intro p{color:var(--ink-soft);max-width:660px;margin:0 auto;font-size:16.5px}
+
+  .stage{margin:30px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 24px 60px -40px rgba(16,33,27,.5)}
+  .panel{padding:26px 24px;min-height:320px}
+
+  /* task prompt */
+  .prompt{max-width:760px;margin:0 auto 22px;background:#0f1e18;color:#dcefe3;border-radius:12px;padding:14px 16px;font-size:14px;display:flex;gap:10px;align-items:flex-start}
+  .prompt .lab{color:#5bbd8e;font-weight:600;flex:none}
+  .prompt .cur{display:inline-block;width:8px;height:16px;background:#5bbd8e;margin-left:2px;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* pipeline DAG */
+  .dag{display:flex;align-items:stretch;gap:0;justify-content:center;flex-wrap:wrap;margin:8px 0 6px}
+  .node{position:relative;width:118px;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:12px 10px;text-align:center;
+    opacity:0;transform:translateY(10px) scale(.96);transition:all .45s cubic-bezier(.2,.7,.3,1)}
+  .node.show{opacity:1;transform:none}
+  .node .pk{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .node .nm{font-size:13px;font-weight:600;margin-top:3px;font-family:'Space Grotesk',sans-serif}
+  .node .ic{width:26px;height:26px;border-radius:8px;margin:0 auto 6px;display:grid;place-items:center;color:#fff;background:var(--accent);font-size:13px}
+  .node .gate{position:absolute;top:-9px;right:-9px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;color:#fff;background:var(--accent);
+    opacity:0;transform:scale(.4);transition:.4s}
+  .node.admitted .gate{opacity:1;transform:scale(1)}
+  .arrow{align-self:center;color:#bcd2c8;font-size:18px;padding:0 4px;opacity:0;transition:.4s}
+  .arrow.show{opacity:1}
+  /* a rejected (filler) candidate */
+  .reject{width:118px;border:1.5px dashed var(--bad);border-radius:13px;padding:12px 10px;text-align:center;background:#fff5f4;align-self:center;margin-left:14px;
+    opacity:0;transform:scale(.9);transition:.45s}
+  .stage[data-step="2"] .reject,.stage[data-step="3"] .reject,.stage[data-step="4"] .reject{opacity:1;transform:none}
+  .reject .nm{font-size:12px;font-weight:600;color:var(--bad)}
+  .reject .why{font-size:10px;color:var(--bad);margin-top:3px}
+
+  /* lift gate explainer */
+  .gatebox{max-width:780px;margin:18px auto 0;border:1px dashed var(--line);border-radius:14px;padding:16px 18px;background:#fbfdfc;opacity:.4;transition:.5s}
+  .stage[data-step="2"] .gatebox,.stage[data-step="3"] .gatebox,.stage[data-step="4"] .gatebox{opacity:1;border-color:rgba(18,122,82,.4)}
+  .gatebox .rule{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-ink);text-align:center}
+  .gatebox .sub{font-size:12.5px;color:var(--muted);text-align:center;margin-top:6px}
+
+  /* lift comparison bars */
+  .lift{max-width:560px;margin:20px auto 0;opacity:.35;transition:.5s}
+  .stage[data-step="3"] .lift,.stage[data-step="4"] .lift{opacity:1}
+  .lrow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .lrow .lbl{width:130px;font-size:13px;font-weight:600;text-align:right;color:var(--ink-soft)}
+  .lrow .track{flex:1;height:26px;background:#eef3f0;border-radius:8px;overflow:hidden;position:relative}
+  .lrow .track i{display:block;height:100%;width:0;border-radius:8px;transition:width 1.1s cubic-bezier(.2,.7,.3,1)}
+  .lrow.bare .track i{background:#c2cfc9} .lrow.pipe .track i{background:linear-gradient(90deg,#2da877,var(--accent))}
+  .stage[data-step="3"] .lrow.bare .track i,.stage[data-step="4"] .lrow.bare .track i{width:46%}
+  .stage[data-step="3"] .lrow.pipe .track i,.stage[data-step="4"] .lrow.pipe .track i{width:89%}
+  .lrow .val{width:42px;font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace}
+  .liftdelta{text-align:center;font-size:13px;color:var(--accent-ink);font-weight:600;margin-top:2px}
+  .liftdelta b{font-size:15px}
+
+  /* run / deliver */
+  .runout{max-width:760px;margin:18px auto 0;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;opacity:.3;transition:.5s}
+  .stage[data-step="4"] .runout{opacity:1}
+  .rchip{font-size:12.5px;font-weight:600;color:var(--accent-ink);background:rgba(18,122,82,.08);border:1px solid rgba(18,122,82,.2);border-radius:999px;padding:6px 12px;display:flex;align-items:center;gap:6px}
+  .rchip::before{content:"→";color:var(--accent)}
+
+  .caption{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;border-top:1px solid var(--line);background:#fbfdfc}
+  .stepno{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px}
+  .caption .ctxt b{display:block;font-size:15px;margin-bottom:2px}
+  .caption .ctxt span{color:var(--ink-soft);font-size:13.5px}
+  .controls{display:flex;gap:8px;align-items:center;padding:0 22px 18px}
+  .controls button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:7px 13px;cursor:pointer}
+  .controls button:hover{border-color:#bcd0c7}
+  .controls .dots{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .controls .dots i{width:8px;height:8px;border-radius:50%;background:#cdded6;cursor:pointer;transition:.2s}
+  .controls .dots i.on{background:var(--accent);transform:scale(1.25)}
+  .footer{padding:18px 0 60px;text-align:center;color:var(--muted);font-size:13px}
+  .footer a{color:var(--accent);font-weight:600}
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="/"><span class="dot"></span> OpenHubForAI</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="https://baltor.ai">Baltor</a>
+        <a href="https://aidoneright.dev">AI Done Right</a>
+        <a href="https://aidoneright.dev/gtm-launch-guide.html">Launch guide</a>
+        <a href="https://openhubforai.com">Get started</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <span class="eyebrow">How it works</span>
+      <h1>Describe a task. Get a governed pipeline<br />that measurably beats the bare model.</h1>
+      <p>OpenHubForAI assembles your task into a governed pipeline of seven primitives, admits each component only if it <b>lifts</b> capability over the model alone — and runs against the agent you already use. Open, portable, measured.</p>
+    </section>
+
+    <section class="stage" id="stage" data-step="0">
+      <div class="panel">
+        <div class="prompt">
+          <span class="lab">task ›</span>
+          <span id="ptext">Detect human-exploitation indicators in a recruitment ad posted from Hong Kong to the Philippines</span><span class="cur"></span>
+        </div>
+
+        <div class="dag" id="dag">
+          <div class="node" data-n="0"><div class="ic">⤓</div><div class="pk">Input</div><div class="nm">Intake + normalize</div><div class="gate">✓</div></div>
+          <span class="arrow">→</span>
+          <div class="node" data-n="1"><div class="ic">▤</div><div class="pk">Knowledge Corpus</div><div class="nm">Trafficking indicators</div><div class="gate">✓</div></div>
+          <span class="arrow">→</span>
+          <div class="node" data-n="2"><div class="ic">◈</div><div class="pk">If Statement</div><div class="nm">Risk routing</div><div class="gate">✓</div></div>
+          <span class="arrow">→</span>
+          <div class="node" data-n="3"><div class="ic">⚙</div><div class="pk">Action</div><div class="nm">Extract + classify</div><div class="gate">✓</div></div>
+          <span class="arrow">→</span>
+          <div class="node" data-n="4"><div class="ic">↻</div><div class="pk">Loop</div><div class="nm">Re-check spans</div><div class="gate">✓</div></div>
+          <span class="arrow">→</span>
+          <div class="node" data-n="5"><div class="ic">◼</div><div class="pk">Stop / End</div><div class="nm">Confidence gate</div><div class="gate">✓</div></div>
+          <span class="arrow">→</span>
+          <div class="node" data-n="6"><div class="ic">◳</div><div class="pk">Output</div><div class="nm">Cited verdict</div><div class="gate">✓</div></div>
+          <div class="reject"><div class="nm">✕ generic “summarize” persona</div><div class="why">no measured lift → rejected</div></div>
+        </div>
+
+        <div class="gatebox">
+          <div class="rule">admit ⟺ &nbsp;pipeline_score − bare_model_score &gt; 0&nbsp; <b>AND</b> &nbsp;the lift is structural</div>
+          <div class="sub">Every component earns its place: it must beat the bare model <i>and</i> the advantage must not vanish when the next model ships. Filler is rejected.</div>
+        </div>
+
+        <div class="lift">
+          <div class="lrow bare"><span class="lbl">Bare model</span><span class="track"><i></i></span><span class="val" id="vbare">0.46</span></div>
+          <div class="lrow pipe"><span class="lbl">Governed pipeline</span><span class="track"><i></i></span><span class="val" id="vpipe">0.89</span></div>
+          <div class="liftdelta">measured lift <b>+0.43</b> on the held-out task set — the bar to enter the catalog.</div>
+        </div>
+
+        <div class="runout">
+          <span class="rchip">Runs in Claude Code / Codex / any agent you already use</span>
+          <span class="rchip">Freezable + portable export</span>
+          <span class="rchip">Cited, governed output</span>
+        </div>
+      </div>
+
+      <div class="caption">
+        <div class="stepno" id="stepno">1</div>
+        <div class="ctxt"><b id="cap-title">Describe the task</b><span id="cap-body">Type the job in plain language — no glue code, no orchestration boilerplate.</span></div>
+      </div>
+      <div class="controls">
+        <button id="prev">‹ Back</button>
+        <button id="playpause">⏸ Pause</button>
+        <button id="next">Next ›</button>
+        <div class="dots" id="dots"></div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Open, portable, measured — and it consumes <a href="https://baltor.ai">Baltor</a>’s verified context as fuel. &nbsp;
+      <a href="https://openhubforai.com">Build a harness →</a>
+    </div>
+  </main>
+
+<script>
+(function(){
+  var stage=document.getElementById('stage');
+  var nodes=[].slice.call(document.querySelectorAll('.node'));
+  var arrows=[].slice.call(document.querySelectorAll('.arrow'));
+  var STEPS=[
+    {title:'Describe the task',body:'Type the job in plain language — no glue code, no orchestration boilerplate.',shown:0,admit:0},
+    {title:'Assemble the seven primitives',body:'The task is composed into a governed pipeline: Input · Knowledge Corpus · If Statement · Action · Loop · Stop/End · Output — each a vetted component.',shown:7,admit:0},
+    {title:'Gate every component on measured lift',body:'A component enters only if it beats the bare model AND the advantage is structural (it won’t close when the next model ships). The generic filler persona is rejected.',shown:7,admit:7},
+    {title:'Prove the lift',body:'The whole pipeline is scored against the bare model on held-out tasks. The gap — the measured lift — is the price of admission to the catalog.',shown:7,admit:7},
+    {title:'Run it against your own agent',body:'Export it, freeze it, or run it in the agent you already use. Open and portable — and it pulls Baltor’s verified context as fuel.',shown:7,admit:7}
+  ];
+  var N=STEPS.length, cur=0, playing=true;
+  function render(){
+    stage.setAttribute('data-step',cur);
+    var S=STEPS[cur];
+    nodes.forEach(function(n,i){
+      n.classList.toggle('show', i < S.shown);
+      n.classList.toggle('admitted', i < S.admit);
+    });
+    arrows.forEach(function(a,i){ a.classList.toggle('show', i < S.shown-1); });
+    document.getElementById('cap-title').textContent=S.title;
+    document.getElementById('cap-body').textContent=S.body;
+    document.getElementById('stepno').textContent=(cur+1);
+    document.querySelectorAll('#dots i').forEach(function(d,k){ d.className=k===cur?'on':''; });
+  }
+  function go(n){ cur=(n+N)%N; render(); }
+  function setPP(){ document.getElementById('playpause').textContent=playing?'⏸ Pause':'▶ Play'; }
+  function stop(){ playing=false; setPP(); }
+  document.getElementById('next').onclick=function(){stop();go(cur+1);};
+  document.getElementById('prev').onclick=function(){stop();go(cur-1);};
+  document.getElementById('playpause').onclick=function(){playing=!playing;setPP();};
+  var dotsWrap=document.getElementById('dots');
+  for(var k=0;k<N;k++){ var d=document.createElement('i'); d.onclick=(function(kk){return function(){stop();go(kk);};})(k); dotsWrap.appendChild(d); }
+  render();
+  setInterval(function(){ if(playing) go(cur+1); }, 3400);
+})();
+</script>
+</body>
+</html>

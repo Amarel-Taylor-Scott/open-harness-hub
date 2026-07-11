@@ -1,13 +1,33 @@
 # AI Done Right
 
 > **AI, done right.** This is the monorepo for the **AI Done Right** product family (the GitHub repo is named
-> `open-harness-hub` for historical reasons). The canonical references are: north star **`docs/BIBLE.md`**, agent
-> operating rules **`CLAUDE.md`** + **`AGENTS.md`**, design system **`docs/DESIGN-BIBLE.md`**, frontend/backend
-> integration **`docs/INTEGRATION-BIBLE.md`**.
+> `open-harness-hub` for historical reasons). The canonical references are: north star
+> **`_repos/shared-backend-components/docs/BIBLE.md`**, agent operating rules **`CLAUDE.md`** + **`AGENTS.md`**,
+> design system **`_repos/shared-backend-components/docs/DESIGN-BIBLE.md`**, frontend/backend integration
+> **`_repos/shared-backend-components/docs/INTEGRATION-BIBLE.md`**.
 >
 > Repository history: this project previously lived at `github.com/taylor-s-amarel/open-harness-hub`; its canonical
 > home is now [`github.com/Amarel-Taylor-Scott/open-harness-hub`](https://github.com/Amarel-Taylor-Scott/open-harness-hub)
 > (all history preserved; the old URL still redirects).
+
+## Repository layout — everything lives under `_repos/`
+
+The tree was reorganized: the repo **root** now holds only `_repos/`, the essential meta files (`README.md`,
+`LICENSE`, `AGENTS.md`, `CLAUDE.md`, `conftest.py`, `.gitignore`, `.env`, `.aidoneright-root`), and tooling-hidden
+dirs (`.venv`, `.claude`, `.codex`, `.github`). Every former top-level dir moved into `_repos/<owner>/`:
+
+- **`_repos/shared-backend-components/`** — the substrate + all tooling: `scripts/` (suite runner + every
+  `check_*.py`/`build_*.py`/`validate.py`), `architecture/*.json`, `schemas/`, `vocabularies/`, `catalog/`,
+  `db/`, `docs/` (BIBLE, DESIGN-BIBLE, INTEGRATION-BIBLE, codex, concepts, strategy), `hf-space/`, `dist/`, `data/`.
+- **`_repos/{teleon,baltor,openhubforai,aidevobserver,aidoneright}/`** — each surface: `backend/src/<x>/`,
+  `frontend/`, `context/`, `EDGES.md`, `interface.json`.
+- **`_repos/dev-rules-context/`** — the devkit (`standards/`, `prompts/`, `hooks/`, `commands/`, `skills/`, …).
+- **`_repos/_shared/`** — cross-cutting (`strategy/`, `codex/`, `concepts/`, `taxonomy/`, `_reference/`, `archive/`).
+
+Authoritative maps: **[`_repos/INDEX.md`](_repos/INDEX.md)**, **[`_repos/MIGRATION-STATUS.md`](_repos/MIGRATION-STATUS.md)**,
+**[`_repos/_moved_dirs.json`](_repos/_moved_dirs.json)**. **Convention in the sections below:** a bare `scripts/x.py`,
+`docs/…`, `architecture/…`, `catalog/…` names the file under `_repos/shared-backend-components/…`; product code
+written `src/<x>/…` lives at `_repos/<x>/backend/src/<x>/…` (the `src/<x>/…` form is the canonical, location-stable name).
 
 ## The product family: 5 surfaces, one design system
 
@@ -24,7 +44,8 @@ A holding company, **AI Done Right** (`aidoneright.dev`), owns three product lay
 | **OpenHubForAI** (`openhubforai.io`) | the open store both products consume: the component, harness, and skill registries |
 
 **Architectural law:** Baltor depends on Teleon depends on OpenHarnessHub, never the reverse
-(`architecture/portfolio_dependency_law.json`). Backends are reached through same-origin seams; see the INTEGRATION-BIBLE.
+(`_repos/shared-backend-components/architecture/portfolio_dependency_law.json`). Backends are reached through
+same-origin seams; see the INTEGRATION-BIBLE.
 
 ## Design and the Claude Design handoff
 
@@ -85,7 +106,7 @@ The only admission rule: a component must **measurably lift capability over a ba
 already does zero-shot is out of scope by design. That keeps the registry parked on the
 moving frontier of *what models still can't do reliably* — long-tail facts, esoteric
 rules, verifiable procedures, fast-changing regulation. See
-[`docs/codex/master-goal.md`](docs/codex/master-goal.md).
+[`_repos/_shared/codex/master-goal.md`](_repos/_shared/codex/master-goal.md).
 
 ## The foundry — evidence-driven generation (no filler)
 
@@ -96,7 +117,7 @@ source-key), benchmark-measured, gated, and human-approved (knowledge always rou
 human, because the model can't self-certify its own gaps). A clone cross-product can't
 satisfy that, so filler is impossible by construction. Run the proof:
 `python -m scripts.foundry.pipeline --self-test`. Design:
-[`docs/architecture/evidence-driven-component-factory.md`](docs/architecture/evidence-driven-component-factory.md).
+[`_repos/shared-backend-components/context/architecture/evidence-driven-component-factory.md`](_repos/shared-backend-components/context/architecture/evidence-driven-component-factory.md).
 
 ## Open-core, pricing, and freshness
 
@@ -105,16 +126,16 @@ satisfy that, so filler is impossible by construction. Run the proof:
 **RAG databases**, **dynamic corpora kept fresh** (scrape → date + provenance + CDC),
 hosted processing, and build-on-demand. **Public-good** components (e.g. anti-trafficking)
 are free. The split is enforced automatically per component — see
-[open-core](docs/strategy/open-core-model.md) and the 20
-[monetization mechanisms](docs/strategy/monetization-mechanisms.md).
+[open-core](_repos/_shared/strategy/open-core-model.md) and the 20
+[monetization mechanisms](_repos/_shared/strategy/monetization-mechanisms.md).
 
 ## Catalog status
 
 <!-- BEGIN GENERATED:catalog-stats -->
 <!-- Generated by scripts/build_readme_stats.py — do not edit by hand (see docs/codex/no-magic-values.md). -->
 
-- **Catalog manifests (schema-validated): 2,682** — 2,682 committed to git, 0 machine-generated candidates pending review/promotion.
-- **By type:** knowledge-packs 427 · pipelines 420 · rule-packs 402 · rubrics 245 · personas 233 · datasets 205 · harnesses 195 · processors 180 · tools 173 · benchmarks 111 · patterns 56 · adapters 33 · logic-packs 2.
+- **Catalog manifests (schema-validated): 2,684** — 2,684 committed to git, 0 machine-generated candidates pending review/promotion.
+- **By type:** knowledge-packs 428 · pipelines 420 · rule-packs 402 · rubrics 245 · personas 233 · datasets 205 · harnesses 195 · processors 181 · tools 173 · benchmarks 111 · patterns 56 · adapters 33 · logic-packs 2.
 - **Loaded into the derived query DB** (`dist/catalog.sqlite`): 505 objects, 1,024 relationship edges, 0 embeddings (vector search pending — see docs/codex/billion-component-goal.md).
 - **Emitters** (`scripts/emit/`): 13.
 
@@ -131,7 +152,7 @@ _Counts are generated; run `python3 scripts/build_readme_stats.py` to refresh (`
     3 pipelines, k-anonymity cross-org pattern, CBP-WRO tool, 3
     synthetic disclosure samples, regression benchmark. The GREP
     rules have been LIVE-TESTED — see `data/esg-grep-findings.json`
-    and `docs/use-cases/esg-supply-chain-due-diligence.md`.
+    and `_repos/shared-backend-components/context/use-cases/esg-supply-chain-due-diligence.md`.
   - **Kaggle-mined verified pipelines** — verified-evidence shapes,
     each attributed to a permissively-licensed source repo or
     competition kernel with explicit author + URL + license in the
@@ -148,7 +169,7 @@ _Counts are generated; run `python3 scripts/build_readme_stats.py` to refresh (`
   Optimizer, Multi-Agent-Debate, Routing, Prompt-Chaining,
   Naive/Corrective/Fusion RAG, HyDE, Step-Back, Two-Stage-Retrieve-
   Rerank, K-Anonymity-Aggregation).
-- **<!--N:code_templates-->10<!--/N--> zero-LLM-cost code templates** (extract_email/url/phone,
+- **<!--N:code_templates-->11<!--/N--> zero-LLM-cost code templates** (extract_email/url/phone,
   normalize_date, validate_iban with mod-97, validate_luhn, count_tokens,
   fuzzy_jaro_winkler, cosine_similarity, sha256_hash).
 - **<!--N:model_adapters-->33<!--/N--> model adapters** (e.g. Ollama-default, vLLM-AWQ-local, BGE-embeddings-
@@ -222,7 +243,7 @@ python scripts/oh_hub.py run pipeline/X --inputs input.json
 python scripts/oh_hub.py emit persona/esg-auditor mcp  # emit to MCP / Croissant / etc.
 ```
 
-<!--N:demo_scripts-->23<!--/N--> demo scripts (`scripts/demo_*.py`) are pre-baked end-to-end runs spanning the verticals; the core set:
+<!--N:demo_scripts-->24<!--/N--> demo scripts (`scripts/demo_*.py`) are pre-baked end-to-end runs spanning the verticals; the core set:
 
 ```bash
 python3 scripts/demo_esg_pipeline.py          # ESG / CSDDD supplier grading
@@ -253,9 +274,9 @@ python3 scripts/demo_vendor_onboarding.py     # kitchen-sink: ESG + AppSec + Leg
   competition kernels and production repos. Each pipeline component definition
   references its source(s) + author(s) + license in the definition header.
 - **Hassan Gasim's "Docker-Hub-for-harnesses" framing** seeded the
-  portable spec at [`docs/spec/HARNESS_HUB_SPEC.md`](docs/spec/HARNESS_HUB_SPEC.md)
+  portable spec at [`docs/spec/OPENHUBFORAI_SPEC.md`](docs/spec/OPENHUBFORAI_SPEC.md)
   and the peer-registry comparison at
-  [`docs/comparison/peer-registries.md`](docs/comparison/peer-registries.md).
+  [`_repos/_shared/comparison/peer-registries.md`](_repos/_shared/comparison/peer-registries.md).
 
 Full attribution log: [`ATTRIBUTION.md`](ATTRIBUTION.md).
 

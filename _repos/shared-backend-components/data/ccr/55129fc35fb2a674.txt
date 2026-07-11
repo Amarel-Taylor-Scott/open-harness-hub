@@ -1,0 +1,26 @@
+MODULE src/teleon/self_healing/reheal.py
+## API signatures
+```python
+"""src.teleon.self_healing.reheal — CDC source-change → capability re-heal (the keystone seam)."""
+HEAL_STATUS_HEALTHY = ...
+HEAL_STATUS_HEALED = ...
+HEAL_STATUS_DEGRADED = ...
+HEAL_STATUS_NO_BENCHMARK = ...
+NEXT_RUNG = ...
+SOURCE_DEPENDENCIES_FIELD = ...
+CHANGED_EVENT_KINDS = ...
+class HealOutcome:
+    def as_dict(self) -> dict
+def capabilities_depending_on(source_id: str, specs: list[dict]) -> list[dict]
+    # The capabilities that declared a dependency on `source_id` — only these are re-evaluated when
+def _norm(v: Any) -> str
+def benchmark_health(spec: dict, registry: dict, *, suite: dict | None=None) -> dict
+    # Re-run the capability's benchmark against the CURRENT world. Returns {meets, drift, failures,
+def reheal_on_source_change(event: dict, specs: list[dict], registry: dict, *, now: str, promotion_criteria: dict | None=None) -> list[HealOutcome]
+    # The Baltor↔Teleon seam: a freshness CDC 'changed'/'new' event for a source → re-evaluate +
+```
+## intra-module call edges
+src.teleon.self_healing.reheal.benchmark_health -> src.teleon.self_healing.reheal._norm
+src.teleon.self_healing.reheal.reheal_on_source_change -> src.teleon.self_healing.reheal.HealOutcome
+src.teleon.self_healing.reheal.reheal_on_source_change -> src.teleon.self_healing.reheal.benchmark_health
+src.teleon.self_healing.reheal.reheal_on_source_change -> src.teleon.self_healing.reheal.capabilities_depending_on

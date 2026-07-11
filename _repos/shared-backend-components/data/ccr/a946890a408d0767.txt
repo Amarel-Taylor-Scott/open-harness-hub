@@ -1,0 +1,77 @@
+MODULE src/teleon/storage/record_store.py
+## API signatures
+```python
+"""src.teleon.storage.record_store — the ONE backend-swappable, append-only RECORD STORE for the
+long-lived streams that grow to billions-to-trillions of rows (the descent BRAIN, CDC, versioning)."""
+_REPO = ...
+_POLICY_PATH = ...
+class StorageError:
+    # Raised on an unknown stream, a config-tier stream used as an append log, or a bad policy.
+def tier_policy() -> dict
+    # The whole storage tier policy (single source: architecture/storage_tier_policy.json).
+def stream_spec(stream: str, *, policy: dict | None=None) -> dict
+    # The policy row for one stream. Raises on an unknown stream — never a silent default.
+def backend_for(stream: str, *, mode: str | None=None, policy: dict | None=None) -> str
+    # The backend a stream resolves to for the given mode ('local' default, or 'cloud'). Reads the
+class RecordStore:
+    # Append-only record store port. ``append`` is idempotent when given an ``idem_key``; ``all``
+    def append(self, record: dict, *, idem_key: str | None=None) -> int
+    def all(self, predicate=None) -> list[dict]
+    def count(self) -> int
+    def close(self) -> None
+class LocalRecordStore:
+    # The local (offline) backend used for both the operational and history tiers on a single node:
+    def __init__(self, jsonl_path: str | Path, *, db_path: str | Path | None=None)
+    def append(self, record: dict, *, idem_key: str | None=None) -> int
+    def all(self, predicate=None) -> list[dict]
+    def count(self) -> int
+    def close(self) -> None
+class _UnwiredCloudStore:
+    # A cloud backend that is config-selected but not wired in the offline build. It names its target
+    def __init__(self, *_a, **_k)
+_PG_TABLE_PREFIX = ...
+_PG_IDENT_SUB = ...
+_PG_CONNECT_TIMEOUT_S = ...
+def _pg_table_name(stream: str, shard: str) -> str
+    # A safe, deterministic Postgres identifier for a stream+shard (one table per stream).
+def resolve_postgres_dsn() -> str | None
+    # The operational Postgres DSN from the environment, or None when UNCONFIGURED (single source:
+def psycopg_available() -> bool
+    # Network-free probe: is a Postgres driver (psycopg v3 OR psycopg2) importable? Decides, together
+def connect_postgres(dsn: str)
+    # Open a real Postgres connection. The driver is imported LAZILY (so this module loads with neither
+class PostgresRecordStore:
+    # The OPERATIONAL cloud backend: PostgreSQL, the SAME append-only, content-addressed-idempotent port
+    def __init__(self, stream: str, *, shard: str='000', dsn: str | None=None, connect=None) -> None
+    def _exec(self, sql: str, params=(), *, fetch: bool=False, fetchone: bool=False)
+        # Run one statement on a context-managed cursor (always closed — no leaks).
+    def _init_schema(self) -> None
+    def append(self, record: dict, *, idem_key: str | None=None) -> int
+        # Append one record; idempotent when ``idem_key`` is given (an O(1) INDEXED no-op returning the
+    def all(self, predicate=None) -> list[dict]
+    def count(self) -> int
+    def close(self) -> None
+class WarehouseRecordStore:
+_BACKENDS = ...
+def open_record_store(stream: str, *, shard: str='000', mode: str | None=None) -> RecordStore
+    # Open the append-only store for a declared stream, backend chosen by its tier + the mode.
+```
+## intra-module call edges
+src.teleon.storage.record_store.__init__ -> src.teleon.storage.record_store.PostgresRecordStore._init_schema
+src.teleon.storage.record_store.__init__ -> src.teleon.storage.record_store.StorageError
+src.teleon.storage.record_store.__init__ -> src.teleon.storage.record_store._pg_table_name
+src.teleon.storage.record_store.__init__ -> src.teleon.storage.record_store.psycopg_available
+src.teleon.storage.record_store.__init__ -> src.teleon.storage.record_store.resolve_postgres_dsn
+src.teleon.storage.record_store._init_schema -> src.teleon.storage.record_store.PostgresRecordStore._exec
+src.teleon.storage.record_store.all -> src.teleon.storage.record_store.PostgresRecordStore._exec
+src.teleon.storage.record_store.append -> src.teleon.storage.record_store.PostgresRecordStore._exec
+src.teleon.storage.record_store.append -> src.teleon.storage.record_store.StorageError
+src.teleon.storage.record_store.backend_for -> src.teleon.storage.record_store.stream_spec
+src.teleon.storage.record_store.backend_for -> src.teleon.storage.record_store.tier_policy
+src.teleon.storage.record_store.count -> src.teleon.storage.record_store.PostgresRecordStore._exec
+src.teleon.storage.record_store.open_record_store -> src.teleon.storage.record_store.StorageError
+src.teleon.storage.record_store.open_record_store -> src.teleon.storage.record_store.backend_for
+src.teleon.storage.record_store.open_record_store -> src.teleon.storage.record_store.stream_spec
+src.teleon.storage.record_store.open_record_store -> src.teleon.storage.record_store.tier_policy
+src.teleon.storage.record_store.stream_spec -> src.teleon.storage.record_store.StorageError
+src.teleon.storage.record_store.stream_spec -> src.teleon.storage.record_store.tier_policy

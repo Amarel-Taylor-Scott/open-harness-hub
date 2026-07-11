@@ -1,0 +1,330 @@
+{
+  "version": "1.0",
+  "purpose": "Per capability slot: the wired adapter, the candidate primary external repo, the fallback, the stub that keeps the system running with zero deps, and the contract proofs that any replacement must keep green. If an upstream repo becomes unmaintained, this is the documented swap path \u2014 replace the adapter, keep the slot's I/O contract + proofs.",
+  "derived_from": "architecture/external_capability_catalog.json",
+  "rule": "Every active/candidate slot must declare a primary candidate + at least one fallback-or-stub + at least one contract proof. foil/reference slots are exempt (never adopted).",
+  "slots": [
+    {
+      "capability_slot": "parser_manager",
+      "wired": "parser.stub@v1",
+      "primary": "parser.docling@v1",
+      "fallback_or_stub": "parser.unstructured@v1",
+      "contract_tests": [
+        "check_capability_contract_examples",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor docling -> implement ParserProvider adapter under _repos/baltor/backend/src/baltor/adapters -> keep RawDocument->DocumentTree contract + example -> flip adapter_id"
+    },
+    {
+      "capability_slot": "repo_codegraph",
+      "wired": "codegraph.stub@v1",
+      "primary": "codegraph.ast_grep@v1",
+      "fallback_or_stub": "codegraph.codegraphcontext@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "implement CodeGraphProvider adapter; keep RepoSnapshot->CodeGraph contract"
+    },
+    {
+      "capability_slot": "skills_manager",
+      "wired": "skills.stub@v1",
+      "primary": "skills.anthropic_skills@v1",
+      "fallback_or_stub": "skills.harnesskit@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "implement SkillProvider adapter; keep SkillRequest->ResolvedSkill contract"
+    },
+    {
+      "capability_slot": "scraping_manager",
+      "wired": "scrape.stub@v1",
+      "primary": "scrape.crawl4ai@v1",
+      "fallback_or_stub": "scrape.scrapy@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "implement FetcherProvider adapter (mirror sanctions_feed_live --live seam); keep FetchRequest->SourceRecord contract"
+    },
+    {
+      "capability_slot": "api_manager",
+      "wired": "apigw.stub@v1",
+      "primary": "apigw.litellm@v1",
+      "fallback_or_stub": "apigw.portkey@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix",
+        "check_no_direct_external_imports"
+      ],
+      "swap_steps": "LiteLLM behind the existing LLM gateway router; keep GatewayRequest->GatewayResponse contract"
+    },
+    {
+      "capability_slot": "api_catalog",
+      "wired": "apicat.stub@v1",
+      "primary": "apicat.backstage@v1",
+      "fallback_or_stub": "apicat.apicurio@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "implement CatalogProvider adapter; keep ServiceDescriptor->CatalogEntry contract"
+    },
+    {
+      "capability_slot": "mcp_gateway",
+      "wired": "mcpgw.stub@v1",
+      "primary": "mcpgw.contextforge@v1",
+      "fallback_or_stub": "mcpgw.docker_mcp@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "implement McpGatewayProvider adapter; keep McpToolCall->McpToolResult contract"
+    },
+    {
+      "capability_slot": "durable_workflow_engine",
+      "wired": "durable.sqlite_store@v1",
+      "primary": "durable.dbos@v1",
+      "fallback_or_stub": "durable.temporal@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix",
+        "check_durable_worker_parallel"
+      ],
+      "swap_steps": "DBOS behind the DurableStore seam; keep CommandEnvelope->RunLedger contract + parallel-drain proof"
+    },
+    {
+      "capability_slot": "claim_graph_memory",
+      "wired": "claimgraph.stub@v1",
+      "primary": "claimgraph.graphiti@v1",
+      "fallback_or_stub": "claimgraph.cognee@v1",
+      "contract_tests": [
+        "check_capability_contract_examples",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "Graphiti behind ClaimGraphProvider; keep ClaimSet->TemporalClaimGraph contract"
+    },
+    {
+      "capability_slot": "graph_db_substrate",
+      "wired": "graphdb.stub@v1",
+      "primary": "graphdb.helixdb@v1",
+      "fallback_or_stub": "graphdb.falkordb@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "license-gate (AGPL/SSPL) -> GraphStoreProvider adapter; keep GraphUpsert->GraphQueryResult contract"
+    },
+    {
+      "capability_slot": "hybrid_retrieval",
+      "wired": "vector.deterministic_local@v1",
+      "primary": "vector.qdrant@v1",
+      "fallback_or_stub": "vector.pgvector@v1",
+      "contract_tests": [
+        "check_capability_contract_examples",
+        "check_provider_replacement_matrix",
+        "check_cfpb_vectorization"
+      ],
+      "swap_steps": "Qdrant behind VectorProvider; keep RetrievalQuery->RankedHits contract + vectorization proof"
+    },
+    {
+      "capability_slot": "observability_evals",
+      "wired": "obsv.otel_seam@v1",
+      "primary": "obsv.langfuse@v1",
+      "fallback_or_stub": "obsv.phoenix@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix",
+        "check_otel_spans"
+      ],
+      "swap_steps": "OTLP exporter behind the span seam; keep SpanTree->TraceExport contract"
+    },
+    {
+      "capability_slot": "sandboxed_execution",
+      "wired": "sandbox.worktree_nonet@v1",
+      "primary": "sandbox.e2b@v1",
+      "fallback_or_stub": "sandbox.microsandbox@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "implement SandboxProvider adapter; keep ExecRequest->ExecResult contract"
+    },
+    {
+      "capability_slot": "compression",
+      "wired": "compression.stub@v1",
+      "primary": "compression.llmlingua@v1",
+      "fallback_or_stub": "compression.stub@v1",
+      "contract_tests": [
+        "check_optimization_harness",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "LLMLingua behind CompressionProviderPort; keep ContextPackText->CompressedText contract; proof: answer-critical facts + source handles survive compression"
+    },
+    {
+      "capability_slot": "prompt_optimization",
+      "wired": "promptopt.stub@v1",
+      "primary": "promptopt.dspy@v1",
+      "fallback_or_stub": "promptopt.stub@v1",
+      "contract_tests": [
+        "check_optimization_suite",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "DSPy behind PromptOptimizerProviderPort; candidates only, never production prompts; keep PromptOptimizationRequest->PromptCandidateSet contract"
+    },
+    {
+      "capability_slot": "hyperparameter_optimization",
+      "wired": "hpo.local_search@v1",
+      "primary": "hpo.optuna@v1",
+      "fallback_or_stub": "hpo.local_search@v1",
+      "contract_tests": [
+        "check_optimization_suite",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "Optuna behind HyperparameterOptimizerProviderPort; keep HpoStudy->HpoTrialResult contract; start with local grid/random search"
+    },
+    {
+      "capability_slot": "eval_runner",
+      "wired": "evalrun.baltor_builtin@v1",
+      "primary": "evalrun.promptfoo@v1",
+      "fallback_or_stub": "evalrun.baltor_builtin@v1",
+      "contract_tests": [
+        "check_optimization_suite",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "promptfoo behind EvalHarnessProviderPort; deterministic Baltor checks remain promotion authority"
+    },
+    {
+      "capability_slot": "rag_evaluation",
+      "wired": "rageval.baltor_grounding@v1",
+      "primary": "rageval.ragas@v1",
+      "fallback_or_stub": "rageval.baltor_grounding@v1",
+      "contract_tests": [
+        "check_optimization_suite",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "Ragas behind RagEvalProviderPort as ADVISORY metrics; grounding/source-handle checks stay the authority"
+    },
+    {
+      "capability_slot": "experiment_tracking",
+      "wired": "exptrack.sqlite@v1",
+      "primary": "exptrack.mlflow@v1",
+      "fallback_or_stub": "exptrack.sqlite@v1",
+      "contract_tests": [
+        "check_optimization_suite",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "MLflow behind ExperimentTrackerPort; SQLite ledger first; keep OptimizationRun->ExperimentRef contract"
+    },
+    {
+      "capability_slot": "eval_harness",
+      "wired": "eval.flywheel@v1",
+      "primary": "eval.swebench@v1",
+      "fallback_or_stub": "eval.flywheel@v1",
+      "contract_tests": [
+        "check_capability_contract_examples",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "wrap SWE-bench behind EvalProvider; the flywheel stays the in-repo fitness function"
+    },
+    {
+      "capability_slot": "code_review",
+      "wired": "review.make_review_pack@v1",
+      "primary": "review.pr_agent@v1",
+      "fallback_or_stub": "review.greptile@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "wrap PR-Agent behind ReviewProvider; keep ChangeSet->ReviewPack contract"
+    },
+    {
+      "capability_slot": "skill_memory",
+      "wired": "skillmem.repo_skills@v1",
+      "primary": "skillmem.evoskill@v1",
+      "fallback_or_stub": "skillmem.letta@v1",
+      "contract_tests": [
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "wrap EvoSkill behind SkillMemoryProvider (model frozen); keep FailureTrace->SkillArtifact contract"
+    },
+    {
+      "capability_slot": "agent_runtime",
+      "wired": null,
+      "primary": null,
+      "fallback_or_stub": null,
+      "contract_tests": [
+        "check_flagged_tools_not_reintroduced"
+      ],
+      "exempt": true,
+      "exempt_reason": "FOIL \u2014 self-evolving multi-agent runtimes are never Baltor's runtime"
+    },
+    {
+      "capability_slot": "self_improvement_research",
+      "wired": null,
+      "primary": null,
+      "fallback_or_stub": null,
+      "contract_tests": [
+        "check_flagged_tools_not_reintroduced"
+      ],
+      "exempt": true,
+      "exempt_reason": "REFERENCE \u2014 validates the eval-gated pattern; never imported"
+    },
+    {
+      "capability_slot": "memory_provider",
+      "wired": "memory.baltor_local@v1",
+      "primary": "memory.supermemory_api@candidate",
+      "fallback_or_stub": "memory.baltor_local@v1",
+      "contract_tests": [
+        "check_context_provider_catalog",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor memory.supermemory_api@candidate -> implement adapter under _repos/baltor/backend/src/baltor/adapters behind the port -> keep the I/O contract -> flip adapter_id (stub memory.baltor_local@v1 keeps runtime working meanwhile)"
+    },
+    {
+      "capability_slot": "mcp_tool_provider",
+      "wired": "mcp.memory_stub@v1",
+      "primary": "mcp.supermemory@candidate",
+      "fallback_or_stub": "mcp.memory_stub@v1",
+      "contract_tests": [
+        "check_context_provider_catalog",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor mcp.supermemory@candidate -> implement adapter under _repos/baltor/backend/src/baltor/adapters behind the port -> keep the I/O contract -> flip adapter_id (stub mcp.memory_stub@v1 keeps runtime working meanwhile)"
+    },
+    {
+      "capability_slot": "temporal_graph_provider",
+      "wired": "temporal_graph.baltor_local@v1",
+      "primary": "temporal_graph.graphiti@candidate",
+      "fallback_or_stub": "temporal_graph.baltor_local@v1",
+      "contract_tests": [
+        "check_context_provider_catalog",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor temporal_graph.graphiti@candidate -> implement adapter under _repos/baltor/backend/src/baltor/adapters behind the port -> keep the I/O contract -> flip adapter_id (stub temporal_graph.baltor_local@v1 keeps runtime working meanwhile)"
+    },
+    {
+      "capability_slot": "observability_provider",
+      "wired": "observability.baltor_local_trace@v1",
+      "primary": "observability.langfuse@candidate",
+      "fallback_or_stub": "observability.baltor_local_trace@v1",
+      "contract_tests": [
+        "check_context_provider_catalog",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor observability.langfuse@candidate -> implement adapter under _repos/baltor/backend/src/baltor/adapters behind the port -> keep the I/O contract -> flip adapter_id (stub observability.baltor_local_trace@v1 keeps runtime working meanwhile)"
+    },
+    {
+      "capability_slot": "lineage_provider",
+      "wired": "lineage.baltor_local@v1",
+      "primary": "lineage.openlineage@candidate",
+      "fallback_or_stub": "lineage.baltor_local@v1",
+      "contract_tests": [
+        "check_context_provider_catalog",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor lineage.openlineage@candidate -> implement adapter under _repos/baltor/backend/src/baltor/adapters behind the port -> keep the I/O contract -> flip adapter_id (stub lineage.baltor_local@v1 keeps runtime working meanwhile)"
+    },
+    {
+      "capability_slot": "research_agent",
+      "wired": "research.local_stub@v1",
+      "primary": "research.owl@candidate",
+      "fallback_or_stub": "research.local_stub@v1",
+      "contract_tests": [
+        "check_context_provider_catalog",
+        "check_provider_replacement_matrix"
+      ],
+      "swap_steps": "vendor research.owl@candidate -> implement adapter under _repos/baltor/backend/src/baltor/adapters behind the port -> keep the I/O contract -> flip adapter_id (stub research.local_stub@v1 keeps runtime working meanwhile)"
+    }
+  ]
+}

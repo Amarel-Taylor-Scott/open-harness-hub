@@ -1,0 +1,31 @@
+MODULE src/teleon/knowledge/code_genome.py
+## API signatures
+```python
+"""knowledge.code_genome — the Code Genome (the owner's §9)."""
+def py_function_src_teleon_knowledge_code_genome__decompose(py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__decompose__text: str) -> list[str]
+    # Which architectural primitives are present in this code/description (deterministic signal scan).
+def py_function_src_teleon_knowledge_code_genome__fingerprint(py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__fingerprint__text: str) -> list[float]
+    # A genome fingerprint: a vector over the canonical primitive list (1.0 where the primitive is present).
+def py_function_src_teleon_knowledge_code_genome__genome_similarity(py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__genome_similarity__fp_a: list[float], py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__genome_similarity__fp_b: list[float]) -> float
+    # Cosine similarity between two genome fingerprints (software similarity %).
+def py_function_src_teleon_knowledge_code_genome__decompose_ast(py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__decompose_ast__source: str) -> list[str]
+    # Higher-fidelity decomposition: parse Python source and read only REAL symbols (imports, call names, def/class
+def py_function_src_teleon_knowledge_code_genome__ast_fingerprint(py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__ast_fingerprint__source: str) -> list[float]
+    # A genome fingerprint from the AST decomposition (symbol-level, comment/string-immune).
+def py_function_src_teleon_knowledge_code_genome__nearest_genomes(py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__nearest_genomes__text: str, py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__nearest_genomes__corpus: list[dict], *, py_arg_src_teleon_knowledge_code_genome__py_function_src_teleon_knowledge_code_genome__nearest_genomes__limit: int=5) -> dict
+    # Rank corpus repos by genome similarity to `text`. corpus = [{id, text|fingerprint}]. Governed candidate.
+def _self_test() -> list[str]
+```
+## intra-module call edges
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__ast_fingerprint
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose_ast
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__fingerprint
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__genome_similarity
+src.teleon.knowledge.code_genome._self_test -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__nearest_genomes
+src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__ast_fingerprint -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose_ast
+src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose_ast -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose
+src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__fingerprint -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose
+src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__nearest_genomes -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__decompose
+src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__nearest_genomes -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__fingerprint
+src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__nearest_genomes -> src.teleon.knowledge.code_genome.py_function_src_teleon_knowledge_code_genome__genome_similarity

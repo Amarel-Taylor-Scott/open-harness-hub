@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aidoneright.dev/schemas/browser_control_capability.schema.json",
+  "title": "BrowserControlCapability",
+  "description": "One row of the browser-control tooling capability matrix: for a given tool/category, what was checked, which commands were actually run, whether it is available here, its 17-flag capability profile, its risks, and a routing recommendation. Fed by the tooling survey (probe_browser_control_tools) and by browser_control.BrowserAdapter.capabilities(). The 17 `capabilities` flags are the single source browser_control.adapter.CAPABILITY_KEYS; browser_control/self_test.py fails if the two drift. candidate; serves_truth=false.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["category", "tools_checked", "commands_run", "available", "status", "capabilities", "recommendation", "candidate", "serves_truth"],
+  "properties": {
+    "record_type": {"const": "browser_control_capability"},
+    "schema_version": {"type": "string"},
+    "category": {"type": "string", "description": "the capability family or backend, e.g. static_http / cdp / playwright / remote_browser / extension / mcp / llm_agent"},
+    "adapter": {"type": ["string", "null"], "description": "the browser_control adapter name backing this row, if any"},
+    "tools_checked": {"type": "array", "items": {"type": "string"}, "description": "the concrete tools/packages/binaries probed"},
+    "commands_run": {"type": "array", "items": {"type": ["string", "object"]}, "description": "the actual commands executed to establish availability (evidence, not assertion)"},
+    "available": {"type": "boolean", "description": "usable in THIS environment right now (deps present + a probe succeeded)"},
+    "status": {
+      "enum": ["implemented", "available", "seam", "degraded", "unsupported", "unavailable"],
+      "description": "implemented = real adapter here; available = deps present, launchable; seam = documented design stub; degraded = importable but could not launch; unavailable = deps/keys absent"
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "the 17 driver-neutral capability flags (browser_control.adapter.CAPABILITY_KEYS)",
+      "required": [
+        "session_lifecycle", "tab_control", "navigate", "snapshot", "extract_text", "extract_dom",
+        "extract_links", "extract_forms", "extract_tables", "screenshot", "network_capture", "click",
+        "fill", "wait_for_state", "downloads", "tab_graph", "session_report"
+      ],
+      "properties": {
+        "session_lifecycle": {"type": "boolean"},
+        "tab_control": {"type": "boolean"},
+        "navigate": {"type": "boolean"},
+        "snapshot": {"type": "boolean"},
+        "extract_text": {"type": "boolean"},
+        "extract_dom": {"type": "boolean"},
+        "extract_links": {"type": "boolean"},
+        "extract_forms": {"type": "boolean"},
+        "extract_tables": {"type": "boolean"},
+        "screenshot": {"type": "boolean"},
+        "network_capture": {"type": "boolean"},
+        "click": {"type": "boolean"},
+        "fill": {"type": "boolean"},
+        "wait_for_state": {"type": "boolean"},
+        "downloads": {"type": "boolean"},
+        "tab_graph": {"type": "boolean"},
+        "session_report": {"type": "boolean"}
+      }
+    },
+    "js_render": {"type": "boolean", "description": "executes JavaScript (server-HTML backends are false)"},
+    "risks": {"type": "array", "items": {"type": "string"}, "description": "e.g. agent-written helpers QUARANTINED; 'any client acts as the logged-in user' -> auth gate; requires an absent cloud key"},
+    "best_use_cases": {"type": "array", "items": {"type": "string"}},
+    "not_good_for": {"type": "array", "items": {"type": "string"}},
+    "recommendation": {"type": "string", "description": "the routing verdict — when to prefer this backend and when to route elsewhere"},
+    "evidence_artifacts": {"type": "array", "items": {"type": "string"}, "description": "receipt/report handles backing this row"},
+    "candidate": {"const": true},
+    "serves_truth": {"const": false}
+  }
+}

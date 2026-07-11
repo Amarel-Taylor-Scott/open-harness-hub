@@ -1,0 +1,35 @@
+MODULE src/baltor/workers/telemetry.py
+## API signatures
+```python
+"""src.baltor.workers.telemetry — worker fleet TELEMETRY roll-up (C-FLEET-2)."""
+TASK_FIELDS = ...
+LIFECYCLE_FIELDS = ...
+QUEUE_FIELDS = ...
+PROVIDER_FIELDS = ...
+COST_FIELDS = ...
+FAILURE_FIELDS = ...
+CAPACITY_FIELDS = ...
+_MS = ...
+def _ms(a: str, b: str) -> int | None
+def task_metrics(ledger) -> list[dict]
+def lifecycle_metrics(ledger) -> list[dict]
+def _rate(num: int, den: int) -> float
+def queue_metrics(ledger, *, now: str) -> dict
+def provider_metrics(ledger) -> list[dict]
+def cost_metrics(ledger, *, worker_start_count: int | None=None) -> dict
+def failure_metrics(ledger) -> list[dict]
+def capacity_snapshot(ledger, *, now: str) -> dict
+def all_metrics(ledger, *, now: str) -> dict
+    # The full telemetry bundle — the seven tables in one deterministic snapshot.
+```
+## intra-module call edges
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.capacity_snapshot
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.cost_metrics
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.failure_metrics
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.lifecycle_metrics
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.provider_metrics
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.queue_metrics
+src.baltor.workers.telemetry.all_metrics -> src.baltor.workers.telemetry.task_metrics
+src.baltor.workers.telemetry.provider_metrics -> src.baltor.workers.telemetry._rate
+src.baltor.workers.telemetry.queue_metrics -> src.baltor.workers.telemetry._rate
+src.baltor.workers.telemetry.task_metrics -> src.baltor.workers.telemetry._ms

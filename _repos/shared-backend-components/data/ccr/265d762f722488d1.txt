@@ -1,0 +1,15 @@
+MODULE src/teleon/exploration/__main__.py
+## API signatures
+```python
+"""src.teleon.exploration.__main__ — CLI + self-test for the open-ended exploration escalation ladder."""
+_NOW = ...
+_FAILED_LLM = ...
+_CANDIDATE_LLM = ...
+def _self_test() -> int
+def _decide(task_json: str, history_json: str | None) -> int
+    # One decision as JSON (for a wire-in / shell caller). Reads a task dict + optional history list.
+def main(argv: list[str] | None=None) -> int
+```
+## intra-module call edges
+src.teleon.exploration.__main__.main -> src.teleon.exploration.__main__._decide
+src.teleon.exploration.__main__.main -> src.teleon.exploration.__main__._self_test

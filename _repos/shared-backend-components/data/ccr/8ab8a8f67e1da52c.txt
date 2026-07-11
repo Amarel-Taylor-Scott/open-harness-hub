@@ -1,0 +1,58 @@
+MODULE src/teleon/retrieval/pgvector_index.py
+## API signatures
+```python
+"""src.teleon.retrieval.pgvector_index — HYBRID vector index: a pgvector (Postgres) backend with an HONEST in-memory fallback."""
+def py_function_src_teleon_retrieval_pgvector_index___as_text(py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__as_text__v) -> str
+def py_function_src_teleon_retrieval_pgvector_index___cosine(py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__cosine__a, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__cosine__b) -> float
+def py_function_src_teleon_retrieval_pgvector_index___overlap(py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__overlap__q_toks: set, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__overlap__text: str) -> float
+class py_class_src_teleon_retrieval_pgvector_index__Doc:
+def py_function_src_teleon_retrieval_pgvector_index___score(py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__score__query: str, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__score__qv: list, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__score__doc: py_class_src_teleon_retrieval_pgvector_index__Doc) -> tuple
+    # HYBRID: weighted sum of vector cosine + per-column lexical overlap (name/text, use_cases, labels).
+class py_class_src_teleon_retrieval_pgvector_index___MemBackend:
+    # Always-available in-memory cosine index — the HONEST offline fallback when pgvector isn't reachable.
+    def __init__(self, dim: int)
+    def upsert(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__MemBackend_upsert__doc: py_class_src_teleon_retrieval_pgvector_index__Doc) -> None
+    def candidates(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__MemBackend_candidates__qv, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__MemBackend_candidates__k)
+    def count(self) -> int
+    def close(self) -> None
+class py_class_src_teleon_retrieval_pgvector_index___PgBackend:
+    # Postgres+pgvector store. Real, but engaged only when psycopg + the pgvector adapter + a reachable DSN exist; any
+    def __init__(self, dsn: str, dim: int)
+    def upsert(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__PgBackend_upsert__doc: py_class_src_teleon_retrieval_pgvector_index__Doc) -> None
+    def candidates(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__PgBackend_candidates__qv, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__PgBackend_candidates__k)
+    def count(self) -> int
+    def close(self) -> None
+def py_function_src_teleon_retrieval_pgvector_index___psycopg_available() -> bool
+    # Network-free: are BOTH psycopg and the pgvector adapter importable?
+def py_function_src_teleon_retrieval_pgvector_index___resolve_backend(py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__resolve_backend__dsn, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__resolve_backend__allow_pg: bool, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__resolve_backend__dim: int)
+class py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex:
+    # Hybrid (lexical + learned-vector + use_cases + labels) index over a pgvector OR in-memory backend (auto, honest).
+    def __init__(self, *, embedder=None, dsn: str | None=None, allow_pg: bool=True)
+    def _doc_vector(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex__doc_vector__text: str, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex__doc_vector__use_cases: str) -> list
+    def add(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex_add__id: str, *, text='', use_cases='', labels='', vector=None) -> None
+    def add_many(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex_add_many__docs) -> None
+    def search(self, py_arg_src_teleon_retrieval_pgvector_index__py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex_search__query: str, *, k: int=10, explain: bool=False) -> list[dict]
+    def count(self) -> int
+    def info(self) -> dict
+    def close(self) -> None
+def py_function_src_teleon_retrieval_pgvector_index__build_hybrid_index(py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__build_hybrid_index__docs, *, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__build_hybrid_index__embedder=None, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__build_hybrid_index__dsn=None, py_arg_src_teleon_retrieval_pgvector_index__py_function_src_teleon_retrieval_pgvector_index__build_hybrid_index__allow_pg=True) -> py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex
+def py_function_src_teleon_retrieval_pgvector_index__self_test() -> int
+def main(py_arg_src_teleon_retrieval_pgvector_index__main__argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.retrieval.pgvector_index.__init__ -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___resolve_backend
+src.teleon.retrieval.pgvector_index.add -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index__Doc
+src.teleon.retrieval.pgvector_index.add -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex._doc_vector
+src.teleon.retrieval.pgvector_index.add -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___as_text
+src.teleon.retrieval.pgvector_index.add_many -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex.add
+src.teleon.retrieval.pgvector_index.candidates -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index__Doc
+src.teleon.retrieval.pgvector_index.main -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index__self_test
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___resolve_backend -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index___MemBackend
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___resolve_backend -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index___PgBackend
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___resolve_backend -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___psycopg_available
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___score -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___cosine
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___score -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___overlap
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index__build_hybrid_index -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index__self_test -> src.teleon.retrieval.pgvector_index.py_class_src_teleon_retrieval_pgvector_index__HybridVectorIndex
+src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index__self_test -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___psycopg_available
+src.teleon.retrieval.pgvector_index.search -> src.teleon.retrieval.pgvector_index.py_function_src_teleon_retrieval_pgvector_index___score

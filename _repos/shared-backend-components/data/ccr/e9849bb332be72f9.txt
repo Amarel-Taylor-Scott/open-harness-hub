@@ -1,0 +1,23 @@
+MODULE src/baltor/workers/fleet_supervisor.py
+## API signatures
+```python
+"""src.baltor.workers.fleet_supervisor — the capacity planner. Reads the DB ledger (queued tasks + live
+worker heartbeats), and decides per capability whether to USE an existing worker, SPAWN another, WAIT on a
+batch window, DISPATCH a batch, RECLAIM expired leases, or FALL BACK to another provider. It never owns or
+processes tasks — workers atomically claim from the ledger. Deterministic (injected `"""
+_A = ...
+def _load(name: str, key: str) -> dict
+def _caps() -> dict
+def _decision(capability_id, case, action, reason, *, now, spawn_count=0, batch_size=0, task_ids=None, worker_ids=None)
+def _free_capacity(ledger: FleetLedger, capability_id: str, now: str) -> tuple[int, list]
+def decide_for_capability(ledger: FleetLedger, capability_id: str, *, now: str, caps: dict | None=None, batch_pol: dict | None=None, sla_pol: dict | None=None, life_pol: dict | None=None) -> list[dict]
+def tick(ledger: FleetLedger, *, now: str) -> list[dict]
+    # One supervisor pass over every capability with queued work or live workers.
+```
+## intra-module call edges
+src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._caps
+src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._decision
+src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._free_capacity
+src.baltor.workers.fleet_supervisor.decide_for_capability -> src.baltor.workers.fleet_supervisor._load
+src.baltor.workers.fleet_supervisor.tick -> src.baltor.workers.fleet_supervisor._caps
+src.baltor.workers.fleet_supervisor.tick -> src.baltor.workers.fleet_supervisor.decide_for_capability

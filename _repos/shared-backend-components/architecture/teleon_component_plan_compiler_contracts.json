@@ -1,0 +1,214 @@
+{
+  "serves_truth": false,
+  "id": "teleon-component-plan-compiler-contracts",
+  "purpose": "Contract for the Teleon primitive/component assembly compiler: RAG retrieves ComponentCards, the LLM emits a constrained PipelinePlan, deterministic code validates contracts/policy/order and emits a locked execution manifest. The LLM is planner/explainer only; it never builds or executes arbitrary code. The platform is deterministic-first, not deterministic-only: nondeterministic enrichment/codegen may propose candidate primitives, mutations, templates, or PipelineIR patches, but proof/provenance/promotion decide trust.",
+  "doc": "_repos/shared-backend-components/context/codex/component-plan-compiler-research-and-architecture.md",
+  "library": "_repos/teleon/backend/src/teleon/synthesis/component_plan_compiler.py",
+  "checker": "scripts/check_teleon_component_plan_compiler_contracts.py",
+  "research_sources": [
+    {
+      "id": "hugginggpt",
+      "family": "model_orchestration",
+      "source_url": "https://arxiv.org/abs/2303.17580",
+      "takeaway": "Use an LLM to plan tasks and select existing models/tools by function description, but route execution through controlled orchestration rather than free-form code."
+    },
+    {
+      "id": "visprog",
+      "family": "visual_programming",
+      "source_url": "https://arxiv.org/abs/2211.11559",
+      "takeaway": "LLMs can produce modular programs over existing visual functions; Teleon should output constrained graph IR over primitives instead of source dumps."
+    },
+    {
+      "id": "vipergpt",
+      "family": "visual_programming",
+      "source_url": "https://arxiv.org/abs/2303.08128",
+      "takeaway": "Visual reasoning can be composed by generated Python over tools; Teleon keeps the composition idea but replaces arbitrary Python with validated component plans."
+    },
+    {
+      "id": "video-director-gpt",
+      "family": "video_plan_composition",
+      "source_url": "https://arxiv.org/abs/2309.15091",
+      "takeaway": "For video, an LLM can generate structured plans over scenes/entities/layouts before a downstream generator runs; for code, Teleon should generate plans over primitive contracts before a compiler runs."
+    },
+    {
+      "id": "gorilla",
+      "family": "api_tool_retrieval",
+      "source_url": "https://arxiv.org/abs/2305.15334",
+      "takeaway": "API/tool calls improve when grounded in retrieved API metadata. Teleon applies this to ComponentCards over code primitives."
+    },
+    {
+      "id": "toolllm",
+      "family": "api_tool_retrieval",
+      "source_url": "https://arxiv.org/abs/2307.16789",
+      "takeaway": "Tool-use datasets and search over tool metadata support tool selection; Teleon uses hybrid primitive search plus strict promotion gates."
+    },
+    {
+      "id": "llmcompiler",
+      "family": "parallel_function_calling",
+      "source_url": "https://arxiv.org/abs/2312.04511",
+      "takeaway": "Function calls can be compiled into a dependency graph for scheduling; Teleon's compiler derives topological order and later runtime DAGs."
+    },
+    {
+      "id": "code-as-policies",
+      "family": "primitive_api_programming",
+      "source_url": "https://arxiv.org/abs/2209.07753",
+      "takeaway": "High-level prompts can compose low-level robot APIs; Teleon generalizes this to code primitives with I/O contracts and proof gates."
+    },
+    {
+      "id": "backstage",
+      "family": "catalog_scaffolder",
+      "source_url": "https://backstage.io/docs/features/software-catalog/system-model/",
+      "takeaway": "Software catalogs organize components, APIs, resources, and systems; Teleon ComponentCards are the searchable primitive catalog layer."
+    },
+    {
+      "id": "haystack-pipelines",
+      "family": "pipeline_graph",
+      "source_url": "https://docs.haystack.deepset.ai/docs/pipelines",
+      "takeaway": "Directed component graphs with explicit connections and pre-run checks are the right pipeline shape; Teleon adds strict primitive contracts and lockfiles."
+    },
+    {
+      "id": "temporal",
+      "family": "workflow_runtime",
+      "source_url": "https://docs.temporal.io/workflows",
+      "takeaway": "Durable workflow execution and deterministic replay discipline are a strong runtime fit for long-running primitive graphs."
+    },
+    {
+      "id": "cue-opa",
+      "family": "schema_policy",
+      "source_url": "https://cuelang.org/docs/introduction/",
+      "takeaway": "Schema/constraint unification plus policy evaluation should validate plans, component cards, runtime manifests, licenses, and side effects before execution."
+    }
+  ],
+  "ir_layers": [
+    {
+      "id": "intent_plan",
+      "rule": "Capture goal, constraints, guardrails, context, input/output surfaces, privacy, license, runtime preference, and success metrics."
+    },
+    {
+      "id": "logical_pipeline_plan",
+      "rule": "LLM may propose nodes, component ids, purposes, bindings, gates, and side-effect declarations only from retrieved candidates."
+    },
+    {
+      "id": "physical_execution_lock",
+      "rule": "Only deterministic compiler output may be executed: resolved versions, ordered nodes, source digests, seed strategy, policy report, runtime target, and registry snapshot."
+    }
+  ],
+  "hybrid_lane_policy": {
+    "principle": "Every representation can carry deterministic evidence and nondeterministic candidate enrichment. The compiler tries deterministic search, graph checks, type checks, policy checks, and verified mutations first; unresolved gaps may route to LLM/codegen, but those outputs remain candidate-only until deterministic proof and promotion.",
+    "deterministic_first_order": [
+      "exact_component_match",
+      "contract_compatible_match",
+      "known_deterministic_mutation",
+      "compiler_repair_from_graph",
+      "nondeterministic_candidate_generation"
+    ],
+    "nondeterministic_candidate_artifacts": [
+      "llm_enriched_compact_view",
+      "generated_adapter_candidate",
+      "generated_primitive_candidate",
+      "generated_template_candidate",
+      "pipeline_ir_patch_candidate",
+      "planner_rerank_or_explanation"
+    ],
+    "required_candidate_boundaries": [
+      "serves_truth_false",
+      "proof_required",
+      "provenance_required",
+      "logs_schema_required",
+      "graph_edges_required",
+      "promotion_required_before_trusted_registry"
+    ]
+  },
+  "required_component_card_fields": [
+    "component_id",
+    "version",
+    "purpose",
+    "input_contract",
+    "output_contract",
+    "runtime",
+    "policy",
+    "proofs",
+    "logs_schema",
+    "source_sha256",
+    "serves_truth"
+  ],
+  "required_pipeline_plan_fields": [
+    "plan_id",
+    "goal",
+    "nodes",
+    "component",
+    "bindings"
+  ],
+  "required_lock_fields": [
+    "execution_plan_id",
+    "pipeline_name",
+    "compiler_version",
+    "ordered_nodes",
+    "locked_components",
+    "policy_report",
+    "component_registry_snapshot",
+    "random_seed_strategy",
+    "serves_truth"
+  ],
+  "validation_gates": [
+    "plan_schema_valid",
+    "component_was_retrieved",
+    "component_exists",
+    "version_resolves",
+    "input_binding_exists",
+    "output_binding_exists",
+    "binding_source_allowed",
+    "side_effect_after_required_gate",
+    "policy_tags_allowed",
+    "deterministic_mutation_attempted_before_generation",
+    "nondeterministic_candidate_stays_untrusted",
+    "proof_required_before_promotion",
+    "topological_order_exists",
+    "lockfile_emitted",
+    "serves_truth_false"
+  ],
+  "planner_laws": [
+    "The LLM emits PipelinePlan JSON/objects, not arbitrary executable source.",
+    "The LLM may reference only ComponentCards returned by retrieval.",
+    "The compiler derives ordering from bindings and policy, not from LLM vibes.",
+    "The executor runs a lockfile, never the raw LLM response.",
+    "Generated adapters or new primitives are candidates only until proof and promotion.",
+    "Deterministic search/check/mutation lanes run before nondeterministic candidate generation.",
+    "LLM-enriched compact views, reranks, templates, primitive variants, and PipelineIR patches may be useful candidate evidence but cannot serve truth or execute without deterministic validation."
+  ],
+  "mutation_before_regeneration": [
+    "scalar_to_sequence",
+    "output_field_wrapper",
+    "field_rename_adapter",
+    "retry_cache_rate_limit_adapter",
+    "model_cost_downshift",
+    "browser_to_deterministic_extractor",
+    "local_api_implementation_swap",
+    "generated_adapter_candidate_last_resort"
+  ],
+  "runtime_targets": [
+    "temporal_activity",
+    "argo_workflow",
+    "cloud_run_job",
+    "kubernetes_job",
+    "celery_worker",
+    "dramatiq_worker",
+    "local_runner"
+  ],
+  "required_library_functions": [
+    "py_function_src_teleon_synthesis_component_plan_compiler__parse_component_ref",
+    "py_function_src_teleon_synthesis_component_plan_compiler__index_component_cards",
+    "py_function_src_teleon_synthesis_component_plan_compiler__topological_order",
+    "py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan",
+    "py_function_src_teleon_synthesis_component_plan_compiler___self_test"
+  ],
+  "composes_with": [
+    "architecture/teleon_primitive_assembly_thesis.json",
+    "architecture/primitive_hybrid_search_contracts.json",
+    "architecture/teleon_primitive_variation_contracts.json",
+    "_repos/teleon/backend/src/teleon/registry/primitive_match.py",
+    "_repos/teleon/backend/src/teleon/synthesis/primitive_variations.py",
+    "scripts/primitive_registry_builder.py"
+  ],
+  "promotion_policy": "A lockfile is runnable candidate evidence, not promoted truth. Promotion requires deterministic proof commands, execution logs, graph edges, dependency/license provenance, and owner/human approval where needed."
+}

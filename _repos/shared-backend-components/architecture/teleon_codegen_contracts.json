@@ -1,0 +1,49 @@
+{
+  "serves_truth": false,
+  "purpose": "Teleon writes candidate code. This contract requires generated code to be graphable, scalable, and easy for LLMs to understand from the identifiers and contract metadata before formal type optimization.",
+  "primitive_blocks_module": "_repos/teleon/backend/src/teleon/synthesis/primitive_blocks.py",
+  "checker": "scripts/check_teleon_codegen_contracts.py",
+  "naming_law": "Generated Python identifiers must use meaningful location-derived names: py_<kind>_<file>__<scope>__<name>. Long names are intentional because AI reads the code and long names carry context.",
+  "typing_law": "Defer strict parameter typing in the first generated draft. Prefer flexible scalar_or_sequence contracts and plain dict/list envelopes. Add stricter types after runtime shape, graph edges, and proof coverage stabilize during optimization.",
+  "rules": [
+    {
+      "id": "generated-code-is-candidate-only",
+      "rule": "Generated code and model-authored review are candidates. They must carry serves_truth=false until deterministic proofs and promotion gates pass."
+    },
+    {
+      "id": "full-qualified-names",
+      "rule": "Generated Python functions, classes, constants, module vars, args, and locals should be emitted in the py_<kind>_<file>__<scope>__<name> convention from the start."
+    },
+    {
+      "id": "purpose-input-output-contract",
+      "rule": "Generated code must carry purpose, input shape, output shape, dependencies, and proof-to-run either in a contract object or docstring."
+    },
+    {
+      "id": "scalar-to-sequence-first",
+      "rule": "Any generated step that might later process multiple records should accept scalar_or_sequence input via normalize_to_sequence or a lifted scalar step."
+    },
+    {
+      "id": "looping-is-explicit-and-bounded",
+      "rule": "Iteration must use an explicit bounded loop contract with max_iterations and history. Unbounded while loops are not acceptable generated-code defaults."
+    },
+    {
+      "id": "dispatch-is-data-driven",
+      "rule": "Repeated branch chains should become dispatch tables or rule rows so adding a case means adding data, not rewriting control logic."
+    },
+    {
+      "id": "arrays-over-numbered-scalars",
+      "rule": "Numbered scalar series like item1/item2/item3, threshold_a/threshold_b, or duplicated adjacent calls should be rewritten to arrays, maps, or rule tables."
+    },
+    {
+      "id": "proof-before-promotion",
+      "rule": "The generated block is not promotable until py_compile or AST parse, pyprefix graph/audit, relevant contract checks, and the registered proof gate pass."
+    }
+  ],
+  "benefits": [
+    "LLMs can infer purpose from names without reading whole files.",
+    "Deterministic graph tools can trace calls, data movement, and operation nodes.",
+    "Scalar prototypes can scale to batch processing without rewriting the core function.",
+    "Magic values, fragile branch chains, and copy-paste repeated calls become queryable graph smells.",
+    "Formal types can be added later from observed stable contracts instead of guessed upfront."
+  ]
+}

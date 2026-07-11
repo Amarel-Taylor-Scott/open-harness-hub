@@ -1,0 +1,22 @@
+MODULE src/teleon/registry/search.py
+## API signatures
+```python
+"""registry.search — FEDERATED search across ALL registries (how a DAG/pipeline builder uses the buffet)."""
+def py_function_src_teleon_registry_search___label(py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__label__rec: dict) -> str
+def py_function_src_teleon_registry_search__search_all(py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__search_all__query: str, *, py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__search_all__per_catalog: int=py_var_src_teleon_registry_search___PER_CATALOG) -> list[dict]
+    # One query across EVERY catalog on the menu -> registry-tagged hits (the federated search).
+def py_function_src_teleon_registry_search___facet(py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__facet__query: str, py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__facet__registry_ids: list[str], py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__facet__workflow: str) -> dict
+    # Query the on-menu registries for a workflow; honestly surface the relevant ones not yet on the menu.
+def py_function_src_teleon_registry_search__build_capability(py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__build_capability__intent: str) -> dict
+    # BUILD: ingredients across every registry, grouped by registry, ready to compose into a DAG.
+def py_function_src_teleon_registry_search__troubleshoot(py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__troubleshoot__symptom: str) -> dict
+    # TROUBLESHOOT: search the diagnostic registries for a symptom / error.
+def py_function_src_teleon_registry_search__improve(py_arg_src_teleon_registry_search__py_function_src_teleon_registry_search__improve__capability: str) -> dict
+    # IMPROVE: search the improvement registries for cheaper / faster / more-deterministic alternatives.
+```
+## intra-module call edges
+src.teleon.registry.search.py_function_src_teleon_registry_search___facet -> src.teleon.registry.search.py_function_src_teleon_registry_search___label
+src.teleon.registry.search.py_function_src_teleon_registry_search__build_capability -> src.teleon.registry.search.py_function_src_teleon_registry_search__search_all
+src.teleon.registry.search.py_function_src_teleon_registry_search__improve -> src.teleon.registry.search.py_function_src_teleon_registry_search___facet
+src.teleon.registry.search.py_function_src_teleon_registry_search__search_all -> src.teleon.registry.search.py_function_src_teleon_registry_search___label
+src.teleon.registry.search.py_function_src_teleon_registry_search__troubleshoot -> src.teleon.registry.search.py_function_src_teleon_registry_search___facet

@@ -1,0 +1,37 @@
+MODULE src/baltor/native/skill_md_adapter.py
+## API signatures
+```python
+"""src/baltor/native/skill_md_adapter — interoperate with Anthropic's SKILL.md (Agent Skills) format at the EDGES,
+the same way okf_adapter does for OKF and ftm_adapter does for FollowTheMoney: map a governed Baltor skill /
+CapabilityTask <-> a SKILL.md file, WITHOUT making SKILL.md our core object. SKILL.md is a projection (like OKF /
+FtM / PROV-JSON), not the source of truth."""
+SKILL_REQUIRED_KEYS = ...
+GOVERNANCE_KEY = ...
+_KNOWN_SCALARS = ...
+_LIST_KEYS = ...
+def _sha256(text: str) -> str
+class GovernedSkill:
+    # A Baltor skill / CapabilityTask — the CORE. SKILL.md is one projection of it, never its definition.
+    def content_hash(self) -> str
+    def as_dict(self) -> dict
+def _fmt_scalar(v) -> str
+def _parse_scalar(raw: str)
+def _split_frontmatter(text: str) -> tuple[dict, str]
+def skill_md_import(path: str, text: str) -> GovernedSkill
+    # Parse a SKILL.md file into a GovernedSkill. Enforces the spec's name+description-required rule.
+def _frontmatter(skill: GovernedSkill) -> str
+def skill_md_export(skill: GovernedSkill) -> str
+    # Export a governed skill as a conformant SKILL.md whose frontmatter ALSO proves its lift/safety.
+def round_trip(skill: GovernedSkill) -> GovernedSkill
+    # import(export(x)) — must preserve name/description/body + the governance sidecar + arbitrary extras.
+```
+## intra-module call edges
+src.baltor.native.skill_md_adapter._frontmatter -> src.baltor.native.skill_md_adapter._fmt_scalar
+src.baltor.native.skill_md_adapter.content_hash -> src.baltor.native.skill_md_adapter.GovernedSkill.as_dict
+src.baltor.native.skill_md_adapter.content_hash -> src.baltor.native.skill_md_adapter._sha256
+src.baltor.native.skill_md_adapter.round_trip -> src.baltor.native.skill_md_adapter.skill_md_export
+src.baltor.native.skill_md_adapter.round_trip -> src.baltor.native.skill_md_adapter.skill_md_import
+src.baltor.native.skill_md_adapter.skill_md_export -> src.baltor.native.skill_md_adapter._frontmatter
+src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter.GovernedSkill
+src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter._parse_scalar
+src.baltor.native.skill_md_adapter.skill_md_import -> src.baltor.native.skill_md_adapter._split_frontmatter

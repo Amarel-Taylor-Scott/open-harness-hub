@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/code-templates/parse_csv_rows/input.schema.json",
+  "title": "parse_csv_rows input",
+  "type": "object",
+  "required": ["csv_text"],
+  "properties": {
+    "csv_text": {
+      "type": "string",
+      "description": "CSV text to parse."
+    },
+    "delimiter": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1,
+      "default": ",",
+      "description": "Single-character CSV delimiter."
+    },
+    "has_header": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the first CSV row contains field names."
+    },
+    "trim_whitespace": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether leading and trailing whitespace should be stripped from parsed cells."
+    },
+    "max_rows": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Optional maximum number of data rows to return."
+    }
+  },
+  "additionalProperties": false
+}

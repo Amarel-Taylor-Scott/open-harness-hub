@@ -1,0 +1,21 @@
+MODULE _repos/teleon/backend/src/teleon/demos/byo_key_demo.py
+## API signatures
+```python
+"""demos.byo_key_demo — the BYO-KEY demo plane: run any surface's demo with the USER's own API key, transiently."""
+REPO = ...
+KEY_ENV = ...
+def redact(key: str | None) -> str
+def transient_key(byo_key: str | None, env_var: str=KEY_ENV)
+    # Put the user's key in the environment for ONE call, then restore — never persisted, never logged.
+def _run_observer(inputs: dict) -> dict
+def _run_llm(inputs: dict, *, system: str, default_prompt: str) -> dict
+def run_byo_demo(demo_id: str, byo_key: str | None=None, inputs: dict | None=None) -> dict
+    # Run a surface's demo with the user's BYO key (transient). Never returns or logs the raw key.
+def self_test() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.demos.byo_key_demo.main -> src.teleon.demos.byo_key_demo.self_test
+src.teleon.demos.byo_key_demo.run_byo_demo -> src.teleon.demos.byo_key_demo.redact
+src.teleon.demos.byo_key_demo.run_byo_demo -> src.teleon.demos.byo_key_demo.transient_key
+src.teleon.demos.byo_key_demo.self_test -> src.teleon.demos.byo_key_demo.run_byo_demo

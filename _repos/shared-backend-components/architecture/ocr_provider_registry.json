@@ -1,0 +1,25 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-21",
+  "principle": "OCR / document-parse behind ONE agnostic port (_repos/teleon/backend/src/teleon/extraction/ocr_port.py), populated from this registry, cheapest-first: a PDF text layer (no OCR) → local deterministic OCR (Tesseract/PaddleOCR) → cloud OCR (key-gated) → a vision-LLM last resort. A FUTURE OCR engine drops in by adding a row here (or registering an adapter) with zero caller change. Feeds the document-extraction cascade's acquire stage. serves_truth=false.",
+  "serves_truth": false,
+  "tiers": {"text_layer": 0, "local_ocr": 1, "cloud_ocr": 2, "vision_llm": 3},
+  "providers": [
+    {"id": "pdf_text_layer", "name": "Embedded PDF text extract (no OCR)", "tier": "text_layer", "cost": 1,
+      "license": "n/a", "deterministic": true, "needs": [], "capabilities": ["text"], "status": "live"},
+    {"id": "tesseract", "name": "Tesseract OCR (local)", "tier": "local_ocr", "cost": 2, "license": "Apache-2.0",
+      "deterministic": true, "needs": ["tesseract_bin"], "capabilities": ["text"], "status": "adapter"},
+    {"id": "paddleocr", "name": "PaddleOCR (local)", "tier": "local_ocr", "cost": 2, "license": "Apache-2.0",
+      "deterministic": true, "needs": ["paddleocr_pkg"], "capabilities": ["text", "layout"], "status": "adapter"},
+    {"id": "easyocr", "name": "EasyOCR (local)", "tier": "local_ocr", "cost": 3, "license": "Apache-2.0",
+      "deterministic": true, "needs": ["easyocr_pkg"], "capabilities": ["text"], "status": "adapter"},
+    {"id": "aws_textract", "name": "AWS Textract", "tier": "cloud_ocr", "cost": 4, "license": "proprietary",
+      "deterministic": true, "needs": ["AWS_TEXTRACT_KEY"], "capabilities": ["text", "layout", "tables", "forms"], "status": "candidate"},
+    {"id": "gcv", "name": "Google Cloud Vision OCR", "tier": "cloud_ocr", "cost": 4, "license": "proprietary",
+      "deterministic": true, "needs": ["GCV_API_KEY"], "capabilities": ["text", "layout", "handwriting"], "status": "candidate"},
+    {"id": "azure_di", "name": "Azure Document Intelligence", "tier": "cloud_ocr", "cost": 4, "license": "proprietary",
+      "deterministic": true, "needs": ["AZURE_DI_KEY"], "capabilities": ["text", "layout", "tables", "forms"], "status": "candidate"},
+    {"id": "vision_llm", "name": "Vision-LLM OCR (last resort)", "tier": "vision_llm", "cost": 5, "license": "proprietary",
+      "deterministic": false, "needs": ["LLM_API_KEY"], "capabilities": ["text", "layout", "handwriting", "reasoning"], "status": "candidate"}
+  ]
+}

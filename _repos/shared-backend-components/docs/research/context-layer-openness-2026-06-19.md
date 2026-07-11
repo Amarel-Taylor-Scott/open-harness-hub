@@ -1,0 +1,1 @@
+../../../baltor/context/research/context-layer-openness-2026-06-19.md

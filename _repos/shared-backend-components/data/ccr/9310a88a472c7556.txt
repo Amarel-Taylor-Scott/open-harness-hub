@@ -1,0 +1,26 @@
+MODULE src/teleon/knowledge/dependency_graph.py
+## API signatures
+```python
+"""knowledge.dependency_graph — Dependency Graph Intelligence (the owner's Registry #92 / §3)."""
+def py_function_src_teleon_knowledge_dependency_graph__load_packages() -> list[dict]
+def py_function_src_teleon_knowledge_dependency_graph__build_graph(py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__build_graph__packages: list[dict] | None=None) -> dict
+    # Directed graph: {nodes: {id: record}, edges: {id: [requires...]}, provides: {capability: [ids]}}.
+def py_function_src_teleon_knowledge_dependency_graph__transitive_deps(py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__transitive_deps__graph: dict, py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__transitive_deps__node: str) -> list[str]
+    # All packages reachable from `node` (its full dependency closure), excluding `node`. Cycle-safe.
+def py_function_src_teleon_knowledge_dependency_graph__detect_cycle(py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__detect_cycle__graph: dict) -> list[str]
+    # Return one cycle (node ids) if the dependency graph has one, else [].
+def py_function_src_teleon_knowledge_dependency_graph__ecosystem_cluster(py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__ecosystem_cluster__graph: dict, py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__ecosystem_cluster__node: str) -> list[str]
+    # The connected component (undirected) around `node` — its ecosystem cluster.
+def py_function_src_teleon_knowledge_dependency_graph__stack_exists(py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__stack_exists__capabilities: list[str], py_arg_src_teleon_knowledge_dependency_graph__py_function_src_teleon_knowledge_dependency_graph__stack_exists__graph: dict | None=None) -> dict
+    # Does an existing package (with its transitive deps) already cover ALL requested capabilities? The stack-level
+def _self_test() -> list[str]
+```
+## intra-module call edges
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__build_graph
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__detect_cycle
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__ecosystem_cluster
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__stack_exists
+src.teleon.knowledge.dependency_graph._self_test -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__transitive_deps
+src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__build_graph -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__load_packages
+src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__stack_exists -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__build_graph
+src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__stack_exists -> src.teleon.knowledge.dependency_graph.py_function_src_teleon_knowledge_dependency_graph__transitive_deps

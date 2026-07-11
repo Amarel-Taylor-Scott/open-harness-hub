@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/workers/k8s-keda-worker-mapping.md

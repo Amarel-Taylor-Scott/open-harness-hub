@@ -1,0 +1,169 @@
+# llm_provider_capabilities.yaml — capability registry over the EXISTING _llm_client.PROVIDERS lanes.
+#
+# This is a DATA file (the single source for per-lane rpm/tpm/cost/data-class policy, which lives nowhere
+# else). Model ids + endpoints MIRROR scripts/_config.py and scripts/_llm_client.PROVIDERS; the router
+# (scripts/llm_capability_router.py) drift-gates them at runtime: every entry.provider_id must be a key of
+# _llm_client.PROVIDERS, and every model the JOB_LANES policy references must appear in its lane's models[].
+# Validated against schemas/llm_provider_capability.schema.json. serves_truth=false at this layer.
+#
+# Rate/cost values are POLICY HINTS for the quota manager, not the live source of truth: the real OpenRouter
+# per-model output ceiling is fetched live by hy3_overnight_flywheel._openrouter_max_out(); the Ollama Cloud
+# usage cap is enforced by the circuit breaker in _llm_client. Keep these conservative.
+#
+# Hy3 = tencent/hy3:free on OpenRouter (295B MoE / 21B active, native 256K ctx, FREE, reasons heavily — give
+# it a generous max_output). It is the FIRST lane for long-output generation, NOT the only lane.
+
+registry_version: "2026-07-08"
+
+# Ordered least->most sensitive. A lane may only see a class in its allowed_data_classes; sensitive/restricted
+# route LOCAL-first (cloud lanes are filtered out unless they explicitly allow the class AND redaction passes).
+data_classes: [public, synthetic, internal, sensitive, restricted]
+
+providers:
+
+  # ── OpenRouter: the Hy3-first long-output lane + the other FREE OpenRouter models. Multi-KEY rotation is
+  #    handled by hy3_overnight_flywheel (.agent/openrouter_keys.txt). Cost $0 on the free tier. ──
+  openrouter:
+    provider_id: openrouter
+    endpoint_type: openrouter
+    primary_model: "tencent/hy3:free"
+    models:
+      - "tencent/hy3:free"                          # Hy3 — long-output primary
+      - "nvidia/nemotron-3-super-120b-a12b:free"
+      - "qwen/qwen3-coder:free"                     # strong code lane
+      - "qwen/qwen3-next-80b-a3b-instruct:free"     # cheap/fast lane
+      - "openai/gpt-oss-120b:free"
+      - "google/gemma-4-31b-it:free"                # cheap/fast lane
+      - "z-ai/glm-5.2"
+      - "moonshotai/kimi-k2.7-code"
+    context_window: 262144
+    max_output_tokens: 262144
+    supports_structured_output: true
+    supports_json_mode: true
+    supports_batch: false
+    supports_prompt_caching: false
+    rpm_limit: 20            # free-tier ceiling PER KEY; multi-key rotation multiplies effective throughput
+    tpm_limit: null
+    concurrency_limit: 8
+    cost_input_per_million: 0.0
+    cost_output_per_million: 0.0
+    allowed_data_classes: [public, synthetic]
+    default_timeout_seconds: 175
+    status: active
+    notes: "Free window (2026-07); keys from .agent/openrouter_keys.txt only, never rotated to evade limits."
+
+  # ── NVIDIA Build: OpenAI-compatible hosted GLM 5.2. Survives the Ollama Cloud usage cap + the OpenWebUI
+  #    Cloudflare wall. Strong deterministic-code lane + json/structured lane. ──
+  nvidia:
+    provider_id: nvidia
+    endpoint_type: nvidia
+    primary_model: "z-ai/glm-5.2"
+    models: ["z-ai/glm-5.2"]
+    context_window: 131072
+    max_output_tokens: 65536
+    supports_structured_output: true
+    supports_json_mode: true
+    supports_batch: false
+    supports_prompt_caching: false
+    rpm_limit: 40
+    tpm_limit: null
+    concurrency_limit: 4
+    cost_input_per_million: 0.0
+    cost_output_per_million: 0.0
+    allowed_data_classes: [public, synthetic]
+    default_timeout_seconds: 175
+    status: active
+
+  # ── Ollama Cloud (hosted, https://ollama.com/v1): GLM 5.2 + Kimi (strong code). Account-level usage cap
+  #    enforced by the _llm_client circuit breaker; concurrency-sensitive -> keep concurrency low. ──
+  ollama_cloud:
+    provider_id: ollama
+    endpoint_type: openai_compatible
+    primary_model: "glm-5.2"
+    models: ["glm-5.2", "kimi-k2.7-code"]
+    context_window: 131072
+    max_output_tokens: 65536
+    supports_structured_output: true
+    supports_json_mode: true
+    supports_batch: false
+    supports_prompt_caching: false
+    rpm_limit: null           # gated by the account usage-cap breaker, not a fixed rpm
+    tpm_limit: null
+    concurrency_limit: 1      # "too many concurrent requests" trips the breaker under load
+    cost_input_per_million: 0.0
+    cost_output_per_million: 0.0
+    allowed_data_classes: [public, synthetic]
+    default_timeout_seconds: 300
+    status: active_capped
+
+  # ── Ollama LOCAL (http://localhost:11434/v1): DISABLED — owner directive 2026-07-08: "using local models will
+  #    crash this PC, do not use them." The router NEVER selects a disabled lane, so sensitive/restricted data now
+  #    has NO eligible lane (not local, not unredacted-cloud) and is QUEUED for review instead. Entry kept (not
+  #    deleted) for lineage + the redaction-rule test; re-enable only if the owner gets local-capable hardware. ──
+  ollama_local:
+    provider_id: ollama
+    endpoint_type: ollama_local
+    base_url_override: "http://localhost:11434/v1"
+    primary_model: "gemma4"
+    models: ["gemma4", "qwen2.5-coder:7b", "nomic-embed-text"]
+    context_window: 32768
+    max_output_tokens: 8192
+    supports_structured_output: false
+    supports_json_mode: true
+    supports_batch: false
+    supports_prompt_caching: false
+    rpm_limit: null
+    tpm_limit: null
+    concurrency_limit: 1
+    cost_input_per_million: 0.0
+    cost_output_per_million: 0.0
+    allowed_data_classes: [public, synthetic, internal, sensitive, restricted]
+    default_timeout_seconds: 300
+    status: disabled
+    notes: "DISABLED (owner: local models crash this PC). The router skips disabled lanes; sensitive data queues."
+
+  # ── OmniRoute (local OpenAI-compatible gateway on :20128, MIT): auto-fails-over across the free tiers YOU
+  #    signed into (~8ms). Model 'auto' = its 9-factor router. Lossy compression DELIBERATELY off. ──
+  omniroute:
+    provider_id: omniroute
+    endpoint_type: omniroute
+    primary_model: "auto"
+    models: ["auto"]
+    context_window: 262144
+    max_output_tokens: 262144
+    supports_structured_output: true
+    supports_json_mode: true
+    supports_batch: false
+    supports_prompt_caching: false
+    rpm_limit: null
+    tpm_limit: null
+    concurrency_limit: 8
+    cost_input_per_million: 0.0
+    cost_output_per_million: 0.0
+    allowed_data_classes: [public, synthetic]
+    default_timeout_seconds: 175
+    status: available_if_running
+    notes: "Supplies no keys of its own; aggregates the free tiers you configured. Only reachable when the local gateway is running."
+
+  # ── OpenWebUI (shared Gemma GPU behind a Cloudflare edge): kept for parity with _llm_client.PROVIDERS.
+  #    Session-down + severe rate limiter guards live in _llm_client. Degraded by default. ──
+  openwebui:
+    provider_id: openwebui
+    endpoint_type: openai_compatible
+    primary_model: "gemma-4-coding"
+    models: ["gemma-4-coding"]
+    context_window: 32768
+    max_output_tokens: 8192
+    supports_structured_output: false
+    supports_json_mode: true
+    supports_batch: false
+    supports_prompt_caching: false
+    rpm_limit: null
+    tpm_limit: null
+    concurrency_limit: 1
+    cost_input_per_million: 0.0
+    cost_output_per_million: 0.0
+    allowed_data_classes: [public, synthetic]
+    default_timeout_seconds: 300
+    status: degraded
+    notes: "Reaches the shared Gemma GPU; Cloudflare-edge 5xx trips the session-down breaker in _llm_client."

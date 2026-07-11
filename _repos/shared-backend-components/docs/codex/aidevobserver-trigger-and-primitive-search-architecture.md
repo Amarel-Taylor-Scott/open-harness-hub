@@ -1,0 +1,1 @@
+../../../aidevobserver/context/codex/aidevobserver-trigger-and-primitive-search-architecture.md

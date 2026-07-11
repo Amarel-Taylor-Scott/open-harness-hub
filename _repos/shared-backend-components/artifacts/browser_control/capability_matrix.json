@@ -1,0 +1,950 @@
+{
+  "candidate": true,
+  "categories": [
+    {
+      "available": true,
+      "best_use_cases": [
+        "static / server-rendered pages",
+        "REST / JSON APIs",
+        "very high-volume crawling at ~0 browser cost",
+        "when you only need text / links / tables"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": false,
+        "cloud_llm": false,
+        "dom_snapshot": false,
+        "download": true,
+        "fill": false,
+        "forms_extract": true,
+        "js_render": false,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": false,
+        "screenshot": false,
+        "static_html_fetch": true,
+        "tab_close": false,
+        "tab_focus": false,
+        "tab_list": false,
+        "tab_open": false,
+        "text_extract": true
+      },
+      "category": "raw HTTP scraping",
+      "commands_run": [
+        "StaticBackend().open(fixture+'/')  # urllib GET; no browser",
+        "browser_extract_readable_text / _links / _forms (harness, stdlib html.parser)"
+      ],
+      "evidence_artifacts": [
+        "LIVE: StaticBackend().open(fixture) -> 2866B; extracted 4 links / 1 forms / 562 text-chars via harness browser_*",
+        "LIVE-PROOF raw HTTP runs NO JS: the #js-rendered div still holds 'PENDING_JAVASCRIPT_RENDER' (js_placeholder_unrendered=True); a browser render replaces it with 'JS_RENDERED_CONTENT_OK'",
+        "see meta.live_probe_details.static"
+      ],
+      "not_good_for": [
+        "JS-rendered SPAs (escalate to raw CDP / Playwright)",
+        "any click / fill / multi-step interaction",
+        "screenshots / visual verification"
+      ],
+      "recommendation": "FIRST CHOICE for static content and APIs \u2014 cheapest, fastest, most scalable, zero browser cost. Escalate to a browser lane ONLY when the raw HTML lacks the target content.",
+      "risks": [
+        "blind to JS-rendered / SPA content (sees only server HTML)",
+        "brittle against anti-bot / Cloudflare / login walls",
+        "no screenshots, no interaction"
+      ],
+      "status": "working",
+      "tools_checked": [
+        "urllib (stdlib)",
+        "harness:_Extract (html.parser)",
+        "requests=present",
+        "httpx=present",
+        "bs4=MISSING",
+        "lxml=MISSING",
+        "selectolax=MISSING",
+        "trafilatura=MISSING",
+        "scrapy=MISSING"
+      ]
+    },
+    {
+      "available": true,
+      "best_use_cases": [
+        "sites with a public OpenAPI / GraphQL / REST surface",
+        "the CHEAPEST structured access \u2014 skip the browser entirely",
+        "seeding request/response/contract primitives from a spec",
+        "discovery: robots.txt + sitemap.xml enumerate what exists"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": false,
+        "cloud_llm": false,
+        "dom_snapshot": false,
+        "download": true,
+        "fill": false,
+        "forms_extract": false,
+        "js_render": false,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": false,
+        "screenshot": false,
+        "static_html_fetch": true,
+        "tab_close": false,
+        "tab_focus": false,
+        "tab_list": false,
+        "tab_open": false,
+        "text_extract": true
+      },
+      "category": "API-first discovery (OpenAPI/GraphQL/robots/sitemap)",
+      "commands_run": [
+        "fetch /openapi.json /graphql /robots.txt /sitemap.xml /api/items (urllib)",
+        "json.loads(openapi) -> count paths; browser_detect_openapi_links / _graphql_endpoint"
+      ],
+      "evidence_artifacts": [
+        "LIVE: /openapi.json parsed -> 2 paths; harness openapi links=['http://127.0.0.1:46683/graphql', 'http://127.0.0.1:46683/openapi.json', 'inline:/graphql', 'inline:openapi.json']",
+        "LIVE: /graphql SDL 113B (graphql_detected=True); /robots.txt 86B; /sitemap.xml 215B",
+        "see meta.live_probe_details.static.discovery_endpoints"
+      ],
+      "not_good_for": [
+        "presentational sites with no API",
+        "content only reachable through rendered UI"
+      ],
+      "recommendation": "PREFER THIS over any browser when a spec/API exists \u2014 an OpenAPI/GraphQL call is orders of magnitude cheaper and more stable than rendering a page. Always check robots+sitemap first.",
+      "risks": [
+        "not every site exposes a spec / API (then fall back to a browser lane)",
+        "specs can be stale or partial vs the real API",
+        "auth / rate limits on the real endpoints"
+      ],
+      "status": "working",
+      "tools_checked": [
+        "urllib (stdlib)",
+        "harness:browser_detect_openapi_links",
+        "harness:browser_detect_graphql_endpoint",
+        "robots.txt / sitemap.xml parse",
+        "json"
+      ]
+    },
+    {
+      "available": true,
+      "best_use_cases": [
+        "ATTACH to an already-open Chrome / an existing authenticated session/tab",
+        "ZERO pip/npm dependencies (stdlib websocket) \u2014 works where you can't install packages",
+        "precise, low-level control (specific CDP domains: Network, Input, Fetch, Emulation)",
+        "full network capture + request interception via the Network domain"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "raw CDP (Chrome DevTools Protocol)",
+      "commands_run": [
+        "CdpBackend(port=9413).open(fixture)  # launches headless Chrome, one websocket",
+        "Target.createTarget / getTargets / activateTarget / closeTarget (tab control)"
+      ],
+      "evidence_artifacts": [
+        "LIVE: CdpBackend (stdlib CDP over google-chrome-stable) rendered fixture -> js_rendered=True delayed=True screenshot=True forms=1",
+        "LIVE tab control over CDP Target.*: open=True list=2 focus=True close=True",
+        "CAPABILITY (not exercised this run): click/fill via Input.dispatch*; network_capture via Network.enable \u2014 raw CDP exposes both",
+        "see meta.live_probe_details.cdp"
+      ],
+      "not_good_for": [
+        "ergonomic day-to-day scripting (Playwright is far nicer)",
+        "cross-browser (CDP is Chromium-only)",
+        "teams that want auto-wait + a stable API"
+      ],
+      "recommendation": "The zero-dependency power tool: use it to control an EXISTING browser/session or when you cannot install anything. For greenfield automation prefer Playwright; drop to raw CDP for attach-to-session and precise domain control.",
+      "risks": [
+        "low-level + verbose; brittle across Chrome versions",
+        "you manage the browser process lifecycle",
+        "no auto-wait / retry ergonomics \u2014 you build them"
+      ],
+      "status": "working",
+      "tools_checked": [
+        "harness:CdpBackend",
+        "scripts.browser_capture.CDP (stdlib websocket)",
+        "system chrome=google-chrome-stable"
+      ]
+    },
+    {
+      "available": true,
+      "best_use_cases": [
+        "THE BASELINE for reliable cross-browser automation (Chromium/Firefox/WebKit)",
+        "auto-wait, rich selectors, tracing, network interception, downloads",
+        "greenfield scripted flows where you own the browser lifecycle"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "Playwright",
+      "commands_run": [
+        "playwright.chromium.launch(channel='chrome', headless=True)",
+        "goto / inner_text / wait_for_function / fill / expect_popup+click / screenshot / request.get / page.on('response')"
+      ],
+      "evidence_artifacts": [
+        "LIVE: launch(channel='chrome', headless) -> js_rendered=True delayed=True forms=1 fill_ok=True click_ok=True tab_open=True screenshot=True(62488B)",
+        "LIVE: download via request context=True; network responses captured=1 (network_capture_ok=True)",
+        "CONFIG: system Chrome via channel='chrome' (no `playwright install` needed here). Alt: `playwright install chromium` to use the bundled browser.",
+        "see meta.live_probe_details.playwright"
+      ],
+      "not_good_for": [
+        "attaching to a human's already-open session (use raw CDP)",
+        "ultra-high-volume static scraping (use raw HTTP)",
+        "tiny-footprint / high-density crawl (see Lightpanda)",
+        "environments where you cannot install any browser binary"
+      ],
+      "recommendation": "The BASELINE \u2014 and ONLY the baseline. Excellent default for owned automation, but it is one row in the zoo: raw HTTP is cheaper for static pages, raw CDP attaches to existing sessions, Lightpanda scales denser, remote browsers scale wider, the extension operates the user's real tab. Pick per job.",
+      "risks": [
+        "heavier than raw HTTP; needs a browser binary (`playwright install` OR channel=chrome)",
+        "detectable by sophisticated anti-bot",
+        "one more toolchain to keep patched"
+      ],
+      "status": "working",
+      "tools_checked": [
+        "python:playwright=present",
+        "cli:playwright=present",
+        "channel=chrome (system Chrome)",
+        "bundled-chromium-installed=False"
+      ]
+    },
+    {
+      "available": false,
+      "best_use_cases": [
+        "Node / JavaScript codebases",
+        "Chrome-centric automation + PDF generation",
+        "puppeteer-core to drive the already-installed system Chrome with a tiny install"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "Puppeteer",
+      "commands_run": [
+        "node -e require.resolve('puppeteer') / ('puppeteer-core')"
+      ],
+      "evidence_artifacts": [
+        "LIVE: node present=True; require.resolve('puppeteer')=False, 'puppeteer-core'=False",
+        "ENABLE: npm i puppeteer (bundles Chromium) OR npm i puppeteer-core (reuse system Chrome); test: node -e \"require('puppeteer-core')\""
+      ],
+      "not_good_for": [
+        "Python-first pipelines (use Playwright-Python or raw CDP)",
+        "true cross-browser needs (prefer Playwright)"
+      ],
+      "recommendation": "In a Node stack, Puppeteer (or puppeteer-core + system Chrome) is a fine baseline. Here the Node runtime is present but the package is not installed \u2014 one `npm i puppeteer-core` away. In THIS Python repo, prefer Playwright / raw CDP.",
+      "risks": [
+        "Chromium-focused (Firefox support is newer/thinner than Playwright)",
+        "Node/JS runtime required",
+        "same anti-bot detectability as any CDP driver"
+      ],
+      "status": "missing",
+      "tools_checked": [
+        "node=present",
+        "npm=present",
+        "puppeteer=MISSING",
+        "puppeteer-core=MISSING"
+      ]
+    },
+    {
+      "available": false,
+      "best_use_cases": [
+        "the W3C WebDriver STANDARD (portable across languages + browsers, incl. real Firefox)",
+        "mature Selenium Grid for large parallel farms",
+        "WebDriver-BiDi = standardized bidirectional control (console/network) like CDP but vendor-neutral",
+        "legacy suites already written against Selenium"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "Selenium / WebDriver-BiDi",
+      "commands_run": [
+        "importlib.find_spec('selenium')",
+        "shutil.which('geckodriver' / 'chromedriver')"
+      ],
+      "evidence_artifacts": [
+        "LIVE: import selenium -> MISSING (ModuleNotFoundError); geckodriver=present chromedriver=MISSING",
+        "ENABLE: pip install selenium ; drivers auto-resolved by Selenium Manager (geckodriver already present); test: python -c 'import selenium'"
+      ],
+      "not_good_for": [
+        "quick modern scripting (Playwright is more ergonomic)",
+        "lightweight one-shot scrapes (use raw HTTP / a CLI)"
+      ],
+      "recommendation": "Reach for Selenium/WebDriver-BiDi when you need the vendor-neutral W3C standard, a Grid, or real Firefox. Not installed here (geckodriver IS present) \u2014 one `pip install selenium` away.",
+      "risks": [
+        "heavier + slower to script than Playwright (fewer auto-wait ergonomics)",
+        "classic WebDriver lacks native network intercept (WebDriver-BiDi adds it)"
+      ],
+      "status": "missing",
+      "tools_checked": [
+        "python:selenium=MISSING",
+        "geckodriver=present",
+        "chromedriver=MISSING",
+        "WebDriver-BiDi"
+      ]
+    },
+    {
+      "available": false,
+      "best_use_cases": [
+        "operate on the USER's CURRENT tab / already-authenticated session (no re-login, no captcha)",
+        "privacy-first, on-device, human-in-the-loop 'digest / act on what I'm looking at'",
+        "no separate browser process \u2014 reuse the real one the user already trusts"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "chrome-extension / current-tab bridge",
+      "commands_run": [
+        "environment inspection: no interactive Chrome profile / loaded extension in a headless probe"
+      ],
+      "evidence_artifacts": [
+        "blocked: cannot load an interactive MV3 extension in a headless CI probe",
+        "ENABLE: MV3 manifest with permissions ['tabs','scripting','activeTab','downloads'] (+ 'debugger' for network capture); load unpacked in a non-headless Chrome"
+      ],
+      "not_good_for": [
+        "headless / server-side / unattended automation",
+        "high-volume crawling",
+        "anything that must run without a human's interactive browser"
+      ],
+      "recommendation": "The RIGHT tool for current-tab, privacy-first, consented assistance inside the user's own browser \u2014 a capability NO headless driver has. BLOCKED in this headless probe environment (no interactive profile/extension). ENABLE: load an unpacked MV3 extension into a real Chrome profile; drive tabs via chrome.tabs + a content script.",
+      "risks": [
+        "ACTS AS THE LOGGED-IN USER \u2014 full authority of the human's session (privacy + safety critical)",
+        "requires explicit user install + broad permissions (tabs/scripting/debugger)",
+        "must stay human-in-the-loop; not for unattended automation"
+      ],
+      "status": "blocked",
+      "tools_checked": [
+        "MV3 chrome extension (chrome.tabs / chrome.scripting / chrome.debugger / chrome.downloads)",
+        "harness BACKEND_ZOO seam 'chrome_extension'"
+      ]
+    },
+    {
+      "available": true,
+      "best_use_cases": [
+        "giving an LLM AGENT (Claude Code / Cursor / an MCP client) browser TOOLS via a standard interface",
+        "exploratory, natural-language-driven browsing inside an agent loop",
+        "a uniform tool surface across agents (write once, any MCP client calls it)"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": true,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "MCP browser servers",
+      "commands_run": [
+        "shutil.which('npx'/'node')",
+        "scan .mcp.json / ~/.claude.json / .claude/settings.json"
+      ],
+      "evidence_artifacts": [
+        "LIVE: node=present npx=present; configured browser-MCP servers found=[]",
+        "ENABLE: npx @playwright/mcp@latest (or @modelcontextprotocol/server-puppeteer) and register it in the MCP client config (.mcp.json / client settings)"
+      ],
+      "not_good_for": [
+        "deterministic production pipelines (call Playwright/CDP directly)",
+        "raw programmatic throughput"
+      ],
+      "recommendation": "Use an MCP browser server to hand an AGENT browser tools \u2014 not for deterministic scripting. Node+npx are present so a server is one `npx @playwright/mcp` away; none is configured yet. Quarantine agent-produced output as candidate-only.",
+      "risks": [
+        "output is LLM-mediated tool-calling \u2014 non-deterministic; treat results as candidates",
+        "the MCP server has real browser authority; scope its permissions",
+        "a running server + an agent client are both required"
+      ],
+      "status": "partial",
+      "tools_checked": [
+        "@playwright/mcp",
+        "@modelcontextprotocol/server-puppeteer",
+        "browsermcp",
+        "npx=present",
+        "node=present"
+      ]
+    },
+    {
+      "available": true,
+      "best_use_cases": [
+        "a quick JS render / screenshot with ZERO libraries (chrome --dump-dom / --screenshot)",
+        "shell pipelines + CI smoke checks",
+        "curl/wget for file downloads + raw HTTP",
+        "pinchtab / agent-browser: a ~12MB binary exposing an HTTP browser API for tab control"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": false,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": false,
+        "forms_extract": false,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": false,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": false,
+        "tab_focus": false,
+        "tab_list": false,
+        "tab_open": false,
+        "text_extract": true
+      },
+      "category": "tiny browser-control binaries / CLIs",
+      "commands_run": [
+        "chrome --headless=new --virtual-time-budget=1500 --dump-dom <url>",
+        "shutil.which('curl'/'wget'/'pinchtab'/'agent-browser')"
+      ],
+      "evidence_artifacts": [
+        "LIVE: google-chrome-stable --headless --dump-dom rendered fixture (2915B), js_rendered=True \u2014 a browser render with ZERO libraries",
+        "which: curl=present wget=present pinchtab=MISSING agent-browser=MISSING",
+        "ENABLE pinchtab/agent-browser: download/build the small binary (no go toolchain here) and drive its localhost HTTP API for tab control + click/fill"
+      ],
+      "not_good_for": [
+        "multi-step interactive flows / stateful sessions (use Playwright / raw CDP)",
+        "fine-grained click/fill (with the chrome CLI alone)"
+      ],
+      "recommendation": "For one-shot render/screenshot with no dependencies, `chrome --headless --dump-dom` is unbeatably simple (verified here). For interaction, add a tiny binary (pinchtab/agent-browser, absent here) or step up to raw CDP / Playwright.",
+      "risks": [
+        "one-shot: no persistent session, no multi-step interaction (chrome CLI)",
+        "small third-party binaries (pinchtab/agent-browser) need provenance vetting"
+      ],
+      "status": "working",
+      "tools_checked": [
+        "chrome --headless --dump-dom/--screenshot (google-chrome-stable)",
+        "curl=present",
+        "wget=present",
+        "pinchtab=MISSING",
+        "agent-browser=MISSING",
+        "monolith"
+      ]
+    },
+    {
+      "available": false,
+      "best_use_cases": [
+        "EXPLORATION of an unknown UI \u2014 let the agent discover the flow",
+        "generating CANDIDATE action plans / selectors to later harden into deterministic scripts",
+        "'do X on this site' natural-language tasks where a human reviews the result"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": true,
+        "local_llm": true,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "browser-use / browser-harness LLM agents",
+      "commands_run": [
+        "importlib.find_spec('browser_use')",
+        "local LLM endpoint pings"
+      ],
+      "evidence_artifacts": [
+        "LIVE: import browser_use -> MISSING; local LLM endpoints up={'ollama_local_11434': True, 'openai_compat_8000': True, 'lmstudio_1234': False}",
+        "ENABLE: pip install browser-use (drives Playwright under the hood); needs an LLM \u2014 route via CLOUD free lanes, NOT local Ollama (owner rule: local hardware can't run big models reliably)"
+      ],
+      "not_good_for": [
+        "deterministic / production pipelines (compile the plan down to Playwright/CDP first)",
+        "anything trusted as truth (serves_truth=false; candidate-only)",
+        "unattended money/state-changing actions"
+      ],
+      "recommendation": "Use browser-use/browser-harness for DISCOVERY only, with output QUARANTINED as candidate (serves_truth=false) and every side-effecting action human-gated. Not installed here; route its LLM via cloud free lanes per the owner rule, then distill winning plans into deterministic Playwright/CDP.",
+      "risks": [
+        "OUTPUT MUST BE QUARANTINED \u2014 LLM-planned actions are non-deterministic + can hallucinate steps",
+        "can take UNSAFE actions (submit/pay) without a hard gate \u2014 keep read-only + human approval",
+        "depends on an LLM's quality; small local models plan poorly"
+      ],
+      "status": "missing",
+      "tools_checked": [
+        "python:browser_use=MISSING",
+        "browser-harness (seam)",
+        "harness BACKEND_ZOO seams 'browser_use' / 'browser_harness'"
+      ]
+    },
+    {
+      "available": false,
+      "best_use_cases": [
+        "HIGH-VOLUME, high-density headless crawling at a FRACTION of Chrome's RAM/CPU",
+        "CDP-compatible: existing Playwright/Puppeteer code points at it unchanged",
+        "cost-sensitive fleets where Chrome's footprint is the bottleneck"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "Lightpanda",
+      "commands_run": [
+        "shutil.which('lightpanda')"
+      ],
+      "evidence_artifacts": [
+        "LIVE: which lightpanda -> MISSING; no go/cargo/zig toolchain to build from source",
+        "INSTALL PATH: download the prebuilt binary from lightpanda.io (releases) -> `lightpanda serve --host 127.0.0.1 --port 9222`; it is CDP-compatible, so drive it with Playwright/Puppeteer via connect_over_cdp (or `lightpanda fetch --dump <url>` for one-shot)"
+      ],
+      "not_good_for": [
+        "pixel-perfect fidelity on complex apps (use real Chrome)",
+        "features that depend on full Chromium behavior"
+      ],
+      "recommendation": "The right tool when the constraint is SCALE/COST of headless rendering \u2014 far lighter than Chrome and CDP-compatible so your existing driver code works. UNAVAILABLE here (no binary / no build toolchain); install path recorded above.",
+      "risks": [
+        "not full Chrome \u2014 some heavy/edge-case sites render imperfectly",
+        "younger project; smaller ecosystem than Chromium"
+      ],
+      "status": "missing",
+      "tools_checked": [
+        "lightpanda binary=MISSING",
+        "CDP-over-lightpanda"
+      ]
+    },
+    {
+      "available": false,
+      "best_use_cases": [
+        "SCALE + PARALLELISM without managing local browser infra",
+        "CI / serverless where you can't install browsers",
+        "Browserbase's managed stealth / captcha handling for hard anti-bot targets",
+        "bursty parallel fleets on demand"
+      ],
+      "capabilities": {
+        "api_discovery": true,
+        "click": true,
+        "cloud_llm": false,
+        "dom_snapshot": true,
+        "download": true,
+        "fill": true,
+        "forms_extract": true,
+        "js_render": true,
+        "llm_action_planning": false,
+        "local_llm": false,
+        "network_capture": true,
+        "screenshot": true,
+        "static_html_fetch": true,
+        "tab_close": true,
+        "tab_focus": true,
+        "tab_list": true,
+        "tab_open": true,
+        "text_extract": true
+      },
+      "category": "remote browsers (Browserless / Browserbase)",
+      "commands_run": [
+        "env presence: BROWSERLESS_API_KEY / BROWSERLESS_TOKEN / BROWSERBASE_API_KEY",
+        "shutil.which('docker')"
+      ],
+      "evidence_artifacts": [
+        "LIVE: env key presence -> BROWSERLESS_API_KEY=False BROWSERBASE_API_KEY=False (values never read); docker present=True",
+        "ENABLE (cloud): set BROWSERLESS_API_KEY / BROWSERBASE_API_KEY, connect via CDP websocket: playwright.chromium.connect_over_cdp('wss://...?token=...')",
+        "ENABLE (local, docker present=True): docker run -p 3000:3000 browserless/chrome  ->  connect_over_cdp('ws://localhost:3000')"
+      ],
+      "not_good_for": [
+        "offline / local-first / air-gapped work",
+        "cost-sensitive high volume (local is cheaper)",
+        "data you may not send to a third party"
+      ],
+      "recommendation": "Use a remote browser when you need scale/parallelism or managed anti-bot without local infra \u2014 at the cost of sending pages to a third party. BLOCKED here (no key/endpoint); docker is present, so a local `browserless/chrome` container is the keyless alternative.",
+      "risks": [
+        "SENDS TARGET PAGES (and any credentials you drive) to a THIRD PARTY \u2014 data-residency + privacy",
+        "per-session cost; rate/quota limits",
+        "dependency on an external service's uptime"
+      ],
+      "status": "blocked",
+      "tools_checked": [
+        "Browserless (self-host / cloud)",
+        "Browserbase (cloud, managed stealth)",
+        "playwright/puppeteer connect_over_cdp",
+        "docker=present"
+      ]
+    },
+    {
+      "available": true,
+      "best_use_cases": [
+        "action PLANNING for the agentic browser lanes (MCP / browser-use)",
+        "natural-language -> tool-call intent; DOM/screenshot understanding (multimodal)",
+        "cheap local endpoints for dev; cloud free lanes (OpenRouter file) for real planning"
+      ],
+      "capabilities": {
+        "api_discovery": false,
+        "click": false,
+        "cloud_llm": false,
+        "dom_snapshot": false,
+        "download": false,
+        "fill": false,
+        "forms_extract": false,
+        "js_render": false,
+        "llm_action_planning": true,
+        "local_llm": true,
+        "network_capture": false,
+        "screenshot": false,
+        "static_html_fetch": false,
+        "tab_close": false,
+        "tab_focus": false,
+        "tab_list": false,
+        "tab_open": false,
+        "text_extract": false
+      },
+      "category": "LLM endpoints (local Ollama / localhost:8000 / cloud-if-keyed)",
+      "commands_run": [
+        "GET :11434/api/tags :8000/v1/models :1234/v1/models (2s timeout)",
+        "env presence of cloud keys; count of openrouter_keys.txt lines"
+      ],
+      "evidence_artifacts": [
+        "LIVE PINGS: {'ollama_local_11434': 200, 'openai_compat_8000': 200, 'lmstudio_1234': 'URLError'} (up = HTTP 200; no model names / secrets stored)",
+        "cloud key ENV presence (names only): none set",
+        "file-based OpenRouter keys: present=True count=8 (a count is not a secret; values never read)"
+      ],
+      "not_good_for": [
+        "deterministic control (compile plans to Playwright/CDP)",
+        "being trusted as a source of truth"
+      ],
+      "recommendation": "Local endpoints (Ollama :11434, OpenAI-compat :8000) are UP and verified, but per the owner rule route real action-planning through CLOUD free lanes (the 8 file-based OpenRouter keys) rather than local Ollama. Keep all planner output candidate-only.",
+      "risks": [
+        "OWNER RULE: do NOT rely on LOCAL Ollama \u2014 local hardware can't run big models well",
+        "LLM output is never truth (serves_truth=false); non-deterministic; must be quarantined",
+        "small local models plan browser actions poorly vs frontier models"
+      ],
+      "status": "working",
+      "tools_checked": [
+        "Ollama :11434",
+        "OpenAI-compatible :8000",
+        "LM Studio :1234",
+        ".agent/openrouter_keys.txt (file lane)",
+        "cloud keys (env)"
+      ]
+    }
+  ],
+  "generated_by": "scripts/probe_browser_control_tools.py",
+  "matrix_id": "bcm-6506a686ce7ae4c9",
+  "meta": {
+    "capability_convention": "capabilities{} booleans describe the category's capability PROFILE (what the tool can do); `available` + `status` + `evidence_artifacts` record what was verified LIVE on this machine this run. Missing tools keep their profile but carry status=missing + the install/test command.",
+    "capability_keys": [
+      "static_html_fetch",
+      "js_render",
+      "tab_list",
+      "tab_open",
+      "tab_focus",
+      "tab_close",
+      "dom_snapshot",
+      "text_extract",
+      "screenshot",
+      "forms_extract",
+      "click",
+      "fill",
+      "download",
+      "network_capture",
+      "api_discovery",
+      "llm_action_planning",
+      "local_llm",
+      "cloud_llm"
+    ],
+    "environment": {
+      "binaries_present": {
+        "agent-browser": false,
+        "chrome-headless-shell": false,
+        "chromedriver": false,
+        "chromium": true,
+        "chromium-browser": false,
+        "curl": true,
+        "docker": true,
+        "firefox": true,
+        "geckodriver": true,
+        "google-chrome": true,
+        "google-chrome-stable": true,
+        "lightpanda": false,
+        "monolith": false,
+        "node": true,
+        "npm": true,
+        "npx": true,
+        "pinchtab": false,
+        "playwright": true,
+        "wget": true
+      },
+      "cloud_key_env_presence": {
+        "ANTHROPIC_API_KEY": false,
+        "BROWSERBASE_API_KEY": false,
+        "BROWSERBASE_PROJECT_ID": false,
+        "BROWSERLESS_API_KEY": false,
+        "BROWSERLESS_TOKEN": false,
+        "GEMINI_API_KEY": false,
+        "GOOGLE_API_KEY": false,
+        "NVIDIA_API_KEY": false,
+        "OPENAI_API_KEY": false,
+        "OPENROUTER_API_KEY": false
+      },
+      "openrouter_keys_file": {
+        "count": 8,
+        "present": true
+      },
+      "platform": "linux",
+      "python_packages_present": {
+        "browser_use": false,
+        "bs4": false,
+        "httpx": true,
+        "jsonschema": true,
+        "lxml": false,
+        "nodriver": true,
+        "playwright": true,
+        "pydantic": true,
+        "pyppeteer": false,
+        "readability": false,
+        "requests": true,
+        "scrapy": false,
+        "selectolax": false,
+        "selenium": false,
+        "trafilatura": false
+      },
+      "python_version": "3.11.15"
+    },
+    "fixture_url_used": true,
+    "live_probe_details": {
+      "cdp": {
+        "attempted": true,
+        "delayed_rendered": true,
+        "has_screenshot": true,
+        "html_bytes": 2898,
+        "js_rendered": true,
+        "n_forms": 1,
+        "ok": true,
+        "tab_close_ok": true,
+        "tab_focus_ok": true,
+        "tab_list_count": 2,
+        "tab_open_ok": true,
+        "text_chars": 620
+      },
+      "chrome_cli": {
+        "attempted": true,
+        "available": true,
+        "binary": "google-chrome-stable",
+        "dom_bytes": 2915,
+        "js_rendered": true,
+        "ok": true
+      },
+      "llm": {
+        "lmstudio_1234": {
+          "error": "URLError",
+          "up": false
+        },
+        "ollama_local_11434": {
+          "http": 200,
+          "up": true
+        },
+        "openai_compat_8000": {
+          "http": 200,
+          "up": true
+        }
+      },
+      "mcp_config": {
+        "any": false,
+        "configured_servers_found": []
+      },
+      "node_modules": {
+        "puppeteer": {
+          "node_present": true,
+          "present": false
+        },
+        "puppeteer-core": {
+          "node_present": true,
+          "present": false
+        }
+      },
+      "playwright": {
+        "attempted": true,
+        "available": true,
+        "channel": "chrome",
+        "click_ok": true,
+        "delayed_rendered": true,
+        "download_ok": true,
+        "fill_ok": true,
+        "has_screenshot": true,
+        "js_rendered": true,
+        "n_forms": 1,
+        "network_capture_ok": true,
+        "network_events": 1,
+        "ok": true,
+        "screenshot_bytes": 62488,
+        "tab_close_ok": true,
+        "tab_list_count": 2,
+        "tab_open_ok": true
+      },
+      "static": {
+        "attempted": true,
+        "discovery_endpoints": {
+          "api_items": {
+            "bytes": 262,
+            "ok": true
+          },
+          "graphql_sdl": {
+            "bytes": 113,
+            "ok": true
+          },
+          "openapi": {
+            "bytes": 1010,
+            "ok": true
+          },
+          "robots": {
+            "bytes": 86,
+            "ok": true
+          },
+          "sitemap": {
+            "bytes": 215,
+            "ok": true
+          }
+        },
+        "downloadable_docs": [
+          "http://127.0.0.1:46683/openapi.json"
+        ],
+        "graphql_detected": true,
+        "html_bytes": 2866,
+        "js_placeholder_unrendered": true,
+        "n_forms": 1,
+        "n_links": 4,
+        "ok": true,
+        "openapi_links": [
+          "http://127.0.0.1:46683/graphql",
+          "http://127.0.0.1:46683/openapi.json",
+          "inline:/graphql",
+          "inline:openapi.json"
+        ],
+        "openapi_paths": 2,
+        "static_text_marker_present": true,
+        "text_chars": 562
+      }
+    },
+    "record_fields": [
+      "category",
+      "tools_checked",
+      "commands_run",
+      "available",
+      "status",
+      "capabilities",
+      "risks",
+      "best_use_cases",
+      "not_good_for",
+      "recommendation",
+      "evidence_artifacts"
+    ],
+    "spawned_real_browsers": true,
+    "status_values": [
+      "working",
+      "partial",
+      "missing",
+      "blocked",
+      "unsafe",
+      "not_applicable"
+    ]
+  },
+  "record_type": "browser_capability_matrix",
+  "schema_version": "1.0.0",
+  "serves_truth": false
+}

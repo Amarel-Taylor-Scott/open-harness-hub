@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/daily-showcase-pipeline-factory.md

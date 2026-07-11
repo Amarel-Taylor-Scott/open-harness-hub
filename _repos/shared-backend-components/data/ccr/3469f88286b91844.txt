@@ -1,0 +1,52 @@
+MODULE src/teleon/purpose_tasks/runtime_binding.py
+## API signatures
+```python
+"""src.teleon.purpose_tasks.runtime_binding — CTS-1: bind a PurposeTask's declared RUNTIME CLASS to a CONCRETE
+execution backend by policy + available credentials + provider health."""
+_A = ...
+_PROVIDER_PREFIX = ...
+_DEFAULT_OFFLINE_BACKEND = ...
+def _load(name: str) -> dict
+def _runtime_classes(runtime_classes: dict | None=None) -> dict
+def _matrix(policy_matrix: dict | None=None) -> dict
+def _index(runtime_classes: dict | None=None) -> dict[str, dict]
+def offline_default_backend(policy_matrix: dict | None=None) -> str
+    # The bare-id local backend the platform uses when nothing else is available (deny-by-default target).
+def class_record(runtime_class: str, *, runtime_classes: dict | None=None) -> dict | None
+    # The vocabulary record for a runtime class, or None if it is not a known class.
+def is_known_class(runtime_class: str, *, runtime_classes: dict | None=None) -> bool
+def class_vendor_backends(runtime_class: str, *, runtime_classes: dict | None=None) -> list[str]
+    # The cloud/K8s vendor backends a class may bind to (full ids incl. status suffix). [] for local-only.
+def local_fallback_backend(runtime_class: str, *, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> str
+    # The bare-id LOCAL backend a class falls back to when no cloud vendor is credentialed+healthy. Derived
+def _decision(action: str, runtime_class: str, backend: str, *, is_local_fallback: bool, known_class: bool, reason: str, considered: list[str]) -> dict[str, Any]
+def bind(runtime_class: str, *, available_creds: set | None=None, provider_health: dict | None=None, policy_override: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> dict[str, Any]
+    # Bind ONE runtime class to a concrete backend.
+def bind_allowed(allowed_runtime_classes: list[str] | None, *, available_creds: set | None=None, provider_health: dict | None=None, policy_override: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> dict[str, Any]
+    # Bind a task that allows SEVERAL runtime classes (declared in priority order). Returns the first class
+def resolve_for_spec(spec: dict[str, Any], *, available_creds: set | None=None, provider_health: dict | None=None, policy_override: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> dict[str, Any]
+    # Bind a PurposeTask SPEC by its declared `allowed_runtime_classes` (CTS-1 connection to PurposeTaskSpec).
+def eligible_backends_for_classes(allowed_runtime_classes: list[str] | None, *, runtime_classes: dict | None=None, policy_matrix: dict | None=None) -> list[str]
+    # The union of concrete backends the allowed classes may bind to (cloud vendors + each class's local
+```
+## intra-module call edges
+src.teleon.purpose_tasks.runtime_binding._index -> src.teleon.purpose_tasks.runtime_binding._runtime_classes
+src.teleon.purpose_tasks.runtime_binding._matrix -> src.teleon.purpose_tasks.runtime_binding._load
+src.teleon.purpose_tasks.runtime_binding._runtime_classes -> src.teleon.purpose_tasks.runtime_binding._load
+src.teleon.purpose_tasks.runtime_binding.bind -> src.teleon.purpose_tasks.runtime_binding._decision
+src.teleon.purpose_tasks.runtime_binding.bind -> src.teleon.purpose_tasks.runtime_binding.class_vendor_backends
+src.teleon.purpose_tasks.runtime_binding.bind -> src.teleon.purpose_tasks.runtime_binding.is_known_class
+src.teleon.purpose_tasks.runtime_binding.bind -> src.teleon.purpose_tasks.runtime_binding.local_fallback_backend
+src.teleon.purpose_tasks.runtime_binding.bind -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend
+src.teleon.purpose_tasks.runtime_binding.bind_allowed -> src.teleon.purpose_tasks.runtime_binding._decision
+src.teleon.purpose_tasks.runtime_binding.bind_allowed -> src.teleon.purpose_tasks.runtime_binding.bind
+src.teleon.purpose_tasks.runtime_binding.bind_allowed -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend
+src.teleon.purpose_tasks.runtime_binding.class_record -> src.teleon.purpose_tasks.runtime_binding._index
+src.teleon.purpose_tasks.runtime_binding.class_vendor_backends -> src.teleon.purpose_tasks.runtime_binding.class_record
+src.teleon.purpose_tasks.runtime_binding.eligible_backends_for_classes -> src.teleon.purpose_tasks.runtime_binding.class_vendor_backends
+src.teleon.purpose_tasks.runtime_binding.eligible_backends_for_classes -> src.teleon.purpose_tasks.runtime_binding.local_fallback_backend
+src.teleon.purpose_tasks.runtime_binding.eligible_backends_for_classes -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend
+src.teleon.purpose_tasks.runtime_binding.is_known_class -> src.teleon.purpose_tasks.runtime_binding._index
+src.teleon.purpose_tasks.runtime_binding.local_fallback_backend -> src.teleon.purpose_tasks.runtime_binding.class_record
+src.teleon.purpose_tasks.runtime_binding.local_fallback_backend -> src.teleon.purpose_tasks.runtime_binding.offline_default_backend
+src.teleon.purpose_tasks.runtime_binding.offline_default_backend -> src.teleon.purpose_tasks.runtime_binding._matrix

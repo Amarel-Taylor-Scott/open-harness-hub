@@ -1,0 +1,39 @@
+MODULE _repos/teleon/backend/src/teleon/compiler/emit.py
+## API signatures
+```python
+"""src.teleon.compiler.emit — render a CompiledRuntimeUnit into the concrete deployable text."""
+_K8S_NAME_MAX = ...
+_DNS1123_SUB = ...
+_MILLICORES_PER_CORE = ...
+_MIN_FLY_CPUS = ...
+_CPU_QUANTITY_RE = ...
+def _cpu_to_fly_cpus(cpu_quantity: str) -> int
+    # Translate a Kubernetes CPU quantity ('500m','2','250m','1') from the resource class into a whole Fly guest
+def _k8s_name(capability_id: str) -> str
+    # A deterministic, valid DNS-1123 Job name for a capability ('teleon-' + the sanitized id).
+GENERATED_MARK = ...
+_K8S_ANNOTATION_PREFIX = ...
+_FLY_UNIT_ENV_KEY = ...
+def _require_exec_target(unit: dict, exec_target: str) -> None
+def emit_fly_machine(unit: dict) -> str
+    # A Fly Machines config (JSON) for ``fly machine run --config <file>``. env carries ONLY ref names (the
+def build_k8s_job(unit: dict) -> dict
+    # The Kubernetes batch/v1 Job manifest as a dict (validate/inspect before YAML serialization).
+def emit_k8s_job(unit: dict) -> str
+    # The k8s Job manifest serialized as deterministic YAML (sorted keys, block style).
+def emit_local_process(unit: dict) -> str
+    # A local process spec (JSON): argv + env-ref names + resolved budgets/timeout — the always-available offline
+_REPO_SCMS = ...
+def emit_repo(unit: dict, *, scm: str='github') -> dict[str, str]
+    # Emit a self-contained, GitOps-ready REPOSITORY for a compiled capability so the CUSTOMER runs it through THEIR
+_EMITTERS = ...
+def emit(unit: dict, exec_target: str | None=None) -> str
+    # Render ``unit`` to its concrete deployable text. ``exec_target`` defaults to the unit's own; passing a
+```
+## intra-module call edges
+src.teleon.compiler.emit.build_k8s_job -> src.teleon.compiler.emit._k8s_name
+src.teleon.compiler.emit.build_k8s_job -> src.teleon.compiler.emit._require_exec_target
+src.teleon.compiler.emit.emit_fly_machine -> src.teleon.compiler.emit._cpu_to_fly_cpus
+src.teleon.compiler.emit.emit_fly_machine -> src.teleon.compiler.emit._require_exec_target
+src.teleon.compiler.emit.emit_k8s_job -> src.teleon.compiler.emit.build_k8s_job
+src.teleon.compiler.emit.emit_local_process -> src.teleon.compiler.emit._require_exec_target

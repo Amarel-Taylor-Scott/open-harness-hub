@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/postgres-pgvector-bootstrap.md

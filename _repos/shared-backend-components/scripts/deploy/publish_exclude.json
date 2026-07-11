@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-07-04",
+  "principle": "Single source of the paths that must NEVER leave into a public subtree-split child repo or a published dist/image. The encrypted secrets vault lives in git for the owner's private clone + CI decrypt, but its ciphertext must not be republished (git history + split child repos would retain old ciphertext forever). check_sops_secrets.py asserts every path here is honored by BOTH the subtree-split tooling and the published-dist ignore (.dockerignore).",
+  "serves_truth": false,
+  "subtree_split_exclude": [
+    "_repos/shared-backend-components/secrets/"
+  ],
+  "published_dist_exclude": [
+    "_repos/shared-backend-components/secrets/"
+  ]
+}

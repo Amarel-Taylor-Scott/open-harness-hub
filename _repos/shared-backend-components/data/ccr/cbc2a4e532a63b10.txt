@@ -1,0 +1,37 @@
+MODULE src/baltor/determinism/fallback_router.py
+## API signatures
+```python
+"""src.baltor.determinism.fallback_router — M7 serving: deterministic rule FIRST, recorded fallback otherwise."""
+EPOCH = ...
+SERVED_BY_RULE = ...
+SERVED_BY_GATEWAY = ...
+SERVED_BY_HUMAN = ...
+SERVED_BY_HOLD_OUT = ...
+_FALLBACK_ROUTES = ...
+REASON_RULE_FIRED = ...
+REASON_INACTIVE = ...
+REASON_ABSTAINED = ...
+REASON_OOD = ...
+REASON_LOW_CONFIDENCE = ...
+def _canon(body: Any) -> bytes
+def _attr(obj: Any, name: str, default=None)
+class RoutingEvent:
+    # One serving decision. ``fabricated`` is always False — a fallback may abstain/escalate, never invent.
+    def to_dict(self) -> dict
+def _input_signature(inputs: dict) -> str
+def _is_ood(rule: RuleCandidate, inputs: dict) -> bool
+    # Out-of-distribution = a required input field is missing, OR the input carries an UNKNOWN field the rule
+def route(rule: RuleCandidate, inputs: dict, *, confidence: float=1.0, now: str=EPOCH) -> RoutingEvent
+    # Serve an input deterministically-first. Returns a recorded RoutingEvent (rule-served OR fallback).
+def activate(rule: RuleCandidate, receipt: Any) -> RuleCandidate
+    # Return an ACTIVE copy of a candidate AFTER a promotion receipt cleared it. The router only serves an
+```
+## intra-module call edges
+src.baltor.determinism.fallback_router._input_signature -> src.baltor.determinism.fallback_router._canon
+src.baltor.determinism.fallback_router.activate -> src.baltor.determinism.fallback_router._attr
+src.baltor.determinism.fallback_router.event -> src.baltor.determinism.fallback_router.RoutingEvent
+src.baltor.determinism.fallback_router.event -> src.baltor.determinism.fallback_router._canon
+src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router.RoutingEvent
+src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._canon
+src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._input_signature
+src.baltor.determinism.fallback_router.route -> src.baltor.determinism.fallback_router._is_ood

@@ -1,0 +1,18 @@
+MODULE src/teleon/config/medium_resolver.py
+## API signatures
+```python
+"""src.teleon.config.medium_resolver — resolve the MEDIUMS (compute / llm / search) for a (tenant, function)."""
+_REPO = ...
+_CONFIG = ...
+_A = ...
+def load_config(*, config: dict | None=None) -> dict
+def available_mediums() -> dict
+    # The selectable mediums per kind — COMPUTED from the live registries so the UI is always in sync.
+def resolve_mediums(tenant: str, function: str, *, config: dict | None=None, validate: bool=True) -> dict
+    # The effective mediums for (tenant, function): per-function override -> tenant default -> global default.
+def configured_functions(tenant: str, *, config: dict | None=None) -> list[str]
+```
+## intra-module call edges
+src.teleon.config.medium_resolver.configured_functions -> src.teleon.config.medium_resolver.load_config
+src.teleon.config.medium_resolver.resolve_mediums -> src.teleon.config.medium_resolver.available_mediums
+src.teleon.config.medium_resolver.resolve_mediums -> src.teleon.config.medium_resolver.load_config

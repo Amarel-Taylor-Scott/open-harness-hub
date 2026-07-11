@@ -1,0 +1,68 @@
+<!doctype html><meta charset=utf-8><title>AI Done Right — Hub & Registry Browser</title>
+<style>body{font:14px/1.5 system-ui,sans-serif;margin:2rem;color:#1a1a2e;max-width:1100px}h1{font-size:1.4rem}
+h2{margin-top:2rem;font-size:1.1rem}input{padding:.5rem;width:100%;max-width:420px;margin:.5rem 0;border:1px solid #ccc;border-radius:6px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:.4rem .6rem;border-bottom:1px solid #eee;vertical-align:top}
+th{cursor:pointer;background:#f6f7fb;position:sticky;top:0}th:hover{background:#eef}.b{background:#eef;border-radius:4px;padding:.1rem .4rem;font-size:12px}
+.n{text-align:right;font-variant-numeric:tabular-nums}.f{color:#888;font-family:ui-monospace,monospace;font-size:11px}.muted{color:#888}</style>
+<h1>AI Done Right — Hub &amp; Registry Browser</h1>
+<p class=muted>Browse every Open*Hub and the registries it owns. Counts computed from the live registry files. Candidates are
+private-first (discovery ≠ trust); nothing here asserts truth (serves_truth=false).</p>
+<input id=q placeholder="Filter hubs &amp; registries…" oninput="filt()">
+<h2>Hubs (29)</h2>
+<table id=hubs><thead><tr><th onclick=srt('hubs',0)>Hub</th><th onclick=srt('hubs',1)>Domain</th>
+<th onclick=srt('hubs',2)>Status</th><th onclick=srt('hubs',3)>Maturity</th><th>Thesis</th></tr></thead><tbody>
+<tr><td>OpenContextHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenSkillsHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenToolsHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenMCPHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenCompressionHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenBenchmarkHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenHubForAI</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenSkillToTool</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenReviewHub</td><td>(live)</td><td><span class=b>live</span></td><td>live</td><td>Live open hub.</td></tr>
+<tr><td>OpenTemplatesHub</td><td>opentemplateshub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Reusable starting SHAPES: schema / runtime / API-UI / inference-preference / PurposeTask template families. Templates generate starting shapes; harnesses prove the generated outputs work.</td></tr>
+<tr><td>OpenEndpointHub</td><td>openendpointhub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Governed due-diligence for LLM ENDPOINTS: official free/limited + low-cost (incl. Chinese) providers + gateway/proxy repos, classified official|discovery|aggregator|quarantine with data-use/region/ToS posture. The governed answer to 'which </td></tr>
+<tr><td>OpenEnvironmentHub</td><td>openenvironmenthub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Verifiable agent EVAL ENVIRONMENTS + reward specs (Repo2RLEnv / Harbor / OpenEnv class): a repo/task becomes a runnable environment with an executable reward. A benchmark is a definition; an environment is the runnable thing you score again</td></tr>
+<tr><td>OpenSandboxHub</td><td>opensandboxhub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Isolated EXECUTION SANDBOX registry + risk / conformance / visibility scoring (E2B / Daytona / CubeSandbox / kubernetes-sigs agent-sandbox / Docker). Discovery is not trust: a sandbox must pass a conformance + risk profile before it runs ca</td></tr>
+<tr><td>OpenAgentHub</td><td>openagenthub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>AGENT-RUNTIME / harness registry: open-ended agent runtimes (OpenClaw / Hermes / ARK / AgentScope / kagent) as CANDIDATE bounded adapters + agent capability cards + run receipts. Agents propose; they never serve truth.</td></tr>
+<tr><td>OpenReceiptHub</td><td>openreceipthub.io</td><td><span class=b>candidate</span></td><td>emerging</td><td>Portable signed RECEIPT + provenance + AI-BOM standards: ModelInvocationReceipt / AgentRunReceipt / EnvironmentRunReceipt schemas mapped to the open supply-chain stack (Sigstore/Rekor, in-toto, CycloneDX AI-BOM, OpenSSF). The portable-recei</td></tr>
+<tr><td>OpenStateHub</td><td>openstatehub.io</td><td><span class=b>candidate</span></td><td>emerging</td><td>Governed persistent agent STATE: blackboard schemas + memory/state providers (Irys-style blackboard, mem0 / letta / graphiti) as candidates, with provenance + held-out + tenant scoping. Durable governed state, not volatile prompt context.</td></tr>
+<tr><td>OpenToolToSkillHub</td><td>opentooltoskillhub.io</td><td><span class=b>resolved_merge</span></td><td>ready_substrate</td><td>BIDIRECTIONAL Skill&lt;-&gt;Tool conversion + a CERTIFICATION/trust layer: turn MCP/OpenAPI/CLI tools into portable Agent Skills (SKILL.md), and compile Skills into typed/tested/DETERMINISTIC tools — each conversion signed, sandboxed, tested, per</td></tr>
+<tr><td>OpenCurrentContextHub</td><td>opencurrentcontext.io</td><td><span class=b>resolved_fold</span></td><td>emerging</td><td>Get CURRENT/fresh context on demand: watch a query/source, detect change, alert + serve the fresh source-handled context. The freshness rail as a standalone product. MVP = a Google-Alert-style watch (query/source -&gt; change detection -&gt; aler</td></tr>
+<tr><td>OpenRoutingHub</td><td>openroutinghub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Open, portable ABSTRACTS for model-routing POLICY: how an object/agent declares LLM preferences and how a router resolves them — provider-selection graphs, lane policies (dev/agent/interactive/batch/self-host), governed fallback chains, and</td></tr>
+<tr><td>OpenLinkingHub</td><td>openlinkinghub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Open, portable ABSTRACTS for ENTITY RESOLUTION + record-linkage POLICY: per-entity-type rulesets (person/company/organization/address) of comparators (Jaro-Winkler / token-set / phonetic Soundex) + normalizers (nickname expansion, legal-suf</td></tr>
+<tr><td>OpenSourcesHub</td><td>opensourceshub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Open, portable registry of authoritative DATA SOURCES across industries/systems: where to find/verify data — public registries (NPI/CMS, state Secretary-of-State incorporation registries, FINRA/SEC, NCEES, state boards), open datasets (data</td></tr>
+<tr><td>OpenRedactionHub</td><td>openredactionhub.io</td><td><span class=b>candidate</span></td><td>emerging</td><td>Open, portable RULES for detecting + redacting sensitive data (PII / PHI / secrets / faces / voices) across text, structured records, and media. DURABLE negative space: privacy rules do NOT close as models improve, and the volume of AI-hand</td></tr>
+<tr><td>OpenProvenanceHub</td><td>openprovenancehub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Open, portable shapes for PROVENANCE + authenticity: source handles, edit/lineage history, content-credential (C2PA-style) signatures, and the 'is this real?' signal for media + claims. DURABLE: as AI media/text floods the world, authentici</td></tr>
+<tr><td>OpenGeoHub</td><td>opengeohub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Open, portable RULES for address standardization + geocoding + location matching: USPS-style normalization, directionals/units, address parsing, and location-equivalence — deterministic, durable, and reused across every directory vertical. </td></tr>
+<tr><td>OpenContradictionHub</td><td>opencontradictionhub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Open, portable RULES for claim / stance / contradiction detection: rule-flip → NLI → LLM-adjudicate ladders, position-change-over-time detection, and conflicting-source flagging — deterministic-first, governed (flagged conflict = candidate,</td></tr>
+<tr><td>OpenInterrogationHub</td><td>openinterrogationhub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Nothing is accepted unchallenged. Every object can be interrogated — 5W1H, first-principles, adversarial 'what would refute this?' — BEFORE it is trusted. Interrogation emits a challenge record (questions + probes + what survived), never a </td></tr>
+<tr><td>OpenMutationHub</td><td>openmutationhub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Every architecture can mutate. A running DAG is rewritten by versioned passes (the descent applied to itself: prune intelligence, substitute determinism) under regression-gated rollback. A mutation is a new versioned layer, never a silent i</td></tr>
+<tr><td>OpenRehydrationHub</td><td>openrehydrationhub.io</td><td><span class=b>candidate</span></td><td>ready_substrate</td><td>Distillation is never replacement — and this hub PROVES it. The inverse of distillation: reconstitute the raw/intermediate layer from the compressed one and show answer-critical facts + source handles + held-out items survived. The lossless</td></tr>
+<tr><td>OpenHarnessEvolutionHub</td><td>openharnessevolutionhub.io</td><td><span class=b>candidate</span></td><td>emerging</td><td>The harnesses themselves evolve. As models shift, the flywheel mutates the evals/harnesses (not just the components) so the lift bar stays honest — every failure triggers diagnosis -&gt; a new versioned harness, GEPA-style. Keeps the two-axis </td></tr>
+</tbody></table>
+<h2>Registries (13 · 447 total entries)</h2>
+<table id=regs><thead><tr><th onclick=srt('regs',0)>Registry</th><th onclick=srt('regs',1)>Hub</th>
+<th onclick=srt('regs',2)>Entries</th><th>File</th></tr></thead><tbody>
+<tr><td>Tools</td><td>OpenToolsHub</td><td class=n>254</td><td class=f>architecture/tool_registry.json</td></tr>
+<tr><td>Tool planes</td><td>OpenToolsHub</td><td class=n>30</td><td class=f>architecture/tool_planes.json</td></tr>
+<tr><td>Capability ladders</td><td>OpenHubForAI</td><td class=n>17</td><td class=f>architecture/capability_ladders.json</td></tr>
+<tr><td>DAG templates</td><td>OpenTemplatesHub</td><td class=n>6</td><td class=f>architecture/dag_templates.json</td></tr>
+<tr><td>ML model types</td><td>OpenToolsHub</td><td class=n>25</td><td class=f>architecture/ml_model_registry.json</td></tr>
+<tr><td>Plane I/O contracts</td><td>OpenHubForAI</td><td class=n>24</td><td class=f>architecture/plane_io_contracts.json</td></tr>
+<tr><td>Data sources</td><td>OpenSourcesHub</td><td class=n>17</td><td class=f>architecture/source_registry.json</td></tr>
+<tr><td>Provider source descent</td><td>OpenSourcesHub</td><td class=n>9</td><td class=f>architecture/provider_directory_sources.json</td></tr>
+<tr><td>Entity-resolution rulesets</td><td>OpenLinkingHub</td><td class=n>4</td><td class=f>architecture/entity_resolution_rules.json</td></tr>
+<tr><td>Industry linking rules</td><td>OpenLinkingHub</td><td class=n>6</td><td class=f>architecture/industry_linking_rules.json</td></tr>
+<tr><td>Licensed professions</td><td>OpenLinkingHub</td><td class=n>15</td><td class=f>architecture/licensed_professions.json</td></tr>
+<tr><td>External APIs</td><td>OpenToolsHub</td><td class=n>14</td><td class=f>architecture/external_api_registry.json</td></tr>
+<tr><td>Credential services</td><td>OpenRoutingHub</td><td class=n>26</td><td class=f>architecture/credential_registry.json</td></tr>
+</tbody></table>
+<script>
+function filt(){var q=document.getElementById('q').value.toLowerCase();
+['hubs','regs'].forEach(function(id){document.querySelectorAll('#'+id+' tbody tr').forEach(function(r){
+r.style.display=r.innerText.toLowerCase().indexOf(q)>-1?'':'none';});});}
+function srt(id,c){var t=document.getElementById(id),b=t.tBodies[0],rs=[].slice.call(b.rows);
+var num=c==2&&id=='regs';rs.sort(function(x,y){var a=x.cells[c].innerText,d=y.cells[c].innerText;
+return num?(parseInt(d||0)-parseInt(a||0)):a.localeCompare(d);});rs.forEach(function(r){b.appendChild(r);});}
+</script>

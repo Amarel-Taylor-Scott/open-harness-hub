@@ -1,0 +1,41 @@
+MODULE src/teleon/sandbox/gateway.py
+## API signatures
+```python
+"""src.teleon.sandbox.gateway — SandboxProviderPort + a local deterministic provider + governed run."""
+_REPO = ...
+_CATALOG = ...
+OFFLINE_DEFAULT_PROVIDER = ...
+_SECRET_RE = ...
+_SECRET_ENV_HINTS = ...
+class SandboxProviderPort:
+    def describe(self) -> dict
+    def health(self) -> dict
+    def run(self, request: dict, *, now: str) -> dict
+def load_catalog() -> dict
+def _sanitized_env() -> dict
+    # A minimal env with ALL secret-ish keys stripped (deny-by-default).
+def _receipt(run_id: str, provider_id: str, now: str, **extra) -> dict
+class LocalTempdirProvider:
+    # Offline golden-path sandbox: scoped tempdir + sanitized env + timeout + no shell. Network = none.
+    def __init__(self, requested_provider_id: str | None=None) -> None
+    def describe(self) -> dict
+    def health(self) -> dict
+    def run(self, request: dict, *, now: str) -> dict
+class _CandidateSeam:
+    # A candidate external provider (docker/e2b/daytona/cubesandbox/...) — NOT available offline; never runs on
+    def __init__(self, provider_id: str)
+    def describe(self) -> dict
+    def health(self) -> dict
+    def run(self, request: dict, *, now: str) -> dict
+def select_provider(provider_id: str | None=None) -> SandboxProviderPort
+    # Return a provider. Default = the local golden path. Any external/candidate id → a labelled seam (never the
+def run_in_sandbox(request: dict, *, provider_id: str | None=None, now: str) -> dict
+    # Run a candidate in a sandbox (default local). The result is EVIDENCE for the promotion gate — never truth.
+```
+## intra-module call edges
+src.teleon.sandbox.gateway.run -> src.teleon.sandbox.gateway._receipt
+src.teleon.sandbox.gateway.run -> src.teleon.sandbox.gateway._sanitized_env
+src.teleon.sandbox.gateway.run_in_sandbox -> src.teleon.sandbox.gateway.select_provider
+src.teleon.sandbox.gateway.select_provider -> src.teleon.sandbox.gateway.LocalTempdirProvider
+src.teleon.sandbox.gateway.select_provider -> src.teleon.sandbox.gateway._CandidateSeam
+src.teleon.sandbox.gateway.select_provider -> src.teleon.sandbox.gateway.load_catalog

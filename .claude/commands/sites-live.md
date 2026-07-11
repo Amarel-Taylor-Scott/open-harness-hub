@@ -8,11 +8,11 @@ not stop until the gate is green. Full spec + branch-on-block playbook: `docs/co
 
 ## The three sites (one shared backend)
 
-- **Context is Everything** — parent / mission landing · `OH_PRODUCT=context-is-everything` · :8002 · `web/context-is-everything/`
-- **Baltor** — verified-context SaaS · `OH_PRODUCT=baltor` · :8001 · `web/baltor/`
-- **OpenHubForAI** — open builder funnel · `OH_PRODUCT=openhubforai` · :8000 · `web/openhubforai/`
+- **Context is Everything** — parent / mission landing · `OH_PRODUCT=context-is-everything` · :8002 · `_repos/aidoneright/frontend/`
+- **Baltor** — verified-context SaaS · `OH_PRODUCT=baltor` · :8001 · `_repos/baltor/frontend/`
+- **OpenHubForAI** — open builder funnel · `OH_PRODUCT=openhubforai` · :8000 · `_repos/openhubforai/frontend/`
 
-Brand/identity is LOCKED: `docs/strategy/brand-architecture.md`. Don't rename or restyle the brands here.
+Brand/identity is LOCKED: `_repos/aidoneright/context/strategy/brand-architecture.md`. Don't rename or restyle the brands here.
 
 ## Success condition (the ONLY definition of done)
 

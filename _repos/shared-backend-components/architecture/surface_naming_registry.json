@@ -1,0 +1,41 @@
+{
+  "purpose": "ONE owning source for public surface names, internal modes, legacy namespaces, and FORBIDDEN public aliases (owner canonical operating interpretation, 2026-07-01). Product-facing copy is linted against this registry by scripts/check_surface_naming.py — a forbidden alias in a product surface fails unless the same line marks it legacy/internal. Lowercase path/script namespaces (e.g. `aidevexplorer`) are legacy implementation details, allowed until a deliberate migration removes them.",
+  "gate": "scripts/check_surface_naming.py",
+  "portfolio_sentence": "AI Done Right is the portfolio. AIDevObserver is the customer-facing speed-and-reuse layer for AI coding sessions. Teleon compiles reusable primitives and templates into deterministic, proof-backed capability routes. Baltor governs verified context. OpenHubForAI is the reusable component registry. The AIDevObserver Benchmark Lab is an internal/eval harness, historically named `aidevexplorer` in some paths, not a branded public surface.",
+  "surfaces": {
+    "ai_done_right": {
+      "public_name": "AI Done Right",
+      "kind": "portfolio",
+      "web_root": "web/context-is-everything"
+    },
+    "aidevobserver": {
+      "public_name": "AIDevObserver",
+      "kind": "product",
+      "web_root": "web/aidevobserver"
+    },
+    "aidevobserver_benchmark_lab": {
+      "public_name": "AIDevObserver Benchmark Lab",
+      "kind": "internal_eval_mode",
+      "parent": "aidevobserver",
+      "legacy_namespaces": ["aidevexplorer"],
+      "forbidden_public_names": ["AIDevExplorer", "AI Dev Explorer", "AIDevExploer", "DevExplorer"]
+    },
+    "teleon": {
+      "public_name": "Teleon",
+      "kind": "infrastructure_product",
+      "web_root": "web/teleon"
+    },
+    "baltor": {
+      "public_name": "Baltor",
+      "kind": "context_product",
+      "web_root": "web/baltor"
+    },
+    "openhubforai": {
+      "public_name": "OpenHubForAI",
+      "kind": "registry_substrate",
+      "web_root": "web/openhubforai"
+    }
+  },
+  "legacy_marker_tokens": ["legacy", "not a branded surface", "Benchmark Lab", "benchmark lab", "benchmark-lab"],
+  "recorded": "2026-07-01"
+}

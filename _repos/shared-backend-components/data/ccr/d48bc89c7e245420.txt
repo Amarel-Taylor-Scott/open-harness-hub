@@ -1,0 +1,43 @@
+MODULE _repos/teleon/backend/src/teleon/evolution/meta_learner.py
+## API signatures
+```python
+"""src.teleon.evolution.meta_learner — learn to distill cheaper + faster (the moat)."""
+_MIN_OBS = ...
+_BAND_EDGES = ...
+def determinism_band(determinism_ceiling: float) -> str
+    # The determinism band ('direct'/'extract'/'partial'/'template') for a ceiling — the single source for bands.
+def class_key(category: str, determinism_ceiling: float) -> str
+    # A capability class = category x determinism band — the grain at which a distillation strategy generalizes.
+def _efficiency(rec: dict) -> float
+    # Determinism/coverage SAVING captured per unit of one-time distill COST. saving = coverage * per-call cost
+class DistillationMetaLearner:
+    # Accumulates DistillationRecords and recommends the cheapest-effective strategy + lane per capability class.
+    def __init__(self) -> None
+    def record(self, rec: dict, *, lane_id: str | None=None, lane_cost: float | None=None) -> None
+        # Record one distillation outcome. A record only 'counts' as a success for learning if it was APPLIED
+    def count(self, category: str, determinism_ceiling: float) -> int
+    def strategy_stats(self, category: str, determinism_ceiling: float) -> dict
+        # Per-strategy mean efficiency / coverage / distill_cost for a class (the learned table).
+    def recommend_strategy(self, category: str, determinism_ceiling: float) -> dict
+        # The strategy to use next for this class: the learned highest-efficiency one once there is enough
+    def recommend_lane(self, category: str, determinism_ceiling: float) -> dict
+        # The cheapest INFERENCE LANE observed to successfully distill this class — so distillation runs on the
+    def efficiency_summary(self) -> dict
+        # Across all classes with enough evidence: the learned best strategy + its efficiency, and the distill
+def from_brain(attempts: list[dict]) -> 'DistillationMetaLearner'
+    # Build the meta-learner FROM THE CANONICAL DESCENT BRAIN (descent_attempt_store records). The brain is the single
+def _neg(s: str) -> tuple
+    # Tie-break key: after maximizing, the LOWEST name wins (deterministic).
+```
+## intra-module call edges
+src.teleon.evolution.meta_learner.class_key -> src.teleon.evolution.meta_learner.determinism_band
+src.teleon.evolution.meta_learner.count -> src.teleon.evolution.meta_learner.class_key
+src.teleon.evolution.meta_learner.efficiency_summary -> src.teleon.evolution.meta_learner._efficiency
+src.teleon.evolution.meta_learner.efficiency_summary -> src.teleon.evolution.meta_learner._neg
+src.teleon.evolution.meta_learner.from_brain -> src.teleon.evolution.meta_learner.DistillationMetaLearner
+src.teleon.evolution.meta_learner.recommend_lane -> src.teleon.evolution.meta_learner.class_key
+src.teleon.evolution.meta_learner.recommend_strategy -> src.teleon.evolution.meta_learner.DistillationMetaLearner.strategy_stats
+src.teleon.evolution.meta_learner.recommend_strategy -> src.teleon.evolution.meta_learner._neg
+src.teleon.evolution.meta_learner.record -> src.teleon.evolution.meta_learner.class_key
+src.teleon.evolution.meta_learner.strategy_stats -> src.teleon.evolution.meta_learner._efficiency
+src.teleon.evolution.meta_learner.strategy_stats -> src.teleon.evolution.meta_learner.class_key

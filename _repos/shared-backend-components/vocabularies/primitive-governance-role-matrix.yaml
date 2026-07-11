@@ -1,0 +1,79 @@
+# primitive-governance-role-matrix.yaml — facet lexicons for the FORMAL-PRIMITIVE-PACKAGE governance/runtime/
+# risk dimensions (2026-07-08), distilled from the 2026 skills-as-an-OS research cluster (Formal Skill, SkVM,
+# SWE-Skills-Bench, Skill-Inject/SkillProbe). This is a pure DATA seam: primitive_multi_index auto-derives one
+# facet COLUMN per facet below by globbing vocabularies/*-role-matrix.yaml — so adding this file EXTENDS the
+# advanced multi-column / LSH / blocking search with promotion-stage, runtime-target, permission, risk,
+# determinism, and verifier dimensions WITHOUT any change to the 61-column index core. The existing role-matrix
+# facets (ml-engineer, ai-assisted-engineer, data-structures) are untouched and preserved.
+#
+# Facet names are DISTINCT from existing files (promotion_stage, not the ml-engineer data-pipeline
+# lifecycle_stage) so nothing merges or collides. Terms are lowercase; multi-word phrases match as phrases;
+# `~` aliases map a surface form onto its canonical term. Version in metadata, never in names/ids.
+# candidate-taxonomy; serves_truth: false. Single source consumed by scripts/primitive_package_contract.py.
+schema_version: 1
+source: 2026 skills-as-an-OS research cluster (Formal Skill 2605.19604, SkVM 2604.03088, SWE-Skills-Bench
+  2603.15401, Skill-Inject 2602.20156) — the formal-primitive-package governance/runtime/risk taxonomy
+facets:
+  promotion_stage:
+    - candidate
+    - validated
+    - certified
+    - production
+    - deprecated
+    - superseded
+    - quarantined
+  runtime_target:
+    - python function
+    - typescript function
+    - sql query
+    - json schema validator
+    - openapi adapter
+    - mcp tool wrapper
+    - temporal workflow
+    - airflow dag
+    - shell script
+    - playwright script
+    - dbt model
+    - rules engine policy
+    - deterministic verifier
+    - hybrid bounded llm workflow
+  determinism_level:
+    - deterministic
+    - bounded llm
+    - stochastic seeded
+    - hybrid
+  permission_class:
+    - pure
+    - side effect free
+    - filesystem read
+    - filesystem write
+    - network egress
+    - subprocess
+    - secret access
+    - environment read
+  risk_tier:
+    - safe
+    - low risk
+    - review required
+    - high risk
+    - quarantined
+  verifier_kind:
+    - oracle self test
+    - golden set
+    - property test
+    - mutation gate
+    - deterministic verifier
+    - execution check
+    - none
+  marginal_utility_status:
+    - unmeasured
+    - measured lift
+    - measured no lift
+    - regressed
+    - deprecated for no lift
+aliases:
+  pure function: pure
+  no side effects: side effect free
+  net egress: network egress
+  llm fallback: hybrid bounded llm workflow
+  self test: oracle self test

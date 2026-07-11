@@ -1,0 +1,444 @@
+{
+  "version": "1.0",
+  "note": "SHARED I/O SPINE \u2014 the portfolio-wide map of standardized typed input/output layers. Most layers already EXIST in the repo as scattered contracts; this map RATIFIES them as the one named spine (no duplicate shells) and tracks what is still QUEUED. 'shared' = shared CONTRACTS + patterns + this map; product TRUTH, customer data, production DBs, and tenant secrets stay SEPARATE. Home: schemas/ (read by all) + _repos/teleon/backend/src/teleon (shared-infra layer that Baltor consumes via Baltor->Teleon); NOT a new top-level shared-platform/ tree (would fragment the repo + trip file_layout_policy). status: exists | new | queued.",
+  "law_clause": "All portfolio objects and runtime boundaries use standardized typed I/O: ObjectShell, CommandEnvelope, EventEnvelope, Api{Request,Response}Envelope, ErrorEnvelope, ArtifactRef, ResourceRef, ReceiptRef, ModelInvocationReceipt, SandboxRunResult, EvaluationScorecard, PromotionDecision, + policy/visibility/scope objects. No product invents incompatible id/status/provenance/tenant/visibility/resource fields. No worker references raw tables/buckets/keys/providers/cloud resources directly \u2014 it uses ResourceRef/ResourceBinding/DataResourceSpec + receipts. Templates generate shapes; harnesses prove outputs; Teleon runs capabilities; Baltor governs truth.",
+  "shared_vs_separate": {
+    "shared": [
+      "schemas",
+      "contracts",
+      "ports",
+      "templates",
+      "labels",
+      "numeric codes",
+      "policies",
+      "this spine map",
+      "dashboard components"
+    ],
+    "separate": [
+      "product truth",
+      "customer data",
+      "production databases",
+      "tenant secrets",
+      "private artifacts"
+    ]
+  },
+  "layers": [
+    {
+      "layer": "object_shell",
+      "rule": "every major object composes the canonical 14-section shell; runtime branches on numeric codes",
+      "home": "schemas/shared + templates/schema-objects + _repos/teleon/backend/src/teleon/templates",
+      "contracts": [
+        {
+          "name": "ObjectShell",
+          "schema": "schemas/shared/ObjectShell.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "ReceiptRef",
+          "schema": "schemas/shared/ReceiptRef.schema.json",
+          "status": "new"
+        }
+      ]
+    },
+    {
+      "layer": "command_work_io",
+      "rule": "every durable-worker unit uses a CommandEnvelope/WorkItem; claims/acks/DLQ are typed",
+      "home": "schemas/envelopes + schemas/queue + schemas/workers",
+      "contracts": [
+        {
+          "name": "CommandEnvelope",
+          "schema": "schemas/envelopes/CommandEnvelope.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "queue-message",
+          "schema": "schemas/queue/queue-message.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "worker-run",
+          "schema": "schemas/queue/worker-run.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "CapabilityTask",
+          "schema": "schemas/workers/CapabilityTask.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "WorkItem",
+          "schema": "schemas/io/WorkItem.schema.json",
+          "status": "ratified",
+          "note": "the work-item record IS CapabilityTask (no separate schema); projected by _repos/teleon/backend/src/teleon/io.project_work_item"
+        },
+        {
+          "name": "WorkerClaim",
+          "schema": "schemas/io/WorkerClaim.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "AckNackReceipt",
+          "schema": "schemas/io/AckNackReceipt.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "DeadLetterEntry",
+          "schema": "schemas/io/DeadLetterEntry.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "IdempotencyKey",
+          "schema": "schemas/io/IdempotencyKey.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "OutboxEvent",
+          "schema": "schemas/io/OutboxEvent.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "event_io",
+      "rule": "one CloudEvents-compatible EventEnvelope; every event has correlation_id+causation_id; EVENT_KINDS is the single source",
+      "home": "schemas/envelopes + scripts/context_events.py",
+      "contracts": [
+        {
+          "name": "EventEnvelope",
+          "schema": "schemas/envelopes/EventEnvelope.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "context-event",
+          "schema": "schemas/context-event.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "CloudEventProjection",
+          "schema": "schemas/io/CloudEventProjection.schema.json",
+          "status": "new"
+        }
+      ]
+    },
+    {
+      "layer": "api_io",
+      "rule": "every API shares request/response/error/pagination; public surfaces described with OpenAPI",
+      "home": "schemas/envelopes + schemas/api + spec/openapi",
+      "contracts": [
+        {
+          "name": "ErrorEnvelope",
+          "schema": "schemas/envelopes/ErrorEnvelope.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "ApiRequestEnvelope",
+          "schema": "schemas/io/ApiRequestEnvelope.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "ApiResponseEnvelope",
+          "schema": "schemas/io/ApiResponseEnvelope.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "Pagination",
+          "schema": "schemas/io/Pagination.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "FilterSpec",
+          "schema": "schemas/io/FilterSpec.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "AuthScope",
+          "schema": "schemas/io/AuthScope.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "artifact_payload_io",
+      "rule": "large payloads referenced via ArtifactRef/PayloadRef; results link receipts",
+      "home": "schemas/artifacts + schemas/shared",
+      "contracts": [
+        {
+          "name": "Receipt",
+          "schema": "schemas/artifacts/Receipt.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "ContextPack",
+          "schema": "schemas/artifacts/ContextPack.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "ReceiptRef",
+          "schema": "schemas/shared/ReceiptRef.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "ArtifactRef",
+          "schema": "schemas/io/ArtifactRef.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "PayloadRef",
+          "schema": "schemas/io/PayloadRef.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "ResultEnvelope",
+          "schema": "schemas/io/ResultEnvelope.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "OutputContractValidation",
+          "schema": "schemas/io/OutputContractValidation.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "resource_io",
+      "rule": "no raw tables/buckets/keys in business logic; everything via ResourceRef/Binding/DataResourceSpec + receipts",
+      "home": "schemas/resources + _repos/teleon/backend/src/teleon/resources",
+      "contracts": [
+        {
+          "name": "ResourceRef",
+          "schema": "schemas/resources/ResourceRef.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "ResourceBinding",
+          "schema": "schemas/resources/ResourceBinding.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "DataResourceSpec",
+          "schema": "schemas/resources/DataResourceSpec.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "SecretRef",
+          "schema": "schemas/resources/SecretRef.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "KeyRef",
+          "schema": "schemas/resources/KeyRef.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "ResourceProvisionReceipt",
+          "schema": "schemas/resources/ResourceProvisionReceipt.schema.json",
+          "status": "new"
+        }
+      ]
+    },
+    {
+      "layer": "inference_io",
+      "rule": "every model call carries a preference + an actual-used receipt; fallback never silent; raw keys are refs",
+      "home": "schemas/inference + _repos/teleon/backend/src/teleon/inference",
+      "contracts": [
+        {
+          "name": "InferencePreference",
+          "schema": "schemas/inference/InferencePreference.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "ResolvedInferencePreference",
+          "schema": "schemas/inference/ResolvedInferencePreference.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "ModelInvocationReceipt",
+          "schema": "schemas/inference/ModelInvocationReceipt.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "FreeLimitedEndpoint",
+          "schema": "schemas/inference/FreeLimitedEndpoint.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "InferenceRequest",
+          "schema": "schemas/inference/InferenceRequest.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "ModelRouteDecision",
+          "schema": "schemas/inference/ModelRouteDecision.schema.json",
+          "status": "new"
+        }
+      ]
+    },
+    {
+      "layer": "sandbox_io",
+      "rule": "no external skill/tool/template/code becomes active without a SandboxRunResult; sandbox output is not truth",
+      "home": "schemas/sandbox + _repos/teleon/backend/src/teleon/sandbox",
+      "contracts": [
+        {
+          "name": "SandboxRunRequest",
+          "schema": "schemas/sandbox/SandboxRunRequest.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "SandboxRunResult",
+          "schema": "schemas/sandbox/SandboxRunResult.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "SandboxPolicy",
+          "schema": "schemas/sandbox/SandboxPolicy.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "SandboxReceipt",
+          "schema": "schemas/sandbox/SandboxReceipt.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "SandboxRedteamReport",
+          "schema": "schemas/sandbox/SandboxRedteamReport.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "evaluation_promotion_io",
+      "rule": "promotion requires scorecard + decision + rollback target; boundary expansion needs human approval",
+      "home": "schemas + schemas/experiments + schemas/governance",
+      "contracts": [
+        {
+          "name": "promotion-decision",
+          "schema": "schemas/promotion-decision.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "PathComparisonReport",
+          "schema": "schemas/experiments/PathComparisonReport.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "PathPromotionDecision",
+          "schema": "schemas/experiments/PathPromotionDecision.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "PathRollbackPlan",
+          "schema": "schemas/experiments/PathRollbackPlan.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "HumanApprovalReceipt",
+          "schema": "schemas/governance/HumanApprovalReceipt.schema.json",
+          "status": "new"
+        },
+        {
+          "name": "EvaluationScorecard",
+          "schema": "schemas/evaluation/EvaluationScorecard.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "registry_object_io",
+      "rule": "every registry object has provenance + visibility/status + (for external) source + why_ingested; discovery != trust",
+      "home": "schemas + schemas/templates + schemas/repo_intel",
+      "contracts": [
+        {
+          "name": "context-artifact",
+          "schema": "schemas/context-artifact.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "tool",
+          "schema": "schemas/tool.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "harness",
+          "schema": "schemas/harness.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "rubric",
+          "schema": "schemas/rubric.schema.json",
+          "status": "exists"
+        }
+      ]
+    },
+    {
+      "layer": "telemetry_io",
+      "rule": "runs/tasks/model/sandbox/resource events map to OpenTelemetry trace/log/metric; logs carry correlation/trace/span/tenant ids; no secrets",
+      "home": "schemas/telemetry + schemas/workers",
+      "contracts": [
+        {
+          "name": "WorkerTelemetry",
+          "schema": "schemas/workers/WorkerTelemetry.schema.json",
+          "status": "exists"
+        },
+        {
+          "name": "TraceContext",
+          "schema": "schemas/telemetry/TraceContext.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "TelemetryEvent",
+          "schema": "schemas/telemetry/TelemetryEvent.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "JsonLogRecord",
+          "schema": "schemas/telemetry/JsonLogRecord.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "policy_io",
+      "rule": "every public/open object has a visibility policy; every model/tool/sandbox/resource action has a data policy; tenant-private never flows to open surfaces",
+      "home": "schemas/policy + schemas/governance + schemas/security",
+      "contracts": [
+        {
+          "name": "TenantScope",
+          "schema": "schemas/policy/TenantScope.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "DataClassification",
+          "schema": "schemas/policy/DataClassification.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "VisibilityPolicy",
+          "schema": "schemas/policy/VisibilityPolicy.schema.json",
+          "status": "queued"
+        },
+        {
+          "name": "ResourceAccessPolicy",
+          "schema": "schemas/policy/ResourceAccessPolicy.schema.json",
+          "status": "queued"
+        }
+      ]
+    },
+    {
+      "layer": "openapi_asyncapi",
+      "rule": "OpenAPI covers shared HTTP patterns; AsyncAPI covers shared event patterns; both generated/validated from the schemas",
+      "home": "spec/openapi + spec/asyncapi",
+      "contracts": [
+        {
+          "name": "shared-api-patterns",
+          "schema": "spec/openapi/shared-api-patterns.yaml",
+          "status": "queued"
+        },
+        {
+          "name": "events",
+          "schema": "spec/asyncapi/contextiseverything-events.yaml",
+          "status": "queued"
+        }
+      ]
+    }
+  ]
+}

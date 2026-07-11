@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/source-surface-scan-partitions.md

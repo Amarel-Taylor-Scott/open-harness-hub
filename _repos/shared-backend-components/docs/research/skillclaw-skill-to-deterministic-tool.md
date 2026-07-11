@@ -1,0 +1,1 @@
+../../../baltor/context/research/skillclaw-skill-to-deterministic-tool.md

@@ -1,0 +1,61 @@
+{
+  "amortization": {
+    "break_even_definition": "break_even_tasks is computed per route from receipts (compile cost over per-run tokens avoided); never hand-typed",
+    "compile_cost_fields": [
+      "score:tokens_to_plan",
+      "score:tokens_to_pass"
+    ],
+    "reuse_fields": [
+      "score:route_reuse",
+      "score:tokens_avoided_to_date"
+    ],
+    "runtime_cost_fields": [
+      "score:runtime_llm_tokens",
+      "score:cost_per_success"
+    ]
+  },
+  "candidate": true,
+  "model_id": "economics:route_amortization",
+  "ranking_features": [
+    "task_success_probability",
+    "compile_success_probability",
+    "proof_strength",
+    "source_authority",
+    "freshness_confidence",
+    "contract_fit",
+    "negative_memory_risk",
+    "effect_risk",
+    "privacy_risk",
+    "runtime_latency",
+    "runtime_cost",
+    "compile_cost",
+    "tokens_to_plan",
+    "runtime_llm_tokens",
+    "source_context_tokens",
+    "source_escalation_depth",
+    "route_reuse_count",
+    "tokens_avoided_to_date",
+    "promotion_level",
+    "human_review_required"
+  ],
+  "record_type": "compiled_primitive_route_economics_model",
+  "route_score": {
+    "initial_weighting": "transparent equal weights until receipts accumulate",
+    "negative_terms": [
+      "effect_risk",
+      "negative_memory_risk",
+      "freshness_risk",
+      "total_cost",
+      "source_escalation_depth"
+    ],
+    "positive_terms": [
+      "proof_strength",
+      "source_authority",
+      "contract_fit",
+      "reuse_value"
+    ],
+    "score_is_ranking_aid_not_truth": true,
+    "upgrade_path": "contextual bandit / online ranking only after comparison receipts accumulate"
+  },
+  "serves_truth": false
+}

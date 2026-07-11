@@ -1,0 +1,15 @@
+MODULE src/baltor/workers/provider_fallback.py
+## API signatures
+```python
+"""src.baltor.workers.provider_fallback — contract-driven PROVIDER FALLBACK (C-FLEET-2)."""
+class FallbackRouter:
+    def __init__(self, ordered_providers: list[str], **breaker_kwargs)
+    def select(self, *, now: str) -> str | None
+        # The first provider (primary → fallbacks) whose breaker currently admits work, or None
+    def record_success(self, provider_id: str, *, now: str) -> None
+    def record_failure(self, provider_id: str, failure_type: str, *, now: str, timeout: bool=False) -> None
+    def force_open(self, provider_id: str, *, now: str) -> None
+    def states(self, *, now: str) -> dict
+    def mark_output(provider_id: str, output: dict) -> dict
+        # Stamp a result with the provider that produced it (provenance for fallback results).
+```

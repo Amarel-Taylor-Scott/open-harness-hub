@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/local-blueprint-record-persistence.md

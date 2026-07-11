@@ -1,0 +1,60 @@
+MODULE src/teleon/inference/adapters.py
+## API signatures
+```python
+"""src.teleon.inference.adapters — standardized, governed, swappable inference-provider adapters."""
+ADAPTER_STYLES = ...
+DEFAULT_TEMPERATURE = ...
+_LIVE_CALL_TIMEOUT_S = ...
+_GLOBAL_KEY_ENV = ...
+def resolve_secret_ref(secret_ref: str | None) -> str
+    # Resolve a node's secret_ref to its key VALUE at call time — PER NODE, so two external providers (or
+def provider_unavailable(node_id: str, reason_code: str) -> dict
+    # The single standard 'this provider could not run' result. Never carries output or a secret.
+class InferenceProviderAdapter:
+    # Base class every provider adapter extends. Subclasses set adapter_style + requires_secret/requires_network
+    def __init__(self, node: dict) -> None
+    def available(self, *, secrets: set | None=None, allow_network: bool=False) -> tuple[bool, str]
+    def invoke(self, *, object_id: str, input_text: str, now: str, secrets: set | None=None, allow_network: bool=False) -> dict
+        # Run the model. Return an invoke result (available=True, output, is_truth=False) or provider_unavailable().
+    def describe(self) -> dict
+class LocalStubAdapter:
+    # The deterministic offline golden path. Always available; no secret; no network. Output is byte-identical to the
+    def invoke(self, *, object_id, input_text, now, secrets=None, allow_network=False) -> dict
+class _HttpAdapter:
+    # Shared base for HTTP providers. requires_network=True; the real call uses Teleon egress capture
+    def __init__(self, node: dict) -> None
+    def _build_body(self, *, model: str, system: str, input_text: str, max_tokens: int | None, temperature: float | None) -> dict
+        # OpenAI-compatible chat body (default).
+    def _auth_headers(self, key: str) -> dict
+    def _parse_output(self, payload: dict) -> str
+    def _parse_model(self, payload: dict, default_model: str) -> str
+    def _parse_usage(self, payload: dict) -> dict
+    def invoke(self, *, object_id, input_text, now, secrets=None, allow_network=False, system: str='', max_tokens: int | None=None, temperature: float | None=None, api_key: str | None=None, timeout_s: int | None=None) -> dict
+class HttpOpenAICompatibleAdapter:
+    # One adapter for EVERY OpenAI-compatible endpoint — Ollama (local + cloud), vLLM, OpenRouter, Groq, Gemini's
+class OllamaNativeAdapter:
+    # Ollama's native /api/generate surface (a second API method, distinct from openai_compatible): a single-prompt
+    def _build_body(self, *, model, system, input_text, max_tokens, temperature)
+    def _parse_output(self, payload)
+    def _parse_usage(self, payload)
+class AnthropicMessagesAdapter:
+    # Anthropic's native Messages API (a third API method) — a distinct shape: /messages, a top-level `system`, a
+    def _build_body(self, *, model, system, input_text, max_tokens, temperature)
+    def _auth_headers(self, key)
+    def _parse_output(self, payload)
+    def _parse_usage(self, payload)
+def style_for_node(node: dict) -> str
+    # The adapter style for a node — from CONFIG (node['adapter_style']) with a safe default: the offline-default node
+def resolve_adapter(node: dict, *, registry: dict | None=None) -> InferenceProviderAdapter
+    # Resolve a node to a governed adapter instance by its configured adapter_style. This is the ONE swap point.
+```
+## intra-module call edges
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters.InferenceProviderAdapter.available
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._auth_headers
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._build_body
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._parse_model
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._parse_output
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters._HttpAdapter._parse_usage
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters.provider_unavailable
+src.teleon.inference.adapters.invoke -> src.teleon.inference.adapters.resolve_secret_ref
+src.teleon.inference.adapters.resolve_adapter -> src.teleon.inference.adapters.style_for_node

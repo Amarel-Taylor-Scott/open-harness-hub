@@ -1,0 +1,53 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "Templated processes that GUIDE a frontier LLM through capability synthesis WITHOUT letting it jump down a branch too fast: at every stage it must enumerate options before committing, prefer deterministic over model, test before descending, troubleshoot before backtracking, and TRACK DATA at every step. The LLM proposes within these rails; the scaffold + tests + governance dispose. Used by _repos/teleon/backend/src/teleon/synthesis/intent_to_dag.frontier_prompts(). serves_truth=false.",
+  "serves_truth": false,
+  "discipline": [
+    {"rule": "enumerate_before_commit", "say": "List >=3 candidate components for the step WITH tradeoffs before choosing one. Do not commit on the first idea."},
+    {"rule": "deterministic_before_model", "say": "Never pick a model/LLM rung while a deterministic tool (parser/rules/classifier/solver) could meet the bar. Justify every escalation to a model."},
+    {"rule": "dont_jump_down_too_fast", "say": "Stay at the current level until its options are compared + the chosen one is TESTED. Do not deepen the DAG on an untested assumption."},
+    {"rule": "test_before_descend", "say": "Define + run a test for each component in isolation before building anything on top of it."},
+    {"rule": "troubleshoot_before_backtrack", "say": "On a failure, run the troubleshooting ladder (diagnose -> isolate -> try alternative) BEFORE abandoning the branch."},
+    {"rule": "track_data_every_step", "say": "Record for every node: the options considered, the choice + why, the test result + actual output, cost, latency, confidence."},
+    {"rule": "exhaust_before_unavailable", "say": "Climb every wired rung before reporting unavailable; then name the next cataloged rung. Never give up at rung 0."},
+    {"rule": "one_change_per_branch", "say": "Each modification is ONE versioned branch; keep the losers with lineage so you can jump back up and try another."}
+  ],
+  "stages": [
+    {"stage": "outline", "goal": "understand the goal + context before proposing how",
+     "prompt": "Restate the goal, the constraints, and the given context in your own words. Then list 2-3 candidate APPROACHES at a high level with their tradeoffs. DO NOT pick one yet and DO NOT write components. Prefer approaches that lean on cheap deterministic methods.",
+     "must": ["restate goal + constraints", "list >=2 approaches with tradeoffs"],
+     "avoid": ["jumping straight to an LLM-does-everything plan", "skipping the context", "picking before comparing"],
+     "track": ["restated_goal", "constraints", "candidate_approaches"]},
+    {"stage": "fill", "goal": "choose the cheapest component that meets the bar, per step",
+     "prompt": "For EACH outline step, list >=3 candidate components from the registries (DETERMINISTIC first), each with cost / latency / license / determinism / governance. Pick the cheapest that can meet the bar and JUSTIFY. If you pick a model, state which deterministic options you ruled out and why.",
+     "must": [">=3 options per step", "deterministic options listed first", "explicit why for the choice"],
+     "avoid": ["picking a model when a parser/classifier/solver exists", "one option per step", "unjustified escalation"],
+     "track": ["per_step_options", "chosen", "why", "ruled_out"]},
+    {"stage": "dag_test", "goal": "build the DAG and test every node before relying on it",
+     "prompt": "Assemble the chosen components into a DAG. For EACH node define a concrete test + expected output, run it in isolation, and record pass/fail + the ACTUAL output + cost + latency. Only after a node passes may a downstream node depend on it. Then test the whole DAG end-to-end.",
+     "must": ["a test per node", "isolation before composition", "record actual output + cost"],
+     "avoid": ["assuming a node works", "testing only the whole pipeline", "ignoring cost"],
+     "track": ["per_node_test", "result", "actual_output", "cost", "latency"]},
+    {"stage": "verify", "goal": "5W1H verification per node / group / dag",
+     "prompt": "For each node, group, and the whole DAG, answer the 5W1H ladder: WHO produces/consumes it; WHAT it asserts (deterministic?); WHERE each value comes from (provenance); WHEN it was computed + does it go stale (CDC); WHY this rung over cheaper/dearer; HOW it is verified + how it fails HONESTLY (MISSING, not fabricated).",
+     "must": ["all 6 of who/what/where/when/why/how", "provenance + honest-failure stated"],
+     "avoid": ["skipping provenance", "asserting an unverified value", "hiding a failure mode"],
+     "track": ["provenance", "freshness_cdc", "why_rung", "failure_mode"]},
+    {"stage": "alternatives", "goal": "challenge the chosen path",
+     "prompt": "For the chosen path (each node + the groups), name >=2 alternatives and their pros/cons (cost, latency, license, determinism, governance). Explicitly ask: could a DETERMINISTIC tool replace this model rung? Is there a cheaper path that still meets the bar? Recommend keep-or-switch with reasons.",
+     "must": [">=2 alternatives per node/group", "could-a-deterministic-tool-replace-the-model", "keep/switch recommendation"],
+     "avoid": ["defending the first choice without alternatives", "ignoring a cheaper deterministic option"],
+     "track": ["alternatives", "pros_cons", "deterministic_replaceable", "recommendation"]}
+  ],
+  "troubleshooting_ladder": [
+    {"step": 0, "action": "reproduce", "do": "re-run the failing node with the recorded input; confirm the failure is real + deterministic"},
+    {"step": 1, "action": "isolate", "do": "pin the failure to a single node (not its inputs/downstream)"},
+    {"step": 2, "action": "classify", "do": "category: component-bug | wrong-component-for-the-data | missing-dep-or-key | data/format-issue | bar-too-high"},
+    {"step": 3, "action": "fix_in_place", "do": "if component-bug / missing-dep-or-key / data-issue: fix config/input + re-test (no branch change)"},
+    {"step": 4, "action": "try_alternative", "do": "if wrong-component: swap to the next same-plane alternative (a new versioned branch) + re-test"},
+    {"step": 5, "action": "backtrack", "do": "if no same-plane alternative works: jump back up to the parent decision + try its next branch"},
+    {"step": 6, "action": "escalate_rung", "do": "if the whole rung can't meet the bar: climb to the next (dearer) rung; record why the cheaper rung failed"},
+    {"step": 7, "action": "honest_unavailable", "do": "if every wired rung is exhausted: report unavailable honestly + name the next cataloged rung. Never fabricate."}
+  ]
+}

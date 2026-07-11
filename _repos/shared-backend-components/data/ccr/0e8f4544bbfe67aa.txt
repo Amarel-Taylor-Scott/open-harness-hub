@@ -1,0 +1,22 @@
+MODULE src/teleon/runtime/access_policy.py
+## API signatures
+```python
+"""src.teleon.runtime.access_policy — WHO may use a tool/key/capability (authorization over the registries)."""
+def py_function_src_teleon_runtime_access_policy___cfg() -> dict
+class py_class_src_teleon_runtime_access_policy__Principal:
+    def from_role(cls, py_arg_src_teleon_runtime_access_policy__py_class_src_teleon_runtime_access_policy__Principal_from_role__role: str, *, byo_keys=None) -> 'Principal'
+def py_function_src_teleon_runtime_access_policy__classify(py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__classify__resource: dict) -> dict
+    # Resource dict (fields: internal?, governance?, plane?, key_ownership?, key_service?, keyless?, deterministic?, kind?)
+def py_function_src_teleon_runtime_access_policy__can_access(py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__can_access__principal: py_class_src_teleon_runtime_access_policy__Principal, py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__can_access__resource: dict) -> tuple[bool, str]
+    # (allowed, reason). Deny-by-default.
+def py_function_src_teleon_runtime_access_policy__accessible(py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__accessible__principal: py_class_src_teleon_runtime_access_policy__Principal, py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__accessible__resources: list[dict]) -> list[dict]
+    # Filter a list of resource dicts (each must carry an 'id') to those the principal may use.
+def py_function_src_teleon_runtime_access_policy__explain(py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__explain__principal: py_class_src_teleon_runtime_access_policy__Principal, py_arg_src_teleon_runtime_access_policy__py_function_src_teleon_runtime_access_policy__explain__resources: list[dict]) -> list[dict]
+```
+## intra-module call edges
+src.teleon.runtime.access_policy.from_role -> src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy___cfg
+src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__accessible -> src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__can_access
+src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__can_access -> src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy___cfg
+src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__can_access -> src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__classify
+src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__explain -> src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__can_access
+src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__explain -> src.teleon.runtime.access_policy.py_function_src_teleon_runtime_access_policy__classify

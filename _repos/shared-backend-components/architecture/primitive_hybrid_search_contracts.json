@@ -1,0 +1,111 @@
+{
+  "serves_truth": false,
+  "purpose": "Contract for efficient primitive retrieval and graph assembly. Search must combine cheap blocking, keyword/label/semantic ranking, input/output contract compatibility, graph-neighborhood evidence, and mutation awareness. A result says whether a primitive fits directly, fits after deterministic adapters, needs a non-deterministic/generated candidate edit, or is incompatible.",
+  "library": "_repos/teleon/backend/src/teleon/registry/primitive_match.py",
+  "checker": "scripts/check_primitive_hybrid_search.py",
+  "required_search_dimensions": [
+    "exact",
+    "keyword",
+    "label",
+    "semantic",
+    "input_contract",
+    "output_contract",
+    "graph_neighborhood",
+    "blocking_index",
+    "deterministic_mutation",
+    "nondeterministic_mutation"
+  ],
+  "fit_classes": [
+    "exact_match",
+    "deterministic_edit_match",
+    "nondeterministic_edit_match",
+    "incompatible"
+  ],
+  "required_result_fields": [
+    "fit_class",
+    "graph_assembly_status",
+    "blocking_index",
+    "blocking_reasons",
+    "evidence",
+    "required_mutations",
+    "adapter_plan",
+    "promotion_required",
+    "serves_truth"
+  ],
+  "graph_assembly_statuses": [
+    "chainable_as_is",
+    "chainable_with_adapter_nodes",
+    "candidate_generated_adapter_required",
+    "not_chainable"
+  ],
+  "blocking_profile_fields": [
+    "exact_keys",
+    "keyword_keys",
+    "label_keys",
+    "input_signature",
+    "output_signature",
+    "graph_signature",
+    "semantic_text",
+    "semantic_embedding",
+    "mutation_hints"
+  ],
+  "blocking_index_fields": [
+    "candidate_count",
+    "profile_fields",
+    "inverted",
+    "profile_keys",
+    "serves_truth"
+  ],
+  "compact_view_lanes": [
+    "deterministic_compact_view",
+    "nondeterministic_enriched_view"
+  ],
+  "compact_view_law": "Compact LLM-facing primitive views are generated search artifacts, not truth. Deterministic compact views are rendered from canonical record fields; nondeterministic enriched views may add summaries, labels, examples, query expansions, or planning hints. Both can improve retrieval, but enrichment remains candidate evidence until deterministic checks confirm it still matches source, contracts, graph edges, proof status, and promotion records.",
+  "adapter_plan_lanes": [
+    "deterministic_adapter",
+    "policy_adapter",
+    "deterministic_candidate_optimization",
+    "implementation_swap_candidate",
+    "nondeterministic_generated_candidate"
+  ],
+  "deterministic_mutations": [
+    {
+      "id": "scalar_to_sequence",
+      "rule": "A scalar primitive can match a sequence/batch request through normalize_to_sequence + map_sequence without rewriting business logic."
+    },
+    {
+      "id": "output_field_wrapper",
+      "rule": "A scalar or non-object output can match a one-field object output request by wrapping the output into the requested field."
+    },
+    {
+      "id": "field_rename_adapter",
+      "rule": "A field rename is deterministic only when an explicit deterministic_field_map is provided by the request/contract; do not guess field names from similarity alone."
+    },
+    {
+      "id": "retry_cache_rate_limit_adapter",
+      "rule": "Retry, cache, timeout, rate-limit, and backoff requirements should become adapter/policy graph nodes, not primitive rewrites."
+    },
+    {
+      "id": "model_cost_downshift",
+      "rule": "An LLM-backed primitive can be a candidate for cheaper model/provider substitution, but only after guardrail pass rates are measured."
+    },
+    {
+      "id": "browser_to_deterministic_extractor",
+      "rule": "An LLM/browser scraping primitive can be a candidate for deterministic CSS/XPath/regex/table extraction after observed source structures stabilize."
+    },
+    {
+      "id": "local_api_implementation_swap",
+      "rule": "A hosted/API primitive can be swapped with a local implementation only if the input/output contract stays compatible."
+    }
+  ],
+  "nondeterministic_mutations": [
+    {
+      "id": "generated_adapter_candidate",
+      "rule": "If topic evidence is strong but contracts do not line up through deterministic adapters, route to a generated adapter candidate with serves_truth=false and promotion blocked until proofs pass."
+    }
+  ],
+  "blocking_law": "Cheap blocking must run before expensive matching: exact id/name, keyword overlap, labels/tags/capability facets, input/output field overlap, graph-neighborhood overlap, mutation affordance/need overlap, and coarse deterministic semantic buckets from the lexical embedding. Generic schema boilerplate such as shape/object/string must not create a match by itself.",
+  "contract_law": "Graph assembly depends on input_contract and output_contract compatibility. Search text similarity cannot override incompatible contracts; it can only create a candidate generated-adapter lane.",
+  "promotion_law": "Search output is candidate evidence only. exact_match may be used as a candidate graph edge. deterministic_edit_match and nondeterministic_edit_match require variation records, proof commands, execution logs, provenance/license metadata, and promotion review before trust.",
+  "placeholder_law": "Placeholder or synthetic primitive rows must not enter trusted retrieval unless explicitly marked as examples/candidates with serves_truth=false."
+}

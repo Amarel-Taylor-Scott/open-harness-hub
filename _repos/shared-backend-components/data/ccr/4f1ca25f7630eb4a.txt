@@ -1,0 +1,34 @@
+MODULE src/baltor/memory/builder_memory.py
+## API signatures
+```python
+"""src.baltor.memory.builder_memory — C-MEM-2 DELTA: BUILDER MEMORY capture + session context."""
+TENANT = ...
+PROJECT = ...
+_SENSITIVE = ...
+_KEY_PREFIX = ...
+_KEY_TOKEN = ...
+def redact(value)
+    # Recursively redact secret values. Returns (redacted_value, redaction_count).
+def _capture(provider, *, now: int, memory_type: str, body: dict, tags: list) -> dict
+    # Write one builder MemoryArtifact (redacted, candidate workflow trace) + return artifact + trace.
+def capture_builder_state(provider, *, now: int, target: str='', flywheel: dict | None=None, risks: list | None=None, opportunities: list | None=None, next_target: str='', supervisor: dict | None=None) -> dict
+def capture_proof_result(provider, *, now: int, proof: str, ok: bool, detail: str='') -> dict
+def capture_flywheel_tick(provider, *, now: int, green: int, total: int, red: list | None=None) -> dict
+def capture_supervisor_decision(provider, *, now: int, decision_type: str, capability: str='', reason: str='') -> dict
+def capture_failure_trace(provider, *, now: int, where: str, error: str) -> dict
+def capture_next_target(provider, *, now: int, target: str) -> dict
+def recall_builder_context(provider, query: str, *, now: int, limit: int=10) -> dict
+    # MemoryRecallBundle: project-scoped recall. Results are candidate context, NOT facts.
+def build_session_context_bundle(provider, *, now: int) -> dict
+    # MemoryContextInjection: a safe, advisory session-start bundle regenerated from memory artifacts.
+def default_provider() -> BaltorLocalMemoryProvider
+```
+## intra-module call edges
+src.baltor.memory.builder_memory._capture -> src.baltor.memory.builder_memory.redact
+src.baltor.memory.builder_memory.build_session_context_bundle -> src.baltor.memory.builder_memory.recall_builder_context
+src.baltor.memory.builder_memory.capture_builder_state -> src.baltor.memory.builder_memory._capture
+src.baltor.memory.builder_memory.capture_failure_trace -> src.baltor.memory.builder_memory._capture
+src.baltor.memory.builder_memory.capture_flywheel_tick -> src.baltor.memory.builder_memory._capture
+src.baltor.memory.builder_memory.capture_next_target -> src.baltor.memory.builder_memory._capture
+src.baltor.memory.builder_memory.capture_proof_result -> src.baltor.memory.builder_memory._capture
+src.baltor.memory.builder_memory.capture_supervisor_decision -> src.baltor.memory.builder_memory._capture

@@ -1,0 +1,72 @@
+MODULE _repos/teleon/backend/src/teleon/evolution/capability_graph.py
+## API signatures
+```python
+"""src.teleon.evolution.capability_graph — the EVOLUTION GRAPH of a capability's runners."""
+EDGE_FORK = ...
+EDGE_DISTILL = ...
+EDGE_PROMOTE = ...
+EDGE_ROLLBACK = ...
+EDGE_HEAL = ...
+EDGE_KINDS = ...
+_DESCENT_EDGES = ...
+_EPS = ...
+class EvolutionError:
+    # Raised on a malformed graph: missing node, cycle, or a lossless-invariant violation (dropped residual).
+class RunnerNode:
+    # One runner VERSION of a capability. ``tier`` is the escalation-ladder tier (0 = most deterministic
+    def __post_init__(self) -> None
+    def as_dict(self) -> dict
+class EvolutionEdge:
+    # A directed evolution event parent -> child. ``residual_routed_to`` names the runner that handles the cases
+    def as_dict(self) -> dict
+class CapabilityEvolutionGraph:
+    # The evolution graph for one capability_slot: runner nodes + evolution edges, with lossless invariants and
+    def __init__(self, capability_slot: str) -> None
+    def add_runner(self, node: RunnerNode) -> RunnerNode
+    def add_edge(self, edge: EvolutionEdge) -> EvolutionEdge
+    def document_fork(self, parent_id: str, child: RunnerNode, *, rationale: str='', residual_routed_to: str | None=None, kind: str=EDGE_FORK) -> RunnerNode
+        # Add a forked/distilled child runner AND its edge in one lossless step. The residual (cases the child
+    def node(self, runner_id: str) -> RunnerNode
+    def _incoming(self, runner_id: str) -> list[EvolutionEdge]
+    def _children(self, runner_id: str) -> list[EvolutionEdge]
+    def roots(self) -> list[RunnerNode]
+        # Runners with no incoming descent/heal edge — the original non-deterministic runner(s).
+    def root(self) -> RunnerNode
+    def lineage(self, runner_id: str) -> list[RunnerNode]
+        # The chain root -> runner_id (following descent/heal parent edges). Proves any runner traces to the root.
+    def descent_path(self) -> list[RunnerNode]
+        # Walk root -> most-deterministic: at each step follow the descent child with the LOWEST tier (break ties
+    def most_deterministic_runner(self, *, min_coverage: float=0.0) -> RunnerNode
+        # The most-deterministic-as-possible runner that still meets ``min_coverage`` — highest determinism, then
+    def forks(self) -> list[dict]
+        # Every documented fork/distill with its trade (coverage/determinism/cost deltas + residual route).
+    def _check_acyclic(self) -> None
+    def validate(self) -> None
+        # Re-check the lossless invariants over the whole graph (acyclic; descent edges lose-coverage-only and
+    def to_dict(self) -> dict
+def _neg_str(s: str) -> tuple
+    # Sort key so that, after maximizing numeric fields, the LOWEST runner_id wins (deterministic tie-break).
+def record_heal(graph: CapabilityEvolutionGraph, *, drifted_runner_id: str, healed_runner: RunnerNode, rationale: str='') -> RunnerNode
+    # The BRIDGE from self-healing into the shared lineage. ``src.teleon.self_healing`` (reactive) produces a
+```
+## intra-module call edges
+src.teleon.evolution.capability_graph.__init__ -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.__post_init__ -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph._check_acyclic -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.add_edge -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._check_acyclic
+src.teleon.evolution.capability_graph.add_edge -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.add_runner -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.descent_path -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._children
+src.teleon.evolution.capability_graph.descent_path -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.root
+src.teleon.evolution.capability_graph.document_fork -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.add_edge
+src.teleon.evolution.capability_graph.document_fork -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.add_runner
+src.teleon.evolution.capability_graph.document_fork -> src.teleon.evolution.capability_graph.EvolutionEdge
+src.teleon.evolution.capability_graph.lineage -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph._incoming
+src.teleon.evolution.capability_graph.lineage -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.node
+src.teleon.evolution.capability_graph.lineage -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.most_deterministic_runner -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.most_deterministic_runner -> src.teleon.evolution.capability_graph._neg_str
+src.teleon.evolution.capability_graph.node -> src.teleon.evolution.capability_graph.EvolutionError
+src.teleon.evolution.capability_graph.record_heal -> src.teleon.evolution.capability_graph.EvolutionEdge
+src.teleon.evolution.capability_graph.root -> src.teleon.evolution.capability_graph.CapabilityEvolutionGraph.roots
+src.teleon.evolution.capability_graph.root -> src.teleon.evolution.capability_graph.EvolutionError

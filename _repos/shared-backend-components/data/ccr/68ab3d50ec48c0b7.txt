@@ -1,0 +1,27 @@
+MODULE src/teleon/ingest/browser_table.py
+## API signatures
+```python
+"""Reusable browser/table ingestion primitives."""
+class HtmlTable:
+    # One extracted HTML table.
+def fetch_page_html_with_playwright(url: str, *, timeout_ms: int=30000) -> str
+    # Fetch page HTML, preferring Playwright for browser-rendered pages.
+class _TableParser:
+    def __init__(self) -> None
+    def handle_starttag(self, tag: str, attrs) -> None
+    def handle_data(self, data: str) -> None
+    def handle_entityref(self, name: str) -> None
+    def handle_charref(self, name: str) -> None
+    def handle_endtag(self, tag: str) -> None
+def _rows_to_table(rows: list[list[str]]) -> HtmlTable
+def extract_html_tables(document: str) -> list[HtmlTable]
+    # Extract HTML tables into row dictionaries.
+def write_table_csv(table: HtmlTable, path: Path) -> Path
+    # Persist one extracted table as CSV.
+def write_table_parquet(table: HtmlTable, path: Path) -> Path
+    # Persist one extracted table as Parquet using pandas/pyarrow.
+```
+## intra-module call edges
+src.teleon.ingest.browser_table._rows_to_table -> src.teleon.ingest.browser_table.HtmlTable
+src.teleon.ingest.browser_table.extract_html_tables -> src.teleon.ingest.browser_table._TableParser
+src.teleon.ingest.browser_table.handle_endtag -> src.teleon.ingest.browser_table._rows_to_table

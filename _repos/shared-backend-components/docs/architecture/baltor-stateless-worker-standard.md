@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-stateless-worker-standard.md

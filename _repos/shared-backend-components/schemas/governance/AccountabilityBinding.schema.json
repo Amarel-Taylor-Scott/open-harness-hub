@@ -1,0 +1,23 @@
+{
+  "$id": "governance/AccountabilityBinding",
+  "title": "AccountabilityBinding",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Binds a RUNNING capability (a PurposeTask / promoted artifact_key) to the human party who OWNS ITS OUTCOMES in production — accountability designed BEFORE deployment, not discovered during failure. Distinct from HumanApprovalReceipt, which is a point-in-time approval of a boundary-expanding CHANGE: this is the ONGOING answer to 'who owns the outcome when the agent acts', carrying the authority to pause/rollback and an ordered escalation path for when an outcome goes wrong. A capability serving at autonomy above its ceiling without an active binding is a governance violation. Reuses the approver_role vocabulary and REFERENCES the approval/promotion records rather than duplicating them.",
+  "required": ["schema_version", "binding_id", "subject_key", "accountable_owner", "authority", "escalation_path", "autonomy_ceiling", "on_failure", "status", "created_at"],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["AccountabilityBinding"]},
+    "binding_id": {"type": "string"},
+    "subject_key": {"type": "string", "description": "the capability the owner is accountable for: an artifact_key / PurposeTask id — ongoing, not a one-time change"},
+    "tenant_id": {"type": "string"},
+    "accountable_owner": {"type": "string", "description": "the party who owns the OUTCOME (a role or an id) — the single answer to 'who owns the outcome when the agent acts'"},
+    "authority": {"type": "array", "items": {"type": "string", "enum": ["pause", "rollback", "suspend_autonomy", "approve_boundary", "revoke"]}, "description": "what the owner may do BEFORE something breaks — human authority to prevent, not just observe"},
+    "escalation_path": {"type": "array", "items": {"type": "string", "enum": ["owner", "exec", "policy", "security", "legal", "steward"]}, "description": "ordered roles to escalate to on incident/failure (reuses HumanApprovalReceipt.approver_role)"},
+    "autonomy_ceiling": {"type": "string", "enum": ["L0", "L1", "L2", "L3", "L4", "L5"], "description": "max adaptation-ladder level this capability may run at without a fresh HumanApprovalReceipt; L4/L5 (ENDS) are human-only"},
+    "on_failure": {"type": "string", "enum": ["pause", "rollback", "notify_only", "revoke"], "description": "the automatic action when an outcome breaches its guardrail, before the escalation is answered"},
+    "linked_approval_ids": {"type": "array", "items": {"type": "string"}, "description": "HumanApprovalReceipt ids that authorized this capability's boundary (composition, not duplication)"},
+    "linked_promotion_id": {"type": "string", "description": "the PromotionRecord that put this capability into service"},
+    "status": {"type": "string", "enum": ["active", "suspended", "retired"]},
+    "created_at": {"type": "string", "description": "injected time"}
+  }
+}

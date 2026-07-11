@@ -1,0 +1,39 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "edge-graph-generator",
+  "repo": "aidoneright-edge-graph-generator",
+  "role": "META DEV TOOL \u2014 reads the surface-registry + every repo's published interface.json and GENERATES the repo-to-repo edge context + dependency graph: a compact per-repo edge digest (a session on repo X sees X + its neighbors' EDGES, never their internals) plus the global graph. Keeps cross-repo awareness in sync without full-context reads.",
+  "exposes": [
+    "per-repo-edge-digest",
+    "repo-dependency-graph",
+    "surface-registry-validator",
+    "interface-manifest-validator"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    }
+  ],
+  "consumed_by": [
+    "aidevobserver",
+    "aidoneright",
+    "api-endpoint-wrappers",
+    "baltor",
+    "business-context",
+    "context-injection",
+    "openhubforai",
+    "scraping",
+    "shared-backend-components",
+    "teleon"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

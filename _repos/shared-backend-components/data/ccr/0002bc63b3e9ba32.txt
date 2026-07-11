@@ -1,0 +1,72 @@
+MODULE _repos/teleon/backend/src/teleon/compiler/compile.py
+## API signatures
+```python
+"""src.teleon.compiler.compile — the DETERMINISTIC capability→runtime-unit compiler."""
+_REPO = ...
+_A = ...
+COMPILER_VERSION = ...
+SCHEMA_VERSION = ...
+UNIT_SCHEMA_REF = ...
+PROMOTED_STATUS = ...
+EXEC_TARGETS = ...
+RUNNER_MODULE = ...
+DEFAULT_MAX_OUTPUT_TOKENS = ...
+_DEFAULT_ENV_REF_GROUP = ...
+_TOKEN_BUDGET_KEYS = ...
+class CompilerError:
+    # Base for compile refusals (a clear, actionable reason — never a silent wrong unit).
+class NotPromotedError:
+    # THE LAW: a capability whose status is not 'promoted' was handed to the compiler. An un-gated capability
+    def __init__(self, capability_id: str, status: str) -> None
+def _load_json(name: str) -> dict
+def _canonical(obj: Any) -> str
+    # Canonical JSON (sorted keys, tight separators) — the basis for deterministic hashing/ids.
+def _sha256(text: str) -> str
+def _stable_id(prefix: str, *parts: str) -> str
+_MEM_UNITS_BYTES = ...
+_MB = ...
+_MEM_RE = ...
+def memory_to_mb(quantity: str) -> int
+    # Parse a Kubernetes memory quantity ('512Mi','2Gi','256M','128') to an integer number of MB, deterministically.
+def _resource_class_record(resource_class: str, resource_classes: dict) -> dict
+def _resolve_resources(resource_class: str, resource_classes: dict) -> dict
+def _resolve_timeout(task_spec: dict, resource_rec: dict, sla_policies: dict) -> tuple[int, str]
+    # timeout_s = SLA policy target_seconds (joined by sla_policy_id) else the resource class timeout_default_s.
+def _resolve_max_tokens(resolved_preference: dict) -> tuple[int, str]
+    # max_tokens from the OIPS resolved-preference budget_policy (free-form: try the established token keys), else
+def _resolve_budgets(task_spec: dict, resource_rec: dict, resolved_preference: dict, sla_policies: dict) -> dict
+def _resolve_container(capability_id: str, topology: dict, env_refs: list[str] | None) -> dict
+def _default_env_refs(topology: dict) -> list[str]
+    # The model-plane secret-ref NAMES the capability runtime reads — joined from the deploy topology's secret
+def _otel_attrs(unit_id: str, capability_id: str, capability_version: Any, runtime_class: str, exec_target: str, trace_id: str | None, span_id: str | None) -> dict
+    # OpenTelemetry-shaped resource attributes for trace correlation — the standardization + logging the owner
+def _gate_evidence(capability: dict, *, gate_basis_default: str) -> dict
+    # Lift the gate evidence off the promoted capability record. status is pinned 'promoted' (we only reach here
+def compile_capability(capability: dict, task_spec: dict, *, exec_target: str, policy: dict | None=None, now: str | None=None, rollback_target: str='', receipt_refs: list[str] | None=None, resolved_preference: dict | None=None, gate_basis_default: str='train+holdout', resource_classes: dict | None=None, sla_policies: dict | None=None, topology: dict | None=None, runtime_classes: dict | None=None, policy_matrix: dict | None=None, env_refs: list[str] | None=None) -> dict[str, Any]
+    # Compile ONE promoted capability + its CapabilityTask spec into a CompiledRuntimeUnit dict.
+def _unit_schema() -> dict
+    # The CompiledRuntimeUnit schema document (single source: schemas/runtime/CompiledRuntimeUnit).
+def validate_unit(unit: dict) -> list[str]
+    # Schema-validate a compiled unit against runtime/CompiledRuntimeUnit. Uses the full ``jsonschema``
+```
+## intra-module call edges
+src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile.CompilerError
+src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile._resolve_max_tokens
+src.teleon.compiler.compile._resolve_budgets -> src.teleon.compiler.compile._resolve_timeout
+src.teleon.compiler.compile._resolve_container -> src.teleon.compiler.compile.CompilerError
+src.teleon.compiler.compile._resolve_container -> src.teleon.compiler.compile._default_env_refs
+src.teleon.compiler.compile._resolve_resources -> src.teleon.compiler.compile._resource_class_record
+src.teleon.compiler.compile._resolve_resources -> src.teleon.compiler.compile.memory_to_mb
+src.teleon.compiler.compile._resolve_timeout -> src.teleon.compiler.compile.CompilerError
+src.teleon.compiler.compile._resource_class_record -> src.teleon.compiler.compile.CompilerError
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile.CompilerError
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile.NotPromotedError
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._canonical
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._gate_evidence
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._load_json
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._otel_attrs
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_budgets
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_container
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resolve_resources
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._resource_class_record
+src.teleon.compiler.compile.compile_capability -> src.teleon.compiler.compile._sha256

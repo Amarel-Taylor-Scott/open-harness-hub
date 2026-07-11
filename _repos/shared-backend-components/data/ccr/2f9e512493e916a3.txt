@@ -1,0 +1,22 @@
+MODULE _repos/teleon/backend/src/teleon/digestion/digester.py
+## API signatures
+```python
+"""src.teleon.digestion.digester — parse a SKILL.md (parse-only), extract deterministic substeps, and build a
+cheaper runtime candidate that keeps the original skill as fallback. Pure + deterministic; never executes a skill."""
+RUNTIME_CASCADE = ...
+_DET_PATTERNS = ...
+_ADAPTIVE = ...
+_UNSAFE = ...
+def parse_skill_md(text: str) -> dict[str, Any]
+    # Parse a SKILL.md (YAML-ish frontmatter + markdown body). PARSE ONLY — never executes the skill.
+def is_unsafe(skill: dict) -> list[str]
+    # Parse-time safety flags (secret reads/exfil/log-destruction). Detection only — the skill is NEVER run.
+def extract_determinism(skill: dict) -> dict[str, Any]
+def digest_skill(skill: dict, *, source_ref: str, now: str) -> dict[str, Any]
+    # Digest a parsed skill → SkillDigestRun. Unsafe → quarantine. Else a candidate (never active) with the
+def build_runtime_candidate(digest: dict, *, now: str) -> dict[str, Any]
+    # A cheaper runtime candidate distilled from the digest — status candidate, original kept as fallback.
+```
+## intra-module call edges
+src.teleon.digestion.digester.digest_skill -> src.teleon.digestion.digester.extract_determinism
+src.teleon.digestion.digester.digest_skill -> src.teleon.digestion.digester.is_unsafe

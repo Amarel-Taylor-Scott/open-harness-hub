@@ -1,0 +1,56 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "aidevobserver",
+  "repo": "aidoneright-aidevobserver",
+  "role": "the AI-USAGE layer \u2014 session/AI-usage coaching (not code review); MCP + CLI + extension + app + local service.",
+  "exposes": [
+    "/api/observer",
+    "session-review",
+    "mcp-server",
+    "cli",
+    "extension"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "exposes": [
+        "registry",
+        "primitives",
+        "codegraph",
+        "eval-harness",
+        "storage-tiers",
+        "credential-plane"
+      ],
+      "role": "the SUBSTRATE every product consumes \u2014 the primitive/component/template registry + factory + catalog, codegraph, naming "
+    },
+    {
+      "surface": "openhubforai",
+      "repo": "aidoneright-openhubforai",
+      "exposes": [
+        "capabilitytask-spec",
+        "eval-harnesses",
+        "task-templates",
+        "conformance-tests",
+        "skills"
+      ],
+      "role": "the OPEN ecosystem + the open CapabilityTask spec (CTS): primitives, primitive/task templates, eval harnesses, skills, c"
+    }
+  ],
+  "consumed_by": [
+    "aidoneright"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

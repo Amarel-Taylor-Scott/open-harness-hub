@@ -1,0 +1,26 @@
+MODULE src/baltor/contextops/cross_source_confirmation.py
+## API signatures
+```python
+"""contextops/cross_source_confirmation — DETERMINISTIC cross-source confirmation policies (Lane D)."""
+POLICIES = ...
+_OFFICIAL_TYPES = ...
+_OFFICIAL_MIN_RANK = ...
+class CrossSourceError:
+    # Raised on a malformed policy / source record — explicit failure, never a silent pass.
+class ConfirmedSource:
+    # One backing source for a candidate, as seen by the confirmation evaluator (a discovered/stored source).
+    def effective_rank(self) -> int
+    def is_official(self) -> bool
+    def group_key(self) -> str
+class ConfirmationResult:
+    # The checkable outcome of evaluating a cross-source policy. NEVER a served fact.
+    def to_dict(self) -> dict
+def _independent(sources) -> list
+    # Distinct sources by independence group (two readings of the same publisher are NOT independent).
+def confirm(policy: str, sources, *, now: int=0, is_current_value: bool=False, max_staleness_seconds: int=0, has_human_signoff: bool=False) -> ConfirmationResult
+    # Evaluate a cross-source confirmation ``policy`` over the candidate's backing ``sources``.
+```
+## intra-module call edges
+src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation.ConfirmationResult
+src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation.CrossSourceError
+src.baltor.contextops.cross_source_confirmation.confirm -> src.baltor.contextops.cross_source_confirmation._independent

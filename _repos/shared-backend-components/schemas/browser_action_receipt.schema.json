@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aidoneright.dev/schemas/browser_action_receipt.schema.json",
+  "title": "BrowserActionReceipt",
+  "description": "One evidence record for a single driver-neutral browser command (browser_control.BrowserAdapter, minted by the harness TabControlAPI). The load-bearing invariant: 'the important thing is not the driver, it is that every action produces an evidence record.' READ-ONLY by default: an act command (click/fill/submit) is refused (executed=false, verifier_result=refused_read_only) unless side effects are enabled, and any side_effect_level >= 'write' emits requires_confirmation=true and is never auto-executed. Secrets are redacted before the receipt is written (filled values, tokens). Digests + bounded input only; no raw bodies. candidate; serves_truth=false. The side_effect_level enum is the single source scripts.primitive_browser_control_harness.SIDE_EFFECT_LEVELS; browser_control/self_test.py fails if the two drift.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "command_id", "backend", "action", "input", "before_state_hash", "after_state_hash",
+    "side_effect_level", "requires_confirmation", "verifier_result", "artifact_refs", "error",
+    "timestamp", "candidate", "serves_truth"
+  ],
+  "properties": {
+    "record_type": {"const": "browser_action_receipt"},
+    "schema_version": {"type": "string", "description": "version lives in metadata, never in an id or name"},
+    "session_id": {"type": ["string", "null"], "description": "canonical_id('bsession', ...) of the owning session"},
+    "command_id": {"type": "string", "description": "canonical_id('bcmd', session_id, action, tick) — content-addressed, not a raw counter"},
+    "backend": {"type": "string", "description": "the driver that executed the command (fake/http_scrape/cdp/playwright/...)"},
+    "action": {"type": "string", "description": "the command name (navigate, tab_snapshot, tab_click_ref, tab_fill_ref, focus_tab, capture_screenshot, capture_network, download_artifacts, verify_text, verify_url, build_tab_graph, ...)"},
+    "input": {"type": "object", "description": "bounded, secret-redacted command input (never raw form values or secrets)"},
+    "before_state_hash": {"type": ["string", "null"], "description": "sha256:... of the tab state before the command (null if not applicable)"},
+    "after_state_hash": {"type": ["string", "null"], "description": "sha256:... of the tab state after the command"},
+    "side_effect_level": {
+      "enum": ["read_only", "read", "write_possible", "write", "regulated", "money_movement"],
+      "description": "the side-effect calculus ladder; >= 'write' requires human confirmation even when side effects are permitted"
+    },
+    "requires_confirmation": {"type": "boolean", "description": "true when a human must confirm before the side effect executes"},
+    "executed": {"type": "boolean", "description": "whether the command actually ran (false for refused/pending-confirmation acts)"},
+    "verifier_result": {"type": "string", "description": "captured | empty | passed | failed | ok | focused | closed | protected_last_tab | listed | built | refused_read_only | gated_executed | gated_pending_confirmation | gated_confirmed_execute"},
+    "artifact_refs": {"type": "array", "items": {"type": "string"}, "description": "handles/digests produced (screenshot_hash, spec urls, download urls, opened tab ids) — never raw bytes"},
+    "error": {"type": ["string", "null"]},
+    "timestamp": {"type": ["number", "string", "null"], "description": "from the INJECTED clock (deterministic under --self-test)"},
+    "candidate": {"const": true},
+    "serves_truth": {"const": false}
+  }
+}

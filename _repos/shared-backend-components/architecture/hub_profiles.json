@@ -1,0 +1,904 @@
+{
+ "version": "0.1.0",
+ "updated": "2026-06-24",
+ "principle": "Hub PROFILES — the system-facing map of every Open*Hub as a DIRECTORY the compiler/runtime pulls from. Each profile declares the TYPES of rules / context / modules pullable from that hub, its substrate, and an example pull. This is what lets the model understand the scale + the directories. Distinct from candidate_open_hubs.json (release/brand policy) and products.js (brand display): this is the pullable-capability map. Hub ids cross-validate against candidate_open_hubs (existing + candidates) so the map can't drift. serves_truth=false (hubs register rules/pointers/shapes, never truth or a data dump).",
+ "serves_truth": false,
+ "layers": {
+  "open": "live open registry",
+  "candidate": "private-first, ready/emerging substrate",
+  "method": "Baltor five-stage method spine (private bench)"
+ },
+ "profiles": {
+  "OpenContextHub": {
+   "status": "live",
+   "domain": "opencontexthub.io",
+   "layer": "open",
+   "kind": "governed context packs (Knowledge Corpus)",
+   "pulls": {
+    "rule_types": [
+     "promotion gates",
+     "redaction policy",
+     "freshness/CDC signals"
+    ],
+    "context_types": [
+     "Knowledge Corpus",
+     "source-handled artifacts",
+     "provenance"
+    ],
+    "module_types": [
+     "context retrieval",
+     "verify gate"
+    ]
+   },
+   "substrate": "Baltor context engine + source governance",
+   "example_pull": "a governed context pack with source handles for a capability",
+   "one_liner": "Governed, source-handled context packs (Knowledge Corpus) you drop into a capability without re-curating provenance.",
+   "use_cases": [
+    "Pull a verified context pack with source handles for a RAG step",
+    "Reuse redaction + freshness/CDC policy instead of rebuilding governance",
+    "Ground an agent on provenance-tracked context, not scraped text"
+   ]
+  },
+  "OpenSkillsHub": {
+   "status": "live",
+   "domain": "openskillshub.io",
+   "layer": "open",
+   "kind": "agent skills (SKILL.md)",
+   "pulls": {
+    "rule_types": [
+     "skill triggers / when-to-use"
+    ],
+    "context_types": [
+     "skill procedures",
+     "references"
+    ],
+    "module_types": [
+     "skill loaders"
+    ]
+   },
+   "substrate": "skill registry",
+   "example_pull": "a SKILL.md procedure for a specialized workflow",
+   "one_liner": "A registry of reusable agent skills (SKILL.md procedures) for specialized workflows, with provenance.",
+   "use_cases": [
+    "Install a ready SKILL.md procedure instead of writing the workflow",
+    "Resolve a skill's tools/permissions before running it",
+    "Share a vetted workflow across agents and teams"
+   ]
+  },
+  "OpenToolsHub": {
+   "status": "live",
+   "domain": "opentoolshub.io",
+   "layer": "open",
+   "kind": "tools + agnostic planes",
+   "pulls": {
+    "rule_types": [
+     "plane selection",
+     "tool admission"
+    ],
+    "context_types": [
+     "tool catalog (hundreds)",
+     "tool planes (30)",
+     "plane I/O contracts",
+     "ML model types",
+     "external APIs"
+    ],
+    "module_types": [
+     "agnostic ports",
+     "adapters",
+     "uniform Component invoke"
+    ]
+   },
+   "substrate": "tool_registry.json + tool_planes.json + _repos/teleon/backend/src/teleon/components",
+   "example_pull": "the OCR plane's components for a document pipeline",
+   "one_liner": "Tools and agnostic capability planes (OCR, search, browser…) behind one uniform interface, swappable by registry.",
+   "use_cases": [
+    "Drop in the OCR plane's components for a document pipeline",
+    "Swap a tool backend without touching pipeline code",
+    "Pick a plane's cheapest sufficient tool via the descent"
+   ]
+  },
+  "OpenMCPHub": {
+   "status": "live",
+   "domain": "openmcphub.io",
+   "layer": "open",
+   "kind": "MCP servers + tools",
+   "pulls": {
+    "rule_types": [
+     "MCP capability metadata"
+    ],
+    "context_types": [
+     "MCP tool descriptors"
+    ],
+    "module_types": [
+     "MCP adapters"
+    ]
+   },
+   "substrate": "MCP gateway",
+   "example_pull": "an MCP server's advertised tools as components",
+   "one_liner": "MCP servers and their advertised tools, indexed as governed components an agent can consume.",
+   "use_cases": [
+    "Discover an MCP server's tools as typed components",
+    "Wire a vetted MCP tool into a DAG with a security profile",
+    "Route to an MCP capability instead of reimplementing it"
+   ]
+  },
+  "OpenCompressionHub": {
+   "status": "live",
+   "domain": "opencompressionhub.io",
+   "layer": "open",
+   "kind": "context compression policy",
+   "pulls": {
+    "rule_types": [
+     "compression policy (reversible)"
+    ],
+    "context_types": [],
+    "module_types": [
+     "context compressor"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/context/compressor.py",
+   "example_pull": "a reversible context-compression policy for a token budget",
+   "one_liner": "Reversible context-compression policies that fit a token budget without dropping answer-critical facts.",
+   "use_cases": [
+    "Apply a reversible compression policy to fit a context window",
+    "Shrink a prompt while preserving source handles + held-out warnings",
+    "Tune a per-capability token budget with a proven policy"
+   ]
+  },
+  "OpenBenchmarkHub": {
+   "status": "live",
+   "domain": "openbenchmarkhub.io",
+   "layer": "open",
+   "kind": "benchmark cards + metrics",
+   "pulls": {
+    "rule_types": [
+     "eval rubrics",
+     "promotion-from-evidence rules"
+    ],
+    "context_types": [
+     "benchmark datasets",
+     "result records (evidence, not authority)"
+    ],
+    "module_types": [
+     "eval harness",
+     "A/B harness"
+    ]
+   },
+   "substrate": "ab_harness + eval datasets",
+   "example_pull": "a per-capability benchmark dataset to score candidate DAGs",
+   "one_liner": "Per-capability benchmark cards + datasets to score candidate execution graphs on real metrics, not vibes.",
+   "use_cases": [
+    "Score a candidate DAG against a capability's benchmark dataset",
+    "Compare two pipelines on measured accuracy/cost/latency",
+    "Gate a promotion on a benchmark threshold"
+   ]
+  },
+  "OpenHubForAI": {
+   "status": "live",
+   "domain": "openhubforai.io",
+   "layer": "open",
+   "kind": "evals / harnesses / templates / the CapabilityTask spec",
+   "pulls": {
+    "rule_types": [
+     "capability ladders (cost-ordered, deterministic-first)",
+     "the two-axis admission"
+    ],
+    "context_types": [
+     "capability taxonomy",
+     "the seven primitives"
+    ],
+    "module_types": [
+     "the descent",
+     "the DAG executor",
+     "the compiler"
+    ]
+   },
+   "substrate": "capability_ladders.json + _repos/teleon/backend/src/teleon/synthesis + dag",
+   "example_pull": "the web_browsing ladder (API->browser->stealth) for an acquisition step",
+   "one_liner": "The open evals, harnesses, templates, and CapabilityTask spec the whole ecosystem builds on.",
+   "use_cases": [
+    "Pull the web_browsing ladder (API→browser→stealth) for an acquisition step",
+    "Adopt the open CapabilityTask spec so an agent can call a capability",
+    "Reuse a harness/template instead of authoring a pipeline from scratch"
+   ]
+  },
+  "OpenSkillToTool": {
+   "status": "live",
+   "domain": "openskilltotool.io",
+   "layer": "open",
+   "kind": "skill<->tool conversion",
+   "pulls": {
+    "rule_types": [
+     "conversion + certification rules"
+    ],
+    "context_types": [
+     "conversion packages"
+    ],
+    "module_types": [
+     "skill->tool / tool->skill converters"
+    ]
+   },
+   "substrate": "skill_to_tool_promotion_catalog",
+   "example_pull": "compile a skill into a deterministic typed tool",
+   "one_liner": "Compile a fuzzy agent skill into a deterministic, typed tool — and back — to remove an LLM call.",
+   "use_cases": [
+    "Promote a proven skill into a deterministic typed tool",
+    "Replace a reasoning step with its compiled tool equivalent",
+    "Trace a tool back to the skill it was distilled from (lossless)"
+   ]
+  },
+  "OpenReviewHub": {
+   "status": "live",
+   "domain": "openreviewhub.io",
+   "layer": "open",
+   "kind": "review + verdict",
+   "pulls": {
+    "rule_types": [
+     "review routing (when to escalate to human)",
+     "risk tiers"
+    ],
+    "context_types": [
+     "review tickets",
+     "panel verdicts"
+    ],
+    "module_types": [
+     "review queue",
+     "multi-model panel review"
+    ]
+   },
+   "substrate": "panel_review + review queues",
+   "example_pull": "the review-routing rule that sends a low-confidence change to a human",
+   "one_liner": "Review-routing rules and verdicts that send low-confidence work to the right human or panel.",
+   "use_cases": [
+    "Route a low-confidence change to human review automatically",
+    "Apply a verdict rubric to a candidate before promotion",
+    "Add a review gate to a sensitive-domain pipeline"
+   ]
+  },
+  "OpenTemplatesHub": {
+   "status": "candidate",
+   "domain": "opentemplateshub.io",
+   "layer": "candidate",
+   "kind": "reusable DAG / object templates",
+   "pulls": {
+    "rule_types": [
+     "retrieve-and-mutate policy"
+    ],
+    "context_types": [
+     "DAG template skeletons (document_extraction, rag_qa, web_research, provider_directory, ...)"
+    ],
+    "module_types": [
+     "retrieve_template",
+     "mutate",
+     "mine_template"
+    ]
+   },
+   "substrate": "dag_templates.json + _repos/teleon/backend/src/teleon/synthesis/templates.py",
+   "example_pull": "the provider_directory template, mutated with the vertical's components",
+   "one_liner": "Reusable DAG and object templates you mutate with a vertical's components instead of designing from zero.",
+   "use_cases": [
+    "Start from the provider_directory template for a new vertical",
+    "Mutate a proven DAG template with your own components",
+    "Skip cold-start synthesis for a common pipeline shape"
+   ]
+  },
+  "OpenRoutingHub": {
+   "status": "candidate",
+   "domain": "openroutinghub.io",
+   "layer": "candidate",
+   "kind": "model-routing policy",
+   "pulls": {
+    "rule_types": [
+     "provider-selection graphs",
+     "lane policies",
+     "fallback chains",
+     "PreferenceProfile weights"
+    ],
+    "context_types": [
+     "model index",
+     "model<->provider graph",
+     "ModelInvocationReceipt shapes"
+    ],
+    "module_types": [
+     "routing_engine",
+     "cost_model",
+     "lane_selection"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/inference + economics",
+   "example_pull": "the cheapest viable provider for a model, reliability-weighted",
+   "one_liner": "Reliability-weighted model-routing policy — the cheapest viable provider for a model, not the default frontier.",
+   "use_cases": [
+    "Pick the cheapest sufficient + reliable provider for a model call",
+    "Fail over across providers on outage/rate-limit",
+    "Cap spend by routing down when a smaller model suffices"
+   ]
+  },
+  "OpenEndpointHub": {
+   "status": "candidate",
+   "domain": "openendpointhub.io",
+   "layer": "candidate",
+   "kind": "inference/API endpoints",
+   "pulls": {
+    "rule_types": [
+     "endpoint admission"
+    ],
+    "context_types": [
+     "endpoint catalog",
+     "lane profiles",
+     "execution backend pricebook"
+    ],
+    "module_types": [
+     "economic_graph"
+    ]
+   },
+   "substrate": "inference_lane_profiles.json + execution_backend_pricebook.json",
+   "example_pull": "the lane profiles + prices to simulate a DAG's cost",
+   "one_liner": "Inference lane profiles + endpoint prices to simulate and cost a DAG before you run it.",
+   "use_cases": [
+    "Simulate a DAG's cost from real lane prices",
+    "Compare endpoints by latency/price/reliability",
+    "Choose an endpoint that fits a budget constraint"
+   ]
+  },
+  "OpenLinkingHub": {
+   "status": "candidate",
+   "domain": "openlinkinghub.io",
+   "layer": "candidate",
+   "kind": "entity resolution & linking rules",
+   "pulls": {
+    "rule_types": [
+     "entity-resolution rulesets (person/company/organization/address)",
+     "comparators (Jaro-Winkler/token-set/Soundex)",
+     "normalizers (nickname/legal-suffix)",
+     "blocking keys",
+     "match/review thresholds",
+     "industry linking rules"
+    ],
+    "context_types": [
+     "per-entity-type schemas",
+     "per-industry role maps"
+    ],
+    "module_types": [
+     "resolve_entities",
+     "compare",
+     "link",
+     "industry_links"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/resolution + entity_resolution_rules.json + industry_linking_rules.json",
+   "example_pull": "the 'person' ruleset to dedup a provider directory (typo-robust + NPI override)",
+   "one_liner": "Typo-robust entity-resolution and linking rulesets (person/company/address) for deduping records deterministically.",
+   "use_cases": [
+    "Dedup a provider directory with the 'person' ruleset (NPI override)",
+    "Link records across sources without an LLM",
+    "Resolve entities with a typo-robust deterministic rule first"
+   ]
+  },
+  "OpenSourcesHub": {
+   "status": "candidate",
+   "domain": "opensourceshub.io",
+   "layer": "candidate",
+   "kind": "authoritative data sources",
+   "pulls": {
+    "rule_types": [
+     "cost-ordered acquisition descent (free registries first)"
+    ],
+    "context_types": [
+     "source descriptors per industry/entity/field (NPI/CMS, state SoS incorporation, FINRA/SEC, NCEES, boards, data.gov, websites)"
+    ],
+    "module_types": [
+     "source_registry",
+     "descent",
+     "sources_for"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/sources + source_registry.json",
+   "example_pull": "the cost-ordered sources for verifying a company (SoS incorporation + OpenCorporates)",
+   "one_liner": "Cost-ordered, authoritative data sources for verifying facts — descend from free registries before paid.",
+   "use_cases": [
+    "Verify a company via SoS incorporation + OpenCorporates",
+    "Order sources cheapest-first for a verification step",
+    "Pick an authoritative source with a known freshness bar"
+   ]
+  },
+  "OpenRedactionHub": {
+   "status": "candidate",
+   "domain": "openredactionhub.io",
+   "layer": "candidate",
+   "kind": "PII/sensitive-data redaction rules",
+   "pulls": {
+    "rule_types": [
+     "sensitive-entity detectors",
+     "masking/hashing/tokenization policies",
+     "retention + jurisdiction rules"
+    ],
+    "context_types": [
+     "PII/PHI field schemas"
+    ],
+    "module_types": [
+     "(emerging) redactor + review tier"
+    ]
+   },
+   "substrate": "do-not-store-PII governance + SecretRef redaction + access_policy PII grants",
+   "example_pull": "the redaction ruleset to scrub PII before a record enters a review queue",
+   "one_liner": "Redaction rulesets that scrub PII/sensitive data before a record enters a queue or store — governance, not afterthought.",
+   "use_cases": [
+    "Scrub PII before a record enters a review queue",
+    "Apply a redaction ruleset ahead of storage/logging",
+    "Enforce do-not-store-PII policy deterministically"
+   ]
+  },
+  "OpenProvenanceHub": {
+   "status": "candidate",
+   "domain": "openprovenancehub.io",
+   "layer": "candidate",
+   "kind": "provenance & authenticity shapes",
+   "pulls": {
+    "rule_types": [
+     "content-credential (C2PA-style) signature rules",
+     "authenticity/synthetic-detection signals"
+    ],
+    "context_types": [
+     "provenance records",
+     "lineage / edit history",
+     "source handles"
+    ],
+    "module_types": [
+     "receipts",
+     "the verify gate"
+    ]
+   },
+   "substrate": "OpenReceiptHub + run receipts + the directory audit trail + Baltor verification",
+   "example_pull": "the provenance record shape for an auto-updated field (which sources supported it)",
+   "one_liner": "Provenance and authenticity record shapes that capture which sources supported an auto-updated field.",
+   "use_cases": [
+    "Attach a provenance record to an auto-updated field",
+    "Show which sources supported a served fact",
+    "Make a value auditable with an authenticity shape"
+   ]
+  },
+  "OpenGeoHub": {
+   "status": "candidate",
+   "domain": "opengeohub.io",
+   "layer": "candidate",
+   "kind": "address standardization & geocoding rules",
+   "pulls": {
+    "rule_types": [
+     "address normalization (abbreviations/directionals/units)",
+     "location-match comparators",
+     "geocode policy"
+    ],
+    "context_types": [
+     "address schemas"
+    ],
+    "module_types": [
+     "address normalizer"
+    ]
+   },
+   "substrate": "the 'address' ruleset in entity_resolver + entity_resolution_rules.json",
+   "example_pull": "the address-normalization + location-match rules to dedupe practice locations",
+   "one_liner": "Address-normalization and geocoding rules to standardize and match locations deterministically.",
+   "use_cases": [
+    "Normalize + match practice locations to dedupe a directory",
+    "Standardize addresses before entity resolution",
+    "Geocode with a rule before reaching for a paid API"
+   ]
+  },
+  "OpenContradictionHub": {
+   "status": "candidate",
+   "domain": "opencontradictionhub.io",
+   "layer": "candidate",
+   "kind": "claim / stance / contradiction-detection rules",
+   "pulls": {
+    "rule_types": [
+     "rule-flip patterns",
+     "NLI thresholds",
+     "adjudication ladders",
+     "position-change/CDC signals"
+    ],
+    "context_types": [
+     "stance pairs",
+     "claim schemas"
+    ],
+    "module_types": [
+     "stance_nli",
+     "the public_statement_tracking ladder"
+    ]
+   },
+   "substrate": "stance_nli plane + stance-contradiction-detection task",
+   "example_pull": "the contradiction ladder to flag conflicting source statements for verification",
+   "one_liner": "Stance and contradiction-detection rules that flag conflicting source statements for verification.",
+   "use_cases": [
+    "Flag conflicting source statements for human verification",
+    "Detect a position change over time as a CDC signal",
+    "Run the contradiction ladder (rule→NLI→adjudicate) deterministic-first"
+   ]
+  },
+  "OpenEnvironmentHub": {
+   "status": "candidate",
+   "domain": "openenvironmenthub.io",
+   "layer": "candidate",
+   "kind": "verifiable agent eval environments + reward specs",
+   "pulls": {
+    "rule_types": [
+     "reward specs (executable)",
+     "environment admission / conformance",
+     "held-out coverage rules"
+    ],
+    "context_types": [
+     "agent environment definitions (Repo2RLEnv/Harbor/OpenEnv class)",
+     "Harbor-format intake",
+     "held-out task sets"
+    ],
+    "module_types": [
+     "EnvironmentProviderPort",
+     "reward evaluator"
+    ]
+   },
+   "substrate": "schemas/environments/* + architecture/agent_environment_research_registry.json + _repos/teleon/backend/src/teleon/environments",
+   "example_pull": "a runnable eval environment + its executable reward to score a candidate DAG (evidence, never promotion authority)",
+   "one_liner": "Runnable agent-eval environments + executable reward specs to score candidate DAGs (evidence, never promotion authority).",
+   "use_cases": [
+    "Score a candidate DAG in a runnable eval environment",
+    "Attach an executable reward spec as evidence",
+    "Reproduce an agent's behavior in a sandboxed environment"
+   ]
+  },
+  "OpenSandboxHub": {
+   "status": "candidate",
+   "domain": "opensandboxhub.io",
+   "layer": "candidate",
+   "kind": "isolated execution-sandbox registry + risk/conformance",
+   "pulls": {
+    "rule_types": [
+     "run-isolation policy",
+     "conformance + risk profiles",
+     "sandbox admission (discovery!=trust)"
+    ],
+    "context_types": [
+     "sandbox provider descriptors (E2B/Daytona/agent-sandbox class)"
+    ],
+    "module_types": [
+     "SandboxProviderPort"
+    ]
+   },
+   "substrate": "architecture/sandbox_provider_catalog.json + _repos/teleon/backend/src/teleon/sandbox/gateway.py",
+   "example_pull": "a conformance-passing sandbox to run candidate code in isolation (sandbox output never truth)",
+   "one_liner": "Isolated execution sandboxes with risk/conformance profiles for running candidate code safely (sandbox output never truth).",
+   "use_cases": [
+    "Run candidate code in a conformance-passing sandbox",
+    "Pick a sandbox by isolation/risk profile",
+    "Contain an untrusted step before trusting its output"
+   ]
+  },
+  "OpenAgentHub": {
+   "status": "candidate",
+   "domain": "openagenthub.io",
+   "layer": "candidate",
+   "kind": "agent-runtime registry (the runtimes that run agents)",
+   "pulls": {
+    "rule_types": [
+     "bounded-adapter admission",
+     "agent capability cards"
+    ],
+    "context_types": [
+     "agent-runtime descriptors (OpenClaw/Hermes/AgentScope/kagent class)",
+     "AgentRunReceipt shapes",
+     "teleon_runtime_landscape"
+    ],
+    "module_types": [
+     "agent-runtime provider port",
+     "the Agent Capability Gateway"
+    ]
+   },
+   "substrate": "architecture/agent_runtime_catalog.json + teleon_runtime_landscape.json + _repos/teleon/backend/src/teleon/agent_gateway + agents",
+   "example_pull": "a bounded agent-runtime adapter + its run-receipt shape (agents propose, never serve truth)",
+   "one_liner": "The agent runtimes that run agents — bounded adapters + run-receipt shapes (agents propose, never serve truth).",
+   "use_cases": [
+    "Pick a bounded agent-runtime adapter for a task",
+    "Capture an agent run with a standard receipt shape",
+    "Swap agent runtimes without changing the capability"
+   ]
+  },
+  "OpenReceiptHub": {
+   "status": "candidate",
+   "domain": "openreceipthub.io",
+   "layer": "candidate",
+   "kind": "portable signed receipts + provenance / AI-BOM standards",
+   "pulls": {
+    "rule_types": [
+     "attestation/signature recipes (Sigstore-Rekor / in-toto / CycloneDX AI-BOM mapping)",
+     "verification recipes"
+    ],
+    "context_types": [
+     "ModelInvocationReceipt / AgentRunReceipt / EnvironmentRunReceipt schemas",
+     "open supply-chain standard mappings"
+    ],
+    "module_types": [
+     "receipt emitters",
+     "the verify gate"
+    ]
+   },
+   "substrate": "schemas/inference + schemas/agents + schemas/environments receipt schemas + the open-standards mapping",
+   "example_pull": "the portable signed receipt shape a served fact/run carries so it verifies anywhere",
+   "one_liner": "Portable, signed receipts (AI-BOM) a served fact or run carries so it verifies anywhere.",
+   "use_cases": [
+    "Attach a portable signed receipt to a served fact",
+    "Verify a run's provenance outside the system that produced it",
+    "Map outputs to open AI-BOM / receipt standards"
+   ]
+  },
+  "OpenStateHub": {
+   "status": "candidate",
+   "domain": "openstatehub.io",
+   "layer": "candidate",
+   "kind": "governed persistent agent state (memory / blackboard / graph)",
+   "pulls": {
+    "rule_types": [
+     "blackboard contracts",
+     "tenant scoping",
+     "provenance + held-out on state"
+    ],
+    "context_types": [
+     "memory/state provider descriptors (mem0/letta/graphiti class)",
+     "GovernedBlackboardEntry"
+    ],
+    "module_types": [
+     "the blackboard spine",
+     "state provider port"
+    ]
+   },
+   "substrate": "schemas/blackboard/* + architecture/blackboard_provider_catalog.json + stateful_swarm_provider_catalog.json + _repos/teleon/backend/src/teleon/blackboard + stateful_swarms",
+   "example_pull": "a governed blackboard-entry shape for durable agent working state (analytical, never auto-served as truth)",
+   "one_liner": "Governed persistent agent state (memory / blackboard / graph) shapes for durable working state (analytical, never auto-served).",
+   "use_cases": [
+    "Persist durable agent working state in a governed blackboard shape",
+    "Share a blackboard across a multi-agent run",
+    "Keep analytical state without auto-serving it as truth"
+   ]
+  },
+  "OpenReconciliationHub": {
+   "status": "method",
+   "domain": "openreconciliationhub.io",
+   "layer": "method",
+   "kind": "Baltor method · Reconcile",
+   "pulls": {
+    "rule_types": [
+     "reconciliation policies"
+    ],
+    "context_types": [
+     "conflict sets"
+    ],
+    "module_types": [
+     "reconcile stage"
+    ]
+   },
+   "substrate": "Baltor method spine",
+   "example_pull": "reconcile conflicting records into a canonical candidate",
+   "one_liner": "The Reconcile method — merge conflicting records into one canonical candidate, lineage preserved.",
+   "use_cases": [
+    "Reconcile conflicting source records into a canonical candidate",
+    "Resolve a merge while keeping the losing variants (lossless)",
+    "Produce one record from many noisy duplicates"
+   ]
+  },
+  "OpenHardeningHub": {
+   "status": "method",
+   "domain": "openhardeninghub.io",
+   "layer": "method",
+   "kind": "Baltor method · Harden",
+   "pulls": {
+    "rule_types": [
+     "hardening/validation policies"
+    ],
+    "context_types": [
+     "validation schemas"
+    ],
+    "module_types": [
+     "harden stage"
+    ]
+   },
+   "substrate": "Baltor method spine",
+   "example_pull": "harden a candidate against schema + policy gates",
+   "one_liner": "The Harden method — pass a candidate against schema and policy gates before it can be trusted.",
+   "use_cases": [
+    "Harden a candidate against schema + policy gates",
+    "Block a record that fails a guardrail from promotion",
+    "Add deterministic gates ahead of serving"
+   ]
+  },
+  "OpenEnrichmentHub": {
+   "status": "method",
+   "domain": "openenrichmenthub.io",
+   "layer": "method",
+   "kind": "Baltor method · Enhance",
+   "pulls": {
+    "rule_types": [
+     "enrichment policies"
+    ],
+    "context_types": [
+     "enrichment sources"
+    ],
+    "module_types": [
+     "enrich stage"
+    ]
+   },
+   "substrate": "Baltor method spine",
+   "example_pull": "enrich an entity with cross-source attributes",
+   "one_liner": "The Enhance method — enrich an entity with cross-source attributes, embeddings, and use-cases.",
+   "use_cases": [
+    "Enrich an entity with cross-source attributes",
+    "Add embeddings/descriptions/use-cases to a thin record",
+    "Augment a candidate before review without asserting truth"
+   ]
+  },
+  "OpenOptimizationHub": {
+   "status": "method",
+   "domain": "openoptimizationhub.io",
+   "layer": "method",
+   "kind": "Baltor method · Optimize",
+   "pulls": {
+    "rule_types": [
+     "optimization passes (deterministic-first)"
+    ],
+    "context_types": [
+     "cost model"
+    ],
+    "module_types": [
+     "the descent",
+     "PassManager"
+    ]
+   },
+   "substrate": "optimization_passes.json + the descent",
+   "example_pull": "the deterministic-replacement pass to remove an unnecessary LLM call",
+   "one_liner": "The Optimize method — the descent passes that remove unnecessary LLM calls and cut cost.",
+   "use_cases": [
+    "Run the deterministic-replacement pass to drop an LLM call",
+    "Apply a descent pass to cut a DAG's token cost",
+    "Find a cheaper equivalent path with the optimization passes"
+   ]
+  },
+  "OpenVerificationHub": {
+   "status": "method",
+   "domain": "openverificationhub.io",
+   "layer": "method",
+   "kind": "Baltor method · Verify",
+   "pulls": {
+    "rule_types": [
+     "verification gates",
+     "verified-working DAG checks"
+    ],
+    "context_types": [
+     "evidence ledger"
+    ],
+    "module_types": [
+     "verify_buildable_dag",
+     "conformance"
+    ]
+   },
+   "substrate": "dag_contract + the verification rail",
+   "example_pull": "the verified-working gate before a DAG runs",
+   "one_liner": "The Verify method — the verified-working gate a DAG must pass before it runs or serves.",
+   "use_cases": [
+    "Gate a DAG on verified-working before execution",
+    "Apply the DAG contract to prove type-compatibility + satisfiability",
+    "Block an unverified pipeline from serving truth"
+   ]
+  },
+  "OpenInterrogationHub": {
+   "status": "candidate",
+   "domain": "openinterrogationhub.io",
+   "layer": "candidate",
+   "kind": "challenge probes over any object",
+   "pulls": {
+    "rule_types": [
+     "5W1H probe ladder",
+     "first-principles decomposition",
+     "adversarial 'what would refute this?'"
+    ],
+    "context_types": [
+     "the object under challenge + its stated assumptions"
+    ],
+    "module_types": [
+     "interrogate",
+     "verify_ladder",
+     "alternatives_ladder"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/synthesis/intent_to_dag.py + reasoning_strategies / adversarial registries",
+   "example_pull": "interrogate a proposed DAG with the 5W1H + alternatives ladders before it is trusted",
+   "one_liner": "Challenge any object — design, claim, or pipeline — with structured probes before you trust it.",
+   "use_cases": [
+    "Probe a new architecture with first-principles questions before committing",
+    "Red-team a proposed component with adversarial 'what would refute this?' prompts",
+    "Run the 5W1H + alternatives ladder over a synthesized DAG"
+   ]
+  },
+  "OpenMutationHub": {
+   "status": "candidate",
+   "domain": "openmutationhub.io",
+   "layer": "candidate",
+   "kind": "regression-gated architecture rewrites",
+   "pulls": {
+    "rule_types": [
+     "optimization passes (prune-intelligence / substitute-determinism)",
+     "regression-gated rollback policy"
+    ],
+    "context_types": [
+     "the running DAG + its regression history"
+    ],
+    "module_types": [
+     "propose_mutation",
+     "apply_pass",
+     "rollback"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/tuning/{tuner,action_ledger}.py + the optimization_pass registry",
+   "example_pull": "rewrite a frontier-LLM step to a cheaper deterministic path, gated by regression + rollback",
+   "one_liner": "Rewrite a running architecture with versioned passes under regression-gated rollback — the descent applied to itself.",
+   "use_cases": [
+    "Propose a cheaper deterministic substitution for an expensive step",
+    "Apply an optimization pass and gate it on no accuracy regression",
+    "Roll a mutation back to its prior versioned layer losslessly"
+   ]
+  },
+  "OpenRehydrationHub": {
+   "status": "candidate",
+   "domain": "openrehydrationhub.io",
+   "layer": "candidate",
+   "kind": "lossless-distillation proofs",
+   "pulls": {
+    "rule_types": [
+     "rehydration / retention assertions",
+     "answer-critical-facts-survived checks"
+    ],
+    "context_types": [
+     "the compressed layer + its raw/intermediate lineage"
+    ],
+    "module_types": [
+     "rehydrate",
+     "retention_report",
+     "rollback_plan"
+    ]
+   },
+   "substrate": "_repos/baltor/backend/src/baltor/distillation/{rehydration,retention_report,rollback}.py",
+   "example_pull": "reconstitute a distilled layer and prove source handles + held-out items survived before promotion",
+   "one_liner": "Prove a distillation lost nothing — reconstitute the raw layer from the compressed one and audit what survived.",
+   "use_cases": [
+    "Gate a promotion on a passing rehydration proof",
+    "Audit that answer-critical facts + source handles survived compression",
+    "Reconstitute an intermediate layer for rollback"
+   ]
+  },
+  "OpenHarnessEvolutionHub": {
+   "status": "candidate",
+   "domain": "openharnessevolutionhub.io",
+   "layer": "candidate",
+   "kind": "self-evolving evals / harnesses",
+   "pulls": {
+    "rule_types": [
+     "harness-mutation policy (diagnose-failure -> new versioned harness)",
+     "two-axis lift bar (re-measured per model)"
+    ],
+    "context_types": [
+     "execution patterns + benchmark history + failure diagnoses"
+    ],
+    "module_types": [
+     "evolve_harness",
+     "diagnose_failure",
+     "durable_gap_harness"
+    ]
+   },
+   "substrate": "_repos/teleon/backend/src/teleon/monitoring/flywheel_queue.py + scripts/eval/durable_gap_harness.py + the supervisor ledger",
+   "example_pull": "diagnose a stale eval as the frontier moves and emit a new versioned harness that keeps the lift bar honest",
+   "one_liner": "Evolve the evals themselves as models shift, so 'structural lift' stays measured against today's frontier.",
+   "use_cases": [
+    "Diagnose a harness that no longer separates lift as a new model ships",
+    "Emit a new versioned eval from a failure diagnosis",
+    "Keep the two-axis admission bar honest over time"
+   ]
+  }
+ },
+ "copy_provenance": "one_liner + use_cases are model_authored (Claude Code enrichment loop, 2026-06-24); descriptive copy, serves_truth=false; rendered by build_hub_sites."
+}

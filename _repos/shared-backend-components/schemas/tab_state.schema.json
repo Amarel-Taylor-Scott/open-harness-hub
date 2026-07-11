@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aidoneright.dev/schemas/tab_state.schema.json",
+  "title": "TabState",
+  "description": "One browser tab's state inside a browser_session_report, derived from a single CapturedArtifact (scripts.primitive_browser_control_harness). The tab graph links tabs by opener relationships. Stores digests + bounded structured units only — never raw bodies, never secrets. candidate; serves_truth=false.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "record_type", "tab_id", "context_id", "url", "title", "opener_tab_id", "page_state",
+    "dom_hash", "screenshot_hash", "accessibility_hash", "auth_state", "side_effect_risk",
+    "downloads", "network_calls", "candidate", "serves_truth"
+  ],
+  "properties": {
+    "record_type": {"const": "tab_state"},
+    "schema_version": {"type": "string", "description": "version lives in metadata, never in an id or name"},
+    "tab_id": {"type": "string", "description": "canonical_id('tab', session_id, dom_hash)"},
+    "context_id": {"type": "string", "description": "the browsing context (cookie-jar isolation unit) this tab belongs to"},
+    "url": {"type": "string"},
+    "domain": {"type": ["string", "null"], "description": "host of url"},
+    "trust_tier": {"enum": ["T0", "T1", "T2", "T3", "T4"], "description": "classify_trust_tier(url) from the harness"},
+    "title": {"type": ["string", "null"], "description": "best-effort page title derived from bounded readable text (redacted)"},
+    "opener_tab_id": {"type": ["string", "null"], "description": "the tab whose page linked to this tab's url in the same session; null for the seed/root tab"},
+    "transition_type": {"enum": ["seed", "same_origin_navigation", "cross_origin_transition", "popup"]},
+    "is_popup": {"type": "boolean"},
+    "is_duplicate_of": {"type": ["string", "null"], "description": "another tab_id with an identical dom_hash/url (duplicate tab)"},
+    "page_state": {"enum": ["not_captured", "login_wall", "form_entry", "download_page", "api_portal", "content"],
+                   "description": "classified from login_wall / forms / downloads / api-spec references"},
+    "dom_hash": {"type": ["string", "null"], "description": "the CapturedArtifact source_hash (sha256:...), used as the DOM digest for drift detection"},
+    "screenshot_hash": {"type": ["string", "null"], "description": "digest of the page screenshot when a visual backend captured one; null for the stdlib/static backend"},
+    "accessibility_hash": {"type": ["string", "null"], "description": "digest of the accessibility tree when captured; null for the static backend"},
+    "auth_state": {"enum": ["unknown", "logged_out", "logged_in", "mfa_required"],
+                   "description": "derived from the login wall + auth markers in bounded text"},
+    "side_effect_risk": {"enum": ["none", "read", "write", "regulated"],
+                         "description": "derived from side_effect_controls: mutating (write) vs payment/claim/regulated words (regulated)"},
+    "downloads": {"type": "array", "items": {
+      "type": "object",
+      "required": ["url", "origin", "cross_origin", "trust_tier"],
+      "properties": {
+        "url": {"type": "string"},
+        "origin": {"type": ["string", "null"]},
+        "cross_origin": {"type": "boolean", "description": "download host differs from the page host"},
+        "trust_tier": {"enum": ["T0", "T1", "T2", "T3", "T4"]},
+        "ext": {"type": ["string", "null"], "description": "file extension (pdf/csv/xlsx/...)"}
+      }
+    }},
+    "network_calls": {"type": "array", "items": {
+      "type": "object",
+      "required": ["kind", "url", "source"],
+      "properties": {
+        "kind": {"enum": ["openapi", "graphql", "postman", "asyncapi", "grpc", "xhr", "fetch"]},
+        "url": {"type": "string"},
+        "source": {"enum": ["page_reference", "har_observed"],
+                   "description": "page_reference = the page links/embeds the endpoint (static backend); har_observed = seen in a captured HAR (live backend)"},
+        "trust_tier": {"enum": ["T0", "T1", "T2", "T3", "T4"]}
+      }
+    }},
+    "n_forms": {"type": "integer", "minimum": 0},
+    "captured": {"type": "boolean"},
+    "evidence_source_hash": {"type": ["string", "null"], "description": "the CapturedArtifact source_hash this tab was derived from"},
+    "candidate": {"const": true},
+    "serves_truth": {"const": false}
+  }
+}

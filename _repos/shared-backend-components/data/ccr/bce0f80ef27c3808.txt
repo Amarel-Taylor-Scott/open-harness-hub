@@ -1,0 +1,40 @@
+MODULE _repos/teleon/backend/src/teleon/enrichment/search_enrich.py
+## API signatures
+```python
+"""src.teleon.enrichment.search_enrich — enrich a fact via SEARCH + LLM, descended off the expensive default."""
+_REPO = ...
+_REGISTRY = ...
+_SYNTH_TOKENS_OUT = ...
+def load_providers() -> list[dict]
+def baseline_provider() -> dict
+    # The expensive default most teams use (status=baseline) — the descent's BEFORE state.
+def select_provider(*, grounding_required: bool=True, quality_floor_rank: int=2, providers: list[dict] | None=None) -> dict
+    # Cheapest provider that meets the grounding + quality floor (the search-axis descent). Excludes the baseline so
+def _synth_model() -> dict
+    # The cheapest fresh model to synthesize with + its lineage (reuses substrate_selector / model_index).
+_FIXTURE_SOURCES = ...
+def _search(query: str, provider: dict) -> list[dict]
+    # Deterministic offline stand-in for the selected provider's search adapter: returns grounded sources.
+def _synthesize(query: str, sources: list[dict]) -> str
+    # Deterministic offline synthesis: a grounded answer that cites every source it used (a real deployment swaps in
+def enrich(query: str, *, grounding_required: bool=True, quality_floor_rank: int=2) -> dict
+    # Enrich ``query`` via the DESCENDED path: cheapest grounded search provider + cheap-model synthesis. Returns the
+def enrichment_savings(query: str, **kw) -> dict
+    # The headline: the expensive grounded-synthesis baseline vs the descended path, same query.
+def record_enrichment_descent(store, query: str, **kw) -> dict
+    # Record the enrichment as a DescentAttempt (before = expensive grounded-synthesis default; after = cheap search +
+def demonstrate() -> dict
+```
+## intra-module call edges
+src.teleon.enrichment.search_enrich.baseline_provider -> src.teleon.enrichment.search_enrich.load_providers
+src.teleon.enrichment.search_enrich.demonstrate -> src.teleon.enrichment.search_enrich.enrichment_savings
+src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich._search
+src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich._synth_model
+src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich._synthesize
+src.teleon.enrichment.search_enrich.enrich -> src.teleon.enrichment.search_enrich.select_provider
+src.teleon.enrichment.search_enrich.enrichment_savings -> src.teleon.enrichment.search_enrich.baseline_provider
+src.teleon.enrichment.search_enrich.enrichment_savings -> src.teleon.enrichment.search_enrich.enrich
+src.teleon.enrichment.search_enrich.record_enrichment_descent -> src.teleon.enrichment.search_enrich.enrich
+src.teleon.enrichment.search_enrich.record_enrichment_descent -> src.teleon.enrichment.search_enrich.enrichment_savings
+src.teleon.enrichment.search_enrich.select_provider -> src.teleon.enrichment.search_enrich.baseline_provider
+src.teleon.enrichment.search_enrich.select_provider -> src.teleon.enrichment.search_enrich.load_providers

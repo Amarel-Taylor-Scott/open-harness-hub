@@ -1,0 +1,50 @@
+MODULE src/teleon/purpose_tasks/purpose_task.py
+## API signatures
+```python
+"""src.teleon.purpose_tasks.purpose_task — minimal PurposeTask controller (PoC) over the built Parallel-Path Engine."""
+EVAL_SUITE_FIELD = ...
+def _impls(registry: Registry, slot: str) -> list[dict[str, Any]]
+def provision(spec: dict[str, Any], registry: Registry) -> dict[str, Any]
+    # Bind an implementation for spec['capability_slot'] by numeric priority. Returns an updated spec with
+def _guarded_call(impl: dict[str, Any], input_snapshot: Any, output_contract: str='') -> dict[str, Any]
+    # Run ONE implementation's handler, converting a RAISED exception or a non-RunnerResult return into a
+def _runner(registry: Registry, slot: str) -> Callable[[dict[str, Any], Any], dict[str, Any]]
+def run_current(spec: dict[str, Any], registry: Registry, input_snapshot: Any) -> dict[str, Any]
+    # Run the cheap deterministic hot path = the currently-bound implementation. No LLM, no side-by-side.
+def run_current_guarded(spec: dict[str, Any], registry: Registry, input_snapshot: Any) -> dict[str, Any]
+    # ROBUST hot-path entry: run the bound implementation but NEVER let a misbehaving handler crash the
+def evaluate_health(result: dict[str, Any], success_criteria: dict[str, Any], *, held_out_strings: tuple[str, ...]=()) -> dict[str, Any]
+    # Deterministic health check of a hot-path result vs success_criteria. Returns {meets, drift:[dims]}.
+def adapt(spec: dict[str, Any], registry: Registry, input_snapshot: Any, *, now: str, promotion_criteria: dict[str, Any], candidate_impl_id: str | None=None, held_out_strings: tuple[str, ...]=()) -> dict[str, Any]
+    # Self-adapt on drift: run the next candidate implementation SIDE-BY-SIDE vs the current one through the
+def rollback(spec: dict[str, Any], registry: Registry, *, to: str | None=None) -> dict[str, Any]
+    # Revert the bound implementation to a preserved rollback target — promotion is ALWAYS reversible.
+def _is_model_built(spec: dict[str, Any]) -> bool
+    # A capability the MODEL builds/performs (vs a fixed deterministic impl) must be gated on a non-empty
+def eval_suite_for(spec: dict[str, Any] | 'PurposeTaskSpec') -> dict[str, Any] | None
+    # Return the NORMALIZED eval_suite the runtime gate + compiler consume, or None if the task declares no
+class PurposeTaskSpec:
+    # A thin BUILDER/round-trip wrapper around a PurposeTask spec DICT (the spec stays a plain dict for
+    def __init__(self, spec: dict[str, Any]) -> None
+    def from_dict(cls, spec: dict[str, Any]) -> 'PurposeTaskSpec'
+    def to_dict(self) -> dict[str, Any]
+        # The underlying spec dict (a copy). Round-trips: from_dict(d).to_dict() == d.
+    def __eq__(self, other: object) -> bool
+    def __repr__(self) -> str
+    def eval_suite(self) -> dict[str, Any] | None
+        # The RAW declared eval_suite (as stored), or None. Use `normalized_eval_suite()` for the gate-ready
+    def normalized_eval_suite(self) -> dict[str, Any] | None
+        # The gate-ready normalized eval_suite (defaults filled from the canonical gate constants), or None.
+    def with_eval_suite(self, suite: dict[str, Any], *, model_built: bool | None=None, normalize: bool=True) -> 'PurposeTaskSpec'
+        # Return a NEW PurposeTaskSpec carrying `suite` as its eval_suite. By default the suite is NORMALIZED
+```
+## intra-module call edges
+src.teleon.purpose_tasks.purpose_task._runner -> src.teleon.purpose_tasks.purpose_task._guarded_call
+src.teleon.purpose_tasks.purpose_task.adapt -> src.teleon.purpose_tasks.purpose_task._runner
+src.teleon.purpose_tasks.purpose_task.eval_suite_for -> src.teleon.purpose_tasks.purpose_task._is_model_built
+src.teleon.purpose_tasks.purpose_task.normalized_eval_suite -> src.teleon.purpose_tasks.purpose_task.eval_suite_for
+src.teleon.purpose_tasks.purpose_task.provision -> src.teleon.purpose_tasks.purpose_task._impls
+src.teleon.purpose_tasks.purpose_task.run_current_guarded -> src.teleon.purpose_tasks.purpose_task._guarded_call
+src.teleon.purpose_tasks.purpose_task.runner -> src.teleon.purpose_tasks.purpose_task._guarded_call
+src.teleon.purpose_tasks.purpose_task.with_eval_suite -> src.teleon.purpose_tasks.purpose_task.PurposeTaskSpec
+src.teleon.purpose_tasks.purpose_task.with_eval_suite -> src.teleon.purpose_tasks.purpose_task._is_model_built

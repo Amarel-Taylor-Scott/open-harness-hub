@@ -1,0 +1,64 @@
+# Build-context excludes for shared-backend-components/deploy/Dockerfile — context is _repos/ (the
+# parent of the product repos), so the image can COPY the substrate + the teleon/openhubforai/baltor
+# backends. Docker reads the .dockerignore at the context root (here). The monorepo .git lives ABOVE
+# _repos/, so it is already outside the context (no 3.2 GB .git shipped). Keep: shared-backend-components
+# (minus scratch) + <product>/backend/src. Drop everything else.
+
+# --- caches / tooling / vcs (never needed at runtime) ---
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/venv/
+**/node_modules/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/*.egg-info/
+**/.aidoneright/
+**/.agent/
+**/.git/
+
+# --- repos NOT needed in the deploy image (only shared-backend-components + the 3 product backends are) ---
+_generated/
+_shared/
+generated-edges/
+edge-graph-generator/
+dev-rules-context/
+# aidevobserver + aidoneright: exclude everything EXCEPT their frontend (the web tier ships it). The `/*`
+# form (not the dir itself) lets `!<repo>/frontend` re-include — Docker can't re-include under a fully-excluded dir.
+aidevobserver/*
+!aidevobserver/frontend
+aidoneright/*
+!aidoneright/frontend
+api-endpoint-wrappers/
+business-context/
+context-injection/
+scraping/
+fundraising/
+pitch-decks/
+yc-applications/
+
+# --- substrate: drop the multi-GB generated factory SCRATCH + docs/reference/secrets ---
+shared-backend-components/data/dev-intel/primitive_factory/
+shared-backend-components/data/dev-intel/primitive_codeblocks/
+shared-backend-components/data/dev-intel/primitive_million_seed_bundle/
+shared-backend-components/data/dev-intel/aidevobserver_edge_foundry/
+shared-backend-components/data/descent-attempts/
+shared-backend-components/docs/
+shared-backend-components/_reference/
+shared-backend-components/archive/
+shared-backend-components/secrets/
+shared-backend-components/artifacts/
+**/*.log
+
+# --- product repos: backend/src + frontend are COPYd (the web tier needs the frontends — see Dockerfile);
+#     drop docs/context to keep context small. node_modules is already excluded globally above. ---
+teleon/context/
+teleon/docs/
+openhubforai/context/
+openhubforai/docs/
+baltor/context/
+baltor/docs/
+
+# --- OS cruft ---
+**/.DS_Store

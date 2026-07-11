@@ -1,0 +1,192 @@
+{
+  "serves_truth": false,
+  "purpose": "Adversarial corner-case and interrogatory framework for the Graphable, Enrichable, Verifiable system. It gives deterministic and LLM/human reviewers reusable question sets, skill templates, and challenge cases so review packets maximize context and minimize confusion, hidden blast radius, and unsupported fixes.",
+  "methodology_doc": "_repos/shared-backend-components/context/codex/gev-adversarial-interrogatories.md",
+  "checker": "scripts/check_gev_adversarial_interrogatories.py",
+  "packet_field": "interrogatory_template_ids",
+  "corner_case_categories": [
+    {
+      "id": "dynamic_python",
+      "risks": ["getattr", "setattr", "hasattr", "globals", "locals", "eval", "exec", "__import__", "importlib.import_module", "string dispatch", "monkey patching"],
+      "review_goal": "Mark unresolved references explicitly and block automatic rename or promotion until modeled."
+    },
+    {
+      "id": "framework_entrypoints",
+      "risks": ["CLI main", "pytest discovery", "unittest hooks", "FastAPI/Flask route handlers", "Click/Typer commands", "template run(inputs)", "Celery tasks", "framework decorators"],
+      "review_goal": "Use shims or explicit exemptions for external names while keeping typed internal implementations."
+    },
+    {
+      "id": "schema_and_serialization",
+      "risks": ["JSON keys", "YAML fields", "dataclass fields", "TypedDict keys", "Pydantic models", "CSV columns", "database column names", "OpenAPI contracts"],
+      "review_goal": "Rename code and serialized/public field surfaces only as a coordinated contract."
+    },
+    {
+      "id": "data_shape_scalability",
+      "risks": ["numbered scalar series", "single-item functions that should batch", "repeated adjacent calls", "scalar config where array/map is needed", "one-off switch branches"],
+      "review_goal": "Prefer scalar-or-sequence normalization, maps, dispatch tables, and bounded iteration primitives."
+    },
+    {
+      "id": "control_flow_fragility",
+      "risks": ["long if/elif chains", "unbounded while loops", "implicit fallthrough", "broad exception swallowing", "early return ladders", "retry loops without budgets"],
+      "review_goal": "Make flow graphable, bounded, and rule/table driven where cases can grow."
+    },
+    {
+      "id": "state_and_side_effects",
+      "risks": ["global mutable state", "mutable defaults", "cache invalidation", "file writes", "network calls", "DB writes", "queue publish", "time/random dependence"],
+      "review_goal": "Expose side effects, idempotency keys, rollback paths, receipts, and proof fixtures."
+    },
+    {
+      "id": "blast_radius_and_reexports",
+      "risks": ["__all__", "facades", "star imports", "module aliases", "package __init__", "public exports", "downstream callers", "UI/backend seams"],
+      "review_goal": "Attach import/export/caller/UI path context before changing a symbol."
+    },
+    {
+      "id": "security_privacy_tenant",
+      "risks": ["secret-like literals", "PII/PHI", "tenant boundary", "auth/session", "API keys", "egress", "prompt injection", "unsafe deserialization"],
+      "review_goal": "Route to high-risk review and require deterministic evidence plus owner/human acceptance."
+    },
+    {
+      "id": "temporal_and_freshness",
+      "risks": ["today/yesterday text", "timezone", "stale model/provider facts", "TTL", "CDC freshness", "scheduled jobs", "clock-dependent tests"],
+      "review_goal": "Use explicit timestamps, injected clocks, freshness policies, and stale-holdout behavior."
+    },
+    {
+      "id": "long_name_failure_modes",
+      "risks": ["token bloat", "line length", "path length", "external API name limits", "readability of repeated locals", "case-insensitive filesystem collisions"],
+      "review_goal": "Keep meaningful names but use shims, summaries, aliases, and generated graph views when names hit external limits."
+    },
+    {
+      "id": "multi_language_surface",
+      "risks": ["JSX handlers", "HTML forms", "CSS class state", "data-* attributes", "frontend routes", "fetch calls", "template placeholders"],
+      "review_goal": "Represent frontend-to-backend seams as graph paths and mark missing parser coverage as a gap."
+    },
+    {
+      "id": "generated_code_quality",
+      "risks": ["model-authored code", "unverified snippets", "placeholder variables", "missing purpose", "unbounded generated loops", "too-early strict typing"],
+      "review_goal": "Use Teleon primitive blocks, candidate envelopes, purpose/input/output contracts, and proof-before-promotion."
+    }
+  ],
+  "interrogatory_templates": [
+    {
+      "id": "graphability_interrogatory",
+      "applies_to": ["all"],
+      "questions": [
+        "What node(s) does this artifact create or modify?",
+        "What edge types should exist: calls, contains, imports, data_def_use, UI seam, requirement edge?",
+        "What dynamic or unresolved edge could hide from static parsing?",
+        "Can this be found by exact grep using the long source name?"
+      ],
+      "required_evidence": ["path", "line", "kind", "graph_context"]
+    },
+    {
+      "id": "blast_radius_interrogatory",
+      "applies_to": ["all"],
+      "questions": [
+        "Who calls this, imports this, re-exports this, or serializes this?",
+        "Which UI/backend paths reach it?",
+        "Which proofs fail if this changes?",
+        "What is the smallest bounded slice that can be safely migrated?"
+      ],
+      "required_evidence": ["blast_radius", "graph_context", "proof_to_run"]
+    },
+    {
+      "id": "enrichment_interrogatory",
+      "applies_to": ["all"],
+      "questions": [
+        "What purpose does this object serve?",
+        "What problem does it solve?",
+        "What inputs and outputs does it expect today?",
+        "What UI/UX or product behavior depends on it?",
+        "What would confuse an LLM or engineer reading only this packet?"
+      ],
+      "required_evidence": ["deterministic_evidence", "context_policy"]
+    },
+    {
+      "id": "verification_interrogatory",
+      "applies_to": ["all"],
+      "questions": [
+        "Which deterministic check proves the finding exists?",
+        "Which proof or test accepts a fix?",
+        "What nondeterministic enrichment is merely candidate-only?",
+        "What human/owner review is required before promotion?"
+      ],
+      "required_evidence": ["verification_lanes", "contracts"]
+    },
+    {
+      "id": "data_shape_interrogatory",
+      "applies_to": ["scalar_series_candidate", "repeat_loop_candidate", "rigid_branch_chain", "magic_literal:number"],
+      "questions": [
+        "Is this scalar actually one element of a repeated set?",
+        "Should input be scalar_or_sequence instead of scalar-only?",
+        "Can a table, array, map, or dispatch row replace this branch or repeated call?",
+        "What Teleon primitive block would make the shape scalable?"
+      ],
+      "required_evidence": ["excerpt", "deterministic_rule"]
+    },
+    {
+      "id": "dynamic_reference_interrogatory",
+      "applies_to": ["dynamic_reference_contract", "dynamic_reference_text", "dynamic_python_call", "dynamic_kwargs", "dynamic_kwargs_contract"],
+      "questions": [
+        "What name, field, method, or module is being resolved dynamically?",
+        "Can the possible targets be enumerated into a dispatch table?",
+        "Does this block automatic rename or data-flow confidence?",
+        "What fixture proves each dynamic target remains reachable?"
+      ],
+      "required_evidence": ["excerpt", "verification_lanes"]
+    },
+    {
+      "id": "security_privacy_interrogatory",
+      "applies_to": ["secret_pattern:private_key_block", "secret_pattern:aws_access_key", "secret_pattern:openai_like_key", "secret_pattern:token_assignment"],
+      "questions": [
+        "Is this a real secret, a fixture, or a detector pattern?",
+        "Is the value synthetic and clearly marked?",
+        "Can the pattern leak into docs, logs, prompts, or deployed artifacts?",
+        "Which redaction or fixture-marker proof should guard it?"
+      ],
+      "required_evidence": ["excerpt", "path", "line", "severity"]
+    },
+    {
+      "id": "external_contract_interrogatory",
+      "applies_to": ["external_entrypoint_candidate", "decorated_definition", "pyprefix_symbol"],
+      "questions": [
+        "Is this name called by a framework, CLI, template, or external user?",
+        "Should it remain as a shim while the implementation gets the long pyprefix name?",
+        "Which callers use keyword names, string names, route names, or serialized keys?",
+        "What compatibility proof prevents breaking public behavior?"
+      ],
+      "required_evidence": ["path", "line", "kind"]
+    }
+  ],
+  "skill_templates": [
+    {
+      "id": "graph_cartographer",
+      "role": "Map nodes and edges before proposing fixes.",
+      "prompt_frame": "List the graph nodes, edge types, unresolved edges, and blast-radius level for this packet. Do not propose a fix until the blast radius is named."
+    },
+    {
+      "id": "contract_skeptic",
+      "role": "Find public/API/schema/framework contracts that a rename or refactor could break.",
+      "prompt_frame": "Assume this change breaks an external contract. Name the contract, evidence, and shim or coordinated migration required."
+    },
+    {
+      "id": "data_shape_normalizer",
+      "role": "Find scalar-to-array, loop, dispatch, and rule-table opportunities.",
+      "prompt_frame": "Identify whether the code should become scalar_or_sequence, table-driven, dispatch-driven, or bounded-loop driven. Name the primitive block."
+    },
+    {
+      "id": "verification_prosecutor",
+      "role": "Demand proof before acceptance.",
+      "prompt_frame": "State the deterministic evidence, proof command, required fixture, and why LLM output alone is insufficient."
+    },
+    {
+      "id": "adversarial_breaker",
+      "role": "Imagine ways the finding or fix fails under dynamic, concurrent, malformed, stale, or cross-tenant inputs.",
+      "prompt_frame": "Generate adversarial cases, including dynamic refs, malformed input, repeated input, stale facts, tenant boundaries, and public contract callers."
+    },
+    {
+      "id": "ux_product_mapper",
+      "role": "Map code risk to UI, user workflow, and product-market behavior.",
+      "prompt_frame": "Explain the UX/product impact if this code is wrong, stale, unwired, or confusing. Keep claims candidate-only."
+    }
+  ]
+}

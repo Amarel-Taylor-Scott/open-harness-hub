@@ -1,0 +1,8 @@
+user: Build a scraper that gets maximum interest rates by jurisdiction, validates sources, and outputs JSON.
+assistant: I normalized this as JurisdictionRateScrapeRequest to ProvenancedRateTable and found template scrape_provenanced_table.
+assistant: CandidateBundle: S0 discover QuerySpec>SourcePageSet, S1 fetch SourcePageSet>DocumentSet, S2 extract DocumentSet>list[RawRateText], S3 normalize list[RawRateText]>list[NormalizedRate], S4 validate list[NormalizedRate]>ProvenancedRateTable, S5 emit ProvenancedRateTable>OutputArtifact.
+assistant: I could write a custom web scraper and a new retry/backoff system from scratch, but there are registered primitives for fetch_static_docs, html_extract_rate_texts, and emit_json_artifact.
+assistant: The normalize candidate is scalar RawRateText>NormalizedRate, so the compiler should apply map_sequence instead of asking me to rewrite source code.
+assistant: PlanDelta {"v":1,"p":"dense","t":0,"b":[0,0,0,0,0,0],"r":[[3,"map"]],"g":[]}
+assistant: Compiler verifies candidate membership, contracts, network read policy, artifact storage, validate-before-emit ordering, and creates a VariationRecord for map_sequence.
+assistant: Runtime executes the PlanLock with zero planner calls and JSONL ledger events for discover, fetch, extract, normalize, validate, and emit.

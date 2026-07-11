@@ -1,0 +1,892 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "chunk_count": 1,
+    "chunks": [
+      {
+        "char_count": 212,
+        "id": "chunk-001-89e164e3",
+        "text": "Section 2 Vendor Review. Baltor Security Operations requires Vendor Access Review every 90 days as of 2026-06-01. Contact security@example.com and see https://example.com/policy. The current threshold is $25,000."
+      }
+    ],
+    "claim_count": 3,
+    "claims": [
+      {
+        "claim": "Baltor Security Operations requires Vendor Access Review every 90 days as of 2026-06-01.",
+        "id": "claim-001-13b52d89",
+        "polarity": "neutral",
+        "source_chunk": "chunk-001-89e164e3",
+        "subject": "Baltor Security Operations"
+      },
+      {
+        "claim": "Contact security@example.com and see https://example.com/policy.",
+        "id": "claim-002-97f7f7e7",
+        "polarity": "neutral",
+        "source_chunk": "chunk-001-89e164e3",
+        "subject": "Contact"
+      },
+      {
+        "claim": "The current threshold is $25,000.",
+        "id": "claim-003-8b6016d7",
+        "polarity": "neutral",
+        "source_chunk": "chunk-001-89e164e3",
+        "subject": "the current threshold"
+      }
+    ],
+    "document_edge_count": 2,
+    "document_edges": [
+      {
+        "from": "folder:/",
+        "to": "run:run-deterministic-graph-proof-001",
+        "type": "child_of"
+      },
+      {
+        "from": "file-001-35a480f8",
+        "to": "folder:/",
+        "type": "child_of"
+      }
+    ],
+    "document_node_count": 3,
+    "document_nodes": [
+      {
+        "id": "run:run-deterministic-graph-proof-001",
+        "label": "run-deterministic-graph-proof-001",
+        "type": "run"
+      },
+      {
+        "depth": 0,
+        "id": "folder:/",
+        "label": "/",
+        "type": "folder"
+      },
+      {
+        "byte_size": 0,
+        "char_count": 212,
+        "extension": ".txt",
+        "id": "file-001-35a480f8",
+        "label": "inline.txt",
+        "path": "inline.txt",
+        "readable_text": true,
+        "type": "file"
+      }
+    ],
+    "edges": [
+      {
+        "from": "entity-001-66d2a7a5",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-002-76febfb5",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-003-dcbef577",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-004-b37456c4",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-005-f2c6b564",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "claim-001-13b52d89",
+        "to": "chunk-001-89e164e3",
+        "type": "supported_by"
+      },
+      {
+        "from": "claim-001-13b52d89",
+        "to": "entity-001-66d2a7a5",
+        "type": "mentions"
+      },
+      {
+        "from": "claim-002-97f7f7e7",
+        "to": "chunk-001-89e164e3",
+        "type": "supported_by"
+      },
+      {
+        "from": "claim-002-97f7f7e7",
+        "to": "entity-004-b37456c4",
+        "type": "mentions"
+      },
+      {
+        "from": "claim-003-8b6016d7",
+        "to": "chunk-001-89e164e3",
+        "type": "supported_by"
+      }
+    ],
+    "entities": [
+      {
+        "id": "entity-001-66d2a7a5",
+        "label": "Baltor Security Operations",
+        "type": "entity"
+      },
+      {
+        "id": "entity-002-76febfb5",
+        "label": "Vendor Access Review",
+        "type": "entity"
+      },
+      {
+        "id": "entity-003-dcbef577",
+        "label": "Vendor Review",
+        "type": "entity"
+      },
+      {
+        "id": "entity-004-b37456c4",
+        "label": "Contact",
+        "type": "entity"
+      },
+      {
+        "id": "entity-005-f2c6b564",
+        "label": "Section",
+        "type": "entity"
+      }
+    ],
+    "entity_edges": [
+      {
+        "from": "entity-001-66d2a7a5",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-002-76febfb5",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-003-dcbef577",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-004-b37456c4",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "entity-005-f2c6b564",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      }
+    ],
+    "fragile_facts": [
+      {
+        "authoritative_source_count": 0,
+        "claim": "Baltor Security Operations requires Vendor Access Review every 90 days as of 2026-06-01.",
+        "fact_id": "claim-001-13b52d89",
+        "independent_source_count": 1,
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 24,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "reasons": [
+          "refreshable via search/tool worker"
+        ],
+        "source_chunk": "chunk-001-89e164e3",
+        "state": "needs_second_source",
+        "subject": "Baltor Security Operations"
+      },
+      {
+        "authoritative_source_count": 0,
+        "claim": "The current threshold is $25,000.",
+        "fact_id": "claim-003-8b6016d7",
+        "independent_source_count": 1,
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 24,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "reasons": [
+          "refreshable via search/tool worker"
+        ],
+        "source_chunk": "chunk-001-89e164e3",
+        "state": "needs_second_source",
+        "subject": "the current threshold"
+      }
+    ],
+    "keywords": [
+      {
+        "count": 2,
+        "term": "vendor"
+      },
+      {
+        "count": 2,
+        "term": "review"
+      },
+      {
+        "count": 2,
+        "term": "security"
+      },
+      {
+        "count": 2,
+        "term": "example"
+      },
+      {
+        "count": 2,
+        "term": "com"
+      },
+      {
+        "count": 1,
+        "term": "section"
+      },
+      {
+        "count": 1,
+        "term": "baltor"
+      },
+      {
+        "count": 1,
+        "term": "operations"
+      },
+      {
+        "count": 1,
+        "term": "requires"
+      },
+      {
+        "count": 1,
+        "term": "access"
+      },
+      {
+        "count": 1,
+        "term": "every"
+      },
+      {
+        "count": 1,
+        "term": "days"
+      },
+      {
+        "count": 1,
+        "term": "contact"
+      },
+      {
+        "count": 1,
+        "term": "see"
+      },
+      {
+        "count": 1,
+        "term": "https"
+      },
+      {
+        "count": 1,
+        "term": "policy"
+      },
+      {
+        "count": 1,
+        "term": "current"
+      },
+      {
+        "count": 1,
+        "term": "threshold"
+      }
+    ],
+    "nlp_signals": [
+      {
+        "action_terms": [
+          "requires",
+          "review"
+        ],
+        "avg_sentence_words": 6.25,
+        "char_count": 212,
+        "chunk_id": "chunk-001-89e164e3",
+        "heading_count": 1,
+        "headings": [
+          "2 Vendor Review. Baltor Security Operations requires Vendor Access Review every 90 days as of 2026-06-01. Contact security@example.com and see https://example.com/policy. The current threshold is $25,000."
+        ],
+        "id": "nlp-001-77098668",
+        "sentence_count": 4,
+        "unique_word_ratio": 0.8,
+        "word_count": 25
+      }
+    ],
+    "nodes": [
+      {
+        "id": "entity-001-66d2a7a5",
+        "label": "Baltor Security Operations",
+        "type": "entity"
+      },
+      {
+        "id": "entity-002-76febfb5",
+        "label": "Vendor Access Review",
+        "type": "entity"
+      },
+      {
+        "id": "entity-003-dcbef577",
+        "label": "Vendor Review",
+        "type": "entity"
+      },
+      {
+        "id": "entity-004-b37456c4",
+        "label": "Contact",
+        "type": "entity"
+      },
+      {
+        "id": "entity-005-f2c6b564",
+        "label": "Section",
+        "type": "entity"
+      },
+      {
+        "id": "chunk-001-89e164e3",
+        "label": "chunk-001-89e164e3",
+        "type": "chunk",
+        "weight": 212
+      },
+      {
+        "id": "claim-001-13b52d89",
+        "label": "Baltor Security Operations",
+        "type": "claim"
+      },
+      {
+        "id": "claim-002-97f7f7e7",
+        "label": "Contact",
+        "type": "claim"
+      },
+      {
+        "id": "claim-003-8b6016d7",
+        "label": "the current threshold",
+        "type": "claim"
+      }
+    ],
+    "proper_noun_edges": [
+      {
+        "from": "proper-001-d7b7cb99",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "proper-002-76febfb5",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      },
+      {
+        "from": "proper-003-b37456c4",
+        "to": "chunk-001-89e164e3",
+        "type": "mentioned_in"
+      }
+    ],
+    "proper_nouns": [
+      {
+        "confidence": 0.8,
+        "id": "proper-001-d7b7cb99",
+        "label": "Vendor Review. Baltor Security Operations",
+        "mention_count": 1,
+        "type": "proper_noun"
+      },
+      {
+        "confidence": 0.7,
+        "id": "proper-002-76febfb5",
+        "label": "Vendor Access Review",
+        "mention_count": 1,
+        "type": "proper_noun"
+      },
+      {
+        "confidence": 0.6,
+        "id": "proper-003-b37456c4",
+        "label": "Contact",
+        "mention_count": 1,
+        "type": "proper_noun"
+      }
+    ],
+    "refresh_jobs": [
+      {
+        "budget_policy": {
+          "action": "allow",
+          "budget_used_pct": 14.0,
+          "reason_codes": [
+            "within_budget"
+          ],
+          "task_budget_ceiling_usd": 0.25
+        },
+        "cost_estimate": {
+          "currency": "USD",
+          "estimate_kind": "task_planning",
+          "estimated_browser_seconds": 45,
+          "estimated_ceiling_usd": 0.063,
+          "estimated_floor_usd": 0.0228,
+          "estimated_gpu_seconds": 0,
+          "estimated_search_calls": 1,
+          "estimated_total_usd": 0.035,
+          "estimated_worker_seconds": 20,
+          "line_items": [
+            {
+              "amount_usd": 0.0123,
+              "basis": "verify.second_source.find queue worker",
+              "key": "worker_lane",
+              "label": "Worker lane execution"
+            },
+            {
+              "amount_usd": 0.0228,
+              "basis": "1 planned search/tool call(s)",
+              "key": "search_or_model",
+              "label": "Search/model/tool allowance"
+            }
+          ]
+        },
+        "fact_id": "claim-001-13b52d89",
+        "job_id": "cw-40a8bc618412",
+        "lane": "research",
+        "parent_job_id": "cw-deterministic-graph-proof-001",
+        "pass_index": 2,
+        "payload": {
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "fact_id": "claim-001-13b52d89",
+          "priority": "normal",
+          "query": "Baltor Security Operations authoritative verification source",
+          "queue_policy": {
+            "backoff": "exponential",
+            "budget_policy": {
+              "action": "allow",
+              "budget_used_pct": 14.0,
+              "reason_codes": [
+                "within_budget"
+              ],
+              "task_budget_ceiling_usd": 0.25
+            },
+            "cost_estimate": {
+              "currency": "USD",
+              "estimate_kind": "task_planning",
+              "estimated_browser_seconds": 45,
+              "estimated_ceiling_usd": 0.063,
+              "estimated_floor_usd": 0.0228,
+              "estimated_gpu_seconds": 0,
+              "estimated_search_calls": 1,
+              "estimated_total_usd": 0.035,
+              "estimated_worker_seconds": 20,
+              "line_items": [
+                {
+                  "amount_usd": 0.0123,
+                  "basis": "verify.second_source.find queue worker",
+                  "key": "worker_lane",
+                  "label": "Worker lane execution"
+                },
+                {
+                  "amount_usd": 0.0228,
+                  "basis": "1 planned search/tool call(s)",
+                  "key": "search_or_model",
+                  "label": "Search/model/tool allowance"
+                }
+              ]
+            },
+            "dedupe_key": "local|verify.second_source.find|claim-001-13b52d89|-|-",
+            "lane": "research",
+            "max_attempts": 3,
+            "priority": "normal",
+            "priority_score": 0.45,
+            "reason_codes": [
+              "needs_second_independent_source"
+            ]
+          }
+        },
+        "priority": "normal",
+        "queue_policy": {
+          "backoff": "exponential",
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "dedupe_key": "local|verify.second_source.find|claim-001-13b52d89|-|-",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "run_id": "run-deterministic-graph-proof-001",
+        "source_record_id": "",
+        "state": "queued",
+        "task": "context.search.verify",
+        "task_id": "rt-4533c5349a400d90",
+        "task_type": "verify.second_source.find",
+        "tenant_id": "local"
+      },
+      {
+        "budget_policy": {
+          "action": "allow",
+          "budget_used_pct": 14.0,
+          "reason_codes": [
+            "within_budget"
+          ],
+          "task_budget_ceiling_usd": 0.25
+        },
+        "cost_estimate": {
+          "currency": "USD",
+          "estimate_kind": "task_planning",
+          "estimated_browser_seconds": 45,
+          "estimated_ceiling_usd": 0.063,
+          "estimated_floor_usd": 0.0228,
+          "estimated_gpu_seconds": 0,
+          "estimated_search_calls": 1,
+          "estimated_total_usd": 0.035,
+          "estimated_worker_seconds": 20,
+          "line_items": [
+            {
+              "amount_usd": 0.0123,
+              "basis": "verify.second_source.find queue worker",
+              "key": "worker_lane",
+              "label": "Worker lane execution"
+            },
+            {
+              "amount_usd": 0.0228,
+              "basis": "1 planned search/tool call(s)",
+              "key": "search_or_model",
+              "label": "Search/model/tool allowance"
+            }
+          ]
+        },
+        "fact_id": "claim-003-8b6016d7",
+        "job_id": "cw-c70a5fca742b",
+        "lane": "research",
+        "parent_job_id": "cw-deterministic-graph-proof-001",
+        "pass_index": 2,
+        "payload": {
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "fact_id": "claim-003-8b6016d7",
+          "priority": "normal",
+          "query": "the current threshold authoritative verification source",
+          "queue_policy": {
+            "backoff": "exponential",
+            "budget_policy": {
+              "action": "allow",
+              "budget_used_pct": 14.0,
+              "reason_codes": [
+                "within_budget"
+              ],
+              "task_budget_ceiling_usd": 0.25
+            },
+            "cost_estimate": {
+              "currency": "USD",
+              "estimate_kind": "task_planning",
+              "estimated_browser_seconds": 45,
+              "estimated_ceiling_usd": 0.063,
+              "estimated_floor_usd": 0.0228,
+              "estimated_gpu_seconds": 0,
+              "estimated_search_calls": 1,
+              "estimated_total_usd": 0.035,
+              "estimated_worker_seconds": 20,
+              "line_items": [
+                {
+                  "amount_usd": 0.0123,
+                  "basis": "verify.second_source.find queue worker",
+                  "key": "worker_lane",
+                  "label": "Worker lane execution"
+                },
+                {
+                  "amount_usd": 0.0228,
+                  "basis": "1 planned search/tool call(s)",
+                  "key": "search_or_model",
+                  "label": "Search/model/tool allowance"
+                }
+              ]
+            },
+            "dedupe_key": "local|verify.second_source.find|claim-003-8b6016d7|-|-",
+            "lane": "research",
+            "max_attempts": 3,
+            "priority": "normal",
+            "priority_score": 0.45,
+            "reason_codes": [
+              "needs_second_independent_source"
+            ]
+          }
+        },
+        "priority": "normal",
+        "queue_policy": {
+          "backoff": "exponential",
+          "budget_policy": {
+            "action": "allow",
+            "budget_used_pct": 14.0,
+            "reason_codes": [
+              "within_budget"
+            ],
+            "task_budget_ceiling_usd": 0.25
+          },
+          "cost_estimate": {
+            "currency": "USD",
+            "estimate_kind": "task_planning",
+            "estimated_browser_seconds": 45,
+            "estimated_ceiling_usd": 0.063,
+            "estimated_floor_usd": 0.0228,
+            "estimated_gpu_seconds": 0,
+            "estimated_search_calls": 1,
+            "estimated_total_usd": 0.035,
+            "estimated_worker_seconds": 20,
+            "line_items": [
+              {
+                "amount_usd": 0.0123,
+                "basis": "verify.second_source.find queue worker",
+                "key": "worker_lane",
+                "label": "Worker lane execution"
+              },
+              {
+                "amount_usd": 0.0228,
+                "basis": "1 planned search/tool call(s)",
+                "key": "search_or_model",
+                "label": "Search/model/tool allowance"
+              }
+            ]
+          },
+          "dedupe_key": "local|verify.second_source.find|claim-003-8b6016d7|-|-",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "run_id": "run-deterministic-graph-proof-001",
+        "source_record_id": "",
+        "state": "queued",
+        "task": "context.search.verify",
+        "task_id": "rt-90a57470adc986de",
+        "task_type": "verify.second_source.find",
+        "tenant_id": "local"
+      }
+    ],
+    "regex_edges": [
+      {
+        "from": "regex-001-2a133823",
+        "to": "chunk-001-89e164e3",
+        "type": "found_in"
+      },
+      {
+        "from": "regex-002-f99c3daf",
+        "to": "chunk-001-89e164e3",
+        "type": "found_in"
+      },
+      {
+        "from": "regex-003-02074978",
+        "to": "chunk-001-89e164e3",
+        "type": "found_in"
+      },
+      {
+        "from": "regex-004-8b7e3195",
+        "to": "chunk-001-89e164e3",
+        "type": "found_in"
+      }
+    ],
+    "regex_fact_count": 4,
+    "regex_facts": [
+      {
+        "end": 142,
+        "evidence": "perations requires Vendor Access Review every 90 days as of 2026-06-01. Contact security@example.com and see https://example.com/policy. The current threshold is $25,000.",
+        "id": "regex-001-2a133823",
+        "source_chunk": "chunk-001-89e164e3",
+        "start": 122,
+        "type": "email",
+        "value": "security@example.com"
+      },
+      {
+        "end": 178,
+        "evidence": "ess Review every 90 days as of 2026-06-01. Contact security@example.com and see https://example.com/policy. The current threshold is $25,000.",
+        "id": "regex-002-f99c3daf",
+        "source_chunk": "chunk-001-89e164e3",
+        "start": 151,
+        "type": "url",
+        "value": "https://example.com/policy"
+      },
+      {
+        "end": 211,
+        "evidence": "curity@example.com and see https://example.com/policy. The current threshold is $25,000.",
+        "id": "regex-003-02074978",
+        "source_chunk": "chunk-001-89e164e3",
+        "start": 204,
+        "type": "money",
+        "value": "$25,000"
+      },
+      {
+        "end": 112,
+        "evidence": "w. Baltor Security Operations requires Vendor Access Review every 90 days as of 2026-06-01. Contact security@example.com and see https://example.com/policy. The current t",
+        "id": "regex-004-8b7e3195",
+        "source_chunk": "chunk-001-89e164e3",
+        "start": 102,
+        "type": "date",
+        "value": "2026-06-01"
+      }
+    ],
+    "summary": {
+      "chunks": 1,
+      "claims": 3,
+      "document_nodes": 3,
+      "entities": 5,
+      "fragile_facts": 2,
+      "keywords": 18,
+      "pass_index": 1,
+      "proper_nouns": 3,
+      "refresh_jobs": 2,
+      "regex_facts": 4
+    },
+    "updates": [
+      {
+        "fact_id": "claim-001-13b52d89",
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 24,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "state": "needs_second_source",
+        "target": "Baltor Security Operations",
+        "worker": "verify.second_source.find"
+      },
+      {
+        "fact_id": "claim-003-8b6016d7",
+        "priority": "normal",
+        "priority_signals": {
+          "customer_impact": 0.5,
+          "freshness_age_hours": 24,
+          "risk": 0.35,
+          "source_count": 1
+        },
+        "queue_policy": {
+          "backoff": "exponential",
+          "lane": "research",
+          "max_attempts": 3,
+          "priority": "normal",
+          "priority_score": 0.45,
+          "reason_codes": [
+            "needs_second_independent_source"
+          ]
+        },
+        "state": "needs_second_source",
+        "target": "the current threshold",
+        "worker": "verify.second_source.find"
+      }
+    ]
+  }
+}

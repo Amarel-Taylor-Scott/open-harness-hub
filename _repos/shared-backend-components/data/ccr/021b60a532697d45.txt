@@ -1,0 +1,49 @@
+MODULE src/baltor/native/okf_adapter.py
+## API signatures
+```python
+"""src/baltor/native/okf_adapter — interoperate with Google's Open Knowledge Format (OKF, Apache-2.0, v0.1) at
+the EDGES: import an OKF knowledge repo into governed Baltor context objects, and export governed objects back to
+OKF — WITHOUT making OKF our core object. OKF is a projection (like PROV-JSON / OpenLineage), not the source of
+truth."""
+OKF_REQUIRED_KEY = ...
+OKF_INDEX_FILE = ...
+OKF_LOG_FILE = ...
+GOVERNANCE_KEY = ...
+_KNOWN_SCALARS = ...
+def _sha256(text: str) -> str
+class GovernedConcept:
+    # A Baltor context object — the CORE. OKF is one projection of it, never its definition.
+    def content_hash(self) -> str
+    def as_dict(self) -> dict
+def _fmt_scalar(v) -> str
+def _parse_scalar(raw: str)
+def _split_frontmatter(text: str) -> tuple[dict, str]
+    # Parse `---\nkey: value\n---\nbody`. Unknown keys are returned raw; body is everything after the 2nd fence.
+def okf_import_file(path: str, text: str) -> GovernedConcept
+    # Parse a single OKF concept file into a GovernedConcept. Enforces OKF's `type`-required rule.
+def okf_import(repo: dict) -> list[GovernedConcept]
+    # Import an OKF repo ({path: file_text}). Reserved files (index.md/log.md) are skipped — they are projections,
+def _frontmatter(concept: GovernedConcept) -> str
+def okf_export_file(concept: GovernedConcept) -> str
+def _build_index(concepts: list[GovernedConcept]) -> str
+def _build_log(concepts: list[GovernedConcept]) -> str
+    # Reconstruct OKF's reserved change-history file from our CDC/freshness history — the assurance OKF lacks.
+def okf_export(concepts: list[GovernedConcept], *, include_reserved: bool=True) -> dict
+    # Export governed concepts as an OKF repo ({path: file_text}), with our governance in frontmatter + reserved
+def round_trip(concepts: list[GovernedConcept]) -> list[GovernedConcept]
+    # import(export(x)) — must preserve every answer-critical field + the governance sidecar + arbitrary extras.
+```
+## intra-module call edges
+src.baltor.native.okf_adapter._frontmatter -> src.baltor.native.okf_adapter._fmt_scalar
+src.baltor.native.okf_adapter.content_hash -> src.baltor.native.okf_adapter.GovernedConcept.as_dict
+src.baltor.native.okf_adapter.content_hash -> src.baltor.native.okf_adapter._sha256
+src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter._build_index
+src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter._build_log
+src.baltor.native.okf_adapter.okf_export -> src.baltor.native.okf_adapter.okf_export_file
+src.baltor.native.okf_adapter.okf_export_file -> src.baltor.native.okf_adapter._frontmatter
+src.baltor.native.okf_adapter.okf_import -> src.baltor.native.okf_adapter.okf_import_file
+src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter.GovernedConcept
+src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter._parse_scalar
+src.baltor.native.okf_adapter.okf_import_file -> src.baltor.native.okf_adapter._split_frontmatter
+src.baltor.native.okf_adapter.round_trip -> src.baltor.native.okf_adapter.okf_export
+src.baltor.native.okf_adapter.round_trip -> src.baltor.native.okf_adapter.okf_import

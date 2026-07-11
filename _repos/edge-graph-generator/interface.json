@@ -1,0 +1,34 @@
+{
+  "surface": "edge-graph-generator",
+  "repo": "aidoneright-edge-graph-generator",
+  "interface_version": "0.1.0",
+  "exposes": [
+    {
+      "id": "per-repo-edge-digest",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The generated per-repo EDGES.md \u2014 a repo sees neighbors' exposes, never their internals."
+    },
+    {
+      "id": "repo-dependency-graph",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The global mermaid dependency graph plus graph.json."
+    },
+    {
+      "id": "surface-registry-validator",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Validates the registry: every may_depend_on is real, no forbidden edge, acyclic."
+    },
+    {
+      "id": "interface-manifest-validator",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Validates each repo's interface.json: consumes only exposed capabilities, only from allowed surfaces."
+    }
+  ],
+  "consumes": {
+    "dev-rules-context": []
+  }
+}

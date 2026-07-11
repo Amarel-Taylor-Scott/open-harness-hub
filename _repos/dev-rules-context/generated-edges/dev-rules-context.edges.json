@@ -1,0 +1,36 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "dev-rules-context",
+  "repo": "aidoneright-dev-rules-context",
+  "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the naming law, multi-path methodology, verification laws, the surface registry, and the portable checkers.",
+  "exposes": [
+    "standards/*",
+    "contracts/surface-registry.json",
+    "tools/check_*.py",
+    "_shared/*"
+  ],
+  "depends_on": [],
+  "consumed_by": [
+    "aidevobserver",
+    "aidoneright",
+    "api-endpoint-wrappers",
+    "baltor",
+    "business-context",
+    "context-injection",
+    "edge-graph-generator",
+    "fundraising",
+    "openhubforai",
+    "pitch-decks",
+    "scraping",
+    "shared-backend-components",
+    "teleon",
+    "yc-applications"
+  ],
+  "forbidden_from_me": [
+    {
+      "to": "shared-backend-components",
+      "why": "the rules/standards repo depends on nothing \u2014 it is inherited, not a consumer"
+    }
+  ],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

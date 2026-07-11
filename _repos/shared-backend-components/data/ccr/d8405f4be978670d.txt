@@ -1,0 +1,22 @@
+MODULE src/teleon/runtime/execution_providers/_byo_base.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers._byo_base — shared base for BYO / customer compute providers."""
+class py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider:
+    def __init__(self, *, secret_refs: dict | None=None, resolve_secret: Callable[[str], str | None] | None=None, endpoint: str | None=None, network_ok: bool=False, region: str | None=None) -> None
+    def _secret(self, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider__secret__name: str) -> str | None
+    def _creds_present(self) -> bool
+    def describe(self) -> dict
+    def health(self) -> dict
+    def eligible(self, task: dict, policy: dict) -> dict
+    def estimate(self, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider_estimate__task: dict, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider_estimate__policy: dict) -> dict
+    def invoke(self, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider_invoke__task: dict) -> Any
+    def _live(self, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider__live__task: dict) -> Any
+    def _result(self, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider__result__task: dict, py_arg_src_teleon_runtime_execution_providers__byo_base__py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider__result__detail: dict) -> py_class_src_teleon_runtime_execution_provider__ExecutionResult
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers._byo_base._creds_present -> src.teleon.runtime.execution_providers._byo_base.py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider._secret
+src.teleon.runtime.execution_providers._byo_base.eligible -> src.teleon.runtime.execution_providers._byo_base.py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider._creds_present
+src.teleon.runtime.execution_providers._byo_base.health -> src.teleon.runtime.execution_providers._byo_base.py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider._creds_present
+src.teleon.runtime.execution_providers._byo_base.invoke -> src.teleon.runtime.execution_providers._byo_base.py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider._creds_present
+src.teleon.runtime.execution_providers._byo_base.invoke -> src.teleon.runtime.execution_providers._byo_base.py_class_src_teleon_runtime_execution_providers__byo_base__ByoComputeProvider._live

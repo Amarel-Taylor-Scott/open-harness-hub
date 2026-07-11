@@ -1,0 +1,75 @@
+MODULE src/baltor/distillation/lossless_store.py
+## API signatures
+```python
+"""src.baltor.distillation.lossless_store — the append-only, content-addressed LOSSLESS store."""
+EPOCH = ...
+_ID_SCHEME = ...
+_ID_ALGO = ...
+_ID_PREFIX = ...
+TENANT_PRIVATE = ...
+GLOBAL_PUBLIC = ...
+_SCOPES = ...
+LAYER_RAW = ...
+LAYER_SOURCE = ...
+LAYER_DERIVED = ...
+class DistillationStoreError:
+    # Base class for lossless-store failures.
+class TenantBoundaryError:
+    # A read or a lineage edge crossed a tenant boundary (or pulled tenant_private into global_public).
+def _canon(body: Any) -> bytes
+    # Canonical JSON bytes for content hashing (sorted keys, compact, str-coerced).
+def _hash(body: Any) -> str
+def make_id(content_hash_hex: str, tenant_id: str) -> str
+    # Build the content-addressed entry id: ``dist:sha256:<hex>:<tenant>``.
+def parse_id(entry_id: str) -> tuple[str, str]
+    # Parse an entry id → ``(content_hash_hex, tenant_id)``. Raise on any malformation.
+class LosslessStoreEntry:
+    # One immutable layer in the lossless store. Append-only: once written it is never mutated.
+    def to_dict(self) -> dict
+def _as_tuple(x: Iterable[str] | None) -> tuple[str, ...]
+class LosslessStore:
+    # Append-only, content-addressed, tenant-scoped store of raw/source/derived layers + current pointers.
+    def __init__(self, object_store: LocalContentAddressedObjectStore | None=None) -> None
+    def _put(self, *, tenant_id: str, scope: str, layer: str, key: str, body: dict, parent_ids: Iterable[str] | None=None, source_handles: Iterable[str] | None=None, transform_run_id: str='', receipt_ids: Iterable[str] | None=None, held_out_ids: Iterable[str] | None=None, rejected_ids: Iterable[str] | None=None, rollback_target_ids: Iterable[str] | None=None, payload_ref: str='', transform_type: str='', role: str='', now: str=EPOCH) -> LosslessStoreEntry
+    def _track_version(self, tenant_id: str, key: str, entry_id: str) -> None
+    def put_raw(self, tenant_id: str, *, key: str, raw_bytes: bytes | str, mime_type: str='application/octet-stream', scope: str=TENANT_PRIVATE, transform_run_id: str='', receipt_ids: Iterable[str] | None=None, meta: dict | None=None, now: str=EPOCH) -> LosslessStoreEntry
+        # Write the RAW input layer. The large bytes go to the object store; the entry keeps only an opaque
+    def put_source(self, tenant_id: str, *, key: str, body: dict, parent_ids: Iterable[str] | None=None, source_handles: Iterable[str] | None=None, scope: str=TENANT_PRIVATE, transform_run_id: str='', receipt_ids: Iterable[str] | None=None, payload_ref: str='', now: str=EPOCH) -> LosslessStoreEntry
+        # Write a normalized SOURCE artifact (a new layer over raw). Raw stays; this never overwrites it.
+    def put_derived(self, tenant_id: str, *, key: str, body: dict, parent_ids: Iterable[str] | None=None, source_handles: Iterable[str] | None=None, scope: str=TENANT_PRIVATE, transform_type: str='derive', transform_run_id: str='', receipt_ids: Iterable[str] | None=None, held_out_ids: Iterable[str] | None=None, rejected_ids: Iterable[str] | None=None, rollback_target_ids: Iterable[str] | None=None, role: str=LAYER_DERIVED, payload_ref: str='', now: str=EPOCH) -> LosslessStoreEntry
+        # Write a DERIVED artifact (fact / pack / conclusion / reconciliation / candidate …) as a NEW layer.
+    def get(self, entry_id: str, *, tenant: str | None=None) -> LosslessStoreEntry
+        # Return the (immutable) entry by id. If ``tenant`` is given it MUST match the entry's tenant —
+    def has(self, entry_id: str) -> bool
+    def versions(self, key: str, *, tenant: str) -> list[LosslessStoreEntry]
+        # Every version a key has ever had, oldest→newest. A new version NEVER removes an older one, so a
+    def current_id(self, key: str, *, tenant: str) -> str | None
+        # The id the active pointer names for ``key`` (or None if the key has no versions).
+    def current(self, key: str, *, tenant: str) -> LosslessStoreEntry | None
+    def set_current(self, key: str, entry_id: str, *, tenant: str) -> str | None
+        # Move the active pointer for ``key`` to ``entry_id``. Returns the PRIOR pointer id (which is NOT
+    def query(self, *, tenant: str, layer: str | None=None, role: str | None=None, key: str | None=None) -> list[LosslessStoreEntry]
+        # All entries for a tenant, optionally filtered by layer/role/key. Held-out and rejected entries are
+    def rehydrate_payload(self, ref: str, *, tenant: str | None=None) -> bytes
+        # Return the EXACT stored bytes for an opaque ``payload_ref`` (content-hash verified on the way out).
+```
+## intra-module call edges
+src.baltor.distillation.lossless_store._hash -> src.baltor.distillation.lossless_store._canon
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.DistillationStoreError
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.LosslessStore._track_version
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.LosslessStoreEntry
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.TenantBoundaryError
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store._as_tuple
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store._hash
+src.baltor.distillation.lossless_store._put -> src.baltor.distillation.lossless_store.make_id
+src.baltor.distillation.lossless_store.current -> src.baltor.distillation.lossless_store.LosslessStore.current_id
+src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.DistillationStoreError
+src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.TenantBoundaryError
+src.baltor.distillation.lossless_store.get -> src.baltor.distillation.lossless_store.parse_id
+src.baltor.distillation.lossless_store.parse_id -> src.baltor.distillation.lossless_store.DistillationStoreError
+src.baltor.distillation.lossless_store.put_derived -> src.baltor.distillation.lossless_store.LosslessStore._put
+src.baltor.distillation.lossless_store.put_raw -> src.baltor.distillation.lossless_store.LosslessStore._put
+src.baltor.distillation.lossless_store.put_source -> src.baltor.distillation.lossless_store.LosslessStore._put
+src.baltor.distillation.lossless_store.rehydrate_payload -> src.baltor.distillation.lossless_store.TenantBoundaryError
+src.baltor.distillation.lossless_store.set_current -> src.baltor.distillation.lossless_store.DistillationStoreError
+src.baltor.distillation.lossless_store.set_current -> src.baltor.distillation.lossless_store.TenantBoundaryError

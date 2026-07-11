@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aidoneright.dev/schemas/browser_session_report.schema.json",
+  "title": "BrowserSessionReport",
+  "description": "A read-only report over one browser research session: the tabs (tab_state) and the TAB GRAPH (opener edges, cross-origin transitions, popups, duplicate tabs) reconstructed from a list of CapturedArtifact rows (scripts.primitive_browser_control_harness), plus the network/screenshot/dom/form/download surfaces and the candidate-primitive opportunity seeds the session implies. The harness NEVER submits a form or bypasses a login/captcha; side_effect_attempts records detected-but-not-executed controls. Digests + bounded units only; no raw bodies; secrets redacted. candidate; serves_truth=false.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "record_type", "session_id", "started_at", "ended_at", "mode", "contexts", "tabs",
+    "visited_urls", "network_artifacts", "screenshots", "dom_snapshots", "forms", "downloads",
+    "side_effect_attempts", "candidate_primitives", "candidate", "serves_truth"
+  ],
+  "properties": {
+    "record_type": {"const": "browser_session_report"},
+    "schema_version": {"type": "string", "description": "version lives in metadata, never in an id or name"},
+    "session_id": {"type": "string", "description": "canonical_id('bsr', mode, *sorted dom_hashes) — content-addressed, not time-derived"},
+    "generated_at": {"type": "number", "description": "report-build timestamp from the INJECTED clock (deterministic under --self-test)"},
+    "started_at": {"type": "number", "description": "min CapturedArtifact ts in the session"},
+    "ended_at": {"type": "number", "description": "max CapturedArtifact ts in the session"},
+    "mode": {"enum": ["read_only", "authenticated_internal", "side_effect_allowed"],
+             "description": "read_only never submits; authenticated_internal allows logged-in reads; side_effect_allowed is the only mode a safe_submit_gate may authorize a write under, with confirmation"},
+    "contexts": {"type": "array", "items": {
+      "type": "object",
+      "required": ["context_id", "tab_ids", "origins"],
+      "properties": {
+        "context_id": {"type": "string"},
+        "mode": {"enum": ["read_only", "authenticated_internal", "side_effect_allowed"]},
+        "tab_ids": {"type": "array", "items": {"type": "string"}},
+        "origins": {"type": "array", "items": {"type": "string"}}
+      }
+    }},
+    "tabs": {"type": "array", "items": {"$ref": "tab_state.schema.json"}},
+    "visited_urls": {"type": "array", "items": {"type": "string"}},
+    "network_artifacts": {"type": "array", "items": {
+      "type": "object",
+      "required": ["tab_id", "kind", "url", "source"],
+      "properties": {
+        "tab_id": {"type": "string"},
+        "kind": {"enum": ["openapi", "graphql", "postman", "asyncapi", "grpc", "xhr", "fetch"]},
+        "url": {"type": "string"},
+        "source": {"enum": ["page_reference", "har_observed"]},
+        "trust_tier": {"enum": ["T0", "T1", "T2", "T3", "T4"]}
+      }
+    }},
+    "screenshots": {"type": "array", "items": {
+      "type": "object",
+      "required": ["tab_id", "screenshot_hash"],
+      "properties": {"tab_id": {"type": "string"}, "screenshot_hash": {"type": "string"}, "url": {"type": "string"}}
+    }},
+    "dom_snapshots": {"type": "array", "items": {
+      "type": "object",
+      "required": ["tab_id", "dom_hash"],
+      "properties": {
+        "tab_id": {"type": "string"},
+        "url": {"type": "string"},
+        "dom_hash": {"type": "string", "description": "sha256:... of the captured DOM"},
+        "source_bytes": {"type": "integer", "minimum": 0}
+      }
+    }},
+    "forms": {"type": "array", "items": {
+      "type": "object",
+      "required": ["form_id", "tab_id", "action", "method", "fields", "post", "side_effect"],
+      "properties": {
+        "form_id": {"type": "string"},
+        "tab_id": {"type": "string"},
+        "action": {"type": "string"},
+        "method": {"type": "string"},
+        "fields": {"type": "array", "items": {
+          "type": "object",
+          "properties": {"name": {"type": "string"}, "type": {"type": "string"}}
+        }},
+        "post": {"type": "boolean"},
+        "side_effect": {"type": "boolean", "description": "the form mutates state (POST or a side-effect control)"},
+        "side_effect_risk": {"enum": ["none", "read", "write", "regulated"]}
+      }
+    }},
+    "downloads": {"type": "array", "items": {
+      "type": "object",
+      "required": ["tab_id", "url", "cross_origin"],
+      "properties": {
+        "tab_id": {"type": "string"},
+        "url": {"type": "string"},
+        "origin": {"type": ["string", "null"]},
+        "cross_origin": {"type": "boolean"},
+        "trust_tier": {"enum": ["T0", "T1", "T2", "T3", "T4"]},
+        "ext": {"type": ["string", "null"]}
+      }
+    }},
+    "side_effect_attempts": {"type": "array", "items": {
+      "type": "object",
+      "required": ["tab_id", "kind", "executed", "blocked_reason"],
+      "properties": {
+        "tab_id": {"type": "string"},
+        "kind": {"enum": ["form", "button"]},
+        "action": {"type": "string"},
+        "method": {"type": "string"},
+        "label": {"type": "string"},
+        "side_effect_risk": {"enum": ["none", "read", "write", "regulated"]},
+        "executed": {"const": false, "description": "the read-only harness NEVER activates a side-effect control"},
+        "blocked_reason": {"type": "string"}
+      }
+    }},
+    "candidate_primitives": {"type": "array", "description": "opportunity SEEDS (candidate_type + evidence + stable candidate_id) the session implies; browser_report_to_primitive_candidates expands each into a full browser_primitive_candidate row.", "items": {
+      "type": "object",
+      "required": ["candidate_id", "candidate_type", "evidence_refs", "ref_kind"],
+      "properties": {
+        "candidate_id": {"type": "string"},
+        "candidate_type": {"enum": ["page_state_classifier", "form_field_mapper", "safe_submit_gate",
+                                    "success_state_verifier", "dom_drift_detector",
+                                    "api_from_browser_endpoint_candidate", "tab_graph_builder",
+                                    "popup_detector", "download_origin_tracker"]},
+        "evidence_refs": {"type": "array", "items": {"type": "object"}},
+        "ref_kind": {"enum": ["session", "tab", "form", "download", "network"]},
+        "ref_id": {"type": ["string", "null"]}
+      }
+    }},
+    "tab_graph": {"type": "object",
+      "required": ["nodes", "edges", "openers", "cross_origin_transitions", "popups", "duplicate_groups"],
+      "properties": {
+        "nodes": {"type": "array", "items": {"type": "string"}},
+        "edges": {"type": "array", "items": {
+          "type": "object",
+          "required": ["from", "to", "transition_type"],
+          "properties": {
+            "from": {"type": "string"},
+            "to": {"type": "string"},
+            "transition_type": {"enum": ["same_origin_navigation", "cross_origin_transition", "popup"]}
+          }
+        }},
+        "openers": {"type": "object", "description": "child tab_id -> opener tab_id"},
+        "cross_origin_transitions": {"type": "array", "items": {"type": "object"}},
+        "popups": {"type": "array", "items": {"type": "string"}},
+        "duplicate_groups": {"type": "array", "items": {"type": "array", "items": {"type": "string"}}}
+      }
+    },
+    "stats": {"type": "object", "description": "computed counts (tabs, captured, forms, downloads, ...) — never hand-typed"},
+    "candidate": {"const": true},
+    "serves_truth": {"const": false}
+  }
+}

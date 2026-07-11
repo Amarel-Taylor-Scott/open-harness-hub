@@ -1,0 +1,7 @@
+{"role":"user","content":"Build a ticket classifier that routes support tickets to billing, technical support, sales, security, or human review."}
+{"role":"assistant","content":"I normalized this as SupportTicket to RoutedTicketPacket and found template classify_validate_route_emit."}
+{"role":"assistant","content":"CandidateBundle: normalize, classify, validate, route, emit. The classifier is bounded by an allowed label schema and a confidence gate."}
+{"role":"assistant","content":"I should not parse free-form labels from a model response or upload the entire historical ticket export to the model. The compact bundle is enough to bind the existing classifier and route policy."}
+{"role":"assistant","content":"PlanDelta {\"v\":1,\"p\":\"dense\",\"t\":0,\"b\":[0,0,0,0,0],\"r\":[],\"g\":[]}"}
+{"role":"assistant","content":"Compiler rejects classify_ticket_freeform because TextLabel is not schema-safe and verifies that the validation gate runs before routing."}
+{"role":"assistant","content":"Runtime executes the PlanLock with zero unbounded planner calls and routes low-confidence classifications to human review."}

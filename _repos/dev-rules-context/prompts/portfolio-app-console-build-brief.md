@@ -1,0 +1,1 @@
+../../_shared/portfolio-app-console-build-brief.md

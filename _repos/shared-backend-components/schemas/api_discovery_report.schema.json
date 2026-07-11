@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aidoneright.dev/schemas/api_discovery_report.schema.json",
+  "title": "ApiDiscoveryReport",
+  "description": "The structured API surface reconstructed from a browser research session — an OpenAPI/GraphQL/HAR/Postman reference (or inferred XHR/fetch traffic) turned into method+path pairs, request/response shapes, redacted auth, pagination, and error codes, plus the endpoint primitive CANDIDATES (api_endpoint_primitive / request_schema_validator / response_normalizer / error_mapper / mock_server / contract_test) the surface implies. Auth VALUES are never stored (auth_redacted=true, env-name refs only). Digests + shapes only; no raw bodies. candidate; serves_truth=false.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["source", "method_path_pairs", "auth_redacted", "openapi_candidate", "endpoint_primitive_candidates", "candidate", "serves_truth"],
+  "properties": {
+    "record_type": {"const": "api_discovery_report"},
+    "schema_version": {"type": "string"},
+    "report_id": {"type": ["string", "null"], "description": "canonical_id('apidisc', ...) over the discovered surface"},
+    "source": {
+      "type": "object",
+      "required": ["kind"],
+      "properties": {
+        "kind": {"enum": ["openapi", "swagger", "graphql", "postman", "asyncapi", "grpc", "har_observed", "inferred"]},
+        "url": {"type": ["string", "null"]},
+        "trust_tier": {"enum": ["T0", "T1", "T2", "T3", "T4"]},
+        "evidence_refs": {"type": "array", "items": {"type": "object"}}
+      }
+    },
+    "method_path_pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["method", "path"],
+        "properties": {
+          "method": {"type": "string", "description": "GET/POST/PUT/PATCH/DELETE/QUERY/MUTATION"},
+          "path": {"type": "string"},
+          "operation_id": {"type": ["string", "null"]},
+          "summary": {"type": ["string", "null"]},
+          "side_effect_level": {"enum": ["read_only", "read", "write_possible", "write", "regulated", "money_movement"]}
+        }
+      }
+    },
+    "request_shapes": {"type": "array", "items": {"type": "object"}, "description": "per-endpoint request field shapes (name/type/required), never example secret values"},
+    "response_shapes": {"type": "array", "items": {"type": "object"}, "description": "per-endpoint response field shapes"},
+    "auth_redacted": {"type": "boolean", "const": true, "description": "auth values are ALWAYS redacted; only the scheme + env-name ref survive"},
+    "auth": {
+      "type": "object",
+      "properties": {
+        "type": {"enum": ["none", "apikey", "bearer", "oauth2", "basic", "cookie", "mtls", "unknown"]},
+        "location": {"enum": ["header", "query", "cookie", "body", "unknown"]},
+        "name": {"type": ["string", "null"], "description": "the header/param NAME only (e.g. Authorization) — never a value"},
+        "env_ref": {"type": ["string", "null"], "description": "env:// reference an operator would supply; never an inline secret"}
+      }
+    },
+    "pagination": {
+      "type": "object",
+      "properties": {
+        "style": {"enum": ["none", "page", "cursor", "offset", "link_header", "unknown"]},
+        "params": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "error_codes": {"type": "array", "items": {
+      "type": "object",
+      "required": ["code"],
+      "properties": {"code": {"type": ["integer", "string"]}, "meaning": {"type": ["string", "null"]}}
+    }},
+    "openapi_candidate": {"type": "boolean", "description": "the surface is complete enough to emit a candidate OpenAPI document"},
+    "endpoint_primitive_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["candidate_id", "primitive_type", "method", "path"],
+        "properties": {
+          "candidate_id": {"type": "string", "description": "canonical_id — content-addressed, version in metadata"},
+          "primitive_type": {"enum": ["api_endpoint_primitive", "request_schema_validator", "response_normalizer", "error_mapper", "mock_server", "contract_test", "graphql_introspection_parser"]},
+          "method": {"type": "string"},
+          "path": {"type": "string"},
+          "evidence_refs": {"type": "array", "items": {"type": "object"}}
+        }
+      }
+    },
+    "candidate": {"const": true},
+    "serves_truth": {"const": false}
+  }
+}

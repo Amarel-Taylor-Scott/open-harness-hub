@@ -23,7 +23,7 @@ EXTEND these; creating a parallel `apps/`+`packages/` tree or a second event bus
 | Context object / graph / source handles | `scripts/context_graph.py` (+ `demo-data/*/seed-graph.json`), `schemas/context-object|relationship|assertion`, `scripts/source_handle_resolver.py` + `scripts/source_expansion.py`. |
 | Pack builder / compression | `scripts/context_compress.py` (deterministic ladder) + `scripts/demo_full_app.py` (builds pack+lineage+receipt). |
 | Swarm | `scripts/context_swarm.py` + `schemas/swarm/*`. Review: `schemas/governance/steward-review-*`. Evals: `scripts/eval/context_lift_matrix.py` + `measured_lift_headtohead.py`. |
-| Frontend | `web/baltor/` (SPA shell `index.html`+`app.js`; static `demo-console.html`, `reviews.html`). ADD a live `dashboard.html`; extend `app.js` nav. Do NOT build `apps/web`. |
+| Frontend | `_repos/baltor/frontend/` (SPA shell `index.html`+`app.js`; static `demo-console.html`, `reviews.html`). ADD a live `dashboard.html`; extend `app.js` nav. Do NOT build `apps/web`. |
 | Run state | `.baltor-demo/state/*.jsonl|json` is fine for the demo; the admin server already holds in-memory run + event state. |
 
 ## Verified facts to honor (this host)
@@ -32,7 +32,7 @@ never `pip install`. **Redis OPTIONAL** (runs process via an in-process daemon t
 stream is in-process) → the dashboard MUST work offline/no-pip/no-Redis. The admin server flow test
 passes (`scripts/test_baltor_admin_demo_flow.py`). Brands LOCKED; retire user-facing "Oracle".
 
-## Realtime dashboard (the forcing function) — `web/baltor/dashboard.html` + server routes
+## Realtime dashboard (the forcing function) — `_repos/baltor/frontend/dashboard.html` + server routes
 Live view (SSE-first: `GET /api/events/stream` via `EventSource`; poll `GET /api/events` as
 fallback). Panels: (1) live event stream (seq, kind, stage, module, object_ref, status, severity,
 correlation_id, receipt/pack/review/eval/swarm refs); (2) six-stage board (Source→Reconciliation→
@@ -52,7 +52,7 @@ Emits, in order, each visible on `/dashboard`, composing the EXISTING engines:
 `receipt_issued` (demo_full_app) → `eval.*`/`context_lift.calculated` (context_lift_matrix, mock model)
 → `swarm.*`/`swarm.consensus.created` (context_swarm on obj-runbook) → `pipeline.completed`.
 
-## Pages + routes (extend the admin server + web/baltor)
+## Pages + routes (extend the admin server + _repos/baltor/frontend)
 Pages: `/dashboard` (live) · extend existing `demo-console.html`, `reviews.html` · add `/graph`,
 `/objects`, `/objects/:id`, `/packs/:id`, `/receipts/:id`, `/evals`, `/tools`, `/lineage/:id` as
 they become backed by real routes (don't ship dead links — `check_demo_console_links.py` guards this).

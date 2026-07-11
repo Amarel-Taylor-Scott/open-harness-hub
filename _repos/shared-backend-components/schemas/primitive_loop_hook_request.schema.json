@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openhubforai.io/schemas/primitive_loop_hook_request.schema.json",
+  "title": "Primitive Loop JSON Hook Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action"],
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "actions.list",
+        "status.snapshot",
+        "loop.services.status",
+        "flywheel.run",
+        "source_collect.once",
+        "source_collect.self_test",
+        "deconstruction.once",
+        "deconstruction.self_test",
+        "gemma_long.once",
+        "gemma_long.self_test",
+        "billion_plan.run",
+        "billion_plan.self_test",
+        "twenty_million_goal.run",
+        "twenty_million_goal.self_test",
+        "twenty_million_cycle.run",
+        "twenty_million_cycle.self_test",
+        "token_savings.self_test",
+        "token_savings.run_small",
+        "session_benchmarks.self_test",
+        "session_benchmarks.run"
+      ]
+    },
+    "args": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "dry_run": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, the hook writes the planned fixed argv but does not execute it."
+    },
+    "request_id": {
+      "type": "string",
+      "maxLength": 160
+    }
+  },
+  "examples": [
+    {
+      "action": "gemma_long.once",
+      "dry_run": true,
+      "args": {
+        "limit": 1,
+        "lane_dry_run": true
+      }
+    },
+    {
+      "action": "token_savings.run_small",
+      "args": {
+        "n": 100,
+        "k": 5,
+        "seed": 7,
+        "intent_mode": "paraphrase"
+      }
+    },
+    {
+      "action": "session_benchmarks.run",
+      "args": {
+        "sessions": 12,
+        "k": 8,
+        "components_per_turn": 4,
+        "scenario_mode": "mixed"
+      }
+    },
+    {
+      "action": "session_benchmarks.run",
+      "args": {
+        "sessions": 8,
+        "k": 8,
+        "components_per_turn": 4,
+        "scenario_mode": "ml_lifecycle"
+      }
+    },
+    {
+      "action": "session_benchmarks.run",
+      "args": {
+        "sessions": 6,
+        "k": 8,
+        "components_per_turn": 4,
+        "scenario_mode": "large_org"
+      }
+    },
+    {
+      "action": "flywheel.run",
+      "args": {
+        "iterations": 1,
+        "mode": "full",
+        "max_child_actions": 10,
+        "execute_live_model": false,
+        "auto_reduce_on_issue": true,
+        "input_context_tokens": 262144,
+        "output_context_tokens": 65536,
+        "max_token_ceiling": 65536
+      }
+    },
+    {
+      "action": "twenty_million_goal.run",
+      "args": {
+        "target": 20000000,
+        "horizon_days": 60,
+        "daily_working_target": 100000,
+        "daily_candidate_target": 400000
+      }
+    },
+    {
+      "action": "twenty_million_cycle.run",
+      "args": {
+        "seed_rows": 100000,
+        "compile_shards": 2,
+        "benchmark_n": 300
+      }
+    }
+  ]
+}

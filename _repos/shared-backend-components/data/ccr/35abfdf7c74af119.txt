@@ -1,0 +1,26 @@
+MODULE src/teleon/dag/example_pipelines.py
+## API signatures
+```python
+"""src.teleon.dag.example_pipelines — extraction + enrichment expressed as flexible DAGs over the step library."""
+def _acquire(bus)
+def _normalize(bus)
+def _chunk(bus)
+def _relevance(bus)
+def _extract_item(bus)
+def _merge_chunks(bus)
+def _validate(bus)
+def _emit_schema(bus)
+def build_extraction_dag() -> DAG
+    # document -> defined-schema, as a DAG: route/acquire(choice) -> normalize -> chunk(choice/Loop) -> filter ->
+def _search(bus)
+def _dedupe(bus)
+def _rerank(bus)
+def _synthesize(bus)
+def _attribute(bus)
+def build_enrichment_dag() -> DAG
+    # enrich via search+LLM, as a DAG: search(choice) -> dedupe -> rerank -> synthesize(choice) -> attribute(If).
+def extraction_inputs(*, has_text_layer=True, scanned=False, keys=('LLM_API_KEY',)) -> dict
+def enrichment_inputs(query='What is the registered address of Acme Robotics Inc?', *, keys=('LLM_API_KEY',)) -> dict
+```
+## intra-module call edges
+src.teleon.dag.example_pipelines.build_extraction_dag -> src.teleon.dag.example_pipelines._chunk

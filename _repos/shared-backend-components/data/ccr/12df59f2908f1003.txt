@@ -1,0 +1,28 @@
+MODULE src/teleon/observer/cli.py
+## API signatures
+```python
+"""observer.cli — the CLI BRIDGE: discover Claude sessions, then review or live-route them, from a terminal."""
+LIVE_MODES = ...
+DEFAULT_LIVE_MODE = ...
+def review_path(path: str, *, registry_cwd: str | None=None, requested_input: str | None=None, requested_output: str | None=None) -> dict
+    # Governed post-session report for one transcript file.
+def live_path(path: str, mode: str=DEFAULT_LIVE_MODE) -> dict
+    # Prospective live findings for one transcript file in a LIVE mode -> {surfaced, summary, mode, serves_truth}.
+def _resolve_path(args: argparse.Namespace) -> str | None
+    # --path wins; otherwise (--latest or unspecified) -> the most recent discovered session.
+def cmd_list(args: argparse.Namespace) -> int
+def cmd_review(args: argparse.Namespace) -> int
+def cmd_live(args: argparse.Namespace) -> int
+def cmd_agentic(args: argparse.Namespace) -> int
+    # Supervise an AUTONOMOUS agent loop: post-run review (default) or intra-run monitor (--monitor).
+def _add_target(p: argparse.ArgumentParser) -> None
+def build_parser() -> argparse.ArgumentParser
+def main(argv: list[str] | None=None) -> int
+```
+## intra-module call edges
+src.teleon.observer.cli.build_parser -> src.teleon.observer.cli._add_target
+src.teleon.observer.cli.cmd_live -> src.teleon.observer.cli._resolve_path
+src.teleon.observer.cli.cmd_live -> src.teleon.observer.cli.live_path
+src.teleon.observer.cli.cmd_review -> src.teleon.observer.cli._resolve_path
+src.teleon.observer.cli.cmd_review -> src.teleon.observer.cli.review_path
+src.teleon.observer.cli.main -> src.teleon.observer.cli.build_parser

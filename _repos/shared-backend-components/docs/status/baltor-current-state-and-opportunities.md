@@ -1,0 +1,1 @@
+../../../baltor/context/status/baltor-current-state-and-opportunities.md

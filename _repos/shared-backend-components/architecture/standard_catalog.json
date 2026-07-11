@@ -1,0 +1,575 @@
+{
+  "version": "1.0.0",
+  "note": "Component-construction standards for the Baltor Context Engine. Each standard is a normative description of how the repo ACTUALLY builds one of the canonical 25 component patterns, derived from real exemplar modules. A standard is the contract a template generates against and a check enforces. Do not hand-type counts or model dimensions here (No-Magic-Values); cite real repo paths in 'examples'. status_enum gates how strictly a standard is enforced.",
+  "status_enum": ["draft", "active", "enforced", "deprecated"],
+  "standards": [
+    {
+      "standard_id": "standard.source_adapter",
+      "pattern_id": "source_adapter_pattern",
+      "title": "Governed source adapter behind one SourceAdapterPort",
+      "status": "active",
+      "applies_to": "Any module that ingests an external source type (api/structured-record, csv, json/webhook, feed) and normalizes it into governed artifacts.",
+      "must_have": [
+        "implements the structural SourceAdapter Protocol (source_type, parser_provider, ingest(...))",
+        "normalizes every source into the SAME governed artifact chain (source_record -> source_field -> atomic_fact / narrative_allegation)",
+        "content-addressed ids and content_hash (hashlib over sorted-key JSON); same payload -> same artifacts",
+        "carries tenant_id + scope + source_id + lineage (parent_artifact_id) on every artifact",
+        "structured official fields are promotion_eligible facts; free-text becomes held-out unverified allegations",
+        "a source whose parser is unavailable returns an explicit NON-CONSUMABLE reason + stored raw artifact, never a fabricated result"
+      ],
+      "must_not_have": [
+        "no wall-clock in ids/content (no datetime.now/time.time)",
+        "no network call at import time",
+        "no raw source promoted directly to truth",
+        "no third-party SDK reached as a global; go through ports"
+      ],
+      "naming_rules": "Module file is the source family name (sanctions_feed_live, ecfr_feed); source_type is a lowercase token registered in contract_registry.json#source_types.",
+      "file_location_rules": "scripts/ingest/<source_family>.py (the adapter). Shared adapter Protocol + helpers stay in scripts/ingest/source_adapters.py.",
+      "contract_rules": "Emits source_record + source_field + atomic_fact + narrative_allegation artifact_types (registered in contract_registry.json#artifact_types). Consumes a FetchRequest-style input contract.",
+      "proof_rules": "A check_*.py proves: determinism (same payload -> same ids), narrative vs structured split, NON-CONSUMABLE boundary, tenant/scope present. Offline + --self-test + PASS/FAIL + exit 0/1.",
+      "doc_rules": "A docs section page covers Purpose/Inputs/Outputs/Contracts/Adapters/Proofs with the required headings.",
+      "registry_rules": "Register source_type in contract_registry.json#source_types; register adapter under a section_maturity_matrix.json section (category ingestion); register any new artifact_type.",
+      "security_rules": "No real PII/secrets in fixtures; free-text held-out; no secret markers in emitted artifacts.",
+      "observability_rules": "Emit a durable source ingestion event onto the ONE event log; structured fields, no PII.",
+      "examples": [
+        "scripts/ingest/source_adapters.py",
+        "scripts/ingest/sanctions_feed_live.py",
+        "scripts/ingest/decompose_structured.py"
+      ],
+      "template_ids": ["ingestion.source_adapter"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_consumption_api.py"]
+    },
+    {
+      "standard_id": "standard.ingestion_sync",
+      "pattern_id": "ingestion_sync_pattern",
+      "title": "Idempotent ingestion sync / fetch loop",
+      "status": "active",
+      "applies_to": "Modules that fetch a source on a cadence (or on demand) and stage source_records without re-ingesting duplicates.",
+      "must_have": [
+        "content-addressed snapshot hash so a re-fetch of identical content is a no-op",
+        "idempotency guard (mark_processed style) so a duplicate snapshot does not re-stage",
+        "explicit NON-CONSUMABLE handling when the source/parser is unavailable",
+        "injected clock for any timestamp in staged records (no wall-clock in identity)"
+      ],
+      "must_not_have": [
+        "no network at import time",
+        "no fabricated rows when a fetch fails",
+        "no second durable store / queue framework"
+      ],
+      "naming_rules": "<source_family>_feed.py or <source_family>_feed_live.py; sync function fetch_* / sync_*.",
+      "file_location_rules": "scripts/ingest/.",
+      "contract_rules": "Produces source_record artifacts; consumes a FetchRequest. Reuses scripts/durable_store.py for staging + idempotency.",
+      "proof_rules": "Proof asserts idempotency (re-run -> 0 new rows) and NON-CONSUMABLE boundary, offline, --self-test.",
+      "doc_rules": "Section page documents cadence, snapshot identity, and the non-consumable boundary.",
+      "registry_rules": "Register the queue_name (if any) in contract_registry.json#queue_names and the section in section_maturity_matrix.json.",
+      "security_rules": "Public metadata only; never store credentials in staged records.",
+      "observability_rules": "Emit a durable ingest/sync event; counts only, no payload PII.",
+      "examples": [
+        "scripts/ingest/sanctions_feed_live.py",
+        "scripts/ingest/ecfr_feed.py",
+        "scripts/durable_store.py"
+      ],
+      "template_ids": ["ingestion.source_adapter"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.durable_command",
+      "pattern_id": "durable_command_pattern",
+      "title": "Durable CommandEnvelope enqueued onto one durable store",
+      "status": "active",
+      "applies_to": "Any unit of work submitted for asynchronous, retryable, exactly-once-effect processing.",
+      "must_have": [
+        "a CommandEnvelope-shaped payload with command_type + identity fields",
+        "enqueued via scripts/durable_store.py (one durable store, SQLite-backed) with an idempotency_key",
+        "max_attempts / lease semantics so retries -> DLQ, never infinite",
+        "permanent vs retryable failure distinction (PermanentJobError -> immediate DLQ)"
+      ],
+      "must_not_have": [
+        "no second queue/bus/worker framework",
+        "no wall-clock in idempotency_key derivation",
+        "no direct side effects outside the handler contract"
+      ],
+      "naming_rules": "command_type is a dotted token (pipeline.run_step, context.consume) registered in contract_registry.json#command_types.",
+      "file_location_rules": "Command producers live with their domain; the durable contract is scripts/durable_store.py.",
+      "contract_rules": "command_type registered in contract_registry.json#command_types; handler verdict drives ack/nack.",
+      "proof_rules": "Proof asserts idempotency_key dedupe + DLQ on permanent failure, offline, --self-test.",
+      "doc_rules": "Document command_type, payload shape, idempotency key, retry/DLQ behavior.",
+      "registry_rules": "Register command_type + queue_name.",
+      "security_rules": "No secrets in payloads; tenant_id carried for isolation.",
+      "observability_rules": "Emit a durable event on enqueue/complete/fail.",
+      "examples": [
+        "scripts/flywheel_worker.py",
+        "scripts/durable_store.py",
+        "scripts/runtime/processor_harness.py"
+      ],
+      "template_ids": ["worker.command_handler"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_durable_worker_parallel.py"]
+    },
+    {
+      "standard_id": "standard.worker_claim_loop",
+      "pattern_id": "worker_claim_loop_pattern",
+      "title": "Stateless durable worker claim/ack loop",
+      "status": "active",
+      "applies_to": "A standalone worker process that pulls jobs from the durable queue, runs a handler, and ack/nacks.",
+      "must_have": [
+        "stateless claim-loop: claim (lease) -> handler(store, job) -> ack/nack",
+        "N workers against one queue share work with NO double-processing (BEGIN IMMEDIATE + busy_timeout serialize claims across processes)",
+        "backoff when idle + exit after K empty polls so a drain terminates",
+        "handler contract handler(store, job) -> result; raise to nack -> retry -> DLQ",
+        "default handler idempotent (records doc_id once; double-process detectable)"
+      ],
+      "must_not_have": [
+        "no shared in-process state assumed between workers",
+        "no second worker framework",
+        "no infinite run without a drain/exit condition",
+        "no wall-clock in job identity"
+      ],
+      "naming_rules": "Worker module *_worker.py; worker_id is caller-supplied; queue is a registered queue_name.",
+      "file_location_rules": "scripts/ (top-level worker) or scripts/context_workers/ for the worker fleet.",
+      "contract_rules": "Reuses DurableStore claim/ack/lease/DLQ contract; routes by command_type.",
+      "proof_rules": "Proof: run >1 worker against one queue, assert each job processed exactly once + DLQ after max_attempts. Offline, --self-test.",
+      "doc_rules": "Document the claim/ack/lease/DLQ contract and the no-double-process guarantee.",
+      "registry_rules": "Register queue_name; register the section (category runtime) in section_maturity_matrix.json.",
+      "security_rules": "Tenant scope carried through; no secrets logged.",
+      "observability_rules": "Structured claim/ack/nack/dlq log events; durable Work-plane events.",
+      "examples": [
+        "scripts/flywheel_worker.py",
+        "scripts/durable_store.py",
+        "scripts/check_durable_worker_parallel.py"
+      ],
+      "template_ids": ["worker.command_handler"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_durable_worker_parallel.py"]
+    },
+    {
+      "standard_id": "standard.processor",
+      "pattern_id": "processor_harness_pattern",
+      "title": "Processor run through the standard ProcessorHarness via the registry",
+      "status": "active",
+      "applies_to": "Any pipeline step that transforms artifacts; invoked only through the harness + registry, never directly.",
+      "must_have": [
+        "processor reaches the outside world ONLY through RuntimeContext ports (never globals/SDKs/the admin bus)",
+        "registered in scripts/runtime/processor_registry.py and run via run_command(registry, command, ctx)",
+        "harness verdict {ok, retryable, error|result} drives ack/nack",
+        "deterministic: same inputs -> same artifacts; ids content-addressed; time injected"
+      ],
+      "must_not_have": [
+        "no direct global state / SDK import inside the processor body",
+        "no second harness or registry",
+        "no wall-clock in artifact identity"
+      ],
+      "naming_rules": "processor_id is a dotted token registered in contract_registry.json#processor_ids.",
+      "file_location_rules": "scripts/runtime/builtin_processors.py (built-ins) registered in scripts/runtime/processor_registry.py.",
+      "contract_rules": "Consumes a CommandEnvelope; emits artifact_types; verdict shape stable.",
+      "proof_rules": "Proof asserts the processor runs through run_command and the verdict shape + determinism. Offline, --self-test.",
+      "doc_rules": "Document processor_id, inputs, outputs, ports used.",
+      "registry_rules": "Register processor_id; register in processor_registry.",
+      "security_rules": "Ports only; tenant isolation enforced via context.",
+      "observability_rules": "Emit step.completed / processor.failed events; structured logging via LoggerPort.",
+      "examples": [
+        "scripts/runtime/processor_harness.py",
+        "scripts/runtime/processor_registry.py",
+        "scripts/runtime/builtin_processors.py"
+      ],
+      "template_ids": ["worker.command_handler"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.provider_adapter",
+      "pattern_id": "provider_adapter_pattern",
+      "title": "Provider adapter behind a structural capability port",
+      "status": "active",
+      "applies_to": "An adapter that fronts an external capability (model/gateway/object-store/secrets) behind a Protocol port.",
+      "must_have": [
+        "satisfies a structural Protocol from scripts/runtime/ports.py (duck-typed; runtime_checkable)",
+        "swappable: an in-memory test adapter and a production adapter satisfy the SAME port",
+        "no secret literals; secrets resolved through SecretsResolverPort by ref",
+        "deterministic in tests (no live network in --self-test)"
+      ],
+      "must_not_have": [
+        "no global SDK reach from processors",
+        "no hard-coded api keys / endpoints in source",
+        "no second LLM gateway"
+      ],
+      "naming_rules": "Catalog adapter id 'adapter/<provider>-<model>'; port class <Capability>Port.",
+      "file_location_rules": "Port Protocols in scripts/runtime/ports.py; capability catalog entries in catalog/adapters/<id>.yaml.",
+      "contract_rules": "Adapter conforms to a named Port; capability registered in external_capability_catalog.json.",
+      "proof_rules": "Proof asserts the adapter satisfies its Port (isinstance against runtime_checkable Protocol) and is swappable. Offline, --self-test.",
+      "doc_rules": "Document the port, the swap points, and the secret-ref contract.",
+      "registry_rules": "Register the capability in architecture/external_capability_catalog.json.",
+      "security_rules": "Secrets by ref only; no key literals; user has accepted key-exposure risk policy but fixtures still carry none.",
+      "observability_rules": "Structured call/latency/error logs through LoggerPort; no payload secrets.",
+      "examples": [
+        "scripts/runtime/ports.py",
+        "catalog/adapters/anthropic-claude-opus.yaml",
+        "architecture/external_capability_catalog.json"
+      ],
+      "template_ids": ["provider.adapter"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.api_projection",
+      "pattern_id": "api_projection_route_pattern",
+      "title": "Projection-only HTTP route via a pure request handler",
+      "status": "active",
+      "applies_to": "Any HTTP route that exposes engine output; must be projection-only and testable without a socket.",
+      "must_have": [
+        "pure handler (method, path, body) -> (status, json) so the contract is testable WITHOUT a socket",
+        "NEVER fabricates truth: calls the proven engine and returns its contract object",
+        "projection_only: reads/returns; computes no truth, bypasses no gate",
+        "no secret markers ever emitted in a response"
+      ],
+      "must_not_have": [
+        "no business logic / truth computation in the handler",
+        "no direct DB writes from a GET",
+        "no secret/credential leakage in responses"
+      ],
+      "naming_rules": "Route 'METHOD /api/<area>/<resource>'; handler module scripts/api_<area>_handler.py exporting ROUTES.",
+      "file_location_rules": "scripts/api_<area>_handler.py; the admin server delegates to it (MAIN wires the server).",
+      "contract_rules": "Returns a registered contract (e.g. ContextResponse); route registered in contract_registry.json#api_routes with projection_only:true and an owner.",
+      "proof_rules": "Proof drives the handler directly (no socket), asserts status + contract shape + no secret markers. Offline, --self-test.",
+      "doc_rules": "Document route, method, returns-contract, projection-only guarantee, owner.",
+      "registry_rules": "Register the route in contract_registry.json#api_routes; MAIN folds into section_maturity_matrix.json.",
+      "security_rules": "Token-gate mutations; deny secret markers; projection-only.",
+      "observability_rules": "Structured request log (route, status); no body PII.",
+      "examples": [
+        "scripts/api_context_handler.py",
+        "architecture/contract_registry.json",
+        "scripts/check_consumption_api.py"
+      ],
+      "template_ids": ["api.projection_route"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
+    },
+    {
+      "standard_id": "standard.ui_projection",
+      "pattern_id": "ui_projection_page_pattern",
+      "title": "Projection-only UI page that renders an API (computes no truth)",
+      "status": "active",
+      "applies_to": "Any web page that displays engine output by fetching a projection API.",
+      "must_have": [
+        "the page fetches a projection API and RENDERS only (no truth computed, stored, or mutated client-side)",
+        "explicit comment marking it projection-only",
+        "no secrets / tokens hard-coded in the page",
+        "held-out items shown SEPARATELY from served truth"
+      ],
+      "must_not_have": [
+        "no client-side truth computation",
+        "no embedded credentials",
+        "no direct DB / engine access from the browser"
+      ],
+      "naming_rules": "_repos/baltor/frontend/<page>.html; reads named API constants (SERVE, SECTIONS).",
+      "file_location_rules": "_repos/baltor/frontend/.",
+      "contract_rules": "Consumes a registered api_route projection; renders its contract fields.",
+      "proof_rules": "Proof asserts the page references only projection endpoints + carries the projection-only marker + no secret literal. Offline, --self-test.",
+      "doc_rules": "Document which API the page projects and the projection-only guarantee.",
+      "registry_rules": "Register the ui page under its section (MAIN folds into section_maturity_matrix.json#ui_pages).",
+      "security_rules": "No tokens/secrets in the page; gating happens at the API.",
+      "observability_rules": "n/a client-side beyond fetch status display.",
+      "examples": [
+        "_repos/baltor/frontend/consume.html",
+        "scripts/api_context_handler.py",
+        "scripts/check_consumption_ui.py"
+      ],
+      "template_ids": ["ui.projection_page"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
+    },
+    {
+      "standard_id": "standard.proof_script",
+      "pattern_id": "proof_script_pattern",
+      "title": "Deterministic offline proof script with --self-test",
+      "status": "enforced",
+      "applies_to": "Every check_*.py / proof that asserts a contract holds.",
+      "must_have": [
+        "--self-test mode that prints '[ok]/[FAIL] <name>' lines and a clear PASS/FAIL summary",
+        "exit 0 on pass, 1 on fail (return code drives the flywheel)",
+        "deterministic + offline: tempfile.mkdtemp for any fs, content-addressed ids, no wall-clock, no RNG, no network",
+        "cleans up its temp dir",
+        "asserts against REAL repo artifacts where it claims to (no fabricated numbers)"
+      ],
+      "must_not_have": [
+        "no network call",
+        "no datetime.now/time.time/random in assertions",
+        "no leftover temp files",
+        "no fabricated 'detected' counts"
+      ],
+      "naming_rules": "scripts/check_<thing>.py; a local check(name, ok, detail) helper.",
+      "file_location_rules": "scripts/ (proofs) or alongside the module under scripts/<area>/.",
+      "contract_rules": "n/a (a proof asserts other contracts).",
+      "proof_rules": "Self-referential: the script IS the proof; CLI parses --self-test and returns its int.",
+      "doc_rules": "Module docstring states what unit + integration it proves and the CLI.",
+      "registry_rules": "MAIN registers the proof in scripts/baltor_flywheel.py PROOF_MODULES as (path, label).",
+      "security_rules": "No real PII/secrets in fixtures or logs.",
+      "observability_rules": "PASS/FAIL lines are the observable surface.",
+      "examples": [
+        "scripts/check_event_envelope.py",
+        "scripts/check_file_layout_policy.py",
+        "scripts/check_durable_worker_parallel.py"
+      ],
+      "template_ids": ["proof.self_test"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
+    },
+    {
+      "standard_id": "standard.docs_page",
+      "pattern_id": "documentation_page_pattern",
+      "title": "Section documentation page with the required headings",
+      "status": "active",
+      "applies_to": "Every component/section doc page that prevents repeated slow or incorrect paths.",
+      "must_have": [
+        "the required headings: Purpose, Owner, Inputs, Outputs, Contracts, Ports, Adapters, Registry entries, Proofs, Commands, Limitations, Opportunities, Next steps",
+        "real owner path + real proof paths cited",
+        "product vocabulary (Knowledge Corpus / If Statement / Action; component/subcomponent; avoid 'artifact'/'manifest' in new prose except quoting schemas)"
+      ],
+      "must_not_have": [
+        "no missing required heading",
+        "no hand-typed counts that can drift (No-Magic-Values)",
+        "no fabricated file paths"
+      ],
+      "naming_rules": "docs/<area>/<section>.md.",
+      "file_location_rules": "docs/.",
+      "contract_rules": "Lists the input/output contracts the section uses.",
+      "proof_rules": "A docs-coverage check asserts the required headings exist.",
+      "doc_rules": "Self-describing.",
+      "registry_rules": "MAIN links the doc under section_maturity_matrix.json#docs.",
+      "security_rules": "No secrets/PII in docs.",
+      "observability_rules": "n/a.",
+      "examples": [
+        "_repos/baltor/context/runtime/source-consumption.md",
+        "_repos/baltor/context/runtime/fragile-fact-watchtower.md",
+        "_repos/baltor/context/backend/architecture-overview.md"
+      ],
+      "template_ids": ["docs.section_page"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py", "scripts/check_template_generation.py"]
+    },
+    {
+      "standard_id": "standard.contract_schema",
+      "pattern_id": "contract_schema_pattern",
+      "title": "Versioned contract schema validated by ref",
+      "status": "active",
+      "applies_to": "Any data contract exchanged between components (request/response/artifact envelope).",
+      "must_have": [
+        "schema_version field on the object (e.g. ContextResponse)",
+        "validated through scripts/runtime/schema_validator.validate_ref(obj, ref)",
+        "version lives in the schema_version field, NEVER in the id or name",
+        "registered in contract_registry.json (artifact_types / api_routes returns)"
+      ],
+      "must_not_have": [
+        "no version baked into ids/names",
+        "no unvalidated contract crossing a component boundary",
+        "no silent schema drift (a change is a new .vN)"
+      ],
+      "naming_rules": "<ContractName>.v<N> in schema_version; ref path '<area>/<ContractName>.v<N>'.",
+      "file_location_rules": "Schemas under schemas/ or the runtime; validator scripts/runtime/schema_validator.py.",
+      "contract_rules": "Self-referential; this IS the contract standard.",
+      "proof_rules": "Proof asserts validate_ref accepts a good object and rejects a malformed one. Offline, --self-test.",
+      "doc_rules": "Document the contract fields + version policy.",
+      "registry_rules": "Register in contract_registry.json.",
+      "security_rules": "No secret fields in contracts.",
+      "observability_rules": "Validation failures surfaced as errors, not swallowed.",
+      "examples": [
+        "scripts/runtime/schema_validator.py",
+        "architecture/contract_registry.json",
+        "scripts/check_contract_registry_manifest.py"
+      ],
+      "template_ids": ["api.projection_route"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.artifact_object",
+      "pattern_id": "artifact_envelope_pattern",
+      "title": "Content-addressed governed artifact object",
+      "status": "active",
+      "applies_to": "Every governed object emitted by the engine (source_record, atomic_fact, narrative_allegation, receipts).",
+      "must_have": [
+        "artifact_type from the registered set + content_hash (hashlib over sorted-key JSON)",
+        "tenant_id + scope + source lineage (parent_artifact_id, source_handle)",
+        "claim_status + promotion_eligible flags (facts eligible; allegations held-out)",
+        "id derived from content, not wall-clock"
+      ],
+      "must_not_have": [
+        "no PII in artifact bodies (synthetic/public only)",
+        "no wall-clock in artifact id",
+        "no truncation-only ids (stable hash suffix required)"
+      ],
+      "naming_rules": "artifact_id '<prefix>-<hash16>'; artifact_type a registered token.",
+      "file_location_rules": "Emitted by ingest/runtime modules; type registry architecture/contract_registry.json#artifact_types.",
+      "contract_rules": "artifact_type registered; content_hash deterministic.",
+      "proof_rules": "Proof asserts content-addressing (same body -> same id) + required security metadata. Offline, --self-test.",
+      "doc_rules": "Document the artifact_type fields + lineage.",
+      "registry_rules": "Register artifact_type in contract_registry.json#artifact_types.",
+      "security_rules": "Security metadata (tenant/scope/claim_status) required; no secret markers.",
+      "observability_rules": "Emit on creation via the event log.",
+      "examples": [
+        "scripts/ingest/source_adapters.py",
+        "scripts/runtime/consumption.py",
+        "scripts/check_artifact_type_registry.py"
+      ],
+      "template_ids": ["ingestion.source_adapter"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.optimization_candidate",
+      "pattern_id": "optimization_candidate_pattern",
+      "title": "Governed optimization candidate with baseline/regression/promotion",
+      "status": "active",
+      "applies_to": "Any optimizer that proposes a reduced/improved context pack.",
+      "must_have": [
+        "optimizer satisfies the stable Optimizer port (optimize(pack, signals) -> pack); chainable",
+        "candidate measured against a BaselineSnapshot for lift",
+        "a RegressionGate (no answer-fact loss, source handles preserved, no held-out/allegation promoted, no tenant leak, nothing fabricated)",
+        "PROMOTE only on measured lift + zero regressions; emit content-addressed OptimizationReceipt"
+      ],
+      "must_not_have": [
+        "no silent speedup without measured lift",
+        "no held-out item re-entering the promoted pack",
+        "no second optimizer framework",
+        "no wall-clock in receipt id"
+      ],
+      "naming_rules": "Optimizer .name token; receipt OptimizationReceipt.",
+      "file_location_rules": "scripts/runtime/optimization.py.",
+      "contract_rules": "Consumes only gate-allow artifacts; emits OptimizationReceipt.",
+      "proof_rules": "Proof asserts promotion only on lift + zero regression and that a held-out item cannot be promoted. Offline, --self-test.",
+      "doc_rules": "Document the optimizer port + regression gate + receipt.",
+      "registry_rules": "Register the optimization section in section_maturity_matrix.json.",
+      "security_rules": "No tenant leak across optimization; held-out never promoted.",
+      "observability_rules": "Emit optimization receipt event.",
+      "examples": [
+        "scripts/runtime/optimization.py",
+        "scripts/runtime/consumption.py",
+        "scripts/check_consumption_api.py"
+      ],
+      "template_ids": ["worker.command_handler"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.reconciliation_decision",
+      "pattern_id": "reconciliation_decision_pattern",
+      "title": "Deterministic reconciliation decision over conflicting claims",
+      "status": "active",
+      "applies_to": "Any module that resolves conflicting claims across sources into a decision.",
+      "must_have": [
+        "deterministic decision given the same conflicting inputs (no RNG)",
+        "decision records the winning claim + reason + the losers (audit lineage)",
+        "authority/recency rules explicit, not implicit",
+        "decision id content-addressed"
+      ],
+      "must_not_have": [
+        "no nondeterministic tie-break",
+        "no silent drop of the losing claim (must be recorded)",
+        "no wall-clock in decision id"
+      ],
+      "naming_rules": "ReconciliationDecision object; reason an explicit code.",
+      "file_location_rules": "scripts/artifact_graph/reconciliation.py.",
+      "contract_rules": "Consumes conflicting atomic_facts; emits a reconciliation decision artifact.",
+      "proof_rules": "Proof asserts determinism + the loser is recorded with a reason. Offline, --self-test.",
+      "doc_rules": "Document the authority/recency rules + decision shape.",
+      "registry_rules": "Register the reconciliation section in section_maturity_matrix.json.",
+      "security_rules": "Tenant scope preserved through reconciliation.",
+      "observability_rules": "Emit a reconciliation decision event.",
+      "examples": [
+        "scripts/artifact_graph/reconciliation.py",
+        "scripts/check_cfpb_reconciliation.py",
+        "scripts/runtime/verification_gate.py"
+      ],
+      "template_ids": ["worker.command_handler"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.watchtower_task",
+      "pattern_id": "watchtower_verification_task_pattern",
+      "title": "Watchtower verification task enforcing minimum freshness",
+      "status": "active",
+      "applies_to": "Background verification tasks that re-check fragile/volatile facts for freshness.",
+      "must_have": [
+        "a freshness bound: a fragile fact past its minimum freshness must NOT be served as truth",
+        "deterministic given injected clock (freshness compared to an injected 'now', not wall-clock)",
+        "stale fact -> held-out / re-verify, never silently served",
+        "task is a durable command (reuses the worker/command pattern)"
+      ],
+      "must_not_have": [
+        "no wall-clock comparison in the proof",
+        "no serving of a stale fragile fact",
+        "no second scheduler framework"
+      ],
+      "naming_rules": "Watchtower task command_type dotted token; freshness bound a named constant.",
+      "file_location_rules": "scripts/context_workers/ (the worker fleet) + the consumption gate.",
+      "contract_rules": "Consumes atomic_facts with a fragility/freshness signal; emits a verification task + held-out warning.",
+      "proof_rules": "Proof asserts a stale fact is held out given an injected now. Offline, --self-test.",
+      "doc_rules": "Document the freshness bound + the held-out behavior.",
+      "registry_rules": "Register the watchtower section in section_maturity_matrix.json.",
+      "security_rules": "Tenant scope preserved.",
+      "observability_rules": "Emit watchtower task + held-out events.",
+      "examples": [
+        "scripts/check_watchtower_minimum_freshness.py",
+        "_repos/baltor/context/runtime/fragile-fact-watchtower.md",
+        "scripts/runtime/consumption.py"
+      ],
+      "template_ids": ["worker.command_handler"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.tenant_isolation",
+      "pattern_id": "tenant_isolation_pattern",
+      "title": "Tenant isolation carried on every governed object and boundary",
+      "status": "enforced",
+      "applies_to": "Every component that touches per-tenant data (ingest, runtime, consumption, API).",
+      "must_have": [
+        "tenant_id + scope on every artifact and command",
+        "no cross-tenant private fact served as truth (scope global_public vs tenant)",
+        "the API/consumption layer filters by tenant_id before serving",
+        "experiments / candidate rows isolated from active tenant-visible data"
+      ],
+      "must_not_have": [
+        "no global mutable state mixing tenants",
+        "no tenant_id defaulted-away on a write path",
+        "no cross-tenant leak through optimization/consumption"
+      ],
+      "naming_rules": "tenant_id field name is exactly tenant_id; scope token is global_public or tenant.",
+      "file_location_rules": "Enforced in scripts/runtime/context.py + scripts/runtime/consumption.py + handlers.",
+      "contract_rules": "tenant_id required on requests/artifacts; scope governs promotion eligibility.",
+      "proof_rules": "Proof asserts tenant A cannot see tenant B's private fact through the served response. Offline, --self-test.",
+      "doc_rules": "Document the tenant/scope model + the isolation boundary.",
+      "registry_rules": "n/a (cross-cutting); referenced by relevant sections.",
+      "security_rules": "Core security control; no leakage.",
+      "observability_rules": "Tenant id in structured logs (not PII).",
+      "examples": [
+        "scripts/runtime/consumption.py",
+        "scripts/runtime/context.py",
+        "scripts/check_experiments_isolation.py"
+      ],
+      "template_ids": ["api.projection_route"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    },
+    {
+      "standard_id": "standard.review_pack",
+      "pattern_id": "review_pack_pattern",
+      "title": "Review pack / queue for high-risk artifacts before promotion",
+      "status": "active",
+      "applies_to": "Any flow that routes high-risk or open-review artifacts to a human review queue before tenant-visible promotion.",
+      "must_have": [
+        "a review ticket opened when risk warrants (the review_ticket row family)",
+        "an artifact with open review tickets is NOT tenant-visible (promotion boundary)",
+        "deterministic review pack content-addressed (no wall-clock in id)",
+        "explicit risk reasons recorded on the pack"
+      ],
+      "must_not_have": [
+        "no promotion of an artifact with open review tickets",
+        "no silent auto-approve of high-risk artifacts",
+        "no wall-clock in pack id"
+      ],
+      "naming_rules": "Review pack object; review_ticket row family.",
+      "file_location_rules": "scripts/make_review_pack.py + the promotion-readiness path.",
+      "contract_rules": "Consumes flagged artifacts; emits a review pack + review_ticket rows.",
+      "proof_rules": "Proof asserts an artifact with an open ticket cannot be promoted. Offline, --self-test.",
+      "doc_rules": "Document the review-pack shape + the promotion boundary.",
+      "registry_rules": "Register the review section in section_maturity_matrix.json.",
+      "security_rules": "High-risk artifacts gated behind review; no PII in the pack.",
+      "observability_rules": "Emit review-ticket-opened events.",
+      "examples": [
+        "scripts/make_review_pack.py",
+        "scripts/check_review_pack_recorders.py",
+        "scripts/runtime/consumption.py"
+      ],
+      "template_ids": ["docs.section_page"],
+      "enforcement_proofs": ["scripts/check_standard_catalog.py"]
+    }
+  ]
+}

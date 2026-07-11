@@ -1,0 +1,42 @@
+# esoteric_technology_stack_campaign.yaml — a bounded, candidate-only primitive-generation campaign.
+#
+# Crosses the messy real-world technology landscape (databases x languages x cloud x web/API x data-formats x
+# frameworks x hosting) with the non-ideal SITUATION axis (legacy versions, vendor quirks, broken encodings,
+# malformed input, migrations, deprecated APIs, injection-hardening, unicode edges) via
+# scripts/real_world_situation_primitive_specs.sample_specs, then routes drafting through
+# scripts/llm_capability_router.py (Hy3 primary + code fallback) into
+# scripts/spec_to_executor_synthesizer.run (security gate -> sandbox -> fixture-prove -> promote).
+#
+# Everything generated stays candidate=true, serves_truth=false. The LLM proposes; the gates dispose.
+
+campaign_id: esoteric_technology_stack
+description: >-
+  Esoteric technology-stack x real-world-situation deterministic primitives (parse/normalize/validate/map),
+  drafted Hy3-first with a code fallback and fixture-proven before any promotion.
+
+# Source of candidate specs (deterministic coprime-strided sample; resumable via --start).
+source: real_world_situation_primitive_specs.sample_specs
+
+# Only these D0/D1 NO-SIDE-EFFECT families are minted here (verifier == the validator family in the grid).
+families: [parser, normalizer, validator, mapper, verifier]
+
+# Determinism budgets allowed to auto-run/promote — no D2 partial-failure (side-effect-shaped) work here.
+determinism_allow: [D0_pure, D1_seeded]
+
+# Router job type used to DRAFT each executor. spec_generation = Hy3 primary + code (GLM) fallback lane order,
+# which matches "Hy3 primary + code fallback" while the strong-code lanes back it up.
+draft_job_type: spec_generation
+
+# Data sensitivity of this campaign's material (public technology situations — safe for cloud lanes).
+data_class: public
+
+# Enqueue a spec for executor synthesis ONLY when it carries enough to draft + fixture-prove an executor.
+executor_enqueue_requires: [input_schema, output_schema, promotable_determinism]
+
+# Bounds (overridable on the CLI). Keep runs small; scale by repeating with a new --start.
+defaults:
+  max_jobs: 25
+  start: 0
+  oversample_factor: 8          # sample this-many-x max_jobs from the grid, then filter to families/determinism
+  campaign_cost_cap_usd: 0.0    # the configured lanes are free; a non-zero cap guards paid lanes if added
+  strict_output: true           # request json/structured output where the lane supports it

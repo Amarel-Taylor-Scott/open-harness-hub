@@ -1,0 +1,28 @@
+MODULE _repos/teleon/backend/src/teleon/api/policy_flow.py
+## API signatures
+```python
+"""Reusable API/policy primitives for enrichment-style backend flows."""
+class ValidatedCompanyEnrichmentRequest:
+    # Validated request edge for company/account enrichment.
+class AccountState:
+    # Small deterministic account snapshot used by policy primitives.
+class PolicyDecision:
+    # Decision produced by deterministic enrichment policy.
+class DecisionReceipt:
+    # Receipt for an idempotent persisted policy decision.
+def validate_company_enrichment_request(payload: dict[str, object]) -> ValidatedCompanyEnrichmentRequest
+    # Validate the JSON request for company enrichment.
+def fetch_account_state(request: ValidatedCompanyEnrichmentRequest) -> AccountState
+    # Fetch account state from the local snapshot edge.
+def apply_enrichment_policy(request: ValidatedCompanyEnrichmentRequest, account: AccountState, artifacts: dict[str, object]) -> PolicyDecision
+    # Apply the deterministic enrichment policy.
+def persist_policy_decision(decision: PolicyDecision, idempotency_key: str, store_path: Path) -> DecisionReceipt
+    # Persist a policy decision with an idempotency key.
+def emit_api_response(request: ValidatedCompanyEnrichmentRequest, decision: PolicyDecision, receipt: DecisionReceipt, artifacts: dict[str, object]) -> dict[str, object]
+    # Emit a JSON-compatible API response.
+```
+## intra-module call edges
+src.teleon.api.policy_flow.apply_enrichment_policy -> src.teleon.api.policy_flow.PolicyDecision
+src.teleon.api.policy_flow.fetch_account_state -> src.teleon.api.policy_flow.AccountState
+src.teleon.api.policy_flow.persist_policy_decision -> src.teleon.api.policy_flow.DecisionReceipt
+src.teleon.api.policy_flow.validate_company_enrichment_request -> src.teleon.api.policy_flow.ValidatedCompanyEnrichmentRequest

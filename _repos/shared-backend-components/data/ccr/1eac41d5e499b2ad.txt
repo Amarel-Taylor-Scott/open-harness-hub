@@ -1,0 +1,25 @@
+MODULE _repos/teleon/backend/src/teleon/egress/client.py
+## API signatures
+```python
+"""Runtime egress client."""
+def _now() -> str
+def _header_summary(headers: dict[str, str] | None) -> dict[str, str]
+def _body_hash(body: bytes | None) -> str
+class EgressBlocked:
+    # Raised when route policy blocks an outbound request before transport.
+class EgressClient:
+    # Governed outbound HTTP client with ledger + graph capture.
+    def __init__(self, *, ledger: LocalEgressLedger | None=None, graph: LocalEgressGraph | None=None, transport: UrllibHttpTransport | None=None) -> None
+    def request_bytes(self, *, tenant_id: str, run_id: str, worker_id: str, worker_kind: str, operation: str, url: str, method: str='GET', body: bytes | None=None, headers: dict[str, str] | None=None, timeout_s: int=30, query_text: str='', query_id: str='', tool_name: str='', route_policy_id: str=DEFAULT_ROUTE_POLICY_ID, approved_route_refs: set[str] | None=None, trace_id: str='', now: str | None=None) -> dict[str, Any]
+    def request_json(self, *, json_payload: dict[str, Any], **kwargs: Any) -> dict[str, Any]
+    def _attempt_record(self, intent: dict[str, Any], decision: dict[str, Any], *, status: str, response_summary: dict[str, Any], completed_at: str) -> dict[str, Any]
+    def _observation(self, intent: dict[str, Any], decision: dict[str, Any], request_summary: dict[str, Any], response_summary: dict[str, Any], *, status: str, started_at: str, completed_at: str) -> dict[str, Any]
+```
+## intra-module call edges
+src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressBlocked
+src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressClient._attempt_record
+src.teleon.egress.client.request_bytes -> src.teleon.egress.client.EgressClient._observation
+src.teleon.egress.client.request_bytes -> src.teleon.egress.client._body_hash
+src.teleon.egress.client.request_bytes -> src.teleon.egress.client._header_summary
+src.teleon.egress.client.request_bytes -> src.teleon.egress.client._now
+src.teleon.egress.client.request_json -> src.teleon.egress.client.EgressClient.request_bytes

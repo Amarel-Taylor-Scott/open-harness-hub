@@ -1,0 +1,30 @@
+MODULE src/teleon/templates/instantiator.py
+## API signatures
+```python
+"""src.teleon.templates.instantiator — compose the canonical object shell from mixins + safely instantiate
+schema-object starting shapes (CANDIDATE only). Pure + deterministic; no network, no secret substitution."""
+_REPO = ...
+_SHELL = ...
+_MIXINS = ...
+_A = ...
+CANDIDATE_STATUS = ...
+INTERNAL_VISIBILITY = ...
+_ACTIVE_STATUS = ...
+def load_shell() -> dict
+def load_mixins() -> dict[str, dict]
+def load_schema_object_templates() -> dict[str, dict]
+def _content_hash(payload: dict) -> str
+def compose_object_shell(*, object_id: str, object_type: str, mixin_ids: list[str] | None, now: str, payload: dict | None=None, tenant_id: str | None=None, project_id: str | None=None, status_code: int=CANDIDATE_STATUS, visibility_code: int=INTERNAL_VISIBILITY) -> dict
+    # Compose a canonical-shell object. Defaults to CANDIDATE status + internal visibility. Always carries all
+def _safe_target(out_dir: Path, name: str) -> Path
+    # Resolve out_dir/name, refusing path traversal outside out_dir.
+def instantiate_schema_object(object_family: str, *, out_dir: Path, now: str, object_id: str | None=None, allow_overwrite: bool=False) -> dict
+    # Render a CANDIDATE schema-object starting shape for `object_family` into out_dir + a receipt. Refuses
+def is_active_status(code: int) -> bool
+```
+## intra-module call edges
+src.teleon.templates.instantiator.compose_object_shell -> src.teleon.templates.instantiator._content_hash
+src.teleon.templates.instantiator.compose_object_shell -> src.teleon.templates.instantiator.load_mixins
+src.teleon.templates.instantiator.instantiate_schema_object -> src.teleon.templates.instantiator._safe_target
+src.teleon.templates.instantiator.instantiate_schema_object -> src.teleon.templates.instantiator.compose_object_shell
+src.teleon.templates.instantiator.instantiate_schema_object -> src.teleon.templates.instantiator.load_schema_object_templates

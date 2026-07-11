@@ -1,0 +1,31 @@
+MODULE src/baltor/runtime/registry/preference_graph.py
+## API signatures
+```python
+"""src.baltor.runtime.registry.preference_graph — NUMERIC, non-fragile preference graph for capability-slot
+adapter selection."""
+ROLE_DEFAULT_PRIORITY = ...
+_UNKNOWN_ROLE_PRIORITY = ...
+TIE_BAND = ...
+_ARCH = ...
+EDGE_TYPE_CODE = ...
+_LEGACY_STATUS_CODE = ...
+def _status_label_to_code() -> dict
+    # label → numeric status code, sourced from architecture/provider_status_codes.json (the single source),
+def status_code(adapter: dict) -> int
+    # Numeric status of one adapter for control logic. Explicit `status_code` wins; else map the `status`
+def adapter_priority(adapter: dict) -> float
+    # The numeric preference of one adapter. Explicit `priority` wins; else derive from the advisory role;
+def _runnable(adapter: dict, available: set | None, health: dict | None) -> bool
+def resolve_order(adapters: list[dict], *, health: dict | None=None, available: set | None=None, runnable_only: bool=False) -> list[dict]
+    # Adapters ordered by preference: priority DESC, then healthy-first, then stable adapter_id. No string-role
+def preference_graph(adapters: list[dict]) -> dict
+    # A numeric graph view: nodes (adapter_id, priority, role, status) in preference order + edges between
+```
+## intra-module call edges
+src.baltor.runtime.registry.preference_graph._key -> src.baltor.runtime.registry.preference_graph.adapter_priority
+src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.adapter_priority
+src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.resolve_order
+src.baltor.runtime.registry.preference_graph.preference_graph -> src.baltor.runtime.registry.preference_graph.status_code
+src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.runtime.registry.preference_graph._runnable
+src.baltor.runtime.registry.preference_graph.resolve_order -> src.baltor.runtime.registry.preference_graph.adapter_priority
+src.baltor.runtime.registry.preference_graph.status_code -> src.baltor.runtime.registry.preference_graph._status_label_to_code

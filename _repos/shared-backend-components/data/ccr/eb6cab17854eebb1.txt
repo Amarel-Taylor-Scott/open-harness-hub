@@ -1,0 +1,27 @@
+MODULE src/teleon/synthesis/synthesis_tree.py
+## API signatures
+```python
+"""src.teleon.synthesis.synthesis_tree — versioned decision tree with BACKTRACKING for capability synthesis."""
+class py_class_src_teleon_synthesis_synthesis_tree__Decision:
+    # One versioned decision: at point `id`, we CHOSE `choice`; the untried `alternatives` are recorded, not discarded.
+class py_class_src_teleon_synthesis_synthesis_tree__Attempt:
+class py_class_src_teleon_synthesis_synthesis_tree__SynthesisNode:
+    # A node = a taken decision. status: open -> working (a leaf/subtree that solves) | dead_end (this choice failed its
+    def __init__(self, decision: py_class_src_teleon_synthesis_synthesis_tree__Decision | None, parent: 'SynthesisNode | None'=None)
+    def version(self) -> str
+        # Path of choices from the root = a deterministic version id (so every decision is addressable + replayable).
+    def walk(self)
+class py_class_src_teleon_synthesis_synthesis_tree__SynthesisTree:
+    # DFS-with-backtracking over ordered decision POINTS. points = [(point_id, [options cheapest-first]), ...]. A tester
+    def __init__(self)
+    def synthesize(self, py_arg_src_teleon_synthesis_synthesis_tree__SynthesisTree_synthesize__points, py_arg_src_teleon_synthesis_synthesis_tree__SynthesisTree_synthesize__tester) -> list[py_class_src_teleon_synthesis_synthesis_tree__Decision] | None
+    def branches(self) -> list[dict]
+    def summary(self) -> dict
+```
+## intra-module call edges
+src.teleon.synthesis.synthesis_tree.__init__ -> src.teleon.synthesis.synthesis_tree.py_class_src_teleon_synthesis_synthesis_tree__SynthesisNode
+src.teleon.synthesis.synthesis_tree.rec -> src.teleon.synthesis.synthesis_tree.py_class_src_teleon_synthesis_synthesis_tree__Decision
+src.teleon.synthesis.synthesis_tree.rec -> src.teleon.synthesis.synthesis_tree.py_class_src_teleon_synthesis_synthesis_tree__SynthesisNode
+src.teleon.synthesis.synthesis_tree.summary -> src.teleon.synthesis.synthesis_tree.py_class_src_teleon_synthesis_synthesis_tree__SynthesisTree.branches
+src.teleon.synthesis.synthesis_tree.synthesize -> src.teleon.synthesis.synthesis_tree.py_class_src_teleon_synthesis_synthesis_tree__Decision
+src.teleon.synthesis.synthesis_tree.synthesize -> src.teleon.synthesis.synthesis_tree.py_class_src_teleon_synthesis_synthesis_tree__SynthesisNode

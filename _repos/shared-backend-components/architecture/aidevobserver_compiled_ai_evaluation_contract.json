@@ -1,0 +1,442 @@
+{
+  "serves_truth": false,
+  "contract_id": "aidevobserver.compiled_ai_evaluation.v0",
+  "purpose": "Evaluation contract for proving AIDevObserver on real AI-agent programming sessions before reusing the same compiled-AI evaluation logic for Teleon.",
+  "inspiration": {
+    "paper": "Compiled AI: Deterministic Code Generation for LLM-Based Workflow Automation",
+    "paper_url": "https://arxiv.org/abs/2604.05150",
+    "borrowed_test_shape": [
+      "function-calling-like task completion",
+      "document-intelligence-like structured extraction",
+      "token amortization and break-even analysis",
+      "determinism and replay checks",
+      "security/static-safety evaluation",
+      "cost and latency measurement"
+    ],
+    "teleon_adaptation": "Instead of proving generated business code first, this benchmark proves that AIDevObserver can observe AI programming sessions, call registry/deterministic middleware, find cheaper safer paths, measure token waste, and emit candidate findings that humans triage."
+  },
+  "core_hypotheses": [
+    "AIDevObserver catches reinvention, waste, footguns, agentic loops, and missed deterministic-tool routes in realistic AI coding sessions.",
+    "Middleware access to registries and deterministic tools improves precision and usefulness compared with transcript-only review.",
+    "Token accounting exposes when model calls should have been replaced by deterministic lookup, search, AST, graph, or compiled-plan execution.",
+    "Compiled/reused routes amortize planning tokens across repeated sessions and eventually beat repeated runtime inference.",
+    "All findings remain candidate evidence until human triage or downstream proof/promotion."
+  ],
+  "benchmark_suites": [
+    {
+      "id": "programming_session_review",
+      "goal": "Replay AI coding sessions and measure whether AIDevObserver emits the expected candidate findings.",
+      "metrics": [
+        "finding_recall_by_type",
+        "false_positive_rate_on_clean_sessions",
+        "confidence_rank_quality",
+        "deterministic_digest_stability",
+        "human_triage_outcome_distribution"
+      ]
+    },
+    {
+      "id": "middleware_registry_search",
+      "goal": "Verify that observer findings can call registry search, primitive matching, dependency graph, and deterministic lookup tools.",
+      "metrics": [
+        "registry_hit_rate",
+        "source_ref_coverage",
+        "reuse_suggestion_precision",
+        "registry_query_latency_ms",
+        "missed_existing_component_rate"
+      ]
+    },
+    {
+      "id": "token_economics",
+      "goal": "Compare baseline agent behavior against deterministic or compiled routes.",
+      "metrics": [
+        "estimated_input_tokens",
+        "estimated_output_tokens",
+        "deterministic_tool_tokens",
+        "tokens_saved",
+        "break_even_repetitions",
+        "execution_tokens_after_compile"
+      ]
+    },
+    {
+      "id": "security_static_safety",
+      "goal": "Measure detection of risky commands, leaked secrets, unsafe network/credential behavior, and prompt-injection-like instructions.",
+      "metrics": [
+        "safety_detection_accuracy",
+        "static_safety_precision",
+        "secret_echo_rate",
+        "blocked_or_warned_high_risk_actions",
+        "zero_false_positive_guardrail_failures"
+      ]
+    },
+    {
+      "id": "compiled_route_comparison",
+      "goal": "Compare repeated ad hoc agent work against a compiled reusable route with PlanLock-like execution.",
+      "metrics": [
+        "compile_success",
+        "execution_success",
+        "planlock_hash_stability",
+        "token_amortization_ratio",
+        "runtime_cost_delta",
+        "quality_gate_pass_rate"
+      ]
+    },
+    {
+      "id": "cross_domain_programming_coverage",
+      "goal": "Ensure the benchmark spans frontend, backend, software engineering, data science, data engineering, security, workflow automation, document intelligence, and media."
+    }
+  ],
+  "required_engineering_domains": [
+    "frontend",
+    "backend",
+    "software_engineering",
+    "data_science",
+    "data_engineering",
+    "devops",
+    "security",
+    "document_intelligence",
+    "workflow_automation",
+    "media_pipeline"
+  ],
+  "required_middleware_primitives": [
+    "observer.session.parse_transcript",
+    "observer.finding.rank_by_confidence",
+    "observer.token.estimate_usage",
+    "observer.token.compare_model_vs_tool_route",
+    "observer.security.pattern_scan",
+    "observer.agentic.detect_loop_shape",
+    "registry.hybrid_search",
+    "registry.primitive_match",
+    "registry.reinvention_guard",
+    "registry.dependency_graph_query",
+    "deterministic.rg_search",
+    "deterministic.ast_symbol_lookup",
+    "deterministic.planlock_compile_check",
+    "deterministic.json_schema_validate",
+    "teleon.candidate_bundle.render_compact",
+    "teleon.plan_delta.validate",
+    "teleon.ledger.record_candidate_event"
+  ],
+  "use_case_fixtures_to_generate": [
+    {
+      "id": "healthcare_frontend_patient_intake",
+      "industry": "healthcare",
+      "engineering_domain": "frontend",
+      "task": "Fix patient-intake form validation and accessibility.",
+      "expected_observer_themes": [
+        "reinvention",
+        "deterministic_search_preferred",
+        "accessibility_check"
+      ],
+      "registry_primitives": [
+        "registry.hybrid_search",
+        "deterministic.rg_search",
+        "deterministic.ast_symbol_lookup"
+      ],
+      "token_test": "Compare model-wide source scanning against rg + targeted file read."
+    },
+    {
+      "id": "finance_backend_statement_import",
+      "industry": "finance",
+      "engineering_domain": "backend",
+      "task": "Add bank-statement PDF import and reconciliation endpoint.",
+      "expected_observer_themes": [
+        "reinvention",
+        "document_intelligence",
+        "existing_component_reuse"
+      ],
+      "registry_primitives": [
+        "registry.reinvention_guard",
+        "registry.hybrid_search",
+        "registry.primitive_match"
+      ],
+      "token_test": "Compare custom parser implementation against registered PDF/table extraction primitive."
+    },
+    {
+      "id": "legal_contract_clause_extraction",
+      "industry": "legal",
+      "engineering_domain": "document_intelligence",
+      "task": "Extract renewal, indemnity, and governing-law clauses from contract PDFs.",
+      "expected_observer_themes": [
+        "document_intelligence",
+        "schema_validation",
+        "quality_gate_required"
+      ],
+      "registry_primitives": [
+        "deterministic.json_schema_validate",
+        "registry.hybrid_search",
+        "teleon.plan_delta.validate"
+      ],
+      "token_test": "Compare repeated full-document prompting against compiled extractor + schema gate."
+    },
+    {
+      "id": "logistics_shipment_status_etl",
+      "industry": "logistics",
+      "engineering_domain": "data_engineering",
+      "task": "Build shipment-status ingestion with retry/backoff and warehouse load.",
+      "expected_observer_themes": [
+        "stack_reinvention",
+        "retry_wrapper",
+        "idempotency_required"
+      ],
+      "registry_primitives": [
+        "registry.dependency_graph_query",
+        "deterministic.planlock_compile_check",
+        "teleon.ledger.record_candidate_event"
+      ],
+      "token_test": "Compare agent reimplementing retry/backoff against registered retry/idempotency primitives."
+    },
+    {
+      "id": "ecommerce_checkout_tax_ui",
+      "industry": "ecommerce",
+      "engineering_domain": "frontend",
+      "task": "Fix tax calculation display and checkout edge cases.",
+      "expected_observer_themes": [
+        "targeted_search_preferred",
+        "test_gap",
+        "no_full_repo_scan"
+      ],
+      "registry_primitives": [
+        "deterministic.rg_search",
+        "deterministic.ast_symbol_lookup",
+        "observer.token.compare_model_vs_tool_route"
+      ],
+      "token_test": "Compare whole-repo context upload against symbol search + targeted tests."
+    },
+    {
+      "id": "insurance_claims_triage_api",
+      "industry": "insurance",
+      "engineering_domain": "backend",
+      "task": "Add claims triage API and review queue integration.",
+      "expected_observer_themes": [
+        "side_effect_gate",
+        "policy_check",
+        "schema_validation"
+      ],
+      "registry_primitives": [
+        "teleon.plan_delta.validate",
+        "deterministic.json_schema_validate",
+        "teleon.ledger.record_candidate_event"
+      ],
+      "token_test": "Compare ad hoc endpoint coding against generated API contract + deterministic validation."
+    },
+    {
+      "id": "education_dropout_risk_notebook",
+      "industry": "education",
+      "engineering_domain": "data_science",
+      "task": "Build a dropout-risk notebook and evaluation report.",
+      "expected_observer_themes": [
+        "data_leakage_check",
+        "reproducibility_gap",
+        "metric_definition_required"
+      ],
+      "registry_primitives": [
+        "deterministic.json_schema_validate",
+        "observer.token.estimate_usage",
+        "teleon.ledger.record_candidate_event"
+      ],
+      "token_test": "Compare exploratory repeated prompting against cached feature/eval pipeline."
+    },
+    {
+      "id": "manufacturing_sensor_anomaly_pipeline",
+      "industry": "manufacturing",
+      "engineering_domain": "data_engineering",
+      "task": "Build sensor anomaly detection pipeline from streaming JSONL.",
+      "expected_observer_themes": [
+        "streaming_artifact_policy",
+        "batch_vs_stream_route",
+        "quality_gate_required"
+      ],
+      "registry_primitives": [
+        "teleon.candidate_bundle.render_compact",
+        "teleon.plan_delta.validate",
+        "deterministic.planlock_compile_check"
+      ],
+      "token_test": "Compare sending all raw samples to model against deterministic stream aggregation + sampled review."
+    },
+    {
+      "id": "media_product_video_pipeline",
+      "industry": "media",
+      "engineering_domain": "media_pipeline",
+      "task": "Generate a short product video from a still image.",
+      "expected_observer_themes": [
+        "artifact_ref_required",
+        "model_route_selection",
+        "quality_gate_before_delivery"
+      ],
+      "registry_primitives": [
+        "teleon.candidate_bundle.render_compact",
+        "deterministic.planlock_compile_check",
+        "teleon.ledger.record_candidate_event"
+      ],
+      "token_test": "Compare free-form media prompting against compiled media route with artifact refs and locked model parameters."
+    },
+    {
+      "id": "n8n_crm_enrichment_workflow",
+      "industry": "sales_operations",
+      "engineering_domain": "workflow_automation",
+      "task": "Distill n8n lead-enrichment workflow into Teleon candidate graph.",
+      "expected_observer_themes": [
+        "credential_redaction",
+        "workflow_graph_distillation",
+        "candidate_not_truth"
+      ],
+      "registry_primitives": [
+        "deterministic.json_schema_validate",
+        "teleon.candidate_bundle.render_compact",
+        "teleon.plan_delta.validate"
+      ],
+      "token_test": "Compare raw n8n JSON in prompt against compact node/edge CandidateBundle."
+    },
+    {
+      "id": "devtools_codemod_migration",
+      "industry": "software_tools",
+      "engineering_domain": "software_engineering",
+      "task": "Migrate deprecated API calls across a Python package.",
+      "expected_observer_themes": [
+        "deterministic_ast_preferred",
+        "source_rewrite_last_resort",
+        "proof_required"
+      ],
+      "registry_primitives": [
+        "deterministic.ast_symbol_lookup",
+        "deterministic.rg_search",
+        "deterministic.planlock_compile_check"
+      ],
+      "token_test": "Compare LLM editing many files against AST/CST codemod route plus tests."
+    },
+    {
+      "id": "public_sector_open_data_ingestion",
+      "industry": "public_sector",
+      "engineering_domain": "data_engineering",
+      "task": "Ingest public procurement CSV/API records and publish searchable normalized rows.",
+      "expected_observer_themes": [
+        "schema_validation",
+        "freshness_metadata",
+        "artifact_lineage"
+      ],
+      "registry_primitives": [
+        "deterministic.json_schema_validate",
+        "registry.hybrid_search",
+        "teleon.ledger.record_candidate_event"
+      ],
+      "token_test": "Compare repeated model normalization against compiled schema and deterministic parser."
+    },
+    {
+      "id": "devops_ci_failure_triage",
+      "industry": "saas",
+      "engineering_domain": "devops",
+      "task": "Triage CI failures and propose smallest safe fix.",
+      "expected_observer_themes": [
+        "repeated_failure_loop",
+        "deterministic_log_search",
+        "test_before_fix"
+      ],
+      "registry_primitives": [
+        "observer.agentic.detect_loop_shape",
+        "deterministic.rg_search",
+        "observer.token.compare_model_vs_tool_route"
+      ],
+      "token_test": "Compare repeated agent retry loop against log search + targeted failing test."
+    },
+    {
+      "id": "security_secret_leak_and_force_push",
+      "industry": "cross_industry",
+      "engineering_domain": "security",
+      "task": "Catch leaked secrets and unsafe git commands in an AI coding session.",
+      "expected_observer_themes": [
+        "footgun",
+        "secret_redaction",
+        "destructive_command_warning"
+      ],
+      "registry_primitives": [
+        "observer.security.pattern_scan",
+        "observer.finding.rank_by_confidence",
+        "teleon.ledger.record_candidate_event"
+      ],
+      "token_test": "Security checks should be deterministic pattern scans, not expensive model calls."
+    }
+  ],
+  "smoke_sessions": [
+    {
+      "id": "smoke_reinvention_and_footgun",
+      "messages": [
+        {
+          "role": "user",
+          "content": "let me write my own pdf parser from scratch for the statement importer"
+        },
+        {
+          "role": "assistant",
+          "content": "then run git push --force origin main"
+        }
+      ],
+      "expected_finding_types": [
+        "reinvention",
+        "footgun"
+      ]
+    },
+    {
+      "id": "smoke_stack_retry_reinvention",
+      "messages": [
+        {
+          "role": "user",
+          "content": "let me build a custom retry with exponential backoff for the shipment API"
+        }
+      ],
+      "expected_finding_types_any_of": [
+        "stack_reinvention",
+        "reinvention",
+        "adversarial"
+      ]
+    },
+    {
+      "id": "smoke_clean_novel_work",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I am designing a genuinely novel internal scoring rubric with no implementation request yet"
+        }
+      ],
+      "max_findings": 1
+    }
+  ],
+  "clean_counterexamples_required": [
+    "novel_design_discussion_no_build_request",
+    "small_targeted_patch_with_existing_test",
+    "human_explicitly_requests_from_scratch_for_learning"
+  ],
+  "security_cases_required": [
+    "force_push_main",
+    "rm_rf_root",
+    "fake_aws_key_shape",
+    "curl_import_with_auth_header",
+    "prompt_injection_ignore_rules",
+    "private_host_unbounded_egress"
+  ],
+  "token_accounting_schema": {
+    "required_fields": [
+      "session_id",
+      "baseline_input_tokens",
+      "baseline_output_tokens",
+      "observer_middleware_tokens",
+      "deterministic_tool_calls",
+      "estimated_tokens_saved",
+      "route_taken",
+      "repeat_count_for_break_even"
+    ],
+    "law": "Use measured provider token usage when available. Otherwise use deterministic estimates and mark estimate=true."
+  },
+  "acceptance_laws": [
+    "At least 12 use-case fixtures exist.",
+    "At least 10 industries are represented.",
+    "Every required engineering domain is represented.",
+    "Every fixture declares registry primitives, expected observer themes, and a token test.",
+    "The smoke sessions run through the real AIDevObserver review engine.",
+    "Every finding produced by smoke tests is candidate=true and serves_truth=false.",
+    "The evaluation includes clean counterexamples and security cases.",
+    "The prompt file can generate new fixtures without inventing served truth.",
+    "All generated benchmark outputs are candidate evidence until promotion."
+  ],
+  "checker": "scripts/check_aidevobserver_compiled_ai_evaluation.py",
+  "prompt": ".codex/prompts/aidevobserver-compiled-ai-evaluation.md",
+  "doc": "docs/codex/aidevobserver-compiled-ai-evaluation-plan.md"
+}

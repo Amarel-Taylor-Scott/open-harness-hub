@@ -1,0 +1,111 @@
+MODULE src/teleon/storage/git_record_store.py
+## API signatures
+```python
+"""src.teleon.storage.git_record_store — a GIT-BACKED record store with a BRANCH-PROMOTION model and a
+pgvector MIRROR, behind the same ``RecordStore`` port as ``record_store.py``."""
+_REPO = ...
+RECORDS_DIR = ...
+LINEAGE_DIR = ...
+DEFAULT_MAIN_BRANCH = ...
+DEFAULT_CANDIDATE_BRANCH = ...
+_GIT_NAME = ...
+_GIT_EMAIL = ...
+_DEFAULT_COMMIT_DATE = ...
+_PGVECTOR_DSN_ENV = ...
+class GitStoreError:
+    # Raised on a git failure, an unknown candidate, or a malformed record.
+def _cosine(a: list[float], b: list[float]) -> float
+def _vec_literal(vector) -> str
+    # pgvector accepts a text literal ``[a,b,c]`` for input — render it without the python adapter.
+def _parse_vec(literal) -> list[float]
+class VectorMirror:
+    # The mirror port: upsert a promoted record's embedding, similarity-search it, count, report status.
+    def upsert(self, key: str, record: dict, vector: list[float]) -> None
+    def search(self, vector: list[float], k: int=5) -> list[tuple[str, float, dict]]
+    def count(self) -> int
+    def status(self) -> dict
+    def close(self) -> None
+class InMemoryVectorMirror:
+    # The HONEST fallback when pgvector is unavailable: a simple in-memory cosine index so the descent
+    def __init__(self, *, dim: int=EMBED_DIM, reason: str='') -> None
+    def upsert(self, key: str, record: dict, vector: list[float]) -> None
+    def search(self, vector: list[float], k: int=5) -> list[tuple[str, float, dict]]
+    def count(self) -> int
+    def status(self) -> dict
+class PgVectorMirror:
+    # The operational pgvector projection: a ``vector(dim)`` table with cosine/L2 nearest-neighbour
+    def __init__(self, dsn: str, *, dim: int=EMBED_DIM, connect, table: str='teleon_record_mirror') -> None
+    def _exec(self, sql: str, params=(), *, fetch: bool=False)
+    def _init_schema(self) -> None
+    def upsert(self, key: str, record: dict, vector: list[float]) -> None
+    def search(self, vector: list[float], k: int=5) -> list[tuple[str, float, dict]]
+    def count(self) -> int
+    def status(self) -> dict
+    def close(self) -> None
+def pgvector_availability() -> dict
+    # Probe whether the pgvector stack is importable — the HONEST signal that decides the mirror backend.
+def _real_connect(dsn: str)
+def open_vector_mirror(dsn: str | None=None, *, dim: int=EMBED_DIM, available: bool | None=None, connect=None) -> VectorMirror
+    # Open the operational mirror. Returns a real ``PgVectorMirror`` ONLY when a DSN is set AND the
+class GitRecordStore:
+    # Append-only, content-addressed record store backed by a REAL git repo with a candidate→main
+    def __init__(self, repo_path: str | Path, *, main_branch: str=DEFAULT_MAIN_BRANCH, candidate_branch: str=DEFAULT_CANDIDATE_BRANCH, mirror: VectorMirror | None=None, commit_date: str=_DEFAULT_COMMIT_DATE) -> None
+    def _git(self, *args: str, check: bool=True) -> subprocess.CompletedProcess
+    def _commit(self, message: str) -> None
+    def _ensure_repo(self) -> None
+    def _ensure_branch(self, branch: str) -> None
+    def _current_branch(self) -> str
+    def _envelopes_on(self, branch: str) -> list[dict]
+    def _record_for(self, record_hash: str, branch: str | None=None) -> dict
+    def _rebuild_index(self) -> None
+    def append(self, record: dict, *, idem_key: str | None=None) -> int
+        # Append a record onto the candidate branch. Idempotent: an identical record (same content hash)
+    def all(self, predicate=None) -> list[dict]
+        # The raw candidate layer (truth) — every appended record, promoted or not, winners and losers.
+    def count(self) -> int
+    def close(self) -> None
+    def promote(self, record_hash: str, *, losers: list[str] | None=None, now: str | None=None) -> dict
+        # PROMOTE a candidate: merge/move its content-addressed file onto the main branch and mirror it.
+    def promoted(self, predicate=None) -> list[dict]
+        # The operational (main-branch) projection — only the records that have been promoted.
+    def lineage(self, record_hash: str) -> dict
+        # The promotion lineage for a record (winner + the losers it was promoted over). ``{}`` if absent.
+    def record_hashes(self) -> set[str]
+        # The content hashes of every candidate-layer record (the stable, content-addressed identities).
+    def search(self, query: dict | list[float], k: int=5) -> list[tuple[str, float, dict]]
+        # Similarity-search the operational mirror. ``query`` may be a record (embedded deterministically)
+class _FakePgConnection:
+    # A minimal DB-API test double used ONLY by ``self_test`` to exercise the real ``PgVectorMirror`` SQL
+    def __init__(self) -> None
+    def cursor(self)
+    def commit(self) -> None
+    def close(self) -> None
+class _FakePgCursor:
+    def __init__(self, conn: _FakePgConnection) -> None
+    def execute(self, sql: str, params=())
+    def fetchall(self)
+    def close(self) -> None
+def self_test() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.storage.git_record_store.__init__ -> src.teleon.storage.git_record_store.GitRecordStore._ensure_repo
+src.teleon.storage.git_record_store.__init__ -> src.teleon.storage.git_record_store.GitRecordStore._rebuild_index
+src.teleon.storage.git_record_store.__init__ -> src.teleon.storage.git_record_store.PgVectorMirror._init_schema
+src.teleon.storage.git_record_store.__init__ -> src.teleon.storage.git_record_store.open_vector_mirror
+src.teleon.storage.git_record_store._commit -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store._current_branch -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store._ensure_branch -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store._ensure_repo -> src.teleon.storage.git_record_store.GitRecordStore._ensure_branch
+src.teleon.storage.git_record_store._ensure_repo -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store._envelopes_on -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store._git -> src.teleon.storage.git_record_store.GitStoreError
+src.teleon.storage.git_record_store._init_schema -> src.teleon.storage.git_record_store.PgVectorMirror._exec
+src.teleon.storage.git_record_store._rebuild_index -> src.teleon.storage.git_record_store.GitRecordStore._envelopes_on
+src.teleon.storage.git_record_store._record_for -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store._record_for -> src.teleon.storage.git_record_store.GitStoreError
+src.teleon.storage.git_record_store.all -> src.teleon.storage.git_record_store.GitRecordStore._envelopes_on
+src.teleon.storage.git_record_store.append -> src.teleon.storage.git_record_store.GitRecordStore._commit
+src.teleon.storage.git_record_store.append -> src.teleon.storage.git_record_store.GitRecordStore._ensure_branch
+src.teleon.storage.git_record_store.append -> src.teleon.storage.git_record_store.GitRecordStore._git
+src.teleon.storage.git_record_store.append -> src.teleon.storage.git_record_store.GitStoreError

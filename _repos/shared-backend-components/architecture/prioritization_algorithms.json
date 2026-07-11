@@ -1,0 +1,15 @@
+{
+  "registry": "prioritization_algorithms",
+  "serves_truth": false,
+  "description": "Prioritization + ranking algorithms — how to order a backlog, a work queue, or a candidate set by value/urgency/cost. A registry of algorithm SPECS (what it computes, its inputs, when to use it, whether it is deterministic), not implementations; pointers, never truth. Composes with queueing_disciplines (the serving order), triage_algorithms (the routing decision), decision_policy (thresholds), and formulas (the scoring math). Deterministic-first: prefer a transparent scoring rule over a learned ranker until the lift is proven.",
+  "stage": "cross_cutting",
+  "algorithms": [
+    {"id": "weighted_scoring", "name": "Weighted scoring", "what": "score = sum(weight_i * normalized_factor_i); rank descending", "inputs": "factors + weights", "deterministic": true, "when_to_use": "transparent, explainable priority with a few agreed factors", "composes_with": ["formulas", "decision_policy"]},
+    {"id": "wsjf", "name": "Weighted Shortest Job First", "what": "priority = cost_of_delay / job_size (SAFe)", "inputs": "cost-of-delay components + effort", "deterministic": true, "when_to_use": "maximize economic value delivered per unit effort on a backlog"},
+    {"id": "rice", "name": "RICE", "what": "score = (reach * impact * confidence) / effort", "inputs": "reach, impact, confidence, effort", "deterministic": true, "when_to_use": "product backlog prioritization with rough estimates"},
+    {"id": "mcda_topsis", "name": "MCDA / TOPSIS", "what": "rank by closeness to the ideal solution across weighted criteria", "inputs": "criteria matrix + weights", "deterministic": true, "when_to_use": "many competing criteria, some conflicting; needs a defensible multi-criteria order"},
+    {"id": "eisenhower", "name": "Eisenhower (urgent/important)", "what": "2x2 quadrant: do / schedule / delegate / drop", "inputs": "urgency, importance", "deterministic": true, "when_to_use": "fast triage of a personal/ops task list"},
+    {"id": "moscow", "name": "MoSCoW", "what": "bucket into Must/Should/Could/Won't", "inputs": "stakeholder commitment level", "deterministic": true, "when_to_use": "scope negotiation for a release"},
+    {"id": "learned_ranking", "name": "Learning-to-rank (LTR)", "what": "a model scores items from labeled relevance/outcomes", "inputs": "features + relevance labels", "deterministic": false, "when_to_use": "high-volume ranking where a transparent rule under-performs AND you have outcome labels; admit only on proven lift (two-axis gate)"}
+  ]
+}

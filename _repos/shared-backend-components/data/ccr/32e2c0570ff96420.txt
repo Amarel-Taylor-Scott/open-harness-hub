@@ -1,0 +1,17 @@
+MODULE src/teleon/economics/provider_intel.py
+## API signatures
+```python
+"""provider_intel — System 20 (Provider Intelligence): keep the economics LIVE."""
+REPO = ...
+_SOURCES = ...
+def ingest(observations: list, *, default_source: str='ingest', shard: str='000') -> dict
+    # Record a batch of observations. Each item: {resource_id, [observed_at], [source], cost?, latency_ms?, quality?,
+def record_measured_run(resource_id: str, *, cost=None, latency_ms=None, quality=None, success=None, shard: str='000') -> dict
+    # The telemetry write-back (§10→§1): a real execution's measured economics become an observation (source=measured).
+def pricing_sources() -> list
+def crawl(*, network_allowed=None, timeout: int=20) -> dict
+    # Fetch + ingest current prices from the wired sources (official + secondary providers). Network-gated and
+```
+## intra-module call edges
+src.teleon.economics.provider_intel.crawl -> src.teleon.economics.provider_intel.ingest
+src.teleon.economics.provider_intel.crawl -> src.teleon.economics.provider_intel.pricing_sources

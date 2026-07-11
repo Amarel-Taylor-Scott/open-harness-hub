@@ -1,0 +1,170 @@
+{
+  "purpose": "Migration manifest + anti-regression contract for the pyprefix typed-identifier convention (owner-directed 2026-06-27). Encode each definition's kind in its name so deterministic code graphs need no LLM. A path listed in `migrated` MUST stay 100% conformant (pyprefix check == 0 violations); the gate scripts/check_pyprefix_conformance.py enforces it so renamed code can never silently diverge.",
+  "standard": "scripts/pyprefix.py",
+  "handoff_doc": "_repos/shared-backend-components/context/codex/pyprefix-migration-and-functionality-graph.md",
+  "conformance_gate": "scripts/check_pyprefix_conformance.py",
+  "policy": "Add a path to `migrated` ONLY after (1) `pyprefix apply <path>` renames it, (2) `pyprefix check <path>` reports 0 violations, and (3) the FULL proof gate (scripts/run_proofs.py) is green. Migrate package by package; the gate is the oracle for cross-file safety, not compile() alone.",
+  "global_exempt": ["main", "_self_test", "setup", "teardown", "setUp", "tearDown"],
+  "safe_kinds_phase1": ["function", "class", "const", "var"],
+  "detected_but_deferred_rename": ["method", "instance", "arg", "class-body-var"],
+  "deferred_reason": "methods + instances are referenced as attributes (obj.method) which static analysis cannot resolve across duck-typed receivers; args require signature/keyword-call rewrites; class/body vars include dataclass fields and protocol attributes that must be coordinated with constructors, attribute access, serialization, and tests. Locals are supported by the scoped renamer and included in the operation graph.",
+  "migrated": [
+    "hf-space",
+    "_repos/teleon/backend/src/teleon/synthesis/pipeline_templates.py",
+    "scripts/check_teleon_pipeline_template_runtime.py"
+  ],
+  "partial_migrations": [
+    {
+      "path": "hf-space",
+      "date": "2026-06-28",
+      "scope": "completed leaf package migration: module-scope constants/functions/vars, scoped locals, and keyword-safe args",
+      "renamed_targets": 9,
+      "renamed_scoped_locals": 19,
+      "renamed_keyword_safe_args": 6,
+      "files_touched": 1,
+      "proof_gate": "730/730 green after pyprefix check reported 0 violations",
+      "remaining": "0 violations; added to `migrated` so scripts/check_pyprefix_conformance.py now enforces this package permanently."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/runtime",
+      "date": "2026-06-28",
+      "scope": "phase-1 package migration: globally unique class/function/const/module-var symbols plus cross-file importers/facades; phase-1b scoped local-variable migration; phase-1c resolved module-scope migration for repeated private module names; phase-1d keyword-safe argument migration plus method/field contract risk reporting",
+      "renamed_targets": 93,
+      "renamed_scoped_locals": 108,
+      "renamed_module_scope_targets": 25,
+      "renamed_keyword_safe_args": 93,
+      "files_touched_by_import_rewrite": 57,
+      "proof_gate": "730/730 green after the cross-file package migration, scoped local-variable migration, exception-binding local cleanup, resolved module-scope migration, and keyword-safe argument migration",
+      "remaining": "158 check violations remain under the expanded 8-kind law: args=74, methods=49, class/body vars=35. `arg-report` marks the 74 remaining args as keyword/dynamic-kwargs risky; `contract-report` marks 0/49 methods and 0/35 class/body vars candidate-safe because they are observable protocol, attribute, dataclass/constructor, dynamic, or string-key contracts. Module-scope functions/constants/vars and locals are cleared. Current runtime conformance: 318/476 symbols (66.8%). Not eligible for `migrated` until coordinated contract codemods reach pyprefix check == 0 and the full gate stays green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/registry",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, keyword-safe args, and scoped nested helper functions after the primitive-registry/vectorization/search pipeline reached ready_or_green",
+      "renamed_scoped_locals": 136,
+      "renamed_module_scope_targets": 100,
+      "renamed_keyword_safe_args": 89,
+      "renamed_scoped_functions": 2,
+      "files_touched_by_import_rewrite": 34,
+      "codemod_hardening": "Found and fixed four migration corner cases during this package slice: scoped-local names declared `global` are excluded from local renames; inner args/locals shadow outer renamed locals; cross-file import rewrites now match full identifier tokens so `catalog` cannot rewrite inside `all_catalogs`; module-scope renames update `global` declarations; scoped-function renames now edit the nested `def` name as well as call sites. Each has hermetic pyprefix self-test coverage.",
+      "proof_gate": "744/744 green after focused registry, surface, primitive registry, and full proof gates; refreshed repo inventory, primitive registry artifacts, and north-star loop.",
+      "remaining": "41 pyprefix check violations remain in _repos/teleon/backend/src/teleon/registry: 17 keyword/dynamic-kwargs-risky args, 9 public/protocol/attribute methods, 7 dataclass/constructor/string-key fields, and 8 public compatibility aliases (CATALOGS plus package-facing alias vars). Current registry conformance: 520/563 symbols (92.7%). Repo-wide inventory after the later agents slice reports 78,911 pyprefix violations across 80,863 symbols. Not eligible for `migrated` until the remaining public-contract aliases/methods/fields/args are coordinated with compatibility shims or manifest-declared external exemptions and `pyprefix check _repos/teleon/backend/src/teleon/registry` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/agents",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, and keyword-safe args for the shared agent-runtime provider slice",
+      "renamed_scoped_locals": 16,
+      "renamed_module_scope_targets": 18,
+      "renamed_keyword_safe_args": 8,
+      "files_touched_by_import_rewrite": 4,
+      "codemod_hardening": "Focused checker hardening: check_agent_runtime_layer_redteam now validates degraded runtime results with an isinstance-derived `result_is_unavailable` boolean instead of a brittle pre-migration class-name string, so AI-first class renames do not weaken the degradation proof.",
+      "proof_gate": "744/744 green after focused agent-runtime checks, pyprefix self-test, migration contract check, and full proof gate.",
+      "remaining": "54 pyprefix check violations remain in _repos/teleon/backend/src/teleon/agents: 26 dataclass/protocol/public field vars, 19 keyword/dynamic-kwargs-risky args, and 9 public/protocol/attribute methods. Current agents conformance: 48/102 symbols (47.1%). Not eligible for `migrated` until public method/field/keyword-arg contracts are coordinated with compatibility shims or explicit exemptions and `pyprefix check _repos/teleon/backend/src/teleon/agents` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/retrieval",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, and keyword-safe args for the retrieval ports/vector index/hybrid search slice",
+      "renamed_scoped_locals": 59,
+      "renamed_module_scope_targets": 69,
+      "renamed_keyword_safe_args": 70,
+      "files_touched_by_import_rewrite": 15,
+      "codemod_hardening": "Focused checker hardening: check_local_embedder now uses inspect.getsource() on the imported LocalOllama embedder class instead of brittle old source-text class-name markers, so location-derived class renames do not break the local-first proof.",
+      "proof_gate": "744/744 green after focused retrieval checks, py_compile, pyprefix self-test, migration contract check, and full proof gate.",
+      "remaining": "92 pyprefix check violations remain in _repos/teleon/backend/src/teleon/retrieval: 18 public/protocol/dataclass/string-key field vars, 34 public/protocol/attribute methods, 32 keyword/dynamic-kwargs-risky args, and 8 hard local/comprehension/lambda cases. Current retrieval conformance: 213/305 symbols (69.8%). Not eligible for `migrated` until the remaining public method/field/keyword-arg contracts and local edge cases are coordinated and `pyprefix check _repos/teleon/backend/src/teleon/retrieval` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/components",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, and keyword-safe args for the uniform Component layer",
+      "renamed_scoped_locals": 52,
+      "renamed_module_scope_targets": 27,
+      "renamed_keyword_safe_args": 26,
+      "files_touched_by_import_rewrite": 8,
+      "codemod_hardening": "Focused checker hardening: check_component_standardization now imports the canonical location-derived component package symbols; compile_capability_live now imports canonical component names and degrades honestly when a configured LLM lane is unreachable, keeping the deterministic proof gate offline-safe.",
+      "proof_gate": "744/744 green after focused component checks, compile_capability_live self-test/default live path, pyprefix self-test, migration contract check, and full proof gate.",
+      "remaining": "12 pyprefix check violations remain in _repos/teleon/backend/src/teleon/components: 5 keyword/dynamic-kwargs-risky args, 5 dataclass/string-key/public field vars, 1 public method, and 1 nested function edge case. Current components conformance: 106/118 symbols (89.8%). Not eligible for `migrated` until public field/method/keyword-arg contracts and the nested function edge case are coordinated and `pyprefix check _repos/teleon/backend/src/teleon/components` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/knowledge",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope function/const/module-var symbols, and keyword-safe args for the knowledge-vector, code-genome, dependency-graph, product-distance, and repo-similarity slice",
+      "renamed_scoped_locals": 88,
+      "renamed_module_scope_targets": 32,
+      "renamed_keyword_safe_args": 39,
+      "files_touched_by_import_rewrite": 7,
+      "codemod_hardening": "Found and fixed a dynamic import corner case: product_distance and repo_similarity self-tests used `__import__(..., fromlist=[\"lexical_embed_fn\"]).lexical_embed_fn()` after the module-scope rename. They now import the canonical location-derived lexical embedder symbol directly, removing the dynamic-reference ambiguity from the package audit.",
+      "proof_gate": "744/744 green after knowledge module self-tests, py_compile, pyprefix self-test, and full proof gate.",
+      "remaining": "9 pyprefix check violations remain in _repos/teleon/backend/src/teleon/knowledge: 4 keyword-risky `embed_fn` args and 5 function edge cases. Current knowledge conformance: 165/174 symbols (94.8%). Not eligible for `migrated` until those public keyword-call/function edge cases are coordinated and `pyprefix check _repos/teleon/backend/src/teleon/knowledge` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/agent_gateway",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, and keyword-safe args for the agent-facing capability gateway and MCP projection slice",
+      "renamed_scoped_locals": 76,
+      "renamed_module_scope_targets": 49,
+      "renamed_keyword_safe_args": 43,
+      "files_touched_by_import_rewrite": 9,
+      "codemod_hardening": "Found and fixed a dynamic callback keyword corner case: capability handlers are stored in the CAPABILITIES registry and called through a handler variable as `handler(payload, now=...)`, so static keyword-call indexing missed `now` as a public runtime keyword. pyprefix now treats reserved runtime keyword args (`now`, `context`, `ctx`) as risky and skips them in migrate-safe-args, with self-test coverage. MCP projection checker stale print reference was updated to the canonical renamed constant.",
+      "proof_gate": "744/744 green after focused agent gateway local, MCP projection, boundary schema, Baltor truth-boundary, redteam, pyprefix self-test, and full proof gate.",
+      "remaining": "90 pyprefix check violations remain in _repos/teleon/backend/src/teleon/agent_gateway: 22 keyword/dynamic/reserved-risky args, 48 dataclass/string-key/public field vars, 19 public/attribute methods, and 1 local edge case. Current agent_gateway conformance: 174/264 symbols (65.9%). Not eligible for `migrated` until public method/field/keyword-arg contracts and the local edge case are coordinated and `pyprefix check _repos/teleon/backend/src/teleon/agent_gateway` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/synthesis",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, keyword-safe args, and importers for the primitive assembly / compiler / pass-manager / type-system slice",
+      "renamed_scoped_locals": 360,
+      "renamed_module_scope_targets": 107,
+      "renamed_keyword_safe_args": 152,
+      "files_touched_by_import_rewrite": 37,
+      "codemod_hardening": "Found and fixed two migration fallout cases during this slice: pass_deterministic_replacement now accepts the stable public call-surface alias `substitutions=` after its internal keyword arg was pyprefixed, and check_embedding_port now imports the canonical location-derived INDEX_DIM owner from component_search instead of relying on the old embedding_port re-export. check_type_lattice stale short calls were updated to the canonical renamed type-system symbols.",
+      "proof_gate": "745/745 green after focused synthesis checks, component-plan compiler contract, primitive-variation/codegen/registry-builder contracts, pyprefix self-test, refreshed inventory/registry/loop artifacts, and the full proof gate.",
+      "remaining": "103 pyprefix audit violations remain in _repos/teleon/backend/src/teleon/synthesis: args=35, instance=3, var=37, method=13, function=11, local=4. `arg-report` marks 0 keyword-safe and 35 keyword-risky args; `contract-report` marks 0/13 methods and 0/37 class/body vars candidate-safe because they are public methods, dataclass/attribute/string-key fields, dynamic kwargs surfaces, or external call-surface keywords. Current synthesis conformance: 901/1004 symbols (89.7%). Repo-wide inventory after this slice reports 77,643 pyprefix violations across 81,095 symbols, down from 78,360 before the slice. Not eligible for `migrated` until remaining public-contract names are coordinated with compatibility shims/exemptions or source-level contract codemods and `pyprefix check _repos/teleon/backend/src/teleon/synthesis` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/blackboard",
+      "date": "2026-06-28",
+      "scope": "partial package migration: scoped locals, cross-file module-scope class/function/const/module-var symbols, keyword-safe args, and importers for the durable local blackboard/stateful swarm provider slice",
+      "renamed_scoped_locals": 90,
+      "renamed_module_scope_targets": 21,
+      "renamed_keyword_safe_args": 26,
+      "files_touched_by_import_rewrite": 8,
+      "codemod_hardening": "No new codemod rule was required in this slice; the existing scoped-local, module-scope, facade/import, reserved-runtime-keyword, and keyword-safe argument gates held. The reports deliberately stopped before public keyword args, public/provider methods, and string-key/attribute fields.",
+      "proof_gate": "745/745 green after focused blackboard provider/stateful-swarm/token-economics checks, pyprefix self-test, refreshed inventory/registry/loop artifacts, and the full proof gate.",
+      "remaining": "41 pyprefix audit violations remain in _repos/teleon/backend/src/teleon/blackboard: args=22, methods=14, var=1, functions=2, locals=2. `arg-report` marks 0 keyword-safe and 22 keyword-risky args, including public/runtime keywords such as db_path, task, tenant_scope, now, worker_receipt, kind, and token-economics parameters. `contract-report` marks 0/14 methods and 0/1 class/body vars candidate-safe because provider methods and fields are observable through public methods, attribute dispatch, dynamic string references, or string-key references. Current blackboard conformance: 143/184 symbols (77.7%). Repo-wide inventory after this slice reports 77,507 pyprefix violations across 81,103 symbols, down from 77,643 before the slice. Not eligible for `migrated` until remaining public keyword/method/field contracts are coordinated with compatibility shims/exemptions or source-level contract codemods and `pyprefix check _repos/teleon/backend/src/teleon/blackboard` reaches 0 with the full gate green."
+    },
+    {
+      "path": "_repos/teleon/backend/src/teleon/synthesis/pipeline_templates.py",
+      "date": "2026-06-28",
+      "scope": "completed new primitive-template runtime module: one-line primitive step specs, callable-backed primitive handles, callable introspection into candidate primitive records/LLM views, explicit Python object-graph flattening for lists/dicts/matrices, deterministic derived step ids, deterministic registry resolution, task/named-input state passing, artifact refs, bounded retries, and JSON event logs",
+      "renamed_scoped_locals": 78,
+      "renamed_module_scope_targets": 0,
+      "renamed_keyword_safe_args": 0,
+      "files_touched_by_import_rewrite": 0,
+      "proof_gate": "746/746 green after pipeline template runtime checker was registered in scripts/flywheel_proof_modules.py and the full proof suite passed.",
+      "remaining": "0 violations; `pyprefix audit _repos/teleon/backend/src/teleon/synthesis/pipeline_templates.py` reports 296/296 conforming symbols (100.0%). Added to `migrated` so scripts/check_pyprefix_conformance.py now enforces this file permanently."
+    },
+    {
+      "path": "scripts/check_teleon_pipeline_template_runtime.py",
+      "date": "2026-06-28",
+      "scope": "completed proof checker for the primitive-template runtime contract, including callable-backed Python authoring, callable introspection, explicit object-graph authoring, and no-magic-string policy",
+      "renamed_scoped_locals": 6,
+      "renamed_module_scope_targets": 0,
+      "renamed_keyword_safe_args": 0,
+      "files_touched_by_import_rewrite": 0,
+      "proof_gate": "746/746 green after the checker proved candidate-only templates, one-line step authoring, registry-only primitive resolution, callable introspection, object-graph flattening, bounded retries, JSON event logs, and artifact references.",
+      "remaining": "0 violations; `pyprefix audit scripts/check_teleon_pipeline_template_runtime.py` reports 26/26 conforming symbols (100.0%). Added to `migrated` so scripts/check_pyprefix_conformance.py now enforces this file permanently."
+    }
+  ],
+  "naming": "LOCATION-DERIVED, globally-unique, no hashes (owner law): qualified_name -> py_<kind>_<file>__<scope>__<name>, e.g. py_function_src_teleon_runtime_credentials___dotenv. Spec: docs/codex/ai-first-naming-and-graph-spec.md.",
+  "progress": "2026-06-28 — full proof gate is GREEN (747/747) after the primitive-registry/vectorization/search pipeline, promotion gate, hybrid primitive matcher, component-plan compiler contract, primitive pipeline-template runtime, adversarial authoring-variant benchmark, refreshed inventory, and deeper package-sized pyprefix migrations. Built/hardened: strict location-derived target output in pyprefix check, var/arg/local detection, module.SYMBOL attribute references counted by safe_targets, explicit facade/__all__ rename propagation with a hermetic facade-consumer proof, full-token import rewrite matching, global-declaration rewrite support, nested-scope shadowing, scoped-function definition renames, `migrate-package`, `migrate-scoped`, `migrate-module-scope`, `arg-report`, `migrate-safe-args`, `contract-report`, `audit`, `pyprefix opgraph`, stable call-surface alias support, and methodology checks. Applied: completed `hf-space`, `_repos/teleon/backend/src/teleon/synthesis/pipeline_templates.py`, and `scripts/check_teleon_pipeline_template_runtime.py`; partial `_repos/teleon/backend/src/teleon/runtime`, `_repos/teleon/backend/src/teleon/registry`, `_repos/teleon/backend/src/teleon/agents`, `_repos/teleon/backend/src/teleon/retrieval`, `_repos/teleon/backend/src/teleon/components`, `_repos/teleon/backend/src/teleon/knowledge`, `_repos/teleon/backend/src/teleon/agent_gateway`, `_repos/teleon/backend/src/teleon/synthesis`, and `_repos/teleon/backend/src/teleon/blackboard` migrations. Blackboard remains 143/184 conforming symbols (77.7%); repo-wide inventory reports 77,507 pyprefix violations across 81,270 symbols after adding the new 100%-conformant template runtime/checker and candidate-only adversarial benchmark proof. CORRECT APPROACH remains package-by-package, full gate after EACH, never repo-wide. Next: continue leaf packages or resolve remaining contract-sensitive names via compatibility shims/exemptions or coordinated public-contract codemods.",
+  "planned_order": [
+    "scripts/pyprefix.py — dogfood: the tool conforms to its own standard first",
+    "self-contained leaf scripts (check_*.py whose symbols are not imported cross-file; verify with `pyprefix find <sym>` + grep)",
+    "_repos/teleon/backend/src/teleon/runtime/ then widen _repos/teleon/backend/src/teleon/ package by package",
+    "_repos/baltor/backend/src/baltor/, _repos/openhubforai/backend/src/openhubforai/, then scripts/ in batches",
+    "phase 2: coordinated contract migration for args, methods/instances, dataclass/class-body vars, test-gated"
+  ],
+  "serves_truth": false
+}

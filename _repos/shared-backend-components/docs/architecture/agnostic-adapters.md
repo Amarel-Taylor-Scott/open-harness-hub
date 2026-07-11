@@ -1,0 +1,1 @@
+../../../teleon/context/architecture/agnostic-adapters.md

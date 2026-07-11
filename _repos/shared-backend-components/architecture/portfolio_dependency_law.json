@@ -1,0 +1,100 @@
+{
+  "version": "1.0",
+  "purpose": "Architectural LAW for the brand PORTFOLIO (owner-directed 2026-06-06; canonical doc docs/strategy/teleon-baltor-openhubforai-portfolio.md). A holding company owns three product layers: OpenHubForAI (open ecosystem + the open CapabilityTask spec), Teleon (the purpose-driven runtime SaaS), and Baltor (the applied product, a TENANT of Teleon). This file encodes the allowed/forbidden IMPORT directions so the boundary is enforced by a proof (scripts/check_portfolio_dependency_law.py), not by prose. Branch on the layer + edge, never on a brand display name.",
+  "law": "Baltor depends on Teleon; Teleon may consume OpenHubForAI artifacts; OpenHubForAI depends on neither. Teleon must NEVER import Baltor (it is reusable infrastructure, not a Baltor feature). OpenHubForAI must import neither (the open ecosystem/spec stays neutral).",
+  "layers": {
+    "openhubforai": {
+      "package_roots": [
+        "_repos/openhubforai/backend/src/openhubforai"
+      ],
+      "role": "open ecosystem \u2014 eval harnesses, task templates, conformance tests, skills, runtime-adapter examples, example CapabilityTasks, and the OPEN CapabilityTask spec. The neutral home of the standard.",
+      "may_depend_on": []
+    },
+    "teleon": {
+      "package_roots": [
+        "_repos/teleon/backend/src/teleon"
+      ],
+      "role": "purpose-driven runtime SaaS \u2014 PurposeTask registry, runtime selector, implementation candidates, evidence ledger, promotion gate, policy engine, boundary approvals, task orientation, runtime adapters, assurance dashboard. The reference implementation of the open CapabilityTask spec.",
+      "may_depend_on": [
+        "openhubforai"
+      ]
+    },
+    "baltor": {
+      "package_roots": [
+        "_repos/baltor/backend/src/baltor"
+      ],
+      "role": "applied product \u2014 customer workflows, domain-specific tasks, source/evidence UX, receipts, vertical integrations, Baltor business logic. A TENANT/consumer of Teleon (tenant_id baltor-internal).",
+      "may_depend_on": [
+        "teleon",
+        "openhubforai"
+      ]
+    }
+  },
+  "forbidden_edges": [
+    {
+      "from": "teleon",
+      "to": "baltor",
+      "why": "Teleon must not become Baltor-specific; it is reusable infrastructure usable by any product"
+    },
+    {
+      "from": "openhubforai",
+      "to": "baltor",
+      "why": "the open ecosystem must not require the applied product"
+    },
+    {
+      "from": "openhubforai",
+      "to": "teleon",
+      "why": "the open ecosystem/spec stays neutral; Teleon consumes OHH, not the reverse"
+    }
+  ],
+  "vocabulary": {
+    "PurposeTask": "the stable purpose-level contract (product language)",
+    "CapabilityTask": "the formal/spec name for the same object (open standard, stewarded by OpenHubForAI)",
+    "ImplementationCandidate": "code/prompt/workflow/parser/browser-script/tool-sequence under test (a means)",
+    "RuntimeBinding": "where the task runs (function/job/worker/browser/workflow/GPU/edge/human-review)",
+    "EvidenceLedger": "runs, evals, traces, receipts, scorecards, cost, latency, safety checks",
+    "PromotionGate": "the evidence + policy decision before a candidate promotion",
+    "BoundaryApproval": "human approval for new permissions/systems/data-access/runtime-classes/purpose expansion (an ends change)",
+    "TaskOrientation": "structured operational memory: failure modes, environment facts, rejected strategies, successful migrations",
+    "AssurancePortal": "customer/staff visibility into purpose, evidence, health, approvals, outputs, trust"
+  },
+  "migration_status": {
+    "note": "Generic Teleon concepts are being INCREMENTALLY extracted _repos/baltor/backend/src/baltor -> _repos/teleon/backend/src/teleon (lossless: move a module + a re-export shim so callers + proofs stay green, re-run the flywheel, never big-bang). STARTED with the runtime layer's leaf: the ExecutionProviderPort now lives in _repos/teleon/backend/src/teleon/runtime and _repos/baltor/backend/src/baltor/ports/execution_provider re-exports it. Tracked here, not silent (no-magic-values + lossless-distillation).",
+    "to_extract_into_teleon": [
+      "STEP 1b (DONE 2026-06-08): the WHOLE fleet/execution substrate (fleet_ledger,durable_fleet_ledger,function_emulator,local_job_emulator,local_worker_pool,execution_dispatch) is now in _repos/teleon/backend/src/teleon/workers. No fleet migration debt remains.",
+      "STEP 2 (DONE 2026-06-08): _repos/baltor/backend/src/baltor/experiments/{path_rollback,boundary_approval} -> _repos/teleon/backend/src/teleon/experiments (ids/parallel_paths/path_comparator/path_promotion/path_costing DONE; path_rollback + boundary_approval extracted with Baltor re-export shims). No experiments migration debt remains.",
+      "STEP 3 (DONE 2026-06-08): _repos/baltor/backend/src/baltor/purpose_tasks/* -> _repos/teleon/backend/src/teleon/purpose_tasks (purpose_task/projections/runtime_binding/adaptation_ladder + __init__ extracted with Baltor re-export shims; the only functional repoint was purpose_task's src.baltor.experiments -> src.teleon.experiments)",
+      "STEP 4 (DONE 2026-06-08): _repos/baltor/backend/src/baltor/teleon_client — versioned tenant client (offline-first local + graceful fallback from a remote seam + per-call receipt served_by/fallback); Baltor→Teleon direction. The Baltor→Teleon extraction is COMPLETE: fleet + experiments + purpose_tasks + client.",
+      "RESOLVED (STEP 1b, 2026-06-08; owner decision made — Teleon owns DurableFleetLedger): _repos/baltor/backend/src/baltor/workers/{function_emulator,execution_dispatch,execution_providers/local_job_emulator,execution_providers/local_worker_pool}"
+    ],
+    "extraction_order": [
+      "1. execution layer (_repos/baltor/backend/src/baltor/workers/execution_*) \u2192 _repos/teleon/backend/src/teleon/runtime",
+      "2. Parallel-Path Engine (_repos/baltor/backend/src/baltor/experiments) \u2192 _repos/teleon/backend/src/teleon/experiments",
+      "3. purpose_tasks (_repos/baltor/backend/src/baltor/purpose_tasks) \u2192 _repos/teleon/backend/src/teleon/purpose_tasks",
+      "4. add _repos/baltor/backend/src/baltor/teleon_client that calls the Teleon API/surface (Baltor becomes tenant baltor-internal)"
+    ],
+    "standard_home": "the open CapabilityTask spec moves under OpenHubForAI (neutral); Teleon = best reference impl; Baltor = flagship vertical. 'Teleon implements the Open CapabilityTask Spec.'",
+    "extracted_so_far": [
+      "_repos/baltor/backend/src/baltor/ports/execution_provider -> _repos/teleon/backend/src/teleon/runtime/execution_provider (ExecutionProviderPort + ProviderUnavailableResult + ExecutionResult; Baltor re-exports via shim; Teleon imports only stdlib)",
+      "_repos/baltor/backend/src/baltor/workers/execution_backend_selector -> _repos/teleon/backend/src/teleon/runtime/execution_backend_selector (policy+pricebook backend selection; stdlib-only; Baltor re-exports via shim)",
+      "_repos/baltor/backend/src/baltor/workers/execution_providers/provider_unavailable -> _repos/teleon/backend/src/teleon/runtime/execution_providers/provider_unavailable (unavailable-sentinel adapter; imports the port from Teleon; Baltor re-exports via shim)",
+      "_repos/baltor/backend/src/baltor/workers/execution_providers/managed_venv -> _repos/teleon/backend/src/teleon/runtime/execution_providers/managed_venv (local venv execution provider; port from Teleon; Baltor re-exports via shim; check_local_execution_providers source-scan repointed)",
+      "_repos/baltor/backend/src/baltor/workers/execution_providers/container_image_emulator -> _repos/teleon/backend/src/teleon/runtime/execution_providers/container_image_emulator (container-image local emulator; imports managed_venv from Teleon; Baltor re-exports via shim)",
+      "_repos/baltor/backend/src/baltor/workers/execution_providers/gcp_cloud_run_function_candidate -> _repos/teleon/backend/src/teleon/runtime/execution_providers/gcp_cloud_run_function_candidate (candidate cloud-function adapter, SDK-free at load; port from Teleon; Baltor re-exports via shim; check_execution_backend_redteam source-scan repointed)",
+      "_repos/baltor/backend/src/baltor/experiments/ids -> _repos/teleon/backend/src/teleon/experiments/ids (step 2 leaf: canonical id/hash helpers; pure stdlib; Baltor re-exports via shim so still-in-Baltor experiments siblings' relative `from .ids` keeps resolving)",
+      "_repos/baltor/backend/src/baltor/experiments/parallel_paths -> _repos/teleon/backend/src/teleon/experiments/parallel_paths (Parallel-Path Engine core; imports ids from Teleon + scripts.runtime.schema_validator [scripts is tooling, not a brand layer \u2014 no teleon->baltor]; Baltor re-exports the public surface via shim)",
+      "_repos/baltor/backend/src/baltor/experiments/path_comparator -> _repos/teleon/backend/src/teleon/experiments/path_comparator (candidate-vs-baseline judge; imports ids from Teleon + scripts.runtime.schema_validator; Baltor re-exports public API + canonical_id via shim)",
+      "_repos/baltor/backend/src/baltor/experiments/path_promotion -> _repos/teleon/backend/src/teleon/experiments/path_promotion (the promotion authority \u2014 decide/is_promote_authorized; imports ids from Teleon + scripts.runtime; Baltor re-exports full surface via shim)",
+      "_repos/baltor/backend/src/baltor/experiments/path_costing -> _repos/teleon/backend/src/teleon/experiments/path_costing (pricebook-derived cost estimator; imports ids from Teleon; Baltor re-exports estimate/load_pricebook/SCHEMA_VERSION/COST_CURRENCY/PRICEBOOK_PATH/canonical_id via shim)",
+      "_repos/baltor/backend/src/baltor/workers/{fleet_ledger,durable_fleet_ledger} -> _repos/teleon/backend/src/teleon/workers (the fleet/execution-ledger substrate; Teleon owns execution backends + evidence ledgers; full-surface Baltor re-export shims incl privates _hid/_age_s/_epoch/_plus_s/_VALID_TRANSITIONS + status constants; ~46 callers + fleet proofs green)",
+      "_repos/baltor/backend/src/baltor/workers/{function_emulator,execution_providers/local_job_emulator,execution_providers/local_worker_pool,execution_dispatch} -> _repos/teleon/backend/src/teleon/workers (the local execution backends + live dispatcher; import ledger+siblings from src.teleon; selector from src.teleon.runtime; full-surface Baltor shims incl execution_dispatch privates _JOB_BACKENDS/_POOL_BACKENDS; flywheel 407 green) \u2014 DurableFleetLedger migration COMPLETE"
+    ],
+    "blocked": [
+      "RESOLVED 2026-06-08: DurableFleetLedger placement DECIDED -> Teleon (warrant in decision-ledger). The fleet substrate {fleet_ledger,durable_fleet_ledger} extracts to _repos/teleon/backend/src/teleon/workers/ with Baltor shims; then function_emulator/local_job_emulator/local_worker_pool/execution_dispatch move to Teleon. No longer blocked."
+    ],
+    "lessons": [
+      "Pre-grep must include LAZY (inside-function) ABSOLUTE imports (e.g. `from src.baltor.workers.durable_fleet_ledger import ...` inside a method) \u2014 a top-level import grep misses them and they create a teleon->baltor edge after a move.",
+      "Pre-grep for private re-export must catch `from <mod> import _NAME` (explicit-name imports of underscore privates, incl _UPPERCASE like _JOB_BACKENDS), not just `module._name` attribute access \u2014 proofs import privates by name (check_runtime_class_binding imported _JOB_BACKENDS/_POOL_BACKENDS)."
+    ]
+  }
+}

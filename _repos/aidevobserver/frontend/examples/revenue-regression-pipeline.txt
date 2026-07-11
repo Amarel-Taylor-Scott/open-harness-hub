@@ -1,0 +1,7 @@
+user: Build a regression pipeline to predict next-month revenue from account activity and historical invoices.
+assistant: I normalized this as RevenueTrainingRequest to ModelRegistrationPacket and found template regression_train_evaluate_register.
+assistant: CandidateBundle: load, validate, feature, split, train, evaluate, register. The validation gate includes schema and no-leakage checks.
+assistant: A normal agent might build a notebook and accidentally include future cancellation_date or target labels. I will use deterministic feature validation and artifact-backed datasets instead.
+assistant: PlanDelta {"v":1,"p":"dense","t":0,"b":[0,0,0,0,0,0,0],"r":[],"g":[]}
+assistant: Compiler rejects validate_schema_only because it lacks no_leakage_check, injects deterministic seed into the split, and blocks model registration until the metric gate passes.
+assistant: Runtime stores dataset, feature table, model, and eval report as ArtifactRefs and records replayable JSONL events.

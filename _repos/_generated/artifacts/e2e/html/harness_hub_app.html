@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenHubForAI — describe a task, lift the pipeline</title>
+<meta name="description" content="Assemble governed AI pipelines from vetted components and knowledge corpora that measurably lift capability over a bare model — most of it deterministic and freezable.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<!-- Full family set so every scheme (A–H, S) renders if toggled; scheme S uses Space Grotesk · Inter · JetBrains Mono -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Inter+Tight:wght@400;500;600;700&amp;family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;500;600;700;800&amp;family=Archivo:wght@400;500;600;700;800&amp;family=Spectral:wght@400;500;600;700&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/oh-tokens.css">
+<link rel="stylesheet" href="styles/oh-components.css">
+<link rel="stylesheet" href="styles/oh-explorations.css">
+<link rel="stylesheet" href="styles/proto.css">
+<link rel="stylesheet" href="styles/proto-deep.css">
+<link rel="stylesheet" href="styles/proto-byo.css">
+<link rel="stylesheet" href="styles/proto-admin.css">
+<link rel="stylesheet" href="styles/proto-sdg.css">
+<link rel="stylesheet" href="styles/proto-value.css">
+<link rel="stylesheet" href="styles/proto-ops.css">
+<link rel="stylesheet" href="styles/proto-wide.css">
+</head>
+<!-- Scheme S · Harness House is the locked direction (see HANDOFF.md). Marketing surfaces are light;
+     a global override (the bottom-left switcher) can preview any of the 9 schemes + dark. -->
+<body style="padding-bottom: 44px;">
+<div id="root" class="oh dir-s theme-light">
+
+  <!-- ============ LANDING  (#/) ============ -->
+  <div class="pt-mkt pt-view" data-route="/" style="">
+    <header class="pt-mkt-top">
+      <div class="oh-wordmark" data-nav="/">
+        <span class="oh-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor"></rect>
+            <path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4"></path>
+            <rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)"></rect>
+          </svg>
+        </span> OpenHubForAI
+      </div>
+      <nav>
+        <a data-nav="/pipelines">Explore</a>
+        <a data-nav="/compare">Compare</a>
+        <a data-nav="/solutions">SDG solutions</a>
+        <a data-nav="/pricing">Pricing</a>
+        <a data-nav="/docs">Docs</a>
+        <a data-nav="/trust">Trust</a>
+        <a href="https://baltor.ai">Baltor</a>
+        <a href="https://aidoneright.dev">AI Done Right</a>
+        <a href="https://aidoneright.dev/gtm-launch-guide.html">Launch guide</a>
+        <a href="/how-it-works.html">How it works</a>
+      </nav>
+      <span class="pt-spacer"></span>
+      <a class="oh-btn oh-btn--ghost oh-btn--sm" href="/how-it-works.html" style="margin-right:8px">See how it works</a>
+      <button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>
+    </header>
+    <div class="pt-mkt-body">
+      <section class="pt-hero">
+        <h1 id="hero-headline">Describe a task.<br>Lift the pipeline, not the bill.</h1>
+        <p class="sub">Assembled from vetted components and knowledge corpora that measurably lift capability. Use open harnesses as the builder funnel, and serve verified context from Baltor when a workflow needs current, traceable facts.</p>
+        <div class="pt-entry">
+          <textarea id="task-entry" autofocus="" rows="2" placeholder="Detect human-exploitation indicators in a recruitment ad posted from Hong Kong to the Philippines…" style=""></textarea>
+          <div class="pt-entry-row">
+            <div class="pt-constraints"></div>
+            <button class="oh-btn oh-btn--primary" id="build-btn">Build <span style="font-size:12px;opacity:.7">⌘↵</span></button>
+          </div>
+        </div>
+        <div class="pt-hint" id="entry-hint"></div>
+        <div class="pt-modtabs pt-modtabs--center" id="mod-tabs" role="tablist" aria-label="Example task modality"><button class="pt-modtab on" data-mod="text" role="tab"><span class="gl">⌶</span>Text</button><button class="pt-modtab" data-mod="image" role="tab"><span class="gl">◰</span>Image</button><button class="pt-modtab" data-mod="audio" role="tab"><span class="gl">◵</span>Audio</button><button class="pt-modtab" data-mod="video" role="tab"><span class="gl">▷</span>Video</button></div>
+        <div class="pt-chips" id="example-chips"><button class="pt-chip"><span class="tri">▸</span>Detect human-exploitation indicators in …</button><button class="pt-chip"><span class="tri">▸</span>Trace EUDR deforestation risk for a coff…</button><button class="pt-chip"><span class="tri">▸</span>Screen a recruitment agency against mode…</button><button class="pt-chip"><span class="tri">▸</span>Flag CSDDD tier-2 supplier risk and cite…</button></div>
+        <div class="pt-quiet">
+          <a data-nav="/improve">…or improve a pipeline you already have</a><span class="dot">·</span>
+          <a data-nav="/pipelines">Browse the catalog</a><span class="dot">·</span>
+          <a data-nav="/signin">Sign in</a>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ============ PREVIEW  (#/preview) — logged-out build result ============ -->
+  <div class="pt-mkt pt-view" data-route="/preview" hidden="" style="display: none;">
+    <header class="pt-mkt-top">
+      <div class="oh-wordmark" data-nav="/" style="cursor:pointer">
+        <span class="oh-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor"></rect>
+            <path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4"></path>
+            <rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)"></rect>
+          </svg>
+        </span> OpenHubForAI
+      </div>
+      <span class="pt-spacer"></span>
+      <button class="oh-btn oh-btn--ghost oh-btn--sm" data-nav="/signin">Sign in</button>
+    </header>
+    <div class="pt-mkt-body">
+      <div class="pt-page" id="preview-page" style="max-width:680px"></div>
+    </div>
+  </div>
+
+  <!-- minimal route fallback (#/anything-else) -->
+  <div class="pt-404" data-route="404" hidden="" style="display: none;">
+    <div class="oh-wordmark"><span class="oh-mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="6" width="6" height="6" rx="1.4" fill="currentColor"></rect><path d="M9 9h3.5" stroke="currentColor" stroke-width="1.4"></path><rect x="11" y="3" width="6" height="6" rx="3" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(45 14 6)"></rect></svg></span> OpenHubForAI</div>
+    <h1 style="font-family:var(--font-display)">This screen isn't wired yet</h1>
+    <p style="color:var(--fg-muted);max-width:440px">The landing and logged-out preview are implemented from the Claude Design handoff. The remaining routes (Explore, Flow, Run, Pricing, Foundry, Govern…) are specced in <code>web/README.md</code> and ready to port.</p>
+    <button class="oh-btn oh-btn--primary" data-nav="/">← Back to the entry box</button>
+  </div>
+
+  <!-- dynamic route host: registered pages (web/pages/*.js) render here -->
+  <div id="oh-dynamic" style="display:none"></div>
+
+</div>
+<link rel="icon" href="data:,">
+<script src="data.js"></script>
+<script src="identity.js"></script>
+<script src="app.js"></script><div style="position:fixed;right:14px;bottom:50px;z-index:50;display:flex;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-pill);padding:5px 8px;box-shadow:var(--e2);font-size:12px"><select aria-label="Design scheme" style="background:transparent;border:none;color:var(--fg);font:inherit;font-family:var(--font-sans);cursor:pointer;outline:none"><option value="s">Harness House ★</option><option value="a">Warm Editorial</option><option value="b">Clinical Mono</option><option value="c">Refined Dark</option><option value="d">Answer-Engine Teal</option><option value="e">Blueprint Terminal</option><option value="f">Ledger / Governance</option><option value="g">Hacker Terminal</option><option value="h">Enterprise Slate</option></select><button class="oh-btn oh-btn--ghost oh-btn--sm">◐ Light</button></div><div style="position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--line);font:11.5px/1.5 var(--font-mono)"><div style="display:none;max-height:168px;overflow-y:auto;padding:8px 16px;border-bottom:1px solid var(--line)"></div><div style="display:flex;align-items:center;gap:10px;padding:7px 16px;cursor:pointer"><span style="display:flex;align-items:center;gap:6px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;font-size:10px;color:var(--fg-muted);flex:0 0 auto"><span>▴</span>Activity</span><span style="font-size: 9px; background: var(--accent-weak); color: var(--accent); border-radius: 999px; padding: 0px 6px; flex: 0 0 auto; display: inline-block;">2</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--fg)"><span style="color:var(--fg-faint)">16:05:41</span> <span style="color:var(--accent)">●</span> view · /</span></div></div>
+
+
+<script src="pages/admin.js"></script><script src="pages/auth.js"></script><script src="pages/build.js"></script><script src="pages/byo.js"></script><script src="pages/catalog.js"></script><script src="pages/compare.js"></script><script src="pages/deep.js"></script><script src="pages/docs.js"></script><script src="pages/flow.js"></script><script src="pages/govern.js"></script><script src="pages/landings.js"></script><script src="pages/ops.js"></script><script src="pages/requests.js"></script><script src="pages/run.js"></script><script src="pages/sdg.js"></script><script src="pages/value.js"></script><script src="pages/why.js"></script></body></html>

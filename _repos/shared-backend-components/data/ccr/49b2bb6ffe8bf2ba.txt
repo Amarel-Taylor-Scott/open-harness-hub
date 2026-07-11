@@ -1,0 +1,30 @@
+MODULE src/teleon/frameworks/framework_adapters.py
+## API signatures
+```python
+"""src.teleon.frameworks.framework_adapters — make Teleon capabilities interoperate with the common agent
+frameworks, BOTH directions, governed."""
+SUPPORTED_FRAMEWORKS = ...
+_GOV_KEY = ...
+def _gov(capability: dict) -> dict
+def to_openai_tool(capability: dict) -> dict
+    # A Teleon capability as an OpenAI / AutoGen function-tool spec.
+def to_anthropic_tool(capability: dict) -> dict
+    # A Teleon capability as an Anthropic / Claude-Agent-SDK tool spec.
+def to_mcp_tool(capability: dict) -> dict
+    # A Teleon capability as an MCP tool definition.
+def to_langgraph_node(capability: dict) -> dict
+    # A Teleon capability as a LangGraph node descriptor (a callable node bound to the governed capability).
+def to_crewai_tool(capability: dict) -> dict
+    # A Teleon capability as a CrewAI tool descriptor.
+_EXPORTERS = ...
+def export_capability(capability: dict, framework: str) -> dict
+    # Export a governed capability as the given framework's native tool spec.
+def wrap_agent_as_candidate(framework: str, agent_id: str, *, capability_slot: str, sandbox: str='local_function_emulator') -> dict
+    # Wrap a framework AGENT as a governed candidate behind a port: sandboxed, output is candidate, never truth.
+```
+## intra-module call edges
+src.teleon.frameworks.framework_adapters.to_anthropic_tool -> src.teleon.frameworks.framework_adapters._gov
+src.teleon.frameworks.framework_adapters.to_crewai_tool -> src.teleon.frameworks.framework_adapters._gov
+src.teleon.frameworks.framework_adapters.to_langgraph_node -> src.teleon.frameworks.framework_adapters._gov
+src.teleon.frameworks.framework_adapters.to_mcp_tool -> src.teleon.frameworks.framework_adapters._gov
+src.teleon.frameworks.framework_adapters.to_openai_tool -> src.teleon.frameworks.framework_adapters._gov

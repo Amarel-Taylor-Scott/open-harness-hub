@@ -1,0 +1,40 @@
+{
+  "version": "0.1",
+  "updated": "2026-06-25",
+  "principle": "NEVER stop searching until the ladder is exhausted. A 'no results' is only honest AFTER every cheaper rung was tried and the next rung was named. This is the antidote to premature give-up: the Rehydrator/Doctor/Kickstart layers read this ladder to answer 'have you tried X?' and inject the next untried rung automatically. Cost-ordered, deterministic-first, governed. serves_truth=false (a search result is a candidate, never truth).",
+  "serves_truth": false,
+  "links": {
+    "providers": "architecture/search_provider_registry.json",
+    "credentials": "architecture/credential_registry.json",
+    "external_apis": "architecture/external_api_registry.json",
+    "acquisition_strategies": "architecture/acquisition_strategies.json",
+    "intelligence_sources": "architecture/intelligence_source_registry.json",
+    "capability_ladders": "architecture/capability_ladders.json",
+    "browser_plane": "_repos/teleon/backend/src/teleon/research/browser_port.py"
+  },
+  "cost_tiers": ["free_keyless", "free_keyed", "low", "medium", "grounded"],
+  "rungs": [
+    {"order": 1,  "id": "reformulate_query", "method": "query_rewrite", "provider_ref": "acquisition_strategies:reformulate_query", "needs_key": null, "cost_tier": "free_keyless", "invasiveness": "none", "when": "always first — synonyms, field-ontology expansion, narrower+broader variants, foreign-language", "fallback_to": "duckduckgo"},
+    {"order": 2,  "id": "duckduckgo", "method": "web_search", "provider_ref": "search_provider_registry:duckduckgo", "needs_key": null, "cost_tier": "free_keyless", "invasiveness": "low", "when": "free general web before any paid engine", "fallback_to": "wikipedia"},
+    {"order": 3,  "id": "wikipedia", "method": "reference_search", "provider_ref": "search_provider_registry:wikipedia", "needs_key": null, "cost_tier": "free_keyless", "invasiveness": "none", "when": "entity/definition grounding", "fallback_to": "hacker_news"},
+    {"order": 4,  "id": "hacker_news", "method": "community_search", "provider_ref": "intelligence_source:ai_news", "needs_key": null, "endpoint": "https://hn.algolia.com/api/v1/search", "cost_tier": "free_keyless", "invasiveness": "low", "when": "AI/dev discussions, launches, sentiment", "fallback_to": "github_search"},
+    {"order": 5,  "id": "github_search", "method": "code_repo_search", "provider_ref": "credential_registry:github", "needs_key": "GITHUB_TOKEN", "key_optional": true, "cost_tier": "free_keyed", "invasiveness": "low", "when": "tools/repos/implementations/forks/issues/PRs", "fallback_to": "rss_feeds"},
+    {"order": 6,  "id": "rss_feeds", "method": "feed_pull", "provider_ref": "intelligence_source:ai_news", "needs_key": null, "cost_tier": "free_keyless", "invasiveness": "none", "when": "AI newsletters/blogs with feeds; cheapest fresh-content path", "fallback_to": "reddit_search"},
+    {"order": 7,  "id": "reddit_search", "method": "community_search", "provider_ref": "intelligence_source:community", "needs_key": null, "endpoint": "https://www.reddit.com/search.json", "cost_tier": "free_keyless", "invasiveness": "low", "when": "subreddit discussion, niche sources", "fallback_to": "brave_search"},
+    {"order": 8,  "id": "brave_search", "method": "web_search", "provider_ref": "search_provider_registry:brave_search", "needs_key": "BRAVE_API_KEY", "cost_tier": "low", "invasiveness": "low", "when": "independent index, fewer rate limits than scraping Google", "fallback_to": "tavily"},
+    {"order": 9,  "id": "tavily", "method": "llm_optimized_search", "provider_ref": "search_provider_registry:tavily", "needs_key": "TAVILY_API_KEY", "cost_tier": "low", "invasiveness": "none", "when": "LLM-ready snippets for ingestion", "fallback_to": "exa"},
+    {"order": 10, "id": "exa", "method": "neural_search", "provider_ref": "search_provider_registry:exa", "needs_key": "EXA_API_KEY", "cost_tier": "low", "invasiveness": "none", "when": "semantic/'find similar' discovery", "fallback_to": "serpapi"},
+    {"order": 11, "id": "serpapi", "method": "google_serp", "provider_ref": "search_provider_registry:serpapi", "needs_key": "SERPAPI_KEY", "cost_tier": "medium", "invasiveness": "low", "when": "need real Google SERP coverage", "fallback_to": "rapidapi_endpoints"},
+    {"order": 12, "id": "rapidapi_endpoints", "method": "vendor_api", "provider_ref": "credential_registry:rapidapi", "needs_key": "RAPIDAPI_KEY", "cost_tier": "variable", "invasiveness": "low", "when": "social/news/scrape endpoints (FB pages, X, niche) — governed; the user's RapidAPI services plug here", "governance": "public metadata only; no PII; honor each endpoint's ToS; candidate-only feed", "fallback_to": "apify_actors"},
+    {"order": 13, "id": "apify_actors", "method": "managed_scraper", "provider_ref": "credential_registry:apify", "needs_key": "APIFY_TOKEN", "cost_tier": "variable", "invasiveness": "medium", "when": "structured scrapers for sites without an API", "governance": "public only; ToS-aware", "fallback_to": "browser_automation"},
+    {"order": 14, "id": "browser_automation", "method": "headless_browser", "provider_ref": "browser_port", "needs_key": null, "cost_tier": "low", "invasiveness": "medium", "when": "JS-heavy pages, no API/feed — Playwright/Puppeteer; rotate UA, disable images, try mobile view", "escalation": ["default_chromium", "stealth_undetected", "mobile_viewport", "screenshot_plus_coords"], "fallback_to": "archive_org"},
+    {"order": 15, "id": "archive_org", "method": "cache_search", "needs_key": null, "endpoint": "https://web.archive.org/", "cost_tier": "free_keyless", "invasiveness": "none", "when": "live page gone/blocked — Wayback + CDX API; also Google cache", "fallback_to": "site_surface_probe"},
+    {"order": 16, "id": "site_surface_probe", "method": "structural_probe", "needs_key": null, "cost_tier": "free_keyless", "invasiveness": "low", "when": "last resort on a known domain — sitemap.xml, robots.txt, RSS autodiscovery, /api guesses, JSON-LD, JS bundles", "fallback_to": "grounded_synthesis"},
+    {"order": 17, "id": "grounded_synthesis", "method": "llm_grounded", "provider_ref": "search_provider_registry:perplexity_sonar", "needs_key": "PERPLEXITY_API_KEY", "cost_tier": "grounded", "invasiveness": "none", "when": "only after primary retrieval — synthesize with citations; never as the first/only source", "fallback_to": "semantic_local_index"},
+    {"order": 18, "id": "semantic_local_index", "method": "vector_search", "needs_key": null, "cost_tier": "free_keyless", "invasiveness": "none", "when": "search what we already ingested before concluding nothing exists", "fallback_to": null}
+  ],
+  "exhaustion_gate": {
+    "rule": "Emit honest_no_results ONLY when every rung whose key is available was attempted. The report MUST list: rungs_tried, rungs_skipped_for_missing_key (with the env var that would unlock each), and the single next_rung that would be tried if a key were added.",
+    "never": ["concluding unavailable after one engine", "stopping at the first 0-result page", "skipping the free rungs to jump to a paid one"]
+  }
+}

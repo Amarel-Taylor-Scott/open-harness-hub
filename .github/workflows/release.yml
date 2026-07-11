@@ -26,15 +26,15 @@ jobs:
 
       - name: Validate + emit
         run: |
-          python scripts/validate.py
-          python scripts/build_catalog_index.py
-          python scripts/emit/all.py
+          python _repos/shared-backend-components/scripts/validate.py
+          python _repos/shared-backend-components/scripts/build_catalog_index.py
+          python _repos/shared-backend-components/scripts/emit/all.py
 
       - name: Bundle dist/ archives
         run: |
           VERSION=${GITHUB_REF_NAME}
-          tar -czf "open-harness-hub-${VERSION}.tar.gz" dist/
-          (cd dist && zip -r "../open-harness-hub-${VERSION}.zip" .)
+          tar -czf "open-harness-hub-${VERSION}.tar.gz" -C _repos/shared-backend-components dist
+          (cd _repos/shared-backend-components/dist && zip -r "$GITHUB_WORKSPACE/open-harness-hub-${VERSION}.zip" .)
           ls -la *.tar.gz *.zip
 
       - name: Publish release

@@ -1,0 +1,528 @@
+{
+  "version": "1.0",
+  "purpose": "The cross-repo generalization of architecture/portfolio_dependency_law.json for the MULTI-REPO org. Each product surface is a SEPARATE GitHub repo under one org account. A surface becomes AWARE of another ONLY through that surface's published interface manifest (interface.json) — never by importing its source. This file is the single machine-readable registry of surfaces, what each EXPOSES, and which others it MAY consume. Enforced by tools/check_cross_repo_dependency_law.py in each repo's CI, so the boundary is a proof, not prose.",
+  "law": "Dependency direction is preserved across repos: Baltor -> Teleon -> OpenHubForAI, never the reverse. Every product surface may consume SharedBackendComponents (the substrate) and the OpenHubForAI open spec. A surface consumes another ONLY via its published interface.json (a versioned contract), never its internals. dev-rules-context is inherited by every repo (standards + gates) and depends on nothing.",
+  "_needs_owner_confirmation": {
+    "aidevobserver_naming": "RESOLVED 2026-07-03: name is AIDevObserver (owner-confirmed).",
+    "openhubforai_placement": "Owner's repo list (AiDoneRight, Teleon, Baltor, AIDevObserver, SharedBackendComponents, dev-rules, 'etc') did not name OpenHubForAI explicitly. Kept as its own neutral surface here (it stewards the open spec); confirm whether it is its own repo or folded into SharedBackendComponents.",
+    "consumption_mechanism": "How a consumed interface is delivered across repos (git submodule of a published-interfaces repo, a versioned package, or generated client stubs) is an owner infra choice — the CONTRACT (interface.json) is the same regardless."
+  },
+  "consumption_rule": "surface A may reference surface B's capabilities ONLY through B's interface.json (name + version + exposes). Importing B's source from A is a forbidden cross-repo edge, caught by the checker.",
+  "surfaces": {
+    "dev-rules-context": {
+      "repo": "aidoneright-dev-rules-context",
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the naming law, multi-path methodology, verification laws, the surface registry, and the portable checkers.",
+      "kind": "rules_and_context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "may_depend_on": [],
+      "consumed_by": [
+        "aidoneright",
+        "teleon",
+        "baltor",
+        "aidevobserver",
+        "shared-backend-components",
+        "openhubforai"
+      ]
+    },
+    "shared-backend-components": {
+      "repo": "aidoneright-shared-backend-components",
+      "role": "the SUBSTRATE every product consumes — the primitive/component registry + factory + catalog, codegraph, naming planes, eval, storage tiers, pipelines, credential plane. Reusable infrastructure, product-neutral.",
+      "kind": "substrate",
+      "exposes": [
+        "registry",
+        "primitives",
+        "codegraph",
+        "eval-harness",
+        "storage-tiers",
+        "credential-plane"
+      ],
+      "may_depend_on": [
+        "dev-rules-context"
+      ],
+      "consumed_by": [
+        "teleon",
+        "baltor",
+        "aidevobserver",
+        "openhubforai"
+      ],
+      "projects": {
+        "services-platform": {
+          "kind": "microservice",
+          "code_path": "services/platform",
+          "repo": "aidoneright-svc-platform",
+          "consumes_projects": []
+        },
+        "services-worker": {
+          "kind": "microservice",
+          "code_path": "services/worker",
+          "repo": "aidoneright-svc-worker",
+          "consumes_projects": []
+        },
+        "services-scheduler": {
+          "kind": "microservice",
+          "code_path": "services/scheduler",
+          "repo": "aidoneright-svc-scheduler",
+          "consumes_projects": []
+        }
+      }
+    },
+    "openhubforai": {
+      "repo": "aidoneright-openhubforai",
+      "role": "the OPEN ecosystem + the open CapabilityTask spec (CTS). The neutral home of the standard; stays product-neutral.",
+      "kind": "open_spec",
+      "exposes": [
+        "capabilitytask-spec",
+        "eval-harnesses",
+        "task-templates",
+        "conformance-tests",
+        "skills"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components"
+      ],
+      "consumed_by": [
+        "teleon"
+      ],
+      "projects": {
+        "openhubforai-backend": {
+          "kind": "backend",
+          "code_path": "src/openhubforai",
+          "repo": "aidoneright-openhubforai-backend",
+          "consumes_projects": []
+        },
+        "openhubforai-frontend": {
+          "kind": "frontend",
+          "code_path": "web/openhubforai",
+          "repo": "aidoneright-openhubforai-frontend",
+          "consumes_projects": [
+            "openhubforai-backend"
+          ]
+        }
+      }
+    },
+    "teleon": {
+      "repo": "aidoneright-teleon",
+      "role": "the purpose-driven, eval-gated, self-adaptive compute RUNTIME SaaS. Owns PurposeTask/CapabilityTask, runtime selection, evidence ledger, promotion/policy gates, adapters, the assurance dashboard. Reference implementation of the open spec.",
+      "kind": "product_runtime",
+      "exposes": [
+        "/api/teleon",
+        "PurposeTask",
+        "runtime-selector",
+        "evidence-ledger",
+        "promotion-gate",
+        "assurance-portal"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components",
+        "openhubforai"
+      ],
+      "consumed_by": [
+        "baltor"
+      ],
+      "projects": {
+        "teleon-backend": {
+          "kind": "backend",
+          "code_path": "src/teleon",
+          "repo": "aidoneright-teleon-backend",
+          "exposes": [
+            "/api/teleon"
+          ],
+          "consumes_projects": []
+        },
+        "teleon-frontend": {
+          "kind": "frontend",
+          "code_path": "web/teleon",
+          "repo": "aidoneright-teleon-frontend",
+          "consumes_projects": [
+            "teleon-backend"
+          ]
+        }
+      }
+    },
+    "baltor": {
+      "repo": "aidoneright-baltor",
+      "role": "the applied, customer-facing CONTEXT product, powered by Teleon (a TENANT). Governance / provenance / signed facts / CDC is the moat.",
+      "kind": "product_applied",
+      "exposes": [
+        "/api/baltor",
+        "context-engine",
+        "governance",
+        "customer-workflows",
+        "receipts"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components",
+        "openhubforai",
+        "teleon"
+      ],
+      "consumed_by": [],
+      "projects": {
+        "baltor-backend": {
+          "kind": "backend",
+          "code_path": "src/baltor",
+          "repo": "aidoneright-baltor-backend",
+          "exposes": [
+            "/api/baltor"
+          ],
+          "consumes_projects": []
+        },
+        "baltor-frontend": {
+          "kind": "frontend",
+          "code_path": "web/baltor",
+          "repo": "aidoneright-baltor-frontend",
+          "consumes_projects": [
+            "baltor-backend"
+          ]
+        }
+      }
+    },
+    "aidevobserver": {
+      "repo": "aidoneright-aidevobserver",
+      "role": "the AI-USAGE layer — session/AI-usage coaching (not code review); MCP + CLI + extension + app + local service.",
+      "kind": "product_usage_layer",
+      "exposes": [
+        "/api/observer",
+        "session-review",
+        "mcp-server",
+        "cli",
+        "extension"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components"
+      ],
+      "consumed_by": [],
+      "projects": {
+        "aidevobserver-frontend": {
+          "kind": "frontend",
+          "code_path": "web/aidevobserver",
+          "repo": "aidoneright-aidevobserver-frontend",
+          "consumes_projects": [
+            "aidevobserver-backend"
+          ]
+        },
+        "aidevobserver-backend": {
+          "kind": "backend",
+          "code_path": "scripts/observer (TBD extract)",
+          "repo": "aidoneright-aidevobserver-backend",
+          "consumes_projects": []
+        },
+        "aidevobserver-extension": {
+          "kind": "client",
+          "code_path": "TBD",
+          "repo": "aidoneright-aidevobserver-extension",
+          "consumes_projects": [
+            "aidevobserver-backend"
+          ]
+        }
+      }
+    },
+    "aidoneright": {
+      "repo": "aidoneright-parent",
+      "role": "the PARENT BRAND / portfolio umbrella (aidoneright.dev). References every surface's PUBLIC interface for the portfolio site; owns no product logic.",
+      "kind": "parent_brand",
+      "exposes": [
+        "portfolio-site",
+        "brand"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "teleon",
+        "baltor",
+        "aidevobserver",
+        "openhubforai"
+      ],
+      "_note": "aidoneright consumes only PUBLISHED interfaces (for display/routing), never product internals.",
+      "consumed_by": [],
+      "projects": {
+        "aidoneright-frontend": {
+          "kind": "frontend",
+          "code_path": "web/context-is-everything",
+          "repo": "aidoneright-parent-frontend",
+          "consumes_projects": []
+        }
+      }
+    },
+    "api-endpoint-wrappers": {
+      "repo": "aidoneright-api-endpoint-wrappers",
+      "role": "DEV TOOL — reusable adapters that wrap third-party / local / cloud API endpoints behind stable PORTS (agnostic-adapter pattern), so every product calls a capability, never a hardcoded host. Cost-ordered, deterministic-first.",
+      "kind": "dev_tool",
+      "exposes": [
+        "port-adapters",
+        "provider-registry",
+        "cost-gates",
+        "retry/backoff",
+        "credential-port"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components"
+      ],
+      "consumed_by": [
+        "teleon",
+        "baltor",
+        "aidevobserver",
+        "shared-backend-components",
+        "scraping",
+        "context-injection"
+      ]
+    },
+    "scraping": {
+      "repo": "aidoneright-scraping",
+      "role": "DEV TOOL — reusable scraping / browser-automation / stealth-fetch toolkit (the descent ladder: API -> browser -> stealth -> vision). Feeds intake/discovery. Consented + governed only.",
+      "kind": "dev_tool",
+      "exposes": [
+        "fetch-ladder",
+        "browser-automation",
+        "extract-cascade",
+        "rate-governance",
+        "robots/consent-gate"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components",
+        "api-endpoint-wrappers"
+      ],
+      "consumed_by": [
+        "shared-backend-components",
+        "baltor",
+        "aidevobserver"
+      ]
+    },
+    "context-injection": {
+      "repo": "aidoneright-context-injection",
+      "role": "DEV TOOL — reusable context assembly / packing / memory / prompt-composition tooling (context packs, headroom compression, retrieval-into-prompt). The 'context is everything' plumbing every agent surface uses.",
+      "kind": "dev_tool",
+      "exposes": [
+        "context-pack-builder",
+        "memory-store",
+        "prompt-composer",
+        "headroom-compressor",
+        "retrieval-injector"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "shared-backend-components"
+      ],
+      "consumed_by": [
+        "teleon",
+        "baltor",
+        "aidevobserver",
+        "aidoneright"
+      ]
+    },
+    "business-context": {
+      "repo": "aidoneright-business-context",
+      "role": "CONTEXT repo — business notes, decisions (with warrants), activity log, analytics, MCP server configs, meeting/strategy notes. 'Context in a repo': the durable business memory every surface can reference, separate from product code.",
+      "kind": "context",
+      "exposes": [
+        "decisions-ledger",
+        "activity-log",
+        "analytics",
+        "mcp-configs",
+        "business-notes"
+      ],
+      "may_depend_on": [
+        "dev-rules-context"
+      ],
+      "consumed_by": [
+        "aidoneright",
+        "teleon",
+        "baltor",
+        "aidevobserver"
+      ],
+      "_note": "context-only, no product code; decisions carry warrants (change-verification law); read by humans + agents for grounding, never imported as code."
+    },
+    "edge-graph-generator": {
+      "repo": "aidoneright-edge-graph-generator",
+      "role": "META DEV TOOL — reads the surface-registry + every repo's published interface.json and GENERATES the repo-to-repo edge context + dependency graph: a compact per-repo edge digest (a session on repo X sees X + its neighbors' EDGES, never their internals) plus the global graph. Keeps cross-repo awareness in sync without full-context reads.",
+      "kind": "meta_tool",
+      "exposes": [
+        "per-repo-edge-digest",
+        "repo-dependency-graph",
+        "surface-registry-validator",
+        "interface-manifest-validator"
+      ],
+      "may_depend_on": [
+        "dev-rules-context"
+      ],
+      "consumed_by": [
+        "aidoneright",
+        "teleon",
+        "baltor",
+        "aidevobserver",
+        "shared-backend-components",
+        "openhubforai",
+        "api-endpoint-wrappers",
+        "scraping",
+        "context-injection",
+        "business-context"
+      ],
+      "_note": "reads interface manifests (contracts) only, never repo source; its output is what makes 'edge-aware, not everything-aware' real."
+    },
+    "pitch-decks": {
+      "repo": "aidoneright-pitch-decks",
+      "kind": "context",
+      "role": "CONTEXT repo — investor pitch decks, investment narrative, one-pagers, traction/metrics evidence. The outward-facing fundraising STORY every investor conversation draws from, separate from product code and internal business memory.",
+      "exposes": [
+        "pitch-deck",
+        "investor-narrative",
+        "one-pager",
+        "traction-metrics"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "aidoneright"
+      ],
+      "consumed_by": [],
+      "_note": "context-only, no product code; public/synthetic metrics only (no confidential data); cites the brand + product story via aidoneright's public face."
+    },
+    "yc-applications": {
+      "repo": "aidoneright-yc-applications",
+      "kind": "context",
+      "role": "CONTEXT repo — Y Combinator (and other accelerator) application drafts, answers, founder/video scripts, readiness scoring, demo storyboard. The application artifacts, separate from product code.",
+      "exposes": [
+        "yc-application",
+        "yc-readiness",
+        "demo-storyboard",
+        "founder-answers"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "aidoneright"
+      ],
+      "consumed_by": [],
+      "_note": "context-only; yc-readiness is COMPUTED by scripts/yc_readiness.py (not asserted); public/synthetic only."
+    },
+    "fundraising": {
+      "repo": "aidoneright-fundraising",
+      "kind": "context",
+      "role": "CONTEXT repo — go-to-market + fundraising strategy, investor outreach, round planning, market sizing. The money/market PLAN, separate from the deck itself and from product code.",
+      "exposes": [
+        "gtm-plan",
+        "fundraising-strategy",
+        "investor-outreach",
+        "market-sizing"
+      ],
+      "may_depend_on": [
+        "dev-rules-context",
+        "aidoneright"
+      ],
+      "consumed_by": [],
+      "_note": "context-only; strategy carries warrants (change-verification law); public/synthetic only."
+    }
+  },
+  "forbidden_edges": [
+    {
+      "from": "teleon",
+      "to": "baltor",
+      "why": "Teleon is reusable infrastructure, never Baltor-specific"
+    },
+    {
+      "from": "openhubforai",
+      "to": "teleon",
+      "why": "the open spec stays neutral; Teleon consumes OHH, not the reverse"
+    },
+    {
+      "from": "openhubforai",
+      "to": "baltor",
+      "why": "the open ecosystem must not require the applied product"
+    },
+    {
+      "from": "shared-backend-components",
+      "to": "teleon",
+      "why": "the substrate is product-neutral; products consume it, not the reverse"
+    },
+    {
+      "from": "shared-backend-components",
+      "to": "baltor",
+      "why": "substrate must not depend on a product"
+    },
+    {
+      "from": "dev-rules-context",
+      "to": "shared-backend-components",
+      "why": "the rules/standards repo depends on nothing — it is inherited, not a consumer"
+    }
+  ],
+  "_decomposition_note": "A SURFACE is a product family; a PROJECT is a deployable repo (backend/frontend/microservice/client). Frontends consume their backend via its published API; cross-surface deps go backend-to-backend. code_path = where the code lives in the monolith TODAY, to be git-moved into the project repo at split time (the risky migration step, not yet performed).",
+  "_capability_catalog_note": "Single source for the one-line meaning of every exposed capability id. interface_manifests.py fills each interface.json exposes[].summary from here (via --sync), so the machine contract documents WHAT each capability does, not just its id. Keep one entry per id used in any surface's exposes.",
+  "capability_catalog": {
+    "standards/*": "The eight inherited org laws (multi-path, globally-unique naming, candidate/truth boundary, change-verification, verify-the-verifier, no-magic-values, lossless-distillation, archival).",
+    "contracts/surface-registry.json": "The single source of truth for every surface: its exposes, allowed may_depend_on edges, and forbidden edges.",
+    "tools/check_*.py": "Portable enforcement gates every repo runs (cross-repo dependency law, interface-manifest consistency).",
+    "_shared/*": "Common truth every repo references: the glossary, architecture map, single-source config constants, and the id-minting authority.",
+    "registry": "The federated component/primitive registry behind one Registry<T> port (uniform list/lookup/search/explain).",
+    "primitives": "The seven canonical primitives (Input, Knowledge Corpus, If Statement, Action, Loop, Stop/End, Output) and their composition edges.",
+    "codegraph": "The tree-sitter AST symbol/edge graph over the codebase (callers, callees, impact, change-audit).",
+    "eval-harness": "The two-axis lift+durability gap harness that admits a component only if it lifts over the bare model AND the lift is structural.",
+    "storage-tiers": "The tiered record store: config JSON, operational Postgres+pgvector, and history warehouse.",
+    "credential-plane": "The single-source credential registry — env-var names only, deny-by-default reachability.",
+    "capabilitytask-spec": "The open CapabilityTask Spec (CTS): the neutral, portable definition of an executable capability.",
+    "eval-harnesses": "Open evaluation harnesses for scoring capability lift in the ecosystem.",
+    "task-templates": "Reusable open task/pipeline templates.",
+    "conformance-tests": "Conformance suites that prove an implementation meets the CTS.",
+    "skills": "The open library of composable skills/Actions.",
+    "/api/teleon": "The runtime SaaS API: PurposeTask submission, runtime selection, and receipts.",
+    "PurposeTask": "The core runtime object (formal synonym CapabilityTask): a purpose + guardrails compiled to an optimized, verified execution graph.",
+    "runtime-selector": "Cost-ordered, deterministic-first selection of the execution path, bounded by the org guardrail policy.",
+    "evidence-ledger": "The append-only receipt store recording every run's cost, accuracy, and decisions.",
+    "promotion-gate": "The proof-gated boundary that promotes a candidate to served truth — never self-promoted.",
+    "assurance-portal": "The customer-facing Capability Assurance Portal (runtime health, receipts, policy).",
+    "/api/baltor": "The applied context-product API: customer workflows over the governed context engine.",
+    "context-engine": "The six-stage context pipeline + verification rail that wraps memory/RAG/observability providers.",
+    "governance": "Provenance, signed facts, and CDC/revocation — the external moat; serves_truth=true only after review.",
+    "customer-workflows": "Vertical, customer-facing capability workflows (e.g. sanctions screening, provider directory).",
+    "receipts": "Per-answer provenance receipts: source handles, lineage, and verification status.",
+    "/api/observer": "The AI-usage layer API: session/AI-usage coaching (not code review).",
+    "session-review": "Consented-session review that mines AI-coding sessions into tools, research-queue items, and registry candidates.",
+    "mcp-server": "The Claude Code MCP connection that surfaces live reuse hints.",
+    "cli": "The command-line client for session review and primitive refresh.",
+    "extension": "The editor/browser extension client.",
+    "portfolio-site": "The parent brand site (aidoneright.dev) referencing every surface's public face.",
+    "brand": "The parent brand system ('AI, done right.') and design family.",
+    "port-adapters": "Reusable adapters that wrap third-party/local/cloud API endpoints behind a stable port.",
+    "provider-registry": "The catalog of wrapped providers and their capabilities.",
+    "cost-gates": "Pre-call cost/budget gates on outbound provider calls.",
+    "retry/backoff": "Shared retry and backoff policy for provider reachability.",
+    "credential-port": "The port that resolves provider credentials from the credential-plane (env names only).",
+    "fetch-ladder": "The escalating fetch descent (API to browser to stealth to vision) that climbs only as far as a source needs.",
+    "browser-automation": "Headless browser automation for JS-rendered sources.",
+    "extract-cascade": "The cost-ordered extraction cascade (deterministic-first, model-last).",
+    "rate-governance": "Rate limiting and politeness governance across sources.",
+    "robots/consent-gate": "The robots.txt + consent gate (gate #0) enforced before any fetch.",
+    "context-pack-builder": "Assembles focused, tree-excluded, deduped context packs for a task or area.",
+    "memory-store": "The durable memory store for prompt/context reuse.",
+    "prompt-composer": "Composes prompts from templates plus injected context.",
+    "headroom-compressor": "Compresses context to fit the model's headroom while preserving answer-critical facts and source handles.",
+    "retrieval-injector": "Retrieves and injects relevant context at composition time.",
+    "decisions-ledger": "The warranted decisions log — every decision carries a change-verification warrant.",
+    "activity-log": "The chronological activity/work log.",
+    "analytics": "Business analytics over the ledgers.",
+    "mcp-configs": "MCP server configs for the business-context surface.",
+    "business-notes": "Free-form business notes and research.",
+    "per-repo-edge-digest": "The generated per-repo EDGES.md — a repo sees neighbors' exposes, never their internals.",
+    "repo-dependency-graph": "The global mermaid dependency graph plus graph.json.",
+    "surface-registry-validator": "Validates the registry: every may_depend_on is real, no forbidden edge, acyclic.",
+    "interface-manifest-validator": "Validates each repo's interface.json: consumes only exposed capabilities, only from allowed surfaces.",
+    "pitch-deck": "The investor pitch deck (slides + speaker narrative) for the AI Done Right portfolio.",
+    "investor-narrative": "The long-form investment narrative: problem, wedge, moat, why-now.",
+    "one-pager": "The single-page investor summary.",
+    "traction-metrics": "Traction + metrics evidence supporting the raise (proof-first, no vanity numbers).",
+    "yc-application": "The Y Combinator / accelerator application draft: answers, founder story, video script.",
+    "yc-readiness": "YC-readiness scoring across the dimensions gate (computed by scripts/yc_readiness.py, not asserted).",
+    "demo-storyboard": "The YC / demo-day storyboard: the live capability demo sequence.",
+    "founder-answers": "Reusable answers to common YC / investor founder questions.",
+    "gtm-plan": "The go-to-market plan: beachhead vertical, motion, phased launch.",
+    "fundraising-strategy": "The fundraising strategy: round shape, targets, timeline, use of funds.",
+    "investor-outreach": "Investor outreach tracking + materials (public-only, no confidential data).",
+    "market-sizing": "Market sizing (TAM / SAM / SOM) for the consumption context layer."
+  }
+}

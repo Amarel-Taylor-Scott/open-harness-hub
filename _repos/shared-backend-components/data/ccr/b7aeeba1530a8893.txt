@@ -1,0 +1,41 @@
+MODULE src/teleon/resolution/entity_resolver.py
+## API signatures
+```python
+"""entity_resolver — registry-driven record linkage robust to typos in any column."""
+_RULES = ...
+def _rules() -> dict
+def ruleset(name: str) -> dict
+def _jaro(s1: str, s2: str) -> float
+def jaro_winkler(a: str, b: str, p: float=0.1) -> float
+def token_set(a: str, b: str) -> float
+def levenshtein_ratio(a: str, b: str) -> float
+def soundex(s: str) -> str
+_COMPARATORS = ...
+_NICKNAMES = ...
+_NAME_SUFFIX = ...
+_LEGAL = ...
+_COMPANY_ABBR = ...
+def normalize_person_name(n) -> str
+def normalize_company_name(c) -> str
+_ADDR_ABBR = ...
+def _norm_address(a) -> str
+    # Self-contained address normalizer — the resolution layer must not import UP into a vertical (correct layering:
+_NORMALIZERS = ...
+def compare(ruleset_name: str, a: dict, b: dict) -> dict
+    # Compare two records under a ruleset. Returns {score, decision (match|review|no_match), per_column, identifier}.
+def blocking_key(ruleset_name: str, record: dict) -> str
+    # A cheap key so we only compare records likely to match (scales to millions). person -> soundex of the name;
+def resolve_entities(records: list, ruleset_name: str) -> dict
+    # Cluster records into entities: BLOCK, compare within blocks, union the matches; collect 'review' pairs for a human.
+```
+## intra-module call edges
+src.teleon.resolution.entity_resolver.blocking_key -> src.teleon.resolution.entity_resolver.normalize_company_name
+src.teleon.resolution.entity_resolver.blocking_key -> src.teleon.resolution.entity_resolver.normalize_person_name
+src.teleon.resolution.entity_resolver.blocking_key -> src.teleon.resolution.entity_resolver.ruleset
+src.teleon.resolution.entity_resolver.blocking_key -> src.teleon.resolution.entity_resolver.soundex
+src.teleon.resolution.entity_resolver.compare -> src.teleon.resolution.entity_resolver.ruleset
+src.teleon.resolution.entity_resolver.jaro_winkler -> src.teleon.resolution.entity_resolver._jaro
+src.teleon.resolution.entity_resolver.resolve_entities -> src.teleon.resolution.entity_resolver.blocking_key
+src.teleon.resolution.entity_resolver.resolve_entities -> src.teleon.resolution.entity_resolver.compare
+src.teleon.resolution.entity_resolver.resolve_entities -> src.teleon.resolution.entity_resolver.ruleset
+src.teleon.resolution.entity_resolver.ruleset -> src.teleon.resolution.entity_resolver._rules

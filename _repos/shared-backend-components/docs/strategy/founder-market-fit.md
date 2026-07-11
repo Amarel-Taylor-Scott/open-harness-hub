@@ -1,0 +1,1 @@
+../../../_shared/strategy/founder-market-fit.md

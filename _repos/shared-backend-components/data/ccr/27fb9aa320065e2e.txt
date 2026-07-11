@@ -1,0 +1,45 @@
+MODULE src/teleon/observer/session_store.py
+## API signatures
+```python
+"""observer.session_store — the normalized session model + the accept/reject OUTCOME loop (the Spotter memo §8)."""
+_REPO = ...
+_DIR = ...
+OUTCOMES = ...
+EVENT_KINDS = ...
+def _cid(*parts: str) -> str
+    # Content-addressed id (stable across runs — no Date.now/random; deterministic for replay/dedup).
+def session_record(session_id: str, surface: str, repo: str='', started_at: str='', ended_at: str='') -> dict
+def event_record(session_id: str, t: int, kind: str, payload: str) -> dict
+def intervention_record(session_id: str, t: int, type_: str, confidence: float, message: str, source_ref: dict | None=None) -> dict
+def outcome_record(session_id: str, intervention_id: str, outcome: str, *, source_ref_keys: list[str] | None=None, finding_type: str | None=None) -> dict
+    # The accept/reject SIGNAL — appended (latest-wins), never an in-place mutation (append-only + lossless).
+def _path(session_id: str) -> Path
+def append(record: dict) -> None
+    # Append one record to its session log (append-only; creates the dir/file as needed).
+def load(session_id: str) -> list[dict]
+def load_recent(*, limit_files: int=SESSION_STORE_SETTINGS.recent_files) -> list[dict]
+    # Load recent append-only session/outcome records across local sessions.
+def resolve_outcomes(records: list[dict]) -> dict
+    # Fold the append-only log into current intervention outcomes (latest outcome wins) — the tuning signal.
+def outcome_stats(records: list[dict]) -> dict
+    # Per-type accept/reject rates — what tunes the thresholds. accepted+reused = acted; dismissed+ignored = rejected.
+def _self_test() -> int
+def _raises(fn) -> bool
+```
+## intra-module call edges
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store._cid
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store._path
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store._raises
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.append
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.event_record
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.intervention_record
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.load
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.outcome_record
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.outcome_stats
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.resolve_outcomes
+src.teleon.observer.session_store._self_test -> src.teleon.observer.session_store.session_record
+src.teleon.observer.session_store.append -> src.teleon.observer.session_store._path
+src.teleon.observer.session_store.event_record -> src.teleon.observer.session_store._cid
+src.teleon.observer.session_store.intervention_record -> src.teleon.observer.session_store._cid
+src.teleon.observer.session_store.load -> src.teleon.observer.session_store._path
+src.teleon.observer.session_store.outcome_stats -> src.teleon.observer.session_store.resolve_outcomes

@@ -1,0 +1,30 @@
+MODULE src/baltor/graph/providers/temporal_graph_provider.py
+## API signatures
+```python
+"""src.baltor.graph.providers.temporal_graph_provider — the temporal_graph_provider capability seam."""
+class UnavailableProvider:
+    # A candidate provider has no working backend (e.g. Graphiti not installed). Never fabricate truth.
+class TemporalGraphProviderPort:
+    def project(self, store: TemporalGraphStore, tenant_id: str) -> dict
+    def status(self) -> dict
+def _status(provider_id: str, status: str, available: bool, reason: str='', credential_ref: str='') -> dict
+def _projection(store: TemporalGraphStore, tenant_id: str, provider_id: str) -> dict
+class BaltorLocalTemporalGraph:
+    # The authoritative local provider — pure stdlib, no external deps.
+    def project(self, store: TemporalGraphStore, tenant_id: str) -> dict
+    def status(self) -> dict
+class GraphitiCandidate:
+    # Graphiti wrapper — CANDIDATE. No SDK import; raises UnavailableProvider until a real backend lands.
+    def project(self, store: TemporalGraphStore, tenant_id: str) -> dict
+    def status(self) -> dict
+class GraphitiEmulator:
+    # Deterministic offline emulator implementing the SAME contract as the real Graphiti provider would —
+    def project(self, store: TemporalGraphStore, tenant_id: str) -> dict
+    def status(self) -> dict
+PROVIDERS = ...
+def get_provider(provider_id: str) -> TemporalGraphProviderPort
+```
+## intra-module call edges
+src.baltor.graph.providers.temporal_graph_provider.project -> src.baltor.graph.providers.temporal_graph_provider.UnavailableProvider
+src.baltor.graph.providers.temporal_graph_provider.project -> src.baltor.graph.providers.temporal_graph_provider._projection
+src.baltor.graph.providers.temporal_graph_provider.status -> src.baltor.graph.providers.temporal_graph_provider._status

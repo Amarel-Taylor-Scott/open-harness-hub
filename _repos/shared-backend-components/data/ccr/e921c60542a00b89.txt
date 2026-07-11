@@ -1,0 +1,25 @@
+MODULE src/teleon/monitoring/flywheel_queue.py
+## API signatures
+```python
+"""monitoring.flywheel_queue — wire the service-heartbeat Flywheel onto the DURABLE work queue (#22)."""
+REPO = ...
+TOPIC = ...
+def enqueue_proposals(tick_result: dict, db: Path | None=None) -> int
+    # Enqueue each ResolutionProposal from a flywheel tick onto the durable queue (idempotent). Returns #new enqueued.
+def process_resolution(payload: dict) -> None
+    # Worker handler: record/act on a resolution. Here it just records (governed); real infra dispatches the repair.
+def drain(worker: str='flywheel', max_items: int | None=None, db: Path | None=None) -> dict
+    # Stateless drain of ready resolutions (crash-safe: unacked items reappear after their lease). A manual
+def _down_pinger(surface: dict, *, now: str) -> HeartbeatResult
+def self_test() -> int
+def demo() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.monitoring.flywheel_queue.demo -> src.teleon.monitoring.flywheel_queue.drain
+src.teleon.monitoring.flywheel_queue.demo -> src.teleon.monitoring.flywheel_queue.enqueue_proposals
+src.teleon.monitoring.flywheel_queue.drain -> src.teleon.monitoring.flywheel_queue.process_resolution
+src.teleon.monitoring.flywheel_queue.main -> src.teleon.monitoring.flywheel_queue.demo
+src.teleon.monitoring.flywheel_queue.main -> src.teleon.monitoring.flywheel_queue.self_test
+src.teleon.monitoring.flywheel_queue.self_test -> src.teleon.monitoring.flywheel_queue.drain
+src.teleon.monitoring.flywheel_queue.self_test -> src.teleon.monitoring.flywheel_queue.enqueue_proposals

@@ -1,0 +1,41 @@
+{
+  "surface": "context-injection",
+  "repo": "aidoneright-context-injection",
+  "interface_version": "0.1.0",
+  "exposes": [
+    {
+      "id": "context-pack-builder",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Assembles focused, tree-excluded, deduped context packs for a task or area."
+    },
+    {
+      "id": "memory-store",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The durable memory store for prompt/context reuse."
+    },
+    {
+      "id": "prompt-composer",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Composes prompts from templates plus injected context."
+    },
+    {
+      "id": "headroom-compressor",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Compresses context to fit the model's headroom while preserving answer-critical facts and source handles."
+    },
+    {
+      "id": "retrieval-injector",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Retrieves and injects relevant context at composition time."
+    }
+  ],
+  "consumes": {
+    "dev-rules-context": [],
+    "shared-backend-components": []
+  }
+}

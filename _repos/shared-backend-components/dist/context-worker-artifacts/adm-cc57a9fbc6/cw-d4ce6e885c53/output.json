@@ -1,0 +1,245 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "adapter_status": "approval_or_human_review_required",
+    "llm_audit_reviews": [],
+    "llm_error": "No selected local/allowed model route.",
+    "model_route": {
+      "candidate_adapters": [
+        "local-ollama"
+      ],
+      "cost_estimate": {
+        "estimated_cost_usd": null
+      },
+      "fallbacks": [
+        {
+          "accepted": false,
+          "adapter": "local-ollama",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        }
+      ],
+      "latency_budget_ms": null,
+      "modality": [
+        "text"
+      ],
+      "model_route_id": "mr-ba4e1795c55aea93",
+      "policy": {
+        "allow_cloud": false,
+        "allow_frontier": false,
+        "capability": "audit_review",
+        "max_cost_usd": null,
+        "preferred_lane": "frontier_controlled",
+        "privacy_scope": "tenant",
+        "require_zero_data_retention": false,
+        "tenant_allowed_providers": []
+      },
+      "quality_tier": "none",
+      "route_reason": "no_compliant_model_route",
+      "selected_adapter": "none",
+      "selected_model": "none",
+      "selected_route": null,
+      "task_type": "llm.audit.review",
+      "trust_boundary": "none"
+    },
+    "training_examples": [
+      {
+        "accepted": null,
+        "cascade": {},
+        "do_not_train_changing_facts_into_weights": true,
+        "input": {
+          "claims": [
+            {
+              "claim": "It may change this policy soon.",
+              "claim_id": "claim-001-5ed8a4b3",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "ambiguous_language",
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "review_before_serving"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "policy"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "It may change this policy soon.",
+                "run_id": "adm-cc57a9fbc6",
+                "source_chunk": "chunk-001-bb05c5f1"
+              },
+              "source_chunk": "chunk-001-bb05c5f1",
+              "subject": "It",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            }
+          ],
+          "conflict_candidates": [],
+          "context_concerns": [
+            {
+              "claim_id": "claim-001-5ed8a4b3",
+              "concern_id": "ambiguity-001-815bd0a7",
+              "evidence": "It may change this policy soon.",
+              "recommended_action": "llm_claim_review",
+              "severity": "high",
+              "signals": [
+                "it",
+                "may",
+                "soon",
+                "this"
+              ],
+              "source_chunk": "chunk-001-bb05c5f1",
+              "type": "ambiguous_language"
+            }
+          ],
+          "edges": [
+            {
+              "from": "entity-001-f3423bc5",
+              "to": "chunk-001-bb05c5f1",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-002-d7acc4a6",
+              "to": "chunk-001-bb05c5f1",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "claim-001-5ed8a4b3",
+              "to": "chunk-001-bb05c5f1",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-001-5ed8a4b3",
+              "to": "entity-002-d7acc4a6",
+              "type": "mentions"
+            }
+          ],
+          "nodes": [
+            {
+              "id": "entity-001-f3423bc5",
+              "label": "Acme Holdings Ltd",
+              "type": "entity"
+            },
+            {
+              "id": "entity-002-d7acc4a6",
+              "label": "It",
+              "type": "entity"
+            },
+            {
+              "id": "chunk-001-bb05c5f1",
+              "label": "chunk-001-bb05c5f1",
+              "type": "chunk",
+              "weight": 155
+            },
+            {
+              "id": "claim-001-5ed8a4b3",
+              "label": "It",
+              "type": "claim"
+            }
+          ]
+        },
+        "label_source": "pending_review",
+        "model_output": {
+          "adapter_status": "approval_or_human_review_required",
+          "llm_audit_reviews": [],
+          "llm_error": "No selected local/allowed model route.",
+          "model_route": {
+            "candidate_adapters": [
+              "local-ollama"
+            ],
+            "cost_estimate": {
+              "estimated_cost_usd": null
+            },
+            "fallbacks": [
+              {
+                "accepted": false,
+                "adapter": "local-ollama",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              }
+            ],
+            "latency_budget_ms": null,
+            "modality": [
+              "text"
+            ],
+            "model_route_id": "mr-ba4e1795c55aea93",
+            "policy": {
+              "allow_cloud": false,
+              "allow_frontier": false,
+              "capability": "audit_review",
+              "max_cost_usd": null,
+              "preferred_lane": "frontier_controlled",
+              "privacy_scope": "tenant",
+              "require_zero_data_retention": false,
+              "tenant_allowed_providers": []
+            },
+            "quality_tier": "none",
+            "route_reason": "no_compliant_model_route",
+            "selected_adapter": "none",
+            "selected_model": "none",
+            "selected_route": null,
+            "task_type": "llm.audit.review",
+            "trust_boundary": "none"
+          }
+        },
+        "model_route": {
+          "candidate_adapters": [
+            "local-ollama"
+          ],
+          "cost_estimate": {
+            "estimated_cost_usd": null
+          },
+          "fallbacks": [
+            {
+              "accepted": false,
+              "adapter": "local-ollama",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            }
+          ],
+          "latency_budget_ms": null,
+          "modality": [
+            "text"
+          ],
+          "model_route_id": "mr-ba4e1795c55aea93",
+          "policy": {
+            "allow_cloud": false,
+            "allow_frontier": false,
+            "capability": "audit_review",
+            "max_cost_usd": null,
+            "preferred_lane": "frontier_controlled",
+            "privacy_scope": "tenant",
+            "require_zero_data_retention": false,
+            "tenant_allowed_providers": []
+          },
+          "quality_tier": "none",
+          "route_reason": "no_compliant_model_route",
+          "selected_adapter": "none",
+          "selected_model": "none",
+          "selected_route": null,
+          "task_type": "llm.audit.review",
+          "trust_boundary": "none"
+        },
+        "reviewed_output": null,
+        "run_id": "adm-cc57a9fbc6",
+        "task": "llm.audit.review",
+        "training_example_id": "training-example-001-e0bf844b",
+        "training_task": "llm.audit.review"
+      }
+    ]
+  }
+}

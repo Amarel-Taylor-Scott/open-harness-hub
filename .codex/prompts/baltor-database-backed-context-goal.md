@@ -36,7 +36,7 @@ Primary goals:
 3. `taxonomy/SPEC.md`
 4. `docs/codex/no-magic-values.md`
 5. `docs/architecture/database-backed-context-catalog.md`
-6. `docs/architecture/baltor-business-object-governance-standard.md`
+6. `_repos/baltor/context/architecture/baltor-business-object-governance-standard.md`
 7. `docs/architecture/baltor-rubric-research-and-hierarchical-standard.md`
 8. `docs/architecture/baltor-executive-rubric-suite.md`
 9. `db/postgres/schema.sql`

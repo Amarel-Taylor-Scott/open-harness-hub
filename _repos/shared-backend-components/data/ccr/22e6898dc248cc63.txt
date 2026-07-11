@@ -1,0 +1,91 @@
+MODULE src/teleon/synthesis/pipeline_templates.py
+## API signatures
+```python
+"""Deterministic one-line primitive pipeline templates for Teleon."""
+def py_function_src_teleon_synthesis_pipeline_templates__annotation_name(py_arg_annotation) -> str
+    # Return a compact deterministic name for a Python annotation.
+def py_function_src_teleon_synthesis_pipeline_templates__callable_surface(py_arg_callable) -> dict
+    # Return the deterministic Python surface that can identify and describe a primitive callable.
+def py_function_src_teleon_synthesis_pipeline_templates__stable_json(py_arg_value) -> str
+    # Return deterministic JSON for template digests and candidate logs.
+def py_function_src_teleon_synthesis_pipeline_templates__stable_digest(py_arg_value) -> str
+    # Return a deterministic sha256 digest for task, template, node, and artifact records.
+def py_function_src_teleon_synthesis_pipeline_templates__path_is_allowed(py_arg_path: str) -> bool
+    # Return whether a template path is inside an allowed state root.
+def py_function_src_teleon_synthesis_pipeline_templates__get_path(py_arg_state: dict, py_arg_path: str)
+    # Resolve a simple `$root.key.key` state path without eval or dynamic attribute access.
+def py_function_src_teleon_synthesis_pipeline_templates__set_path(py_arg_state: dict, py_arg_path: str, py_arg_value) -> None
+    # Set a simple `$task.foo`, `$context.foo`, or `$nodes.node.output` path.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_step(py_arg_step_id: str, py_arg_primitive_id: str, py_arg_input_path: str='$task', py_arg_output_path: str='$task', py_arg_state_mode: str=py_const_src_teleon_synthesis_pipeline_templates__STATE_MODE_TASK_VALUE, py_arg_input_bindings: dict | None=None, py_arg_output_storage: str=py_const_src_teleon_synthesis_pipeline_templates__OUTPUT_STORAGE_INLINE, py_arg_max_attempts: int=py_const_src_teleon_synthesis_pipeline_templates__DEFAULT_MAX_ATTEMPTS, py_arg_required: bool=True) -> dict
+    # Create a one-line primitive step spec.
+def py_function_src_teleon_synthesis_pipeline_templates__derive_step_id(py_arg_primitive_id: str, py_arg_occurrence: int=1) -> str
+    # Derive a stable step id from a primitive id instead of requiring hand-typed labels.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_id_from_callable(py_arg_callable) -> str
+    # Return an attached primitive id or derive one from a Python callable surface.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_signature_contract(py_arg_callable) -> dict
+    # Infer a lightweight contract from callable parameters and return annotation.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_record_from_callable(py_arg_callable, py_arg_handle: dict | None=None) -> dict
+    # Build a candidate primitive record from the callable object itself.
+def py_function_src_teleon_synthesis_pipeline_templates__compact_llm_view_from_primitive_record(py_arg_record: dict) -> dict
+    # Return a compact JSON-safe view that an LLM can plan over without source code.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_handle(py_arg_callable=None, py_arg_primitive_id: str | None=None, py_arg_state_mode: str=py_const_src_teleon_synthesis_pipeline_templates__STATE_MODE_TASK_VALUE, py_arg_input_path: str='$task', py_arg_output_path: str='$task', py_arg_input_bindings: dict | None=None, py_arg_output_storage: str=py_const_src_teleon_synthesis_pipeline_templates__OUTPUT_STORAGE_INLINE, py_arg_max_attempts: int=py_const_src_teleon_synthesis_pipeline_templates__DEFAULT_MAX_ATTEMPTS, py_arg_required: bool=True, py_arg_structure_path: str | None=None) -> dict
+    # Create a callable-backed primitive handle for Python authoring.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_metadata(py_arg_primitive_id: str | None=None, py_arg_state_mode: str=py_const_src_teleon_synthesis_pipeline_templates__STATE_MODE_TASK_VALUE, py_arg_input_path: str='$task', py_arg_output_path: str='$task', py_arg_input_bindings: dict | None=None, py_arg_output_storage: str=py_const_src_teleon_synthesis_pipeline_templates__OUTPUT_STORAGE_INLINE, py_arg_max_attempts: int=py_const_src_teleon_synthesis_pipeline_templates__DEFAULT_MAX_ATTEMPTS, py_arg_required: bool=True, py_arg_structure_path: str | None=None)
+    # Attach primitive metadata once to a callable; pipeline templates can then reference the callable.
+def py_function_src_teleon_synthesis_pipeline_templates__coerce_primitive_handle(py_arg_primitive) -> dict
+    # Normalize callable/string/dict primitive references into a primitive handle.
+def py_function_src_teleon_synthesis_pipeline_templates__primitive_step_from_handle(py_arg_primitive_handle: dict, py_arg_step_id: str | None=None, py_arg_occurrence: int=1, py_arg_overrides: dict | None=None) -> dict
+    # Create a primitive step from a handle, deriving step_id when not explicitly supplied.
+def py_function_src_teleon_synthesis_pipeline_templates__is_primitive_leaf(py_arg_value) -> bool
+    # Return whether a value is one primitive reference rather than a structural container.
+def py_function_src_teleon_synthesis_pipeline_templates__flatten_primitive_object_graph(py_arg_value, py_arg_structure_path: str='$') -> list[dict]
+    # Flatten callables/handles nested in lists, tuples, dicts, matrices, or explicit objects.
+def py_function_src_teleon_synthesis_pipeline_templates__handles_from_primitive_object_graph(py_arg_value) -> list[dict]
+    # Return primitive handles from an explicit object graph, preserving each structural path.
+def py_function_src_teleon_synthesis_pipeline_templates__pipeline_template_from_primitives(py_arg_template_id: str, py_arg_primitives: list, py_arg_purpose: str, py_arg_state_policy: str='single_task_object', py_arg_logging_policy: str='structured_json_events', py_arg_storage_policy: str='inline_until_artifact_ref_requested') -> dict
+    # Create a template bundle from callable handles, deriving unique step ids deterministically.
+def py_function_src_teleon_synthesis_pipeline_templates__pipeline_template_from_object_graph(py_arg_template_id: str, py_arg_object_graph, py_arg_purpose: str, py_arg_state_policy: str='single_task_object', py_arg_logging_policy: str='structured_json_events', py_arg_storage_policy: str='inline_until_artifact_ref_requested') -> dict
+    # Create a template from primitives nested in lists, tuples, dicts, matrices, or opt-in objects.
+def py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template_from_primitives(py_arg_template_id: str, py_arg_primitives: list, py_arg_purpose: str) -> dict
+    # Build and compile a candidate template directly from Python primitive handles.
+def py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template_from_object_graph(py_arg_template_id: str, py_arg_object_graph, py_arg_purpose: str) -> dict
+    # Build and compile a candidate template from an explicit Python object graph.
+def py_function_src_teleon_synthesis_pipeline_templates__pipeline_template(py_arg_template_id: str, py_arg_steps: list[dict], py_arg_purpose: str, py_arg_state_policy: str='single_task_object', py_arg_logging_policy: str='structured_json_events', py_arg_storage_policy: str='inline_until_artifact_ref_requested') -> dict
+    # Create a serializable candidate pipeline template from one-line step specs.
+def py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template(py_arg_template: dict, py_arg_callable_registry: dict) -> dict
+    # Resolve primitive ids to callables and return a deterministic compiled candidate template.
+def py_function_src_teleon_synthesis_pipeline_templates__new_pipeline_state(py_arg_task, py_arg_context: dict | None=None, py_arg_system: dict | None=None, py_arg_run_id: str | None=None) -> dict
+    # Return the standard runtime state object shared across primitive steps.
+def py_function_src_teleon_synthesis_pipeline_templates__store_artifact_ref(py_arg_state: dict, py_arg_step_id: str, py_arg_value) -> dict
+    # Store a value in the state artifact table and return a small digest reference.
+def py_function_src_teleon_synthesis_pipeline_templates__call_step(py_arg_callable, py_arg_step: dict, py_arg_state: dict)
+    # Call one primitive according to its state passing mode.
+def py_function_src_teleon_synthesis_pipeline_templates__apply_step_output(py_arg_state: dict, py_arg_step: dict, py_arg_output) -> object
+    # Apply a primitive output to task/context/nodes and return the stored output value.
+def py_function_src_teleon_synthesis_pipeline_templates__append_event(py_arg_state: dict, py_arg_step: dict, py_arg_attempt: int, py_arg_status: str, py_arg_input_digest: str, py_arg_output=None, py_arg_error: str | None=None) -> dict
+    # Append one structured JSON-safe runtime event.
+def py_function_src_teleon_synthesis_pipeline_templates__execute_compiled_pipeline_template(py_arg_compiled_template: dict, py_arg_task, py_arg_context: dict | None=None, py_arg_system: dict | None=None, py_arg_run_id: str | None=None) -> dict
+    # Execute a compiled template with bounded retries and structured candidate logs.
+def py_function_src_teleon_synthesis_pipeline_templates___self_test() -> int
+```
+## intra-module call edges
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__coerce_primitive_handle
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__compact_llm_view_from_primitive_record
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template_from_object_graph
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template_from_primitives
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__execute_compiled_pipeline_template
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__pipeline_template
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_metadata
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_record_from_callable
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_step
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test__py_function_annotated_patch -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_metadata
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test__py_function_callable_prompt_patch -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_metadata
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates___self_test__py_function_callable_summary -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_metadata
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__append_event -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__stable_digest
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__apply_step_output -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__set_path
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__apply_step_output -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__store_artifact_ref
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__call_step -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__get_path
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__coerce_primitive_handle -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__primitive_handle
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__path_is_allowed
+src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__compile_pipeline_template -> src.teleon.synthesis.pipeline_templates.py_function_src_teleon_synthesis_pipeline_templates__stable_digest

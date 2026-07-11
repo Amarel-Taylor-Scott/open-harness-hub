@@ -1,0 +1,1 @@
+../../../openhubforai/context/spec/OPENHUBFORAI_SPEC.md

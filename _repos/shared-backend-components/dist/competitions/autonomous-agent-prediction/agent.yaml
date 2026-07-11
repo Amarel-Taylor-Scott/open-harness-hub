@@ -1,0 +1,25 @@
+# Autonomous Agent Prediction (Beta) — Agent Config (Google ADK Agent Config spec)
+# Strategy: the winning move under a $2 / 60-min / 30-submission budget is NOT to burn LLM tokens deriving
+# an ML pipeline every run, but to REUSE a strong, tested pipeline primitive — the `tabular-automl` skill,
+# which runs in the sandbox (debited against TIME, not tokens) — and spend the model only on orchestration
+# and self-tuning by public score. This is token-reduction-by-reuse applied to win.
+name: tabular_automl_agent
+model: gemini-3.1-flash-lite            # cheapest capable model; the skill does the ML, so a small model suffices
+description: >
+  An autonomous binary-classification agent. It runs a deterministic, tested multi-model AutoML skill to
+  produce a strong AUC baseline for near-zero token cost, submits it, reads the public score, iterates a
+  couple of cheap variations, and selects the two best submissions.
+instruction: !include prompts/system.md
+
+# The competition harness supplies these tools; the agent requests them by name.
+tools:
+  - run_command          # execute shell commands in the Docker sandbox (runs the AutoML skill)
+  - write_file           # write files in the sandbox
+  - edit_file            # edit files in the sandbox
+  - submit_predictions   # submit submission.csv and receive the public score
+  - select_submission    # choose the final submissions scored on the private subset
+  - get_status           # read budget/time/submission status
+
+# Custom skill: the multi-path self-tuning AutoML pipeline (SKILL.md + scripts + resources).
+skills:
+  - tabular-automl

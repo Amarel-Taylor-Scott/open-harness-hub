@@ -12,15 +12,15 @@ you or a real safety/destructive-action blocker prevents progress.
 3. `taxonomy/SPEC.md`
 4. `docs/codex/no-magic-values.md`
 5. `docs/codex/baltor-context-control-current-state.md`
-6. `docs/codex/baltor-context-control-iteration-plan.md`
-7. `docs/codex/baltor-context-control-test-plan.md`
-8. `docs/codex/baltor-context-control-session-ledger.md`
+6. `_repos/baltor/context/codex/baltor-context-control-iteration-plan.md`
+7. `_repos/baltor/context/codex/baltor-context-control-test-plan.md`
+8. `_repos/baltor/context/codex/baltor-context-control-session-ledger.md`
 9. `docs/architecture/document-intelligence-pipeline.md`
 10. `docs/architecture/llm-trust-layer.md`
 11. `docs/architecture/node-research-and-verification.md`
-12. `docs/architecture/baltor-stateless-worker-standard.md`
-13. `docs/architecture/baltor-queue-priority-orchestration.md`
-14. `docs/architecture/baltor-model-and-document-pipeline.md`
+12. `_repos/baltor/context/architecture/baltor-stateless-worker-standard.md`
+13. `_repos/baltor/context/architecture/baltor-queue-priority-orchestration.md`
+14. `_repos/baltor/context/architecture/baltor-model-and-document-pipeline.md`
 15. `docs/architecture/baltor-mcp-context-gateway.md`
 16. `docs/architecture/baltor-context-layer-mvp-roadmap.md`
 17. `docs/research/enterprise-context-database-phases.md`
@@ -61,7 +61,7 @@ VERIFY   Hit local routes/APIs and inspect worker logs before editing.
 BUILD    Make one durable improvement that removes a real gap.
 TEST     Use HTTP checks, Python proof scripts, Playwright/Chromium if present,
          Redis/worker logs, export validation, and py_compile.
-RECORD   Append to docs/codex/baltor-context-control-session-ledger.md.
+RECORD   Append to _repos/baltor/context/codex/baltor-context-control-session-ledger.md.
 REPEAT   Continue to the next highest-value issue without asking.
 ```
 

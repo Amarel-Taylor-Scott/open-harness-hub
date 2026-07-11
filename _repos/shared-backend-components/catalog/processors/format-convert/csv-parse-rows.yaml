@@ -1,0 +1,69 @@
+id: "processor/csv-parse-rows"
+type: processor
+version: "0.1.0"
+name: "CSV parse rows"
+description: |
+  Parse CSV text into deterministic JSON-compatible row dictionaries using
+  Python's standard CSV parser. Preserves row order, deduplicates repeated
+  headers, pads missing cells with empty strings, supports headerless files,
+  and can cap returned rows for review or preview flows.
+
+  This avoids spending model tokens on a solved parsing problem and gives
+  coding agents a reusable component for importers, ETL pipelines, document
+  review tools, and benchmark fixture loaders.
+authors:
+  - name: "OpenHubForAI contributors"
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["format_conversion", "extraction"]
+modality: ["structured", "text"]
+lifecycle: "stable"
+trust_boundary: "local"
+lifecycle_position: "pre_api.format_convert"
+tags:
+  - "csv"
+  - "parser"
+  - "rows"
+  - "deterministic"
+  - "zero-token"
+created: "2026-06-29"
+updated: "2026-06-29"
+
+process_kind: "format_convert.csv_parse"
+deterministic: true
+idempotent: true
+streaming: false
+latency_budget_ms: 50
+
+inputs:
+  - name: "csv_text"
+    type: "string"
+    schema: "code-templates/parse_csv_rows/input.schema.json"
+  - name: "delimiter"
+    type: "string"
+  - name: "has_header"
+    type: "boolean"
+  - name: "trim_whitespace"
+    type: "boolean"
+  - name: "max_rows"
+    type: "integer"
+outputs:
+  - name: "headers"
+    type: "string[]"
+  - name: "rows"
+    type: "object[]"
+    schema: "code-templates/parse_csv_rows/output.schema.json"
+  - name: "row_count"
+    type: "integer"
+  - name: "delimiter"
+    type: "string"
+  - name: "truncated"
+    type: "boolean"
+
+side_effects: "none"
+on_error: "raise"
+
+implementations:
+  - kind: "callable"
+    path: "code-templates/parse_csv_rows/parse_csv_rows.py:run"
+    language: "python"

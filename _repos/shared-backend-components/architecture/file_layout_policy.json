@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "reusable_code_home": "_repos/baltor/backend/src/baltor",
+  "scripts_policy": "scripts/ is for entrypoints, proof scripts (check_*.py / demo_*.py), CLI wrappers, and compatibility wrappers ONLY. New reusable product/runtime code belongs under _repos/baltor/backend/src/baltor/.",
+  "scan_scope": [
+    "_repos/shared-backend-components/scripts",
+    "_repos/baltor/backend/src/baltor"
+  ],
+  "approved_top_level_note": "After the _repos/ migration (see _repos/MIGRATION-STATUS.md) the repo ROOT holds only `_repos/` + meta files + tooling-hidden dirs. check_file_layout_policy.py iterates the real repo root, so this list must name the actual non-hidden root DIRS only. `data` is currently recreated at root by background loops (its canonical home is _repos/shared-backend-components/data per _repos/_moved_dirs.json); keep it here while it exists on disk so the check stays green.",
+  "approved_top_level": [
+    "_repos",
+    "data"
+  ],
+  "banned_filenames": [
+    "utils.py",
+    "helpers.py",
+    "common.py",
+    "misc.py",
+    "stuff.py",
+    "temp.py",
+    "scratch.py",
+    "final.py",
+    "old.py",
+    "new.py",
+    "fix.py",
+    "test2.py"
+  ],
+  "banned_filename_allowlist": [
+    {
+      "path": "_repos/shared-backend-components/scripts/new.py",
+      "reason": "legacy OHH entrypoint predating the policy; rename in a later pass"
+    },
+    {
+      "path": "_repos/shared-backend-components/scripts/context_workers/common.py",
+      "reason": "legacy OHH module (out of Baltor governed scope); rename when context_workers is migrated"
+    }
+  ],
+  "line_budgets": {
+    "runtime_core": {
+      "warn": 350,
+      "fail": 500
+    },
+    "processor": {
+      "warn": 300,
+      "fail": 450
+    },
+    "adapter": {
+      "warn": 350,
+      "fail": 500
+    },
+    "proof": {
+      "warn": 250,
+      "fail": 400
+    },
+    "api_server": {
+      "warn": 500,
+      "fail": 750
+    },
+    "ui_page": {
+      "warn": 350,
+      "fail": 600
+    }
+  }
+}

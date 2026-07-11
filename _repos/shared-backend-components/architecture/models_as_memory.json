@@ -1,0 +1,63 @@
+{
+  "registry": "models_as_memory",
+  "serves_truth": false,
+  "description": "Models-as-memory — patterns that store knowledge IN model weights / adapters / caches instead of (or alongside) external retrieval. A registry of memory MECHANISMS: what each remembers, how it is written + read, its freshness/forgetting behavior, and its tradeoff vs RAG. The governing rule: a model/adapter memory is a CANDIDATE source (serves_truth=false) — it never asserts verified truth; the verification rail + provenance still gate any truth-bearing output. Composes with lora_adapters / qlora_adapters (the write mechanism) and the context engine (the read path).",
+  "stage": "model",
+  "memories": [
+    {
+      "id": "adapter_as_memory",
+      "name": "Adapter-as-memory (LoRA/QLoRA knowledge store)",
+      "mechanism": "bake a stable corpus into a LoRA/QLoRA; the adapter IS the memory, hot-swapped per tenant/domain",
+      "remembers": "slow-changing domain knowledge, house conventions, a product's stable facts",
+      "write": "train/refresh the adapter (offline); versioned, rollback-able (lossless distillation applies)",
+      "read": "load the adapter at inference; no retrieval hop",
+      "freshness": "stale between retrains — NOT for volatile facts; pair with RAG for those",
+      "vs_rag": "lower latency + no index, but no per-fact provenance — so serves_truth=false, governance rail still gates",
+      "tradeoff": "cheap fast recall of stable knowledge; volatile/regulated facts stay in the governed retrieval layer"
+    },
+    {
+      "id": "kv_cache_working_memory",
+      "name": "KV-cache working memory",
+      "mechanism": "persist + reuse the attention KV-cache across turns/calls as short-term working memory",
+      "remembers": "the active session's context without re-encoding it each call",
+      "write": "implicit during generation; prefix-cache reuse for shared system context",
+      "read": "attend over the retained cache",
+      "freshness": "session-scoped; evicted on reset",
+      "vs_rag": "fastest recall, but ephemeral + capacity-bounded; not durable knowledge",
+      "tradeoff": "cuts repeated-context cost (the oversized-context waste the observer flags); not a knowledge store"
+    },
+    {
+      "id": "memory_layer_kv_store",
+      "name": "Trainable memory layer (key-value memory)",
+      "mechanism": "an explicit differentiable key-value memory module the model reads/writes during inference",
+      "remembers": "facts written at runtime, addressable by learned keys",
+      "write": "runtime writes to the memory matrix (editable without a full retrain)",
+      "read": "learned-key lookup blended into the forward pass",
+      "freshness": "editable in place — supports targeted updates/forgetting",
+      "vs_rag": "in-model + editable, but opaque provenance; a candidate source, never truth",
+      "tradeoff": "fast editable recall; pair with provenance for anything truth-bearing"
+    },
+    {
+      "id": "knowledge_editing_inplace",
+      "name": "In-place knowledge editing (targeted weight edit)",
+      "mechanism": "edit specific facts in the weights (locate-then-edit) without full fine-tune",
+      "remembers": "a small set of corrected/updated facts",
+      "write": "surgical weight edit targeting the responsible layers",
+      "read": "normal forward pass returns the edited fact",
+      "freshness": "point-updates; risk of collateral drift — shadow + monitor before promotion",
+      "vs_rag": "no retrieval hop, but edits can leak/regress; held-out + side-by-side required (lossless distillation)",
+      "tradeoff": "fix a known wrong fact cheaply; verify no regression before it goes tenant-visible"
+    },
+    {
+      "id": "episodic_replay_adapter",
+      "name": "Episodic-replay adapter",
+      "mechanism": "periodically distill recent verified interactions into a small replay adapter (the determinism factory pattern, model-side)",
+      "remembers": "patterns from past VERIFIED sessions (never raw unverified output)",
+      "write": "scheduled distillation from the verified ledger into an adapter version",
+      "read": "load the current episodic adapter",
+      "freshness": "refreshed each distillation cycle; old versions retained for rollback",
+      "vs_rag": "compounding self-improvement, but only from verified inputs — distill from verified, never from raw",
+      "tradeoff": "the flywheel's model-side memory; gated by the same verified-only promotion boundary"
+    }
+  ]
+}

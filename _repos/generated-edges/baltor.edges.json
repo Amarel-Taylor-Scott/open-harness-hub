@@ -1,0 +1,69 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "baltor",
+  "repo": "aidoneright-baltor",
+  "role": "the applied, customer-facing CONTEXT product, powered by Teleon (a TENANT). Governance / provenance / signed facts / CDC is the moat.",
+  "exposes": [
+    "/api/baltor",
+    "context-engine",
+    "governance",
+    "customer-workflows",
+    "receipts"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "exposes": [
+        "registry",
+        "primitives",
+        "codegraph",
+        "eval-harness",
+        "storage-tiers",
+        "credential-plane"
+      ],
+      "role": "the SUBSTRATE every product consumes \u2014 the primitive/component registry + factory + catalog, codegraph, naming planes, e"
+    },
+    {
+      "surface": "openhubforai",
+      "repo": "aidoneright-openhubforai",
+      "exposes": [
+        "capabilitytask-spec",
+        "eval-harnesses",
+        "task-templates",
+        "conformance-tests",
+        "skills"
+      ],
+      "role": "the OPEN ecosystem + the open CapabilityTask spec (CTS). The neutral home of the standard; stays product-neutral."
+    },
+    {
+      "surface": "teleon",
+      "repo": "aidoneright-teleon",
+      "exposes": [
+        "/api/teleon",
+        "PurposeTask",
+        "runtime-selector",
+        "evidence-ledger",
+        "promotion-gate",
+        "assurance-portal"
+      ],
+      "role": "the purpose-driven, eval-gated, self-adaptive compute RUNTIME SaaS. Owns PurposeTask/CapabilityTask, runtime selection, "
+    }
+  ],
+  "consumed_by": [
+    "aidoneright"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

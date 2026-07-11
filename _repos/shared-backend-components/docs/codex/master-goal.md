@@ -1,0 +1,1 @@
+../../../_shared/codex/master-goal.md

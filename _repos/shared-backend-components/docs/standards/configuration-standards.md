@@ -1,0 +1,1 @@
+../../../_shared/standards/configuration-standards.md

@@ -1,0 +1,30 @@
+MODULE src/teleon/synthesis/intent_to_dag.py
+## API signatures
+```python
+"""src.teleon.synthesis.intent_to_dag — intent -> outline -> component DAG -> verification ladder -> alternatives ladder."""
+def py_function_src_teleon_synthesis_intent_to_dag___load(py_arg_src_teleon_synthesis_intent_to_dag__load__name)
+def py_function_src_teleon_synthesis_intent_to_dag___ladders() -> dict
+def py_function_src_teleon_synthesis_intent_to_dag__pick_ladder(py_arg_src_teleon_synthesis_intent_to_dag__pick_ladder__intent: str) -> dict | None
+    # Stage 1 routing: classify -> a ladder; fall back to a keyword match on ladder ids; else search_research.
+def py_function_src_teleon_synthesis_intent_to_dag__outline(py_arg_src_teleon_synthesis_intent_to_dag__outline__intent: str) -> dict
+    # Stages 1-2: the capability + its ordered outline (the ladder's rungs as steps).
+def py_function_src_teleon_synthesis_intent_to_dag__build_dag(py_arg_src_teleon_synthesis_intent_to_dag__build_dag__intent: str) -> dict
+    # Stage 3: a DAG of component nodes (one per rung) with cheapest-first OPTIONS; edges = the descent order.
+def py_function_src_teleon_synthesis_intent_to_dag__decision_points(py_arg_src_teleon_synthesis_intent_to_dag__decision_points__intent: str, *, principal=None) -> list
+    # The ordered (point_id, [options]) for SynthesisTree — branch over the component choice at each DAG node. A node
+def py_function_src_teleon_synthesis_intent_to_dag__verification_ladder(py_arg_src_teleon_synthesis_intent_to_dag__verification_ladder__node: dict) -> dict
+    # Stage 4: the 5W1H verification questions for a DAG node (governance-aware — provenance/why-this-rung/honest-fail).
+def py_function_src_teleon_synthesis_intent_to_dag__alternatives_ladder(py_arg_src_teleon_synthesis_intent_to_dag__alternatives_ladder__node: dict) -> dict
+    # Stage 5: the critique ladder for a node — other components on its plane + the best-way / pros-cons prompts.
+def py_function_src_teleon_synthesis_intent_to_dag__frontier_prompts(py_arg_src_teleon_synthesis_intent_to_dag__frontier_prompts__intent: str) -> list[dict]
+    # Disciplined per-stage prompts from architecture/synthesis_prompt_templates.json (enumerate-before-commit,
+```
+## intra-module call edges
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag___ladders -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag___load
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__alternatives_ladder -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag___load
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__build_dag -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__pick_ladder
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__decision_points -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__build_dag
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__frontier_prompts -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag___load
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__frontier_prompts -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__outline
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__outline -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__pick_ladder
+src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag__pick_ladder -> src.teleon.synthesis.intent_to_dag.py_function_src_teleon_synthesis_intent_to_dag___ladders

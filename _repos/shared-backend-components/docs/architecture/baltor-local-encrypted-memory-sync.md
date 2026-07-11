@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-local-encrypted-memory-sync.md

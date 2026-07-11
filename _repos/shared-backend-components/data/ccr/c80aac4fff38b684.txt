@@ -1,0 +1,20 @@
+MODULE src/teleon/evolution/self_optimizing_unit.py
+## API signatures
+```python
+"""src.teleon.evolution.self_optimizing_unit — the SELF-IMPROVING, AUTO-OPTIMIZING Teleon capability unit."""
+_MODEL_ROOT_DETERMINISM = ...
+class OptimizationStep:
+    def as_dict(self) -> dict
+class SelfOptimizingCapabilityUnit:
+    # A capability that improves itself. ``optimize`` measures the unit, auto-applies the best governed method per
+    def __init__(self, spec: dict) -> None
+    def optimize(self, *, policy=None) -> dict
+    def is_converged(self, *, policy=None) -> bool
+        # Auto-optimization converges: re-optimizing yields the same governed forks (deterministic, idempotent).
+def demonstrate(spec: dict | None=None) -> dict
+    # Run the self-optimizing unit on a representative fragile regulated-fact capability and return the receipt.
+```
+## intra-module call edges
+src.teleon.evolution.self_optimizing_unit.demonstrate -> src.teleon.evolution.self_optimizing_unit.SelfOptimizingCapabilityUnit
+src.teleon.evolution.self_optimizing_unit.is_converged -> src.teleon.evolution.self_optimizing_unit.SelfOptimizingCapabilityUnit.optimize
+src.teleon.evolution.self_optimizing_unit.optimize -> src.teleon.evolution.self_optimizing_unit.OptimizationStep

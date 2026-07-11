@@ -13,14 +13,14 @@ immediately**. Goal: drive both products to launch quality and keep both public 
   tiers → host/download → serve corpora+tools into open agent loops. Pinned brand `baltor`.
   Home `/baltor`. Tunnel → `dist/showcase-share-url-baltor.txt`.
 
-Canonical: `docs/strategy/two-services-shared-infrastructure.md`, `docs/strategy/context-enrichment-service.md`,
+Canonical: `_repos/_shared/strategy/two-services-shared-infrastructure.md`, `_repos/baltor/context/strategy/context-enrichment-service.md`,
 `docs/concepts/context-layer-and-the-desk.md`. Each product has its OWN self-contained front-end folder
-(`web/openhubforai/`, `web/baltor/`); only the backend is shared, and `server.py` serves
+(`_repos/openhubforai/frontend/`, `_repos/baltor/frontend/`); only the backend is shared, and `server.py` serves
 `web/<OH_PRODUCT>/` (default openhubforai).
 
 ## Standing contract (no terminal state)
 
-Follow `docs/codex/app-polish-loop.md` + `.codex/prompts/direction.md` + `.claude/commands/goal.md`:
+Follow `_repos/shared-backend-components/context/codex/app-polish-loop.md` + `.codex/prompts/direction.md` + `.claude/commands/goal.md`:
 **decide autonomously, never ask, branch on any block, never end on a question.** Record each
 assumption in `.research-notes/autonomous-session-ledger.md`. "Screen polished" → next screen;
 "blocked/red" → roll back to green, switch paths, keep going. Every change carries a **warrant**
@@ -49,14 +49,14 @@ assets serve with `Cache-Control: no-store` — HTML/JS/CSS edits go live with *
    Preview a product locally with `OH_PRODUCT=<id> python3 -m scripts.showcase --port <p>` (or
    `bash scripts/serve_two_products.sh`), or hit its pinned tunnel directly.
 2. **Make it sell its value**: lead with **measured lift / fidelity**, **governance/provenance**, and
-   **freezable = no recurring cost** (`docs/design/value-propositions.md`). Keep the two brands
+   **freezable = no recurring cost** (`_repos/_shared/design/value-propositions.md`). Keep the two brands
    *distinct* but visually *consistent* (shared design tokens; never a parallel palette).
 3. **Verify**: `node --check` every touched file; walk the funnel end-to-end; confirm **both** share
    URLs still serve their OWN product's front-end (`curl <tunnel>/` shows that product's index/markers)
    and render. Keep each `web/<product>/` no-build (vanilla JS + ported CSS only).
 4. **Separation + no magic values**: the two front-end folders are self-contained — never cross-import
    between them; only the backend is shared. New facets are attribute rows, not columns
-   (`docs/codex/schema-extensibility.md`).
+   (`_repos/shared-backend-components/context/codex/schema-extensibility.md`).
 5. **Record** a ledger line, **branch** to the next weakest surface, **repeat**.
 
 ## Done-enough bar (then keep going)

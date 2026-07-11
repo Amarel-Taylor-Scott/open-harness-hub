@@ -1,0 +1,15 @@
+{
+  "registry": "triage_algorithms",
+  "serves_truth": false,
+  "description": "Triage + routing algorithms — how to classify an incoming item (incident, support ticket, alert, lead, agent task) by severity and route it to the right handler/queue/escalation. A registry of triage SPECS (the decision, inputs, when to use, deterministic vs learned), not implementations; pointers, never truth. Generic operational triage (incident/support/alert/lead), NOT medical. Composes with prioritization_algorithms (the score), queueing_disciplines (the destination queue), access_policy_authorization (who may handle), and decision_policy (the thresholds).",
+  "stage": "cross_cutting",
+  "triage": [
+    {"id": "severity_classification", "name": "Severity classification", "decision": "map an item to a severity band (SEV1..SEVn / P1..Pn)", "inputs": "impact x scope x urgency", "deterministic": true, "when_to_use": "the first cut on any incident/alert; drives the SLA + escalation"},
+    {"id": "rule_based_routing", "name": "Rule-based routing", "decision": "route by deterministic rules (keyword/category/owner)", "inputs": "attributes + a rule table", "deterministic": true, "when_to_use": "stable, auditable routing; the floor before any model"},
+    {"id": "sla_escalation_ladder", "name": "SLA escalation ladder", "decision": "escalate to the next tier when an SLA timer breaches", "inputs": "severity -> SLA, elapsed time", "deterministic": true, "when_to_use": "time-bound handling with on-call tiers"},
+    {"id": "confidence_thresholding", "name": "Confidence thresholding", "decision": "auto-handle above a confidence bar, else route to a human", "inputs": "a model score + a threshold", "deterministic": true, "when_to_use": "human-in-the-loop gating of an automated classifier (governance bar)"},
+    {"id": "dedup_correlation", "name": "Dedup + correlation triage", "decision": "collapse duplicate/related alerts into one incident", "inputs": "fingerprint / time-window / topology", "deterministic": true, "when_to_use": "alert storms; cut noise before prioritizing"},
+    {"id": "ml_classifier_routing", "name": "ML classifier routing", "decision": "a model predicts category/severity/owner", "inputs": "labeled history + features", "deterministic": false, "when_to_use": "high-volume, fuzzy intake where rules under-fit AND labels exist; admit on proven lift, keep the rule floor as fallback"},
+    {"id": "weighted_lead_scoring", "name": "Lead/opportunity triage scoring", "decision": "score + route a lead by fit x intent", "inputs": "firmographic + behavioral signals", "deterministic": true, "when_to_use": "sales/ops intake; deterministic-first, learned only on proven lift"}
+  ]
+}

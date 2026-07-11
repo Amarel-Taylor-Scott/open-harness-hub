@@ -1,0 +1,48 @@
+{
+  "surface": "teleon",
+  "repo": "aidoneright-teleon",
+  "interface_version": "0.1.0",
+  "exposes": [
+    {
+      "id": "/api/teleon",
+      "kind": "api",
+      "stability": "declared",
+      "summary": "The runtime SaaS API: PurposeTask submission, runtime selection, and receipts."
+    },
+    {
+      "id": "PurposeTask",
+      "kind": "type",
+      "stability": "declared",
+      "summary": "The core runtime object (formal synonym CapabilityTask): a purpose + guardrails compiled to an optimized, verified execution graph."
+    },
+    {
+      "id": "runtime-selector",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "Cost-ordered, deterministic-first selection of the execution path, bounded by the org guardrail policy."
+    },
+    {
+      "id": "evidence-ledger",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The append-only receipt store recording every run's cost, accuracy, and decisions."
+    },
+    {
+      "id": "promotion-gate",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The proof-gated boundary that promotes a candidate to served truth \u2014 never self-promoted."
+    },
+    {
+      "id": "assurance-portal",
+      "kind": "capability",
+      "stability": "declared",
+      "summary": "The customer-facing Capability Assurance Portal (runtime health, receipts, policy)."
+    }
+  ],
+  "consumes": {
+    "dev-rules-context": [],
+    "shared-backend-components": [],
+    "openhubforai": []
+  }
+}

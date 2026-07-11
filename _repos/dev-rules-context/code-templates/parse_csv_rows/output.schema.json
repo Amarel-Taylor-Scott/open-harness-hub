@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-harness-hub.dev/code-templates/parse_csv_rows/output.schema.json",
+  "title": "parse_csv_rows output",
+  "type": "object",
+  "required": ["headers", "rows", "row_count", "delimiter", "truncated"],
+  "properties": {
+    "headers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": { "type": "string" }
+      }
+    },
+    "row_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "delimiter": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1
+    },
+    "truncated": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}

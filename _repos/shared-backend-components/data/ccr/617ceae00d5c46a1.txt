@@ -1,0 +1,32 @@
+MODULE src/baltor/workers/supervisor_ledger.py
+## API signatures
+```python
+"""src.baltor.workers.supervisor_ledger — coordination ledger for SCALING the lightweight flywheel
+supervisor (C-FLEET-3)."""
+class SupervisorLedgerError:
+def _hid(prefix: str, *parts: str) -> str
+class SupervisorLedger:
+    def __init__(self) -> None
+    def register_instance(self, *, supervisor_id: str, hostname: str='', pid: int=0, version: str='', now: str) -> dict
+    def heartbeat_instance(self, supervisor_id: str, now: str) -> None
+    def acquire_lease(self, *, lease_name: str, owner_id: str, now: str, ttl_seconds: int=30) -> bool
+        # CAS acquire: succeed iff the lease is unheld, expired, or already ours. Models
+    def renew_lease(self, *, lease_name: str, owner_id: str, now: str, ttl_seconds: int=30) -> bool
+    def lease_holder(self, lease_name: str, *, now: str) -> str | None
+    def is_leader(self, *, lease_name: str, owner_id: str, now: str) -> bool
+    def register_shard(self, *, shard_id: str, shard_type: str, shard_key: str) -> dict
+    def claim_shard(self, *, shard_id: str, owner_id: str, now: str, ttl_seconds: int=30) -> bool
+        # CAS claim a shard: succeed iff unclaimed, expired, or already ours.
+    def heartbeat_shard(self, *, shard_id: str, owner_id: str, now: str, ttl_seconds: int=30) -> bool
+    def shards_owned_by(self, owner_id: str, *, now: str) -> list[dict]
+    def reclaim_stale_shards(self, *, now: str) -> list[str]
+    def record_decision(self, *, supervisor_id: str, decision_type: str, idempotency_key: str, shard_id: str='', reason: str='', output_command_ids: list | None=None, now: str) -> dict
+        # Idempotent: the SAME idempotency_key returns the SAME decision (no duplicate work). Models a
+    def decisions(self) -> list[dict]
+    def record_tick(self, *, supervisor_id: str, shard_id: str='', started_at: str, duration_ms: int, due_task_count: int=0, scheduled_count: int=0, interval_ms: int=0) -> dict
+    def ticks(self) -> list[dict]
+```
+## intra-module call edges
+src.baltor.workers.supervisor_ledger.claim_shard -> src.baltor.workers.supervisor_ledger.SupervisorLedgerError
+src.baltor.workers.supervisor_ledger.is_leader -> src.baltor.workers.supervisor_ledger.SupervisorLedger.lease_holder
+src.baltor.workers.supervisor_ledger.record_decision -> src.baltor.workers.supervisor_ledger._hid

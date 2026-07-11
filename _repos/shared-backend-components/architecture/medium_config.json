@@ -1,0 +1,32 @@
+{
+  "version": "0.1.0",
+  "note": "UI-configurable per-tenant + per-FUNCTION MEDIUM selection. A client connects their preferred mediums (compute backend, LLM lane, search provider) and can set DIFFERENT mediums for DIFFERENT functions (e.g. extraction on Cloudflare, enrichment on Ollama). Resolved by _repos/teleon/backend/src/teleon/config/medium_resolver.py, which validates ids against the LIVE registries (no-magic-values) and reuses the objective/OIPS selectors + compute_ownership. Secrets are tenant SecretRefs (never inline). Edited from the config UI (dist/teleon-config/index.html). serves_truth=false.",
+  "resolution_order": "tenant.per_function[function]  ->  tenant.per_function[default]  ->  global defaults (most specific wins)",
+  "medium_kinds": {
+    "compute": "where a capability unit RUNS (execution_backend_policy_matrix.backends_enum, + compute_ownership)",
+    "llm": "which model lane improves/runs the LLM step (cloudflare_workers_ai | ollama | openrouter | a lowcost lane)",
+    "search": "which grounded search provider enriches (search_provider_registry)"
+  },
+  "defaults": {
+    "compute": "cloudflare_workers",
+    "compute_ownership": "customer_account",
+    "llm": "cloudflare_workers_ai",
+    "search": "wikipedia",
+    "fallback_compute": "local_function_emulator",
+    "fallback_llm": "ollama"
+  },
+  "tenants": {
+    "demo": {
+      "display_name": "Demo tenant",
+      "secrets": {
+        "cloudflare_api_token": "secret://tenant/demo/cloudflare_api_token",
+        "cloudflare_account_id": "secret://tenant/demo/cloudflare_account_id"
+      },
+      "per_function": {
+        "default": {"compute": "cloudflare_workers", "llm": "cloudflare_workers_ai", "search": "wikipedia"},
+        "extraction": {"compute": "cloudflare_workers", "llm": "cloudflare_workers_ai"},
+        "enrichment": {"llm": "ollama", "search": "federal_register"}
+      }
+    }
+  }
+}

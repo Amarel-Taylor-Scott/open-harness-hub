@@ -1,0 +1,65 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "adapter_status": "planned_not_executed",
+    "llm_claim_reviews": [],
+    "model_route": {
+      "candidate_adapters": [
+        "local-ollama"
+      ],
+      "cost_estimate": {
+        "estimated_cost_usd": 0.0
+      },
+      "fallbacks": [
+        {
+          "accepted": true,
+          "adapter": "local-ollama",
+          "reason_codes": []
+        }
+      ],
+      "latency_budget_ms": null,
+      "modality": [
+        "text"
+      ],
+      "model_route_id": "mr-59e0729d291a5c0f",
+      "policy": {
+        "allow_cloud": false,
+        "allow_frontier": false,
+        "capability": "claim_review",
+        "max_cost_usd": null,
+        "preferred_lane": "local_efficient",
+        "privacy_scope": "tenant",
+        "require_zero_data_retention": false,
+        "tenant_allowed_providers": []
+      },
+      "quality_tier": "local_efficient",
+      "route_reason": "selected_first_compliant_policy_route",
+      "selected_adapter": "local-ollama",
+      "selected_model": "gemma4",
+      "selected_route": {
+        "adapter": "local-ollama",
+        "api_key_env": null,
+        "backend": "http-openai",
+        "base_url": "http://localhost:11434/v1",
+        "capabilities": [
+          "*"
+        ],
+        "data_retention": "local",
+        "enabled": true,
+        "estimated_cost_usd": 0.0,
+        "free_credit": false,
+        "lane": "local_efficient",
+        "latency_ms": null,
+        "modalities": [
+          "text"
+        ],
+        "model": "gemma4",
+        "provider": "ollama",
+        "quality_tier": "local_efficient",
+        "trust_boundary": "local"
+      },
+      "task_type": "llm.claim.review",
+      "trust_boundary": "local"
+    }
+  }
+}

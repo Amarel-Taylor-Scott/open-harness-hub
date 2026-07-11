@@ -1,0 +1,27 @@
+MODULE src/teleon/observer/sessions.py
+## API signatures
+```python
+"""observer.sessions — Claude Code session DISCOVERY (the on-disk capture seam, zero live install)."""
+_NON_ALNUM = ...
+_PROJECTS_ENV = ...
+_DEFAULT_PROJECTS = ...
+def _projects_dir() -> Path
+    # The Claude Code projects root (``~/.claude/projects``), overridable via OBSERVER_PROJECTS_DIR for tests.
+def encode_cwd(path: str | Path) -> str
+    # Encode an absolute cwd the way Claude Code names its per-project transcript directory.
+def discover_sessions(cwd: str | Path | None=None) -> list[dict]
+    # Discover this project's Claude Code sessions, newest first.
+def latest_session(cwd: str | Path | None=None) -> str | None
+    # Path of the most recently modified session for ``cwd`` (defaults to ``os.getcwd()``), or None if none.
+def _self_test() -> int
+def main() -> int
+```
+## intra-module call edges
+src.teleon.observer.sessions._self_test -> src.teleon.observer.sessions.discover_sessions
+src.teleon.observer.sessions._self_test -> src.teleon.observer.sessions.encode_cwd
+src.teleon.observer.sessions._self_test -> src.teleon.observer.sessions.latest_session
+src.teleon.observer.sessions.discover_sessions -> src.teleon.observer.sessions._projects_dir
+src.teleon.observer.sessions.discover_sessions -> src.teleon.observer.sessions.encode_cwd
+src.teleon.observer.sessions.latest_session -> src.teleon.observer.sessions.discover_sessions
+src.teleon.observer.sessions.main -> src.teleon.observer.sessions._self_test
+src.teleon.observer.sessions.main -> src.teleon.observer.sessions.discover_sessions

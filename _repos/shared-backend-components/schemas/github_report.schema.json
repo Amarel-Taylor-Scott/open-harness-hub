@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aidoneright.dev/schemas/github_report.schema.json",
+  "title": "GithubReport",
+  "description": "An OFFLINE-first ingestion report over a LOCAL repo fixture (a directory tree, or a {path: content} JSON), the intake front-end of the Primitive Discovery Factory. One row per (repo, report_type): it stores paths, languages, digests, and extracted STRUCTURED UNITS + bounded, secret-redacted snippets — NEVER raw file bodies — and proposes candidate primitives / verifiers / benchmarks mined from those units. candidate; serves_truth=false. Generation is not promotion.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "report_id", "record_type", "repo", "commit_sha", "report_type", "schema_version",
+    "source_refs", "generated_at", "findings", "candidate_primitives", "candidate_verifiers",
+    "candidate_benchmarks", "risk_flags", "artifact_refs", "candidate", "serves_truth"
+  ],
+  "properties": {
+    "report_id": {
+      "type": "string",
+      "description": "canonical_id('ghreport', repo, report_type, commit_sha) — '{prefix}-{sha256[:16]}'. Never a name-embedded version.",
+      "pattern": "^ghreport-[0-9a-f]{16}$"
+    },
+    "record_type": {"const": "github_report"},
+    "repo": {"type": "string", "description": "repo label, e.g. 'OWNER/REPO' (live) or the local fixture basename (offline)."},
+    "commit_sha": {
+      "type": "string",
+      "description": "The git commit sha for --live; for an offline fixture a deterministic content anchor 'tree:<sha256[:16]>' over the sorted (path, file-digest) pairs, so report_id is content-addressed and reproducible."
+    },
+    "report_type": {
+      "enum": ["repo_inventory", "primitive_mining", "test_fixture", "ci", "security", "pr_issue", "dependency"],
+      "description": "Which lens produced this report. repo_inventory | primitive_mining | test_fixture are the implemented lenses; ci | security | pr_issue | dependency are reserved forward-compat seams (add a builder row to implement one)."
+    },
+    "schema_version": {"type": "string", "description": "Schema version metadata — version lives HERE, never in an id or name."},
+    "source_refs": {
+      "type": "array",
+      "description": "Provenance handles the findings were derived from — file paths + digests, spec files, the tree anchor. Handles + digests only; never a raw body.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["kind"],
+        "properties": {
+          "kind": {"type": "string"},
+          "path": {"type": ["string", "null"]},
+          "digest": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "generated_at": {"type": "string", "description": "ISO-8601 UTC timestamp from an INJECTED clock (no wall-clock in tests)."},
+    "findings": {
+      "type": "array",
+      "description": "What the lens observed (language distribution, manifests, entrypoints, detected units, 'N tests imply a reusable primitive', …). Structured detail, no raw bodies.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["kind"],
+        "properties": {"kind": {"type": "string"}}
+      }
+    },
+    "candidate_primitives": {
+      "type": "array",
+      "description": "Reusable-component candidates mined from the units (small pure functions, pydantic models, api endpoints/specs, test-backed primitives). Born candidate=true, serves_truth=false.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["primitive_id", "record_type", "kind", "name", "source_ref", "candidate", "serves_truth"],
+        "properties": {
+          "primitive_id": {"type": "string"},
+          "record_type": {"const": "github_report_candidate_primitive"},
+          "kind": {"enum": ["pure_function", "pydantic_model", "api_endpoint", "api_spec", "test_backed_primitive"]},
+          "name": {"type": "string"},
+          "signature": {"type": ["string", "null"], "description": "Secret-redacted signature/binding; never a raw body."},
+          "source_ref": {"type": "object", "required": ["path"]},
+          "candidate": {"const": true},
+          "serves_truth": {"const": false}
+        }
+      }
+    },
+    "candidate_verifiers": {
+      "type": "array",
+      "description": "Proof obligations that would promote a candidate (unit/property test, schema roundtrip, contract test, golden case table). candidate=true.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["verifier_id", "kind", "target", "candidate", "serves_truth"],
+        "properties": {
+          "verifier_id": {"type": "string"},
+          "kind": {"type": "string"},
+          "target": {"type": "string"},
+          "candidate": {"const": true},
+          "serves_truth": {"const": false}
+        }
+      }
+    },
+    "candidate_benchmarks": {
+      "type": "array",
+      "description": "Measurable hooks (reuse-vs-regenerate token savings, golden regression suites) a promotion gate would run. candidate=true.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["benchmark_id", "kind", "candidate", "serves_truth"],
+        "properties": {
+          "benchmark_id": {"type": "string"},
+          "kind": {"type": "string"},
+          "candidate": {"const": true},
+          "serves_truth": {"const": false}
+        }
+      }
+    },
+    "risk_flags": {
+      "type": "array",
+      "description": "Ingestion risks (secret-shaped strings redacted, license-review, injection/jailbreak signal, unresolved source) that gate promotion.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["kind"],
+        "properties": {"kind": {"type": "string"}, "severity": {"type": ["string", "null"]}}
+      }
+    },
+    "artifact_refs": {
+      "type": "array",
+      "description": "Pointers to salient artifacts the report references (manifests, entrypoints, spec files, staged output). Pointers only.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["kind"],
+        "properties": {"kind": {"type": "string"}, "ref": {"type": ["string", "null"]}}
+      }
+    },
+    "secrets_redacted": {"type": "integer", "minimum": 0, "description": "Count of secret-shaped substrings scrubbed before this row was written."},
+    "candidate": {"const": true},
+    "serves_truth": {"const": false}
+  }
+}

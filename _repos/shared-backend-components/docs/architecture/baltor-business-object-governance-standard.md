@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-business-object-governance-standard.md

@@ -1,0 +1,70 @@
+MODULE src/teleon/tuning/action_ledger.py
+## API signatures
+```python
+"""src.teleon.tuning.action_ledger — the append-only ACTION LEDGER for the self-tuning runtime layer."""
+_REPO = ...
+LEDGER_SCHEMA_VERSION = ...
+ACTION_ID_PREFIX = ...
+SERVES_TRUTH = ...
+_INDEX_DB_SUFFIX = ...
+class ActionLedgerRejected:
+    # Raised when an append would violate the action-ledger contract (bad outcome, or a truth-bearing record).
+class ActionRecord:
+    # One runtime ACTION: in ``context`` the runtime made ``choice`` and the run produced the outcome
+    def outcome(self) -> dict[str, Any]
+        # The outcome sub-record (passed/cost/latency/tokens) — the signal the tuner contrasts on.
+    def _identity(self) -> dict[str, Any]
+    def action_id(self) -> str
+        # Stable content-addressed id ``act_<hash16>`` over the canonical bytes of the action (the idempotency key).
+    def to_record(self) -> dict[str, Any]
+        # The full ledger record (self-describing): identity + schema version + serves_truth flag.
+class _JsonlFallbackStore:
+    # Pure-Python append-only JSONL store honoring the record_store port (append/all/count), used ONLY when the
+    def __init__(self, jsonl_path: str | Path) -> None
+    def append(self, record: dict, *, idem_key: str | None=None) -> int
+    def all(self, predicate=None) -> list[dict]
+    def count(self) -> int
+    def close(self) -> None
+def _open_store(jsonl_path: Path)
+    # Open the append-only backing store. PRIMARY = the repo's backend-swappable ``LocalRecordStore`` (SQLite-WAL
+class ActionLedger:
+    # Append-only, content-addressed ledger of runtime actions; idempotent by ``action_id``; lossless (keeps
+    def __init__(self, path: str | Path) -> None
+    def _open(self)
+    def backend(self) -> str
+        # Which backend the store resolved to (``sqlite_wal`` or ``jsonl_fallback``) — honest about degradation.
+    def append(self, action: ActionRecord) -> dict
+        # Append one action; IDEMPOTENT by content-hash ``action_id`` (re-appending the same observation is a no-op).
+    def extend(self, actions) -> int
+        # Append many actions; returns the number of DISTINCT records now in the ledger after the batch.
+    def all(self) -> list[dict]
+        # Every action record, oldest-first. Empty (not an error) when nothing has been appended yet.
+    def count(self) -> int
+        # Live count of distinct action records.
+    def stats(self) -> dict
+        # Aggregate readout (COMPUTED, never typed): per-(task, choice) n / pass-rate / mean cost — the raw shape
+    def close(self) -> None
+def self_test() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.tuning.action_ledger._identity -> src.teleon.tuning.action_ledger.ActionRecord.outcome
+src.teleon.tuning.action_ledger._open -> src.teleon.tuning.action_ledger._open_store
+src.teleon.tuning.action_ledger._open_store -> src.teleon.tuning.action_ledger._JsonlFallbackStore
+src.teleon.tuning.action_ledger.action_id -> src.teleon.tuning.action_ledger.ActionRecord._identity
+src.teleon.tuning.action_ledger.all -> src.teleon.tuning.action_ledger.ActionLedger._open
+src.teleon.tuning.action_ledger.append -> src.teleon.tuning.action_ledger.ActionLedger._open
+src.teleon.tuning.action_ledger.append -> src.teleon.tuning.action_ledger.ActionLedgerRejected
+src.teleon.tuning.action_ledger.append -> src.teleon.tuning.action_ledger._JsonlFallbackStore.count
+src.teleon.tuning.action_ledger.backend -> src.teleon.tuning.action_ledger.ActionLedger._open
+src.teleon.tuning.action_ledger.count -> src.teleon.tuning.action_ledger.ActionLedger._open
+src.teleon.tuning.action_ledger.count -> src.teleon.tuning.action_ledger._JsonlFallbackStore.all
+src.teleon.tuning.action_ledger.extend -> src.teleon.tuning.action_ledger._JsonlFallbackStore.append
+src.teleon.tuning.action_ledger.extend -> src.teleon.tuning.action_ledger._JsonlFallbackStore.count
+src.teleon.tuning.action_ledger.main -> src.teleon.tuning.action_ledger.self_test
+src.teleon.tuning.action_ledger.self_test -> src.teleon.tuning.action_ledger.ActionLedger
+src.teleon.tuning.action_ledger.self_test -> src.teleon.tuning.action_ledger.ActionRecord
+src.teleon.tuning.action_ledger.self_test -> src.teleon.tuning.action_ledger._JsonlFallbackStore
+src.teleon.tuning.action_ledger.self_test -> src.teleon.tuning.action_ledger._JsonlFallbackStore.all
+src.teleon.tuning.action_ledger.stats -> src.teleon.tuning.action_ledger._JsonlFallbackStore.all
+src.teleon.tuning.action_ledger.to_record -> src.teleon.tuning.action_ledger.ActionRecord.action_id

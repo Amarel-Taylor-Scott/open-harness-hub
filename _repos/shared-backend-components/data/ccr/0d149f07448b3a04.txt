@@ -1,0 +1,30 @@
+MODULE _repos/teleon/backend/src/teleon/environments/baltor_cfpb_context_governance.py
+## API signatures
+```python
+"""src.teleon.environments.baltor_cfpb_context_governance — a Baltor-STYLE governed task, as Teleon INFRA."""
+ENVIRONMENT_ID = ...
+REWARD_SPEC_ID = ...
+DEFAULT_TENANT_ID = ...
+DEFAULT_AGENT_ID = ...
+AUTHORITATIVE_ANSWER = ...
+HELD_OUT_CONTRADICTION = ...
+AUTHORITATIVE_SOURCE_HANDLE = ...
+_REPO = ...
+_SEED_PATH = ...
+def load_fixture(*, seed_path: Path | None=None) -> dict
+    # Return the deterministic task fixture: the question, the authoritative answer + source handle, and the
+def build_reward_spec(fixture: dict | None=None) -> dict
+    # The deterministic RewardSpec for this environment (kind=deterministic_check). One check per governance
+def build_request(run_id: str, *, candidate_answer: str, source_handles: list[str] | None=None, fixture: dict | None=None) -> tuple[dict, dict]
+    # Build the ``(EnvironmentRunRequest, candidate_output)`` for a CANDIDATE answer to the Reg E question.
+def run_candidate(run_id: str, *, candidate_answer: str, now: str, source_handles: list[str] | None=None, provider: LocalEnvironmentProvider | None=None, scorer: RewardRunner | None=None, fixture: dict | None=None) -> dict
+    # Run a CANDIDATE answer through the LOCAL environment + the deterministic RewardRunner.
+def describe() -> dict
+    # EnvironmentProviderNode-style card for this governed-context environment (local-first; serves_truth False).
+```
+## intra-module call edges
+src.teleon.environments.baltor_cfpb_context_governance.build_request -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture
+src.teleon.environments.baltor_cfpb_context_governance.build_reward_spec -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture
+src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.baltor_cfpb_context_governance.build_request
+src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.baltor_cfpb_context_governance.build_reward_spec
+src.teleon.environments.baltor_cfpb_context_governance.run_candidate -> src.teleon.environments.baltor_cfpb_context_governance.load_fixture

@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/codex/schema-extensibility.md

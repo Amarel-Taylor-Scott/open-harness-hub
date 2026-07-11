@@ -1,0 +1,1 @@
+../../../_shared/strategy/competitive-landscape-2026.md

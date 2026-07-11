@@ -7,9 +7,9 @@ immediately. Read and follow:
 
 1. `.codex/prompts/baltor-context-control-goal.md`
 2. `docs/codex/baltor-context-control-current-state.md`
-3. `docs/codex/baltor-context-control-iteration-plan.md`
-4. `docs/codex/baltor-context-control-test-plan.md`
-5. `docs/codex/baltor-context-control-session-ledger.md`
+3. `_repos/baltor/context/codex/baltor-context-control-iteration-plan.md`
+4. `_repos/baltor/context/codex/baltor-context-control-test-plan.md`
+5. `_repos/baltor/context/codex/baltor-context-control-session-ledger.md`
 6. `AGENTS.md`
 7. `README.md`
 8. `taxonomy/SPEC.md`

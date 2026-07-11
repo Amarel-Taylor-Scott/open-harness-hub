@@ -1,0 +1,15 @@
+# Cloudflare URL handoff — rubric scorecard
+
+Overall: **RED**
+
+| Rubric | Score |
+|---|---|
+| url_inventory_completeness | green |
+| local_url_health | red |
+| cloudflare_url_health | red |
+| brand_boundary | green |
+| secret_privacy_safety | green |
+| demo_readiness | red |
+| one_by_one_review_usability | green |
+| screenshot_availability | partial |
+| no_reinvention_reuse | green |

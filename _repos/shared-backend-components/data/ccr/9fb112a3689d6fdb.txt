@@ -1,0 +1,79 @@
+MODULE src/teleon/workers/durable_fleet_ledger.py
+## API signatures
+```python
+"""src.teleon.workers.durable_fleet_ledger — the DURABLE (SQLite) capability-task ledger."""
+_REPO = ...
+DEFAULT_DB = ...
+def _iso(now: str | None) -> str
+class DurableFleetLedger:
+    def __init__(self, path: str | Path=DEFAULT_DB) -> None
+    def _init_schema(self) -> None
+    def register_worker(self, *, worker_id: str, capability_ids: list, max_concurrency: int=1, now: str | None=None) -> dict
+    def set_worker_status(self, worker_id: str, status: str, *, now: str | None=None) -> None
+    def worker(self, worker_id: str) -> dict | None
+    def live_workers(self, capability_id: str | None=None, *, now: str | None=None) -> list[dict]
+    def enqueue_task(self, *, tenant_id: str, capability_id: str, idempotency_key: str, now: str | None=None, priority_class: str='standard', queue_name: str='', deadline_at: str='', not_before: str='', max_attempts: int=3, depends_on: list | None=None, payload: dict | None=None) -> dict
+    def _deps_satisfied(self, depends_on_json: str | None) -> bool
+        # A task is claimable only when EVERY task it depends on has succeeded (dependency ordering).
+    def claim_task(self, *, worker_id: str, capability_id: str, now: str | None=None, lease_seconds: int=60) -> dict | None
+        # ATOMIC claim: the oldest ready task for this capability → EXACTLY ONE worker. The
+    def start_task(self, task_id: str, worker_id: str, now: str | None=None) -> dict
+    def ack_task(self, task_id: str, worker_id: str, result_ids: list | None=None, now: str | None=None) -> dict
+    def nack_task(self, task_id: str, worker_id: str, error: dict, *, retryable: bool, now: str | None=None) -> dict
+    def reclaim_expired_leases(self, now: str | None=None) -> list[str]
+    def _require_owner(self, task_id: str, worker_id: str) -> None
+    def task(self, task_id: str) -> dict | None
+    def queued_tasks(self, capability_id: str | None=None) -> list[dict]
+    def tasks_by_status(self, status: str) -> list[dict]
+    def close(self) -> None
+_TASK_COLUMNS = ...
+_TASK_COLS = ...
+_WORKER_COLUMNS = ...
+_WORKER_COLS = ...
+_PG_CLAIM_TASK_SQL = ...
+class PostgresFleetLedger:
+    # DURABLE capability-task ledger on PostgreSQL — drop-in for the subset of the FleetLedger contract
+    def __init__(self, *, dsn: str | None=None, connect=None) -> None
+    def _exec(self, sql: str, params=(), *, fetch: bool=False, fetchone: bool=False)
+        # Run one statement on a context-managed cursor (always closed — no leaks).
+    def _init_schema(self) -> None
+    def register_worker(self, *, worker_id: str, capability_ids: list, max_concurrency: int=1, now: str | None=None) -> dict
+    def set_worker_status(self, worker_id: str, status: str, *, now: str | None=None) -> None
+    def worker(self, worker_id: str) -> dict | None
+    def live_workers(self, capability_id: str | None=None, *, now: str | None=None) -> list[dict]
+    def enqueue_task(self, *, tenant_id: str, capability_id: str, idempotency_key: str, now: str | None=None, priority_class: str='standard', queue_name: str='', deadline_at: str='', not_before: str='', max_attempts: int=3, depends_on: list | None=None, payload: dict | None=None) -> dict
+    def claim_task(self, *, worker_id: str, capability_id: str, now: str | None=None, lease_seconds: int=60) -> dict | None
+        # ATOMIC claim via FOR UPDATE SKIP LOCKED + LIMIT 1 — concurrent workers each lock a DIFFERENT
+    def start_task(self, task_id: str, worker_id: str, now: str | None=None) -> dict
+    def ack_task(self, task_id: str, worker_id: str, result_ids: list | None=None, now: str | None=None) -> dict
+    def nack_task(self, task_id: str, worker_id: str, error: dict, *, retryable: bool, now: str | None=None) -> dict
+    def reclaim_expired_leases(self, now: str | None=None) -> list[str]
+    def _require_owner(self, task_id: str, worker_id: str) -> None
+    def task(self, task_id: str) -> dict | None
+    def queued_tasks(self, capability_id: str | None=None) -> list[dict]
+    def tasks_by_status(self, status: str) -> list[dict]
+    def close(self) -> None
+def open_fleet_ledger(path: str | Path=DEFAULT_DB, *, dsn: str | None=None, connect=None)
+    # Select the durable-ledger BACKEND: ``PostgresFleetLedger`` when a DSN is configured (or a ``connect``
+```
+## intra-module call edges
+src.teleon.workers.durable_fleet_ledger.__init__ -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger._init_schema
+src.teleon.workers.durable_fleet_ledger._init_schema -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger._require_owner -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger.ack_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger._require_owner
+src.teleon.workers.durable_fleet_ledger.ack_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.task
+src.teleon.workers.durable_fleet_ledger.ack_task -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger.ack_task -> src.teleon.workers.durable_fleet_ledger._iso
+src.teleon.workers.durable_fleet_ledger.claim_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger._deps_satisfied
+src.teleon.workers.durable_fleet_ledger.claim_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.task
+src.teleon.workers.durable_fleet_ledger.claim_task -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger.claim_task -> src.teleon.workers.durable_fleet_ledger._iso
+src.teleon.workers.durable_fleet_ledger.enqueue_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.task
+src.teleon.workers.durable_fleet_ledger.enqueue_task -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger.enqueue_task -> src.teleon.workers.durable_fleet_ledger._iso
+src.teleon.workers.durable_fleet_ledger.live_workers -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger.nack_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger._require_owner
+src.teleon.workers.durable_fleet_ledger.nack_task -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger.task
+src.teleon.workers.durable_fleet_ledger.nack_task -> src.teleon.workers.durable_fleet_ledger.PostgresFleetLedger._exec
+src.teleon.workers.durable_fleet_ledger.nack_task -> src.teleon.workers.durable_fleet_ledger._iso
+src.teleon.workers.durable_fleet_ledger.open_fleet_ledger -> src.teleon.workers.durable_fleet_ledger.DurableFleetLedger

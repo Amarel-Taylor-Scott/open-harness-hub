@@ -1,0 +1,68 @@
+MODULE src/baltor/workers/supervisor_store.py
+## API signatures
+```python
+"""src.baltor.workers.supervisor_store — DURABLE, cross-process supervisor coordination (OPP-supervisor-
+scaling-live). The durable analog of the in-memory SupervisorLedger: it persists the control-plane
+coordination state in SQLite so MULTIPLE `baltor_flywheel.py --watch` processes coordinate safely against
+ONE ledger."""
+_REPO = ...
+DEFAULT_DB = ...
+DEFAULT_SHARDS = ...
+def _now(now: int | None) -> int
+def _hid(prefix: str, *parts: str) -> str
+class SupervisorStore:
+    def __init__(self, path: str | Path=DEFAULT_DB) -> None
+    def _init_schema(self) -> None
+    def register_instance(self, *, supervisor_id: str, pid: int=0, hostname: str='', version: str='', mode: str='watch', metadata: dict | None=None, now: int | None=None) -> dict
+    def heartbeat_instance(self, supervisor_id: str, *, now: int | None=None) -> None
+    def set_instance_status(self, supervisor_id: str, status: str, *, now: int | None=None) -> None
+    def instance(self, supervisor_id: str) -> dict | None
+    def instances(self) -> list[dict]
+    def try_claim_leader(self, *, lease_name: str, supervisor_id: str, ttl_seconds: int=30, now: int | None=None) -> bool
+        # Atomic: claim iff unheld, expired, or already ours. Generation increments on a takeover.
+    def renew_leader(self, *, lease_name: str, supervisor_id: str, ttl_seconds: int=30, now: int | None=None) -> bool
+    def release_leader(self, *, lease_name: str, supervisor_id: str) -> None
+    def get_leader(self, lease_name: str, *, now: int | None=None) -> str | None
+    def failovers(self) -> list[dict]
+    def ensure_default_shards(self, *, now: int | None=None) -> None
+    def claim_shard(self, *, shard_id: str, supervisor_id: str, ttl_seconds: int=30, now: int | None=None) -> bool
+    def claim_available_shards(self, *, supervisor_id: str, max_shards: int, ttl_seconds: int=30, now: int | None=None) -> list[str]
+    def renew_shards(self, *, supervisor_id: str, shard_ids: list[str], ttl_seconds: int=30, now: int | None=None) -> int
+    def expire_stale_shards(self, *, now: int | None=None) -> list[str]
+    def list_owned_shards(self, supervisor_id: str, *, now: int | None=None) -> list[str]
+    def shards(self) -> list[dict]
+    def record_decision(self, *, supervisor_id: str, decision_type: str, idempotency_key: str, tick_id: str='', shard_id: str='', reason: str='', input_snapshot_hash: str='', output_command_ids: list | None=None, now: int | None=None) -> dict
+    def decision_exists(self, idempotency_key: str) -> bool
+    def record_spawn_decision(self, *, supervisor_id: str, capability_id: str, action: str, idempotency_key: str, reason: str='', tick_id: str='', shard_id: str='', now: int | None=None) -> dict
+    def decisions(self, *, decision_type: str | None=None) -> list[dict]
+    def spawn_decisions(self) -> list[dict]
+    def record_spawn_request(self, *, supervisor_id: str, capability_id: str, worker_id: str, decision_id: str='', pid: int=0, dry_run: bool=True, command: list | None=None, status: str='issued', idempotency_key: str='', now: int | None=None) -> dict
+        # Record an ISSUED worker-spawn (links to the decision). Idempotent by key so a re-tick over the same
+    def spawn_requests(self) -> list[dict]
+    def record_tick(self, *, supervisor_id: str, mode: str='watch', leader: bool=False, shard_ids: list | None=None, started_at: int | None=None, duration_ms: int=0, status: str='ok', proof_count: int=0, green_count: int=0, red_count: int=0, queue_snapshot_hash: str='', decision_count: int=0, error: dict | None=None) -> dict
+    def ticks(self, *, supervisor_id: str | None=None) -> list[dict]
+    def record_capacity_snapshot(self, *, supervisor_id: str, tick_id: str='', queue_depths: dict | None=None, worker_counts: dict | None=None, oldest_task_age: dict | None=None, due_jobs: dict | None=None, stale_workers: dict | None=None, provider_health: dict | None=None, now: int | None=None) -> dict
+    def capacity_snapshots(self) -> list[dict]
+    def close(self) -> None
+```
+## intra-module call edges
+src.baltor.workers.supervisor_store.__init__ -> src.baltor.workers.supervisor_store.SupervisorStore._init_schema
+src.baltor.workers.supervisor_store.claim_available_shards -> src.baltor.workers.supervisor_store.SupervisorStore.claim_shard
+src.baltor.workers.supervisor_store.claim_shard -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.ensure_default_shards -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.expire_stale_shards -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.get_leader -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.heartbeat_instance -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.list_owned_shards -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store.SupervisorStore.capacity_snapshots
+src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store._hid
+src.baltor.workers.supervisor_store.record_capacity_snapshot -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.record_decision -> src.baltor.workers.supervisor_store._hid
+src.baltor.workers.supervisor_store.record_decision -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_store.SupervisorStore.record_decision
+src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_store._hid
+src.baltor.workers.supervisor_store.record_spawn_decision -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.workers.supervisor_store._hid
+src.baltor.workers.supervisor_store.record_spawn_request -> src.baltor.workers.supervisor_store._now
+src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_store.SupervisorStore.ticks
+src.baltor.workers.supervisor_store.record_tick -> src.baltor.workers.supervisor_store._hid

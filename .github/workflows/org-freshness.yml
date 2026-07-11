@@ -1,0 +1,41 @@
+name: Org freshness (multi-repo drift gate)
+
+# The whole multi-repo org layout is DERIVED from one source:
+#   _repos/dev-rules-context/contracts/surface-registry.json (+ each repo's interface.json + the code layout).
+# Never hand-edit a derived file. This gate fails the build if any derived artifact
+# (edges, dependency graph, interface manifests, migration plan) has drifted from that source.
+# If it's red: run `make refresh` (python3 _repos/shared-backend-components/scripts/refresh_all.py --write) and commit the
+# regenerated files together with the source change.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  org-freshness:
+    runs-on: ubuntu-latest
+    # The org-maintainer scripts import the shared `scripts._repo_paths` package, so its package root
+    # (`_repos/shared-backend-components`) must be on PYTHONPATH — the same invocation `run_proofs` uses.
+    # Absolute (not `.`) so the subprocess maintainers refresh_all spawns (cwd=shared-backend-components) resolve it too.
+    env:
+      PYTHONPATH: ${{ github.workspace }}/_repos/shared-backend-components
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Prove the gates themselves are sound (pure, offline self-tests) before trusting them.
+      - name: Self-test the org maintainers (offline)
+        run: |
+          python3 _repos/shared-backend-components/scripts/check_org_freshness.py --self-test
+          python3 _repos/shared-backend-components/scripts/refresh_all.py --self-test
+          python3 _repos/shared-backend-components/scripts/scaffold_component.py --self-test
+          python3 _repos/shared-backend-components/scripts/build_migration_plan.py --self-test
+
+      # The drift gate: derived artifacts must match exactly what a refresh would write.
+      - name: Check org is in sync with the single-source registry
+        run: |
+          python3 _repos/shared-backend-components/scripts/check_org_freshness.py
+          python3 _repos/shared-backend-components/scripts/refresh_all.py --check

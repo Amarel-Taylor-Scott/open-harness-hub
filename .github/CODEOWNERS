@@ -1,33 +1,32 @@
-# Open Harness Hub — CODEOWNERS
-# Routes pull-request reviews to topic maintainers.
-# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# CODEOWNERS — generated from _repos/dev-rules-context/contracts/surface-registry.json (do not hand-edit;
+# regenerate). Maps each component + its monorepo code path to the team that owns it. Placeholders
+# (@aidoneright/<team>) become real GitHub teams on the new org account. Clear ownership = onboarding.
 
-# Default owner for anything not matched below.
-*                                  @TaylorAmarelTech
+# The shared devkit + standards are owned by the platform/architecture team (highest blast radius).
+/_repos/dev-rules-context/   @aidoneright/platform
+/_repos/edge-graph-generator/ @aidoneright/platform
 
-# Specification + schemas
-taxonomy/SPEC.md                   @TaylorAmarelTech
-schemas/                           @TaylorAmarelTech
-vocabularies/                      @TaylorAmarelTech
-
-# Catalog (by type)
-catalog/harnesses/                 @TaylorAmarelTech
-catalog/pipelines/                 @TaylorAmarelTech
-catalog/rule-packs/                @TaylorAmarelTech
-catalog/knowledge-packs/           @TaylorAmarelTech
-catalog/processors/                @TaylorAmarelTech
-
-# Industry-specific routing (extend with @healthcare-maintainers etc when teams form)
-catalog/pipelines/healthcare-*     @TaylorAmarelTech
-catalog/pipelines/finance-*        @TaylorAmarelTech
-catalog/pipelines/generate-image*  @TaylorAmarelTech
-catalog/pipelines/research-entity* @TaylorAmarelTech
-catalog/pipelines/verify-data*     @TaylorAmarelTech
-
-# Tooling
-scripts/                           @TaylorAmarelTech
-scripts/emit/                      @TaylorAmarelTech
-.github/                           @TaylorAmarelTech
-
-# Docs (consider giving a wider group write access here once one exists)
-docs/                              @TaylorAmarelTech
+# Products, their projects (backend/frontend/microservice), and their monorepo code paths:
+/_repos/dev-rules-context/   @aidoneright/devrulescontext
+/_repos/shared-backend-components/   @aidoneright/platform
+/services/platform/   @aidoneright/platform   # services-platform (microservice)
+/services/worker/   @aidoneright/platform   # services-worker (microservice)
+/services/scheduler/   @aidoneright/platform   # services-scheduler (microservice)
+/_repos/openhubforai/   @aidoneright/openhubforai
+/src/openhubforai/   @aidoneright/openhubforai   # openhubforai-backend (backend)
+/web/openhubforai/   @aidoneright/openhubforai   # openhubforai-frontend (frontend)
+/_repos/teleon/   @aidoneright/teleon
+/src/teleon/   @aidoneright/teleon   # teleon-backend (backend)
+/web/teleon/   @aidoneright/teleon   # teleon-frontend (frontend)
+/_repos/baltor/   @aidoneright/baltor
+/src/baltor/   @aidoneright/baltor   # baltor-backend (backend)
+/web/baltor/   @aidoneright/baltor   # baltor-frontend (frontend)
+/_repos/aidevobserver/   @aidoneright/aidevobserver
+/web/aidevobserver/   @aidoneright/aidevobserver   # aidevobserver-frontend (frontend)
+/_repos/aidoneright/   @aidoneright/aidoneright
+/web/context-is-everything/   @aidoneright/aidoneright   # aidoneright-frontend (frontend)
+/_repos/api-endpoint-wrappers/   @aidoneright/apiendpointwrappers
+/_repos/scraping/   @aidoneright/scraping
+/_repos/context-injection/   @aidoneright/contextinjection
+/_repos/business-context/   @aidoneright/businesscontext
+/_repos/edge-graph-generator/   @aidoneright/edgegraphgenerator

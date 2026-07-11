@@ -1,0 +1,123 @@
+{
+  "serves_truth": false,
+  "purpose": "Contract for the Teleon primitive pipeline template runtime: LLM JSON may propose a compact step list, but deterministic code resolves primitive ids from an allowed registry, compiles the template, executes one line per primitive step, and records structured candidate events.",
+  "runtime_module": "_repos/teleon/backend/src/teleon/synthesis/pipeline_templates.py",
+  "python_object_facade_module": "_repos/teleon/backend/src/teleon/synthesis/pipeline_object_api.py",
+  "checker": "scripts/check_teleon_pipeline_template_runtime.py",
+  "core_law": "The authoring surface is one primitive step per line or one JSON object per step. The runtime owns state passing, retries, artifact references, JSON logging, and candidate-only provenance.",
+  "llm_boundary": "The LLM may emit template JSON with step_id, primitive_id, state_mode, paths, bindings, storage policy, retry count, and required flag. It may not emit callable objects or execute raw code. The compiler resolves primitive_id only from an allowed deterministic callable registry.",
+  "python_authoring_law": "Python-authored templates should not repeat magic step labels or primitive-id strings at every call site. Local Python primitives may attach metadata once to a callable, or allow a deterministic primitive id to be derived from the callable surface. Pipeline steps may then be generated from primitive handles with deterministic collision-safe step ids.",
+  "python_authoring_surfaces": [
+    "primitive_metadata decorator",
+    "primitive_handle",
+    "callable_surface",
+    "primitive_id_from_callable",
+    "primitive_record_from_callable",
+    "compact_llm_view_from_primitive_record",
+    "derive_step_id",
+    "primitive_step_from_handle",
+    "pipeline_template_from_primitives",
+    "compile_pipeline_template_from_primitives",
+    "flatten_primitive_object_graph",
+    "handles_from_primitive_object_graph",
+    "pipeline_template_from_object_graph",
+    "compile_pipeline_template_from_object_graph",
+    "object-first Primitive facade",
+    "object-first Pipeline facade",
+    "operator composition with >>",
+    "namespace primitive discovery",
+    "standard compact alias lines"
+  ],
+  "object_graph_authoring_law": "Because Python functions, handles, and grouping containers are all objects, Python-authored templates may be nested lists, tuples, dicts, or matrices of primitive objects. The runtime flattens only explicit containers and opt-in objects into deterministic step order, preserving a structure_path on each step. It does not crawl arbitrary object internals.",
+  "object_first_facade_law": "Clean Python authoring may use @primitive, Primitive, Pipeline, and operator composition. These are facade objects only: they deterministically emit primitive handles, compact alias lines, and compiled step specs for the existing runtime; execution still runs compiled candidate templates, not arbitrary live object graphs.",
+  "introspection_contract": {
+    "source": "Python callable objects",
+    "deterministic_fields": [
+      "__module__",
+      "__qualname__",
+      "__name__",
+      "inspect.signature parameters",
+      "parameter annotations",
+      "return annotation",
+      "docstring first line",
+      "attached primitive metadata"
+    ],
+    "outputs": [
+      "candidate primitive record",
+      "compact LLM view",
+      "derived primitive id",
+      "derived step id"
+    ],
+    "law": "Callable introspection may create candidate metadata and compact views, but proof and promotion still decide whether the primitive can serve truth."
+  },
+  "state_patterns": [
+    {
+      "id": "task_value",
+      "description": "Primitive accepts the current task object and returns the next task object. Best for simple transform chains like add_random_emphasis(task)."
+    },
+    {
+      "id": "task_patch",
+      "description": "Primitive accepts the current task object and returns a dict patch merged into the task. Best for field updates and partial outputs."
+    },
+    {
+      "id": "named_inputs",
+      "description": "Primitive receives explicit keyword inputs resolved from $task, $context, $nodes, or $system paths. Best for typed surfaces and graph edges."
+    },
+    {
+      "id": "artifact_ref",
+      "description": "Large/durable outputs are stored by digest in the artifact table while state passes only a reference. Best for images, videos, pages, logs, tables, and model responses."
+    },
+    {
+      "id": "object_graph",
+      "description": "Python-authored pipelines can be explicit object graphs: lists, tuples, dicts, matrices, primitive handles, callables, or opt-in objects. The compiler flattens them into ordinary primitive step specs."
+    }
+  ],
+  "logging_contract": {
+    "event": "primitive_step",
+    "required_fields": [
+      "event_index",
+      "run_id",
+      "step_id",
+      "primitive_id",
+      "attempt",
+      "status",
+      "input_digest",
+      "output_digest",
+      "error",
+      "serves_truth"
+    ],
+    "law": "Every attempt emits one JSON-safe candidate event. Logs are evidence for replay/proof/promotion, not served truth."
+  },
+  "storage_contract": {
+    "inline": "Small values may remain in task/context/node state.",
+    "artifact_ref": "Large or durable values are stored as content-addressed candidate artifacts and passed by reference."
+  },
+  "compile_checks": [
+    "template serves_truth=false",
+    "every step has a step_id",
+    "step_id is unique",
+    "primitive_id exists in allowed callable registry",
+    "state_mode is one of task_value/task_patch/named_inputs",
+    "state paths use only $task/$context/$nodes/$system",
+    "output_storage is inline or artifact_ref",
+    "max_attempts is bounded and explicit",
+    "callable object graphs flatten to serializable step specs before execution",
+    "callable introspection emits candidate primitive records and compact LLM views only",
+    "compiled output serves_truth=false"
+  ],
+  "no_magic_string_policy": [
+    "canonical primitive ids remain the JSON/wire format for LLM plans and lockfiles",
+    "Python pipeline sites should prefer callable-backed primitive handles for local primitives",
+    "step ids are derived from primitive ids by the deterministic compiler unless an explicit alias is required",
+    "duplicate primitive use receives deterministic suffixes instead of manually invented labels",
+    "nested Python containers may organize primitives, but the runtime records structure_path instead of requiring hand-authored step labels"
+  ],
+  "benefits": [
+    "Generated pipelines become compact JSON step lists instead of bespoke glue code.",
+    "The runtime can express long chains as one primitive call per line while keeping logs, retries, artifacts, and state policy uniform.",
+    "Task-object pipelines and typed binding pipelines can coexist under one deterministic compiler.",
+    "Large outputs avoid memory blowups by switching to artifact references without changing primitive business logic.",
+    "Primitive templates become searchable, graphable, replayable, and mutation-ready.",
+    "Python authors can compose real objects while every string crossing the LLM, lockfile, and ledger boundaries remains generated from standardized records."
+  ]
+}

@@ -1,0 +1,70 @@
+MODULE src/baltor/determinism/trace_store.py
+## API signatures
+```python
+"""src.baltor.determinism.trace_store — the append-only, content-addressed, tenant-scoped TRACE STORE."""
+EPOCH = ...
+_ID_SCHEME = ...
+_ID_ALGO = ...
+_ID_PREFIX = ...
+TENANT_PRIVATE = ...
+GLOBAL_PUBLIC = ...
+_SCOPES = ...
+KIND_WORKFLOW = ...
+KIND_LLM = ...
+KIND_ADJUDICATION = ...
+KIND_CONSENSUS = ...
+_KINDS = ...
+_VERIFIABLE_KINDS = ...
+class TraceStoreError:
+    # Base class for trace-store failures.
+class TenantBoundaryError:
+    # A read crossed a tenant boundary, or a tenant_private trace tried to enter a global mining set.
+def _canon(body: Any) -> bytes
+    # Canonical JSON bytes for content hashing (sorted keys, compact, str-coerced).
+def _hash(body: Any) -> str
+def make_trace_id(content_hash_hex: str, tenant_id: str) -> str
+    # Build the content-addressed trace id: ``dtrace:sha256:<hex>:<tenant>``.
+def parse_trace_id(trace_id: str) -> tuple[str, str]
+    # Parse a trace id → ``(content_hash_hex, tenant_id)``. Raise on any malformation.
+def _as_tuple(x: Iterable[str] | None) -> tuple[str, ...]
+class Trace:
+    # One immutable trace in the store. Append-only: once written it is never mutated.
+    def to_dict(self) -> dict
+class TraceStore:
+    # Append-only, content-addressed, tenant-scoped store of decision traces.
+    def __init__(self) -> None
+    def append(self, *, tenant_id: str, scope: str, trace_kind: str, workflow_id: str, step_id: str, decision_key: str, decision: dict, verified: bool=False, anonymized: bool=False, approved_for_global: bool=False, input_handles: Iterable[str] | None=None, output_handles: Iterable[str] | None=None, receipt_ids: Iterable[str] | None=None, model_id: str='', provider_id: str='', prompt_hash: str='', parent_trace_ids: Iterable[str] | None=None, now: str=EPOCH) -> Trace
+        # Append a trace. Returns the immutable :class:`Trace`. Idempotent: the same identity-bearing body
+    def append_trace(self, trace: Trace) -> Trace
+        # Append a pre-built :class:`Trace` (e.g. one produced by :mod:`consensus`). Re-derives the id from
+    def get(self, trace_id: str, *, tenant: str | None=None) -> Trace
+        # Return the (immutable) trace by id. If ``tenant`` is given it MUST match the trace's tenant — a
+    def has(self, trace_id: str) -> bool
+    def __len__(self) -> int
+    def all(self) -> list[Trace]
+        # Every trace, in deterministic append order.
+    def query(self, *, tenant: str | None=None, trace_kind: str | None=None, decision_key: str | None=None, verified: bool | None=None) -> list[Trace]
+        # Traces filtered by tenant / kind / decision_key / verified, in deterministic append order.
+    def mining_set(self, *, scope: str=GLOBAL_PUBLIC, tenant: str | None=None, require_verified: bool=True) -> list[Trace]
+        # Return the set of traces eligible to mine deterministic rules.
+    def assert_mineable_global(self, trace: Trace) -> None
+        # Raise :class:`TenantBoundaryError` if ``trace`` is NOT allowed into a global mining set.
+```
+## intra-module call edges
+src.baltor.determinism.trace_store._hash -> src.baltor.determinism.trace_store._canon
+src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.Trace
+src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.TraceStoreError
+src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store._as_tuple
+src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store._hash
+src.baltor.determinism.trace_store.append -> src.baltor.determinism.trace_store.make_trace_id
+src.baltor.determinism.trace_store.append_trace -> src.baltor.determinism.trace_store.TraceStore.append
+src.baltor.determinism.trace_store.assert_mineable_global -> src.baltor.determinism.trace_store.TenantBoundaryError
+src.baltor.determinism.trace_store.assert_mineable_global -> src.baltor.determinism.trace_store.TraceStoreError
+src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.TenantBoundaryError
+src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.TraceStoreError
+src.baltor.determinism.trace_store.get -> src.baltor.determinism.trace_store.parse_trace_id
+src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TenantBoundaryError
+src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStore.all
+src.baltor.determinism.trace_store.mining_set -> src.baltor.determinism.trace_store.TraceStoreError
+src.baltor.determinism.trace_store.parse_trace_id -> src.baltor.determinism.trace_store.TraceStoreError
+src.baltor.determinism.trace_store.query -> src.baltor.determinism.trace_store.TraceStore.all

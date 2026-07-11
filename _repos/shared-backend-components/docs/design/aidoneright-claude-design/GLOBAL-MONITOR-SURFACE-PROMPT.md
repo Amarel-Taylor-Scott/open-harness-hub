@@ -1,0 +1,1 @@
+../../../../_shared/design/aidoneright-claude-design/GLOBAL-MONITOR-SURFACE-PROMPT.md

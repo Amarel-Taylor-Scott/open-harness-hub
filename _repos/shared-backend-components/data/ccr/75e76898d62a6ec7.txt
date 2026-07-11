@@ -1,0 +1,32 @@
+MODULE _repos/teleon/backend/src/teleon/egress/ledger.py
+## API signatures
+```python
+"""Append-only local egress ledger."""
+LEDGER_SCHEMA_VERSION = ...
+DEFAULT_LEDGER_DB_PATH = ...
+class EgressLedgerRejected:
+    # Raised when an append would violate the egress ledger contract.
+def _content_hash(record: dict[str, Any]) -> str
+class LocalEgressLedger:
+    # SQLite append-only egress ledger.
+    def __init__(self, db_path: str | None=None) -> None
+    def _init_schema(self) -> None
+    def _next_seq(self) -> int
+    def describe(self) -> dict[str, Any]
+    def _append(self, table: str, key_field: str, record: dict[str, Any], columns: dict[str, Any]) -> dict[str, Any]
+    def append_intent(self, intent: dict[str, Any]) -> dict[str, Any]
+    def append_decision(self, decision: dict[str, Any]) -> dict[str, Any]
+    def append_attempt(self, attempt: dict[str, Any]) -> dict[str, Any]
+    def append_payload_ref(self, payload_ref: dict[str, Any]) -> dict[str, Any]
+    def records(self, table: str, *, tenant_id: str='') -> list[dict[str, Any]]
+```
+## intra-module call edges
+src.teleon.egress.ledger.__init__ -> src.teleon.egress.ledger.LocalEgressLedger._init_schema
+src.teleon.egress.ledger._append -> src.teleon.egress.ledger.EgressLedgerRejected
+src.teleon.egress.ledger._append -> src.teleon.egress.ledger.LocalEgressLedger._next_seq
+src.teleon.egress.ledger._append -> src.teleon.egress.ledger._content_hash
+src.teleon.egress.ledger.append_attempt -> src.teleon.egress.ledger.LocalEgressLedger._append
+src.teleon.egress.ledger.append_decision -> src.teleon.egress.ledger.LocalEgressLedger._append
+src.teleon.egress.ledger.append_intent -> src.teleon.egress.ledger.LocalEgressLedger._append
+src.teleon.egress.ledger.append_payload_ref -> src.teleon.egress.ledger.LocalEgressLedger._append
+src.teleon.egress.ledger.records -> src.teleon.egress.ledger.EgressLedgerRejected

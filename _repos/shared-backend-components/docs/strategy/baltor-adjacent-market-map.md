@@ -1,0 +1,1 @@
+../../../baltor/context/strategy/baltor-adjacent-market-map.md

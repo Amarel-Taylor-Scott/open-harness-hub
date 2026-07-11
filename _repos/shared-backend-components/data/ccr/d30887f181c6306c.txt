@@ -1,0 +1,44 @@
+MODULE src/baltor/determinism/rule_candidate_generator.py
+## API signatures
+```python
+"""src.baltor.determinism.rule_candidate_generator — turn a mined PatternCandidate into a PROPOSED RuleCandidate."""
+EPOCH = ...
+RULE_TYPES = ...
+_TRUTH_SERVING_KINDS = ...
+_ROUTING_KINDS = ...
+LABEL_VALIDATOR = ...
+LABEL_AUTHORITY = ...
+LABEL_ADJUDICATION = ...
+LABEL_CONSENSUS_ONLY = ...
+_VERIFIED_LABEL_SOURCES = ...
+class RuleCandidateError:
+    # Base class for candidate-generation failures.
+class ConsensusOnlyError:
+    # The pattern's label came from multi-LLM consensus ALONE — consensus is evidence, never truth.
+class NoVerifiedTraceError:
+    # The pattern carries no VERIFIED distilled-from traces — there is nothing lossless to link back to.
+def _canon(body: Any) -> bytes
+def _rule_id(body: dict) -> str
+def is_truth_serving(decision_kind: str) -> bool
+    # A rule that selects/serves a FACT is truth-serving (strict promotion bar). Routing rules are not.
+class FallbackPolicy:
+    # The mandatory fallback every active rule must carry: rule-first, then a recorded non-fabricating path.
+    def to_dict(self) -> dict
+class RuleCandidate:
+    # A PROPOSED deterministic rule distilled from a VERIFIED pattern — not active, not authoritative.
+    def to_dict(self) -> dict
+def _attr(obj: Any, name: str, default=None)
+    # Duck-typed read: works on a Lane B dataclass (attribute) OR a plain dict (key) — so lanes decouple.
+def from_pattern(pattern: Any, *, decision_kind: str, asserts_equivalence_to: str, output_decision: str, decision_logic: dict, fallback: FallbackPolicy | None=None, expected_failure_modes: tuple[str, ...]=(), now: str=EPOCH) -> RuleCandidate
+    # Generate a PROPOSED RuleCandidate from a VERIFIED PatternCandidate.
+```
+## intra-module call edges
+src.baltor.determinism.rule_candidate_generator._rule_id -> src.baltor.determinism.rule_candidate_generator._canon
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.ConsensusOnlyError
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.FallbackPolicy
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.NoVerifiedTraceError
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.RuleCandidate
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.RuleCandidateError
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator._attr
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator._rule_id
+src.baltor.determinism.rule_candidate_generator.from_pattern -> src.baltor.determinism.rule_candidate_generator.is_truth_serving

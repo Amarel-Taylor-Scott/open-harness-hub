@@ -1,0 +1,19 @@
+MODULE src/teleon/objectives/tenant_binding.py
+## API signatures
+```python
+"""src.teleon.objectives.tenant_binding — per-tenant objective binding."""
+_REGISTRY_PATH = ...
+DEFAULT_OBJECTIVE_PRESET = ...
+def _load_registry(registry: dict | None=None) -> dict
+def _objective_from_binding(tenant_id: str, binding: dict) -> CapabilityObjective
+    # Build a CapabilityObjective from one binding entry: explicit weights win; else a named preset.
+def objective_for_tenant(tenant_id: str, *, registry: dict | None=None) -> CapabilityObjective
+    # Resolve the CapabilityObjective governing ``tenant_id``. An explicit binding wins; otherwise the registry's
+def bound_tenants(*, registry: dict | None=None) -> dict
+    # All explicitly-bound tenant_ids -> their resolved objective name (for listing/telemetry/demo).
+```
+## intra-module call edges
+src.teleon.objectives.tenant_binding.bound_tenants -> src.teleon.objectives.tenant_binding._load_registry
+src.teleon.objectives.tenant_binding.bound_tenants -> src.teleon.objectives.tenant_binding.objective_for_tenant
+src.teleon.objectives.tenant_binding.objective_for_tenant -> src.teleon.objectives.tenant_binding._load_registry
+src.teleon.objectives.tenant_binding.objective_for_tenant -> src.teleon.objectives.tenant_binding._objective_from_binding

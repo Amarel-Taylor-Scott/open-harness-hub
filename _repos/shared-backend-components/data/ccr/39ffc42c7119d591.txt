@@ -1,0 +1,37 @@
+MODULE src/baltor/graph/temporal/store.py
+## API signatures
+```python
+"""src.baltor.graph.temporal.store — the LOCAL deterministic temporal fact graph store."""
+class TenantScopeError:
+    # A read attempted to cross a tenant boundary.
+class TemporalGraphStore:
+    def __init__(self) -> None
+    def upsert_node(self, node: TemporalFactNode) -> TemporalFactNode
+    def add_observation(self, *, canonical_fact_key: str, tenant_id: str, scope: str, subject: str, predicate: str, obj: str, value_normalized: str, source_authority: str, source_handles: list, unit: str='', source_artifact_ids: list | None=None, valid_from: str='', valid_to: str='', now: str=EPOCH, claim_status: str='candidate', source_version: str='v1') -> TemporalFactNode
+    def set_state(self, temporal_fact_id_: str, state: str, *, now: str=EPOCH, reconciliation_receipt_ids: list | None=None) -> None
+    def add_edge(self, *, tenant_id: str, from_id: str, to_id: str, edge_type: str, edge_source: str='deterministic', observed_at: str=EPOCH, policy_id: str='', policy_version: str='', receipt_id: str='', confidence: float=1.0, source_artifact_ids: list | None=None, source_handles: list | None=None, evidence_json: dict | None=None, created_at: str=EPOCH) -> dict
+    def get_node(self, tid: str, *, tenant_id: str | None=None) -> dict | None
+    def _visible(self, tenant_id: str) -> list[TemporalFactNode]
+    def nodes(self, tenant_id: str) -> list[dict]
+    def edges(self, tenant_id: str, *, edge_type: str | None=None) -> list[dict]
+    def timeline(self, canonical_fact_key: str, tenant_id: str) -> list[dict]
+    def by_fact_key(self, canonical_fact_key: str, tenant_id: str) -> list[TemporalFactNode]
+    def by_source_handle(self, handle: str, tenant_id: str) -> list[dict]
+    def contradictions(self, tenant_id: str) -> list[dict]
+    def held_out(self, tenant_id: str) -> list[dict]
+    def current_nodes(self, tenant_id: str) -> list[dict]
+    def snapshot(self, tenant_id: str) -> dict
+```
+## intra-module call edges
+src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.add_edge
+src.baltor.graph.temporal.store.add_observation -> src.baltor.graph.temporal.store.TemporalGraphStore.upsert_node
+src.baltor.graph.temporal.store.by_fact_key -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
+src.baltor.graph.temporal.store.by_source_handle -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
+src.baltor.graph.temporal.store.contradictions -> src.baltor.graph.temporal.store.TemporalGraphStore.edges
+src.baltor.graph.temporal.store.current_nodes -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
+src.baltor.graph.temporal.store.edges -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
+src.baltor.graph.temporal.store.get_node -> src.baltor.graph.temporal.store.TenantScopeError
+src.baltor.graph.temporal.store.held_out -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
+src.baltor.graph.temporal.store.nodes -> src.baltor.graph.temporal.store.TemporalGraphStore._visible
+src.baltor.graph.temporal.store.snapshot -> src.baltor.graph.temporal.store.TemporalGraphStore.edges
+src.baltor.graph.temporal.store.snapshot -> src.baltor.graph.temporal.store.TemporalGraphStore.nodes

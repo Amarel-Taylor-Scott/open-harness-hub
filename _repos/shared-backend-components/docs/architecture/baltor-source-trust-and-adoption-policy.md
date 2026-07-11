@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-source-trust-and-adoption-policy.md

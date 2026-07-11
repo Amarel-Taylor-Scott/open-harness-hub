@@ -1,0 +1,27 @@
+MODULE src/teleon/evolution/registry_descent.py
+## API signatures
+```python
+"""src.teleon.evolution.registry_descent — run the unbounded->bounded DESCENT across ALL capability-bearing registries
+and record every attempt into the descent brain (more registries -> more training data)."""
+_REPO = ...
+_IMPL = ...
+_TUNABLE = ...
+_COST_TIER = ...
+_DET_FLOOR = ...
+def _axes(cost: float, det: float) -> dict
+    # Canonical descent axes (single-sourced from descent_axes): llm_usage 0/1 by determinism; freshness ~ determinism.
+def _strategy_outcome(before: dict, after: dict) -> tuple
+def _impl_registry_attempts() -> list[DescentAttempt]
+def _tunable_task_attempts() -> list[DescentAttempt]
+def convert_all_registries(store: DescentAttemptStore) -> dict
+    # Run the descent across every capability-bearing registry, recording each attempt into the brain.
+def demonstrate(store_path: str | Path) -> dict
+```
+## intra-module call edges
+src.teleon.evolution.registry_descent._impl_registry_attempts -> src.teleon.evolution.registry_descent._axes
+src.teleon.evolution.registry_descent._impl_registry_attempts -> src.teleon.evolution.registry_descent._strategy_outcome
+src.teleon.evolution.registry_descent._tunable_task_attempts -> src.teleon.evolution.registry_descent._axes
+src.teleon.evolution.registry_descent._tunable_task_attempts -> src.teleon.evolution.registry_descent._strategy_outcome
+src.teleon.evolution.registry_descent.convert_all_registries -> src.teleon.evolution.registry_descent._impl_registry_attempts
+src.teleon.evolution.registry_descent.convert_all_registries -> src.teleon.evolution.registry_descent._tunable_task_attempts
+src.teleon.evolution.registry_descent.demonstrate -> src.teleon.evolution.registry_descent.convert_all_registries

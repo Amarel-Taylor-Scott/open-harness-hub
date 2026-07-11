@@ -1,0 +1,35 @@
+MODULE src/baltor/context_audit/context_auditor.py
+## API signatures
+```python
+"""src.baltor.context_audit.context_auditor — deterministic Context Auditor (MVP)."""
+_SEVERITY_RANK = ...
+UNTRUSTED_KINDS = ...
+_INJECTION_PATTERNS = ...
+DUP_THRESHOLD = ...
+DEFAULT_TTL_DAYS = ...
+BLOAT_MIN = ...
+_SHINGLE_N = ...
+_CHARS_PER_TOKEN = ...
+def _tokens(src: dict[str, Any]) -> int
+def _authority(src: dict[str, Any]) -> int
+def _shingles(text: str, n: int=_SHINGLE_N) -> frozenset[str]
+def _jaccard(a: frozenset[str], b: frozenset[str]) -> float
+def _keep_drop(a: dict[str, Any], b: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]
+    # Of two duplicates, keep the higher-authority then newer (smaller age_days) then lower-id; drop the other.
+def audit(sources: list[dict[str, Any]], *, task_keywords: tuple[str, ...]=(), dup_threshold: float=DUP_THRESHOLD, default_ttl_days: int=DEFAULT_TTL_DAYS) -> dict[str, Any]
+    # Audit `sources` and return a ContextAuditReport. Never mutates `sources` (lossless).
+def _fixture() -> list[dict[str, Any]]
+    # Reproduces the owner's worked example: a duplicate RAG pair, a JWT-alg memory conflict, a bloated MCP
+def _self_test() -> int
+```
+## intra-module call edges
+src.baltor.context_audit.context_auditor._keep_drop -> src.baltor.context_audit.context_auditor._authority
+src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor._authority
+src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor._fixture
+src.baltor.context_audit.context_auditor._self_test -> src.baltor.context_audit.context_auditor.audit
+src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._authority
+src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._jaccard
+src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._keep_drop
+src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._shingles
+src.baltor.context_audit.context_auditor.audit -> src.baltor.context_audit.context_auditor._tokens
+src.baltor.context_audit.context_auditor.key -> src.baltor.context_audit.context_auditor._authority

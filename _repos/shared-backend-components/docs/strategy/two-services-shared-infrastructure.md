@@ -1,0 +1,1 @@
+../../../_shared/strategy/two-services-shared-infrastructure.md

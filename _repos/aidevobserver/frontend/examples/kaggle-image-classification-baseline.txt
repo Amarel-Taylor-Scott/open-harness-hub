@@ -1,0 +1,11 @@
+user: Build a baseline for an image-classification competition. I need training, validation accuracy, confusion matrix, and a prediction file.
+assistant: I will create a new notebook, crawl the image folders manually, write a custom image loader, and hand-roll augmentation settings.
+assistant: I am reading every sample filename and pasting a long directory listing into the model so I can infer labels.
+assistant: I am writing custom resize_images(), make_train_valid_folders(), augment_batch(), train_cnn(), accuracy_report(), and write_predictions() helpers.
+assistant: AIDevObserver note: this looks like a solved image-competition route. The primitive database already has image.read_dataset_manifest, image.validate_label_map, image.resize_normalize, vision.augment_train_only, dataset.train_valid_split_seeded, model.train_transfer_classifier, metric.compute_accuracy_confusion_matrix, and submission.write_image_predictions.
+assistant: I normalized the session as ImageCompetitionBaselineRequest to PredictionArtifact and found template image_classification_competition_baseline.
+assistant: CandidateBundle: ingest manifest, validate labels, split, preprocess, augment train split only, train transfer model, evaluate, emit predictions.
+assistant: PlanDelta {"v":1,"p":"dense","t":0,"b":[0,0,0,0,0,0,0,0],"r":[[3,"map"],[4,"map"]],"g":[]}
+assistant: Compiler rejects augmentation on validation data, requires seeded split, requires ArtifactRefs for images/model/report, and blocks prediction output until label-map and metric gates pass.
+assistant: Runtime executes the locked route with no free-form planner calls and records dataset, model, confusion matrix, and prediction artifact digests in JSONL.
+assistant: Promotion remains candidate-only: this is synthetic_from_public_project shape evidence, not a copied notebook or served truth.

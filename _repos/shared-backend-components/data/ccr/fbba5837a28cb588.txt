@@ -1,0 +1,23 @@
+MODULE src/teleon/retrieval/search_port.py
+## API signatures
+```python
+"""src.teleon.retrieval.search_port — the SEARCH abstraction: any grounded-search provider behind ONE port (agnostic)."""
+class py_class_src_teleon_retrieval_search_port__SearchPort:
+    def search(self, py_arg_src_teleon_retrieval_search_port__py_class_src_teleon_retrieval_search_port__SearchPort_search__query: str, *, limit: int=3) -> list[dict]
+class py_class_src_teleon_retrieval_search_port__GroundedSearch:
+    # Keyless grounded search (Wikipedia / Federal Register), provider SELECTED from the registry. Network-gated:
+    def __init__(self, provider: str | None=None)
+    def search(self, py_arg_src_teleon_retrieval_search_port__py_class_src_teleon_retrieval_search_port__GroundedSearch_search__query: str, *, limit: int=3) -> list[dict]
+class py_class_src_teleon_retrieval_search_port__NotWiredSearch:
+    # A keyed provider whose key isn't present — honest, never fabricates results.
+    def __init__(self, name: str)
+    def search(self, py_arg_src_teleon_retrieval_search_port__py_class_src_teleon_retrieval_search_port__NotWiredSearch_search__query: str, *, limit: int=3) -> list[dict]
+def py_function_src_teleon_retrieval_search_port__register_search_adapter(py_arg_src_teleon_retrieval_search_port__py_function_src_teleon_retrieval_search_port__register_search_adapter__name: str, py_arg_src_teleon_retrieval_search_port__py_function_src_teleon_retrieval_search_port__register_search_adapter__factory) -> None
+    # Future-proofing hook: wire a real search provider by name; callers of select_search never change.
+def py_function_src_teleon_retrieval_search_port__available_search() -> dict
+def py_function_src_teleon_retrieval_search_port__select_search(py_arg_src_teleon_retrieval_search_port__py_function_src_teleon_retrieval_search_port__select_search__provider: str='auto') -> py_class_src_teleon_retrieval_search_port__SearchPort
+    # Resolve a search provider. 'auto' -> the registry-selected keyless grounded baseline; a keyed provider not yet
+```
+## intra-module call edges
+src.teleon.retrieval.search_port.py_function_src_teleon_retrieval_search_port__select_search -> src.teleon.retrieval.search_port.py_class_src_teleon_retrieval_search_port__GroundedSearch
+src.teleon.retrieval.search_port.py_function_src_teleon_retrieval_search_port__select_search -> src.teleon.retrieval.search_port.py_class_src_teleon_retrieval_search_port__NotWiredSearch

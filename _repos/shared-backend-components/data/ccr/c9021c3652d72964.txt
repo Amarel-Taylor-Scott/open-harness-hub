@@ -1,0 +1,33 @@
+MODULE src/baltor/determinism/replay_engine.py
+## API signatures
+```python
+"""src.baltor.determinism.replay_engine — replay a RuleCandidate against historical VERIFIED traces."""
+EPOCH = ...
+VERDICT_MATCH = ...
+VERDICT_ABSTAIN = ...
+GLOBAL_PUBLIC = ...
+TENANT_PRIVATE = ...
+def _canon(body: Any) -> bytes
+def _attr(obj: Any, name: str, default=None)
+class TraceVerdict:
+    # One trace's outcome under the candidate: the rule verdict, the verified label, and the safety class.
+    def to_dict(self) -> dict
+class RuleReplayReport:
+    # Scored outcome of replaying a candidate against a historical VERIFIED trace corpus.
+    def to_dict(self) -> dict
+def evaluate_rule(rule: RuleCandidate, trace: Any) -> tuple[bool, Any]
+    # Evaluate a candidate's declarative ``decision_logic`` against ONE trace → (fired, rule_decision).
+def _resolve_then(then: Any, field, cond: dict) -> Any
+    # Resolve a ``then`` clause into a concrete decision. Selectors read the winning side from the trace.
+def replay(rule: RuleCandidate, traces: list, *, now: str=EPOCH) -> RuleReplayReport
+    # Replay a candidate against a historical VERIFIED trace corpus → a scored RuleReplayReport.
+```
+## intra-module call edges
+src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.determinism.replay_engine._attr
+src.baltor.determinism.replay_engine.evaluate_rule -> src.baltor.determinism.replay_engine._resolve_then
+src.baltor.determinism.replay_engine.field -> src.baltor.determinism.replay_engine._attr
+src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.RuleReplayReport
+src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.TraceVerdict
+src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine._attr
+src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine._canon
+src.baltor.determinism.replay_engine.replay -> src.baltor.determinism.replay_engine.evaluate_rule

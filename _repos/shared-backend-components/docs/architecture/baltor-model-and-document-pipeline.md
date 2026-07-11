@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-model-and-document-pipeline.md

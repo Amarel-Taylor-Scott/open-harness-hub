@@ -1,0 +1,25 @@
+MODULE src/teleon/evolution/freshness_runtime.py
+## API signatures
+```python
+"""src.teleon.evolution.freshness_runtime — the freshness / anti-fragility axis, END-TO-END on a regulated-fact
+capability."""
+STATUS_FRESH = ...
+STATUS_HELD_OUT_STALE = ...
+STATUS_UNSYNCED = ...
+class FreshnessSyncedCapability:
+    # A capability whose answer must stay current. ``sync`` ingests the current authoritative value; a CDC
+    def __init__(self, capability_slot: str, *, authoritative_source: str, volatility_class: str) -> None
+    def _provenance(self) -> dict
+    def sync(self, value, *, now: str, source_version: str) -> dict
+        # Ingest the CURRENT authoritative value (initial sync or re-sync after a change). Clears any held-out
+    def on_source_change(self, event: dict, *, now: str) -> dict
+        # A freshness CDC event ({kind:'changed'|'new', source:<id>, ...}) for this capability's source -> hold the
+    def serve(self, *, now: str) -> dict
+        # Return the value ONLY when fresh; a stale/unsynced capability serves NOTHING (held out) — never a stale
+def demonstrate_freshness_e2e(*, capability_slot: str='reg-e-error-resolution-deadline', authoritative_source: str='ecfr://12/1005.11', volatility_class: str='low') -> dict
+    # Walk the freshness axis end-to-end on a regulated fact: sync the current value -> serve it (fresh) -> the
+```
+## intra-module call edges
+src.teleon.evolution.freshness_runtime.demonstrate_freshness_e2e -> src.teleon.evolution.freshness_runtime.FreshnessSyncedCapability
+src.teleon.evolution.freshness_runtime.serve -> src.teleon.evolution.freshness_runtime.FreshnessSyncedCapability._provenance
+src.teleon.evolution.freshness_runtime.sync -> src.teleon.evolution.freshness_runtime.FreshnessSyncedCapability.serve

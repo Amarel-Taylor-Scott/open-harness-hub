@@ -1,0 +1,23 @@
+MODULE src/teleon/synthesis/microsteps.py
+## API signatures
+```python
+"""src.teleon.synthesis.microsteps — decompose a ladder rung into smaller MICRO-STEPS (finer components, more substitution)."""
+def py_function_src_teleon_synthesis_microsteps___decomps() -> dict
+def py_function_src_teleon_synthesis_microsteps___plane_tools() -> dict
+def py_function_src_teleon_synthesis_microsteps__microsteps_for(py_arg_src_teleon_synthesis_microsteps__microsteps_for__capability: str, py_arg_src_teleon_synthesis_microsteps__microsteps_for__tier: str) -> list[dict]
+    # The atomic sub-steps a rung decomposes into ([] if not decomposed yet — use generate_microstep_prompt).
+def py_function_src_teleon_synthesis_microsteps__expand_to_micro_dag(py_arg_src_teleon_synthesis_microsteps__expand_to_micro_dag__intent: str) -> dict
+    # A FINER DAG: each rung that has micro-steps becomes its sub-step chain; un-decomposed rungs stay one node.
+def py_function_src_teleon_synthesis_microsteps__micro_decision_points(py_arg_src_teleon_synthesis_microsteps__micro_decision_points__intent: str) -> list
+    # Decision points at MICRO granularity for the synthesis tree: each micro-step -> the tools on its plane (the finer
+def py_function_src_teleon_synthesis_microsteps__generate_microstep_prompt(py_arg_src_teleon_synthesis_microsteps__generate_microstep_prompt__capability: str, py_arg_src_teleon_synthesis_microsteps__generate_microstep_prompt__tier: str, py_arg_src_teleon_synthesis_microsteps__generate_microstep_prompt__method: str='') -> str
+    # The GENERATOR (more components): ask the LLM to decompose a rung into atomic micro-steps typed by the 7 primitives.
+def py_function_src_teleon_synthesis_microsteps__coverage() -> dict
+    # Which ladder rungs are decomposed into micro-steps (the rest are candidates for the generator).
+```
+## intra-module call edges
+src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__coverage -> src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps___decomps
+src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__expand_to_micro_dag -> src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__microsteps_for
+src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__micro_decision_points -> src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps___plane_tools
+src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__micro_decision_points -> src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__expand_to_micro_dag
+src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps__microsteps_for -> src.teleon.synthesis.microsteps.py_function_src_teleon_synthesis_microsteps___decomps

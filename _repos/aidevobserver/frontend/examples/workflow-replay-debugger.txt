@@ -1,0 +1,7 @@
+user: Build a debugger that can replay a failed AI workflow run and tell me which step failed and why.
+assistant: I normalized this as LedgerArtifact plus PlanLockRef to WorkflowDebugReport and found template workflow_replay_debugger.
+assistant: CandidateBundle: load_ledger, load_planlock, reconstruct_state, compare_replay_to_planlock, classify_failure, emit_report.
+assistant: I should not ask an LLM to read arbitrary logs or guess why a run failed. The registry has deterministic ledger replay and PlanLock diff primitives.
+assistant: PlanDelta {"v":1,"p":"dense","t":0,"b":[0,0,0,0,0,0],"r":[],"g":[]}
+assistant: Compiler rejects ask_llm_to_explain_logs because unbounded log explanation is not deterministic and verifies JSONL parsing, hash matching, and artifact-backed debug reports.
+assistant: Runtime emits a replayable WorkflowDebugReport and creates negative-memory edges from typed failures.

@@ -1,0 +1,1 @@
+../../../../openhubforai/context/design/aidoneright-claude-design/OpenHubForAI-BRIEF.md

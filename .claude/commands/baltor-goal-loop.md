@@ -75,8 +75,8 @@ create a labeled stub/SEAM + a TODO with the exact next command, and continue �
     hold the whole plan in one context.
 
 ## Orient (read first each pass) + what's ALREADY built (don't reinvent)
-Read: `prompts/baltor-context-engine-build.md`, `docs/backend/architecture-overview.md`,
-`docs/backend/document-decomposition.md`, `data/backend-tools.yaml`,
+Read: `_repos/baltor/context/baltor-context-engine-build.md`, `_repos/baltor/context/backend/architecture-overview.md`,
+`_repos/baltor/context/backend/document-decomposition.md`, `data/backend-tools.yaml`,
 `research/backend-tool-verification.md`, `research/free-demo-apis.md`, `CLAUDE.md`, `AGENTS.md`.
 Proven anchors to EXTEND: `scripts/pipeline/verified_context_flow.py` (ingest→assure→serve),
 `scripts/ingest/sanctions_feed_live.py` (live OFAC fetch → flow → caught a real would-be violation),
@@ -93,9 +93,9 @@ Proven anchors to EXTEND: `scripts/pipeline/verified_context_flow.py` (ingest→
 
 ## Work passes (cover these; pick highest-leverage first, branch freely)
 0. **Inventory** — stack, dirs, build/test cmds, what exists vs missing → `.agent/repo-inventory.md`.
-1. **Naming + visuals** — retire product "Oracle" in `web/baltor/` + `docs/product-language.md`;
-   wire stage copy to one `web/baltor/stages.json`; keep the hero simple.
-2. **Raw document processing** — expand `docs/backend/document-decomposition.md` into
+1. **Naming + visuals** — retire product "Oracle" in `_repos/baltor/frontend/` + `docs/product-language.md`;
+   wire stage copy to one `_repos/baltor/frontend/stages.json`; keep the hero simple.
+2. **Raw document processing** — expand `_repos/baltor/context/backend/document-decomposition.md` into
    `docs/backend/raw-document-processing.md`; add recursive `schemas/context/{context-object,
    document-page,table-object,figure-object,ocr-span,parser-run,parsed-artifact}.schema.json` +
    fixtures wired to `scripts/validate.py`; a Parser Manager routing Docling/LiteParse/Unstructured

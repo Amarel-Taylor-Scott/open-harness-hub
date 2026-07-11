@@ -1,0 +1,48 @@
+{
+  "version": "1.0",
+  "updated": "2026-07-07",
+  "principle": "Per-surface capability/feature/function spec for the 5 brand pillars (owner 2026-06-25: ContextIsEverything Group → AI Done Right; the canonical set is AI Done Right · Teleon.dev · AIDevObserver · Baltor · OpenHubForAI). Complements architecture/surface_map.json (per-surface WEDGE) + demo_surface_registry.json (demos) — does NOT duplicate them. Each pillar names its BUILT-OUT canonical surface (the rich web/* app, never the basic dist/portfolio-public landing) + its features, so the launchers serve the right thing and check_surface_and_dev_contract.py can verify it exists. serves_truth=false.",
+  "serves_truth": false,
+  "pillars": [
+    {
+      "id": "ai-done-right", "accent": "#5a6b87", "brand": "AI Done Right", "was": "ContextIsEverything Group", "role": "parent / holding brand",
+      "canonical_surface": "_repos/aidoneright/frontend", "surface_map_id": "ai-done-right",
+      "must_exist": ["_repos/aidoneright/frontend/index.html", "_repos/aidoneright/frontend/cie-main.jsx", "_repos/aidoneright/frontend/Demo Control Tower.html"],
+      "capabilities": ["brand home", "portfolio index → the pillars", "/demo walk-through", "GTM launch guide"],
+      "status": "built"
+    },
+    {
+      "id": "teleon", "accent": "#6d5ef0", "brand": "Teleon.dev", "role": "the purpose-driven, eval-gated, self-adaptive compute runtime",
+      "canonical_surface": "_repos/teleon/frontend", "surface_map_id": "teleon",
+      "must_exist": ["_repos/teleon/frontend/index.html", "_repos/teleon/frontend/teleon-main.jsx", "_repos/teleon/frontend/teleon-live.js", "_repos/teleon/frontend/Teleon PurposeTask Control Tower.html"],
+      "capabilities": ["home", "PurposeTask / CapabilityTask Control Tower", "live runtime view", "program a capability", "evidence ledger / promotion gates"],
+      "status": "built"
+    },
+    {
+      "id": "aidevobserver", "accent": "#b25fd6", "brand": "AIDevObserver", "was": "Teleon Observer (renamed 2026-06-25)", "domain": "aidevobserver.io", "role": "watches AI USAGE — reviews the SESSION (post) + helps intra-session (while); registry-consumer wedge",
+      "canonical_surface": "_repos/aidevobserver/frontend", "surface_map_id": null,
+      "must_exist": ["_repos/aidevobserver/frontend/index.html", "_repos/aidevobserver/frontend/aidevobserver-main.jsx", "_repos/aidevobserver/frontend/aidevobserver.css", "_repos/teleon/backend/src/teleon/observer/review.py", "_repos/teleon/backend/src/teleon/observer/router.py", "_repos/teleon/backend/src/teleon/observer/session_store.py"],
+      "capabilities": ["upload a session → post-session review report", "intra-session pop-ups / coaching", "session router over typed interventions", "registry-grounded reuse / primitive search", "candidate primitive refresh"],
+      "status": "built web surface + Teleon-adjacent engine/tooling; consumes the shared registry substrate"
+    },
+    {
+      "id": "baltor", "accent": "#0e7c86", "brand": "Baltor.ai", "role": "managed, verified, provable context, powered by Teleon — governs TRUTH",
+      "canonical_surface": "_repos/baltor/frontend", "surface_map_id": "baltor",
+      "must_exist": ["_repos/baltor/frontend/index.html", "_repos/baltor/frontend/ce-main.jsx", "_repos/baltor/frontend/dashboard.html", "_repos/baltor/frontend/Baltor Receipts Explorer.html"],
+      "capabilities": ["home", "ce-app (engine · pipeline · store · shell)", "19 guided demos (CFPB · FDA · OSHA · Sanctions · Tariff · EUDR · …)", "dashboards (ops + dev)", "Receipts Explorer", "review queue", "context governance report", "guided demos index"],
+      "status": "built"
+    },
+    {
+      "id": "open-star-hubs", "accent": "#3b6fd4", "brand": "OpenHubForAI", "role": "the open registry / faceted catalog Teleon, Baltor, and AIDevObserver consume (primitives · templates · context · tools · skills · harnesses · specs) + the open CapabilityTask spec (CTS)",
+      "canonical_surface": "_repos/openhubforai/frontend", "surface_map_id": "openhubforai",
+      "must_exist": ["_repos/openhubforai/frontend/index.html", "_repos/openhubforai/frontend/proto-main.jsx", "_repos/openhubforai/frontend/admin-demo.html", "_repos/openhubforai/frontend/pages/auth.js"],
+      "capabilities": ["home", "login / auth (pages/auth.js)", "store / catalog", "BYO compute", "admin / ops", "publish", "the per-category OpenHubForAI registries"],
+      "status": "built (one OpenHubForAI link on the portfolio index, per owner 2026-06-25)"
+    }
+  ],
+  "serving_rule": "Launchers (launch_service_plane_tunnels / launch_portfolio_trycloudflare) MUST serve each pillar's canonical_surface (the built-out web/* app), NOT the basic dist/portfolio-public landing. See docs/codex/surface-and-development-contract.md.",
+  "also": {
+    "design_portfolio": "dist/sites/aidoneright-design (3.2MB, gitignored — flag: track it; source-of-record is FULLDESIGNDETAILS)",
+    "teleon_demos": "surface_map_id teleon-demos — the proof surface (descent demos with measured savings)"
+  }
+}

@@ -1,0 +1,60 @@
+MODULE src/teleon/synthesis/codeblock_loop.py
+## API signatures
+```python
+"""src.teleon.synthesis.codeblock_loop — the CODEBLOCK fill loop: fill a reusable code template's variables, VALIDATE
+the filled block (syntax + the declared input/output contract), and on failure RETRY with feedback (bounded)."""
+class py_class_src_teleon_synthesis_codeblock_loop__Codeblock:
+    def declared_variables(self) -> list
+def py_function_src_teleon_synthesis_codeblock_loop__codeblock_from_dict(py_arg_src_teleon_synthesis_codeblock_loop__codeblock_from_dict__d: dict) -> py_class_src_teleon_synthesis_codeblock_loop__Codeblock
+    # Build a Codeblock from a plain dict (so a composer can hand JSON). Tolerant of id/body aliases.
+def py_function_src_teleon_synthesis_codeblock_loop__template_variables(py_arg_src_teleon_synthesis_codeblock_loop__template_variables__template: str) -> list
+    # The ordered, de-duplicated `{{slot}}` names in a template body.
+def py_function_src_teleon_synthesis_codeblock_loop__render(py_arg_src_teleon_synthesis_codeblock_loop__render__template: str, py_arg_src_teleon_synthesis_codeblock_loop__render__fills: dict) -> str
+    # Substitute each `{{slot}}` with str(fills[slot]); an absent/None fill leaves the slot intact so validation
+def py_function_src_teleon_synthesis_codeblock_loop___names(py_arg_src_teleon_synthesis_codeblock_loop__names__tree: ast.AST) -> tuple
+    # (defined, referenced) identifier names in an AST: defined = def/class names + assignment (Store) targets;
+def py_function_src_teleon_synthesis_codeblock_loop__validate(py_arg_src_teleon_synthesis_codeblock_loop__validate__text: str, py_arg_src_teleon_synthesis_codeblock_loop__validate__block: py_class_src_teleon_synthesis_codeblock_loop__Codeblock) -> dict
+    # Verdict for a filled block: unfilled slots, python-syntax, and the declared input/output contract.
+def py_function_src_teleon_synthesis_codeblock_loop___deterministic_fill(py_arg_src_teleon_synthesis_codeblock_loop__deterministic_fill__block: py_class_src_teleon_synthesis_codeblock_loop__Codeblock, py_arg_src_teleon_synthesis_codeblock_loop__deterministic_fill__values: dict, py_arg_src_teleon_synthesis_codeblock_loop__deterministic_fill__feedback: dict) -> dict
+    # Fill from the caller's provided values. Repair: for any variable the validator flagged UNFILLED, supply the
+def py_function_src_teleon_synthesis_codeblock_loop___fill_prompt(py_arg_src_teleon_synthesis_codeblock_loop__fill_prompt__task: str, py_arg_src_teleon_synthesis_codeblock_loop__fill_prompt__block: py_class_src_teleon_synthesis_codeblock_loop__Codeblock, py_arg_src_teleon_synthesis_codeblock_loop__fill_prompt__need: list, py_arg_src_teleon_synthesis_codeblock_loop__fill_prompt__feedback: dict) -> str
+def py_function_src_teleon_synthesis_codeblock_loop___parse_fills(py_arg_src_teleon_synthesis_codeblock_loop__parse_fills__text: str, py_arg_src_teleon_synthesis_codeblock_loop__parse_fills__variables: list) -> dict
+    # Parse `name = value` / `name: value` lines (tolerating code-fence backticks) into a fills dict for known vars.
+def py_function_src_teleon_synthesis_codeblock_loop___llm_fill(py_arg_src_teleon_synthesis_codeblock_loop__llm_fill__call, py_arg_src_teleon_synthesis_codeblock_loop__llm_fill__task: str, py_arg_src_teleon_synthesis_codeblock_loop__llm_fill__block: py_class_src_teleon_synthesis_codeblock_loop__Codeblock, py_arg_src_teleon_synthesis_codeblock_loop__llm_fill__values: dict, py_arg_src_teleon_synthesis_codeblock_loop__llm_fill__feedback: dict) -> dict
+    # The LLM proposes fills for the gap variables; provided values stay authoritative; declared defaults backstop
+def py_function_src_teleon_synthesis_codeblock_loop___resolve_llm(py_arg_src_teleon_synthesis_codeblock_loop__resolve_llm__llm)
+    # Resolve the fill LLM to a (prompt)->str callable, or None (honest-unavailable -> deterministic fill).
+class py_class_src_teleon_synthesis_codeblock_loop__FillAttempt:
+    def to_dict(self) -> dict
+def py_function_src_teleon_synthesis_codeblock_loop___feedback(py_arg_src_teleon_synthesis_codeblock_loop__feedback__verdict: dict) -> str
+def py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock(py_arg_src_teleon_synthesis_codeblock_loop__fill_codeblock__task: str, py_arg_src_teleon_synthesis_codeblock_loop__fill_codeblock__block: py_class_src_teleon_synthesis_codeblock_loop__Codeblock, values: dict | None=None, *, llm='auto', max_attempts: int=py_const_src_teleon_synthesis_codeblock_loop__DEFAULT_MAX_ATTEMPTS) -> dict
+    # Fill -> validate -> (on failure) feedback -> retry, BOUNDED by max_attempts (1 initial + retries). Returns the
+def py_function_src_teleon_synthesis_codeblock_loop___result(py_arg_src_teleon_synthesis_codeblock_loop__result__task: str, py_arg_src_teleon_synthesis_codeblock_loop__result__block: py_class_src_teleon_synthesis_codeblock_loop__Codeblock, py_arg_src_teleon_synthesis_codeblock_loop__result__history: list, py_arg_src_teleon_synthesis_codeblock_loop__result__ok: bool, py_arg_src_teleon_synthesis_codeblock_loop__result__llm_used: bool) -> dict
+def py_function_src_teleon_synthesis_codeblock_loop__persist_history(py_arg_src_teleon_synthesis_codeblock_loop__persist_history__result: dict, py_arg_src_teleon_synthesis_codeblock_loop__persist_history__path) -> str
+    # LOSSLESS sink: the template + every attempt (incl. rejected) as JSONL (the caller owns the path; temp/local).
+def py_function_src_teleon_synthesis_codeblock_loop__compose_codeblock(py_arg_src_teleon_synthesis_codeblock_loop__compose_codeblock__intent: str, py_arg_src_teleon_synthesis_codeblock_loop__compose_codeblock__block_spec, values: dict | None=None, *, llm='auto', py_arg_src_teleon_synthesis_codeblock_loop__compose_codeblock__max_attempts: int=py_const_src_teleon_synthesis_codeblock_loop__DEFAULT_MAX_ATTEMPTS) -> dict
+    # Compose a codeblock as a runnable stage: hand an intent + a codeblock spec (a Codeblock or a plain dict) +
+def py_function_src_teleon_synthesis_codeblock_loop__self_test() -> int
+def main(py_arg_src_teleon_synthesis_codeblock_loop__main__argv: list) -> int
+```
+## intra-module call edges
+src.teleon.synthesis.codeblock_loop.declared_variables -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__template_variables
+src.teleon.synthesis.codeblock_loop.main -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__self_test
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___llm_fill -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___fill_prompt
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___llm_fill -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___parse_fills
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__codeblock_from_dict -> src.teleon.synthesis.codeblock_loop.py_class_src_teleon_synthesis_codeblock_loop__Codeblock
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__compose_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__codeblock_from_dict
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__compose_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_class_src_teleon_synthesis_codeblock_loop__FillAttempt
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___deterministic_fill
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___feedback
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___llm_fill
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___resolve_llm
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___result
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__render
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__validate
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__self_test -> src.teleon.synthesis.codeblock_loop.py_class_src_teleon_synthesis_codeblock_loop__Codeblock
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__self_test -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__compose_codeblock
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__self_test -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__fill_codeblock
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__self_test -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__persist_history
+src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop__validate -> src.teleon.synthesis.codeblock_loop.py_function_src_teleon_synthesis_codeblock_loop___names

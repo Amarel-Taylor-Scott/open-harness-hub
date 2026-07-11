@@ -1,0 +1,1 @@
+../../../_shared/strategy/open-core-model.md

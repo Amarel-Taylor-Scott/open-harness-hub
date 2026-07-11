@@ -1,0 +1,30 @@
+MODULE src/teleon/economics/economic_graph.py
+## API signatures
+```python
+"""economic_graph — the JOIN: model/component → providers → endpoints → LIVE economics, as one traversable graph."""
+REPO = ...
+_SUBSTITUTION_CODES = ...
+def _pricebook() -> dict
+def _lanes() -> dict
+def _graph() -> dict
+def _default_economics(resource_id: str) -> dict
+    # Config-tier default economics: from the lane profile, else the execution pricebook, else zeros (unknown).
+def merged_economics(resource_id: str, *, shard: str='000') -> dict
+    # Config default OVERLAID with live observations (live wins per field). The single economics view the cost model reads.
+def _provider_of(node_id: str) -> str
+def _route(resource_id: str, kind: str, *, display: str, external: bool, deterministic: bool, shard: str) -> dict
+def routes_for_model(model_node_id: str, *, shard: str='000') -> list
+    # The model node + its substitutable alternatives, each a Route with merged economics. This is the arbitrage set:
+def routes_for_lanes(*, capability_min: float | None=None, shard: str='000') -> list
+    # Every inference lane as a route (optionally those clearing a capability floor) — the provider/endpoint market.
+```
+## intra-module call edges
+src.teleon.economics.economic_graph._default_economics -> src.teleon.economics.economic_graph._lanes
+src.teleon.economics.economic_graph._default_economics -> src.teleon.economics.economic_graph._pricebook
+src.teleon.economics.economic_graph._route -> src.teleon.economics.economic_graph._provider_of
+src.teleon.economics.economic_graph._route -> src.teleon.economics.economic_graph.merged_economics
+src.teleon.economics.economic_graph.merged_economics -> src.teleon.economics.economic_graph._default_economics
+src.teleon.economics.economic_graph.routes_for_lanes -> src.teleon.economics.economic_graph._lanes
+src.teleon.economics.economic_graph.routes_for_lanes -> src.teleon.economics.economic_graph._route
+src.teleon.economics.economic_graph.routes_for_model -> src.teleon.economics.economic_graph._graph
+src.teleon.economics.economic_graph.routes_for_model -> src.teleon.economics.economic_graph._route

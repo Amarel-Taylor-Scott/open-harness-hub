@@ -1,0 +1,58 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "scraping",
+  "repo": "aidoneright-scraping",
+  "role": "DEV TOOL \u2014 reusable scraping / browser-automation / stealth-fetch toolkit (the descent ladder: API -> browser -> stealth -> vision). Feeds intake/discovery. Consented + governed only.",
+  "exposes": [
+    "fetch-ladder",
+    "browser-automation",
+    "extract-cascade",
+    "rate-governance",
+    "robots/consent-gate"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "exposes": [
+        "registry",
+        "primitives",
+        "codegraph",
+        "eval-harness",
+        "storage-tiers",
+        "credential-plane"
+      ],
+      "role": "the SUBSTRATE every product consumes \u2014 the primitive/component/template registry + factory + catalog, codegraph, naming "
+    },
+    {
+      "surface": "api-endpoint-wrappers",
+      "repo": "aidoneright-api-endpoint-wrappers",
+      "exposes": [
+        "port-adapters",
+        "provider-registry",
+        "cost-gates",
+        "retry/backoff",
+        "credential-port"
+      ],
+      "role": "DEV TOOL \u2014 reusable adapters that wrap third-party / local / cloud API endpoints behind stable PORTS (agnostic-adapter p"
+    }
+  ],
+  "consumed_by": [
+    "aidevobserver",
+    "baltor",
+    "shared-backend-components"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

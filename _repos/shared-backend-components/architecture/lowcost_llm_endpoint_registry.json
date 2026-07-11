@@ -1,0 +1,472 @@
+{
+  "version": "1.0",
+  "note": "GOVERNED LOW-COST PAID lane catalog for cheaper Chinese / China-adjacent LLM endpoints. This is a DISTINCT lane from architecture/free_limited_llm_endpoint_registry.json (the FREE lane) \u2014 every entry here is LOW-COST PAID (cost_class lowcost_usd), billed per token, NOT free. Pricing is web-verified ~USD/Mtok as of 2026-06 and is approximate (list price, pre-promo, excl. cache/batch discounts) \u2014 reconfirm against official provider docs before any spend. Every entry is candidate/probation/watchlist (NEVER active); no raw keys (secret_ref only); model output is NEVER treated as truth. Companion doc: _repos/shared-backend-components/context/research/chinese-lowcost-llm-endpoints.md. Checked by scripts/check_lowcost_llm_endpoint_registry.py.",
+  "governance_law": "LOWCOST != FREE: every entry is low-cost PAID (cost_class lowcost_usd), billed per token \u2014 do NOT treat as a free tier and do NOT merge into the free registry. CANDIDATE != ACTIVE: production_allowed is false for every entry; status is candidate/probation/watchlist (never active); promotion requires official paid/ZDR terms + security/privacy review + receipts + fallback. DATA-CLASS + JURISDICTION POLICY IS LOAD-BEARING: low-cost and China-region lanes may carry ONLY public + internal_non_sensitive data; they must NEVER carry customer data, regulated data, secrets, confidential data, or PII \u2014 those route ONLY to paid-enterprise-ZDR providers or self-hosted/private inference. Region/jurisdiction + data-residency metadata is required on every entry; a China-mainland jurisdiction caps allowed_data_classes to public/internal_non_sensitive regardless of price. SECRETS ARE REFS ONLY: secret_ref is a vault://-style reference, never a raw API key. OUTPUT != TRUTH: any output from these endpoints is a candidate artifact, never governed-context truth, and is gated through the Teleon Inference Gateway with a ModelInvocationReceipt. UNPAID-USAGE-TRAINS-VENDOR CAUTION: where a provider's free/unpaid tier may be used to train the vendor (Gemini-style), that caution is carried in data_use_note \u2014 but this catalog is PAID usage, which generally carries stronger retention terms; verify per provider.",
+  "lane_taxonomy": {
+    "free/*": "The no-cost / rate-limited tier (GitHub Models, Groq, Gemini free, etc.). Lives in architecture/free_limited_llm_endpoint_registry.json \u2014 NOT this file. Prototype-only; free-tier data may train the vendor; never customer-sensitive.",
+    "lowcost/global-cheap": "Low-cost PAID providers with a clean international/non-China data-residency option (e.g. Qwen Model Studio International @ Singapore, SiliconFlow .com). Cheapest safe-region routes for public/internal_non_sensitive bulk work.",
+    "lowcost/china-cheap": "Low-cost PAID providers whose primary jurisdiction/data-residency is China-mainland (DeepSeek direct, Baidu Qianfan, Tencent Hunyuan, Volcengine Ark/Doubao, StepFun, MiniMax CN). Often the cheapest per token, but China jurisdiction \u2192 ONLY public + internal_non_sensitive, NEVER customer/regulated/secrets/confidential.",
+    "lowcost/code-agent": "Low-cost PAID models tuned for coding / tool-use / agentic loops (DeepSeek V4, Z.AI GLM coding, StepFun agent, Kimi/Moonshot). Same data-class caps as their jurisdiction.",
+    "lowcost/long-context": "Low-cost PAID models with very large context windows (DeepSeek 1M ctx, MiniMax ~204K, Kimi 262K, StepFun 256K). For large-document/codebase passes; same data-class caps as jurisdiction.",
+    "paid/safe": "Paid ENTERPRISE providers with strong privacy/ZDR + acceptable jurisdiction \u2014 the ONLY lane allowed to carry customer / regulated / confidential / PII data. Not enumerated here (separate enterprise registry).",
+    "selfhost/private": "Self-hosted / private inference (local Ollama/vLLM, VPC) \u2014 the most-private lane; the fallback for any data that cannot leave the boundary. Not enumerated here (see the free registry's self_hosted_gateway rows + Teleon Sandbox).",
+    "lowcost/edge-byo": "customer's own edge account (BYO key); they run + pay, we dispatch"
+  },
+  "valid_data_classes": [
+    "public",
+    "internal_non_sensitive",
+    "customer",
+    "regulated",
+    "secrets",
+    "confidential",
+    "pii"
+  ],
+  "lowcost_forbidden_data_classes": [
+    "customer",
+    "regulated",
+    "secrets",
+    "confidential",
+    "pii"
+  ],
+  "admit_tiers": [
+    "admit_first",
+    "probation",
+    "watchlist",
+    "exclude"
+  ],
+  "entries": [
+    {
+      "provider_id": "deepseek_direct",
+      "display_name": "DeepSeek (direct, api.deepseek.com)",
+      "lane": "lowcost/china-cheap",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.deepseek.com",
+      "model": "deepseek-chat (V4 Flash, default)",
+      "cost_per_mtok_usd": {
+        "input": 0.14,
+        "output": 0.28,
+        "cache_hit": 0.0028
+      },
+      "context_window": 1000000,
+      "capabilities": [
+        "chat",
+        "json_mode",
+        "function_calling",
+        "tool_use",
+        "reasoning",
+        "long_context",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland"
+      ],
+      "data_residency": "China (PRC). PRC data jurisdiction applies.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/deepseek_direct",
+      "admit_tier": "admit_first",
+      "status": "candidate",
+      "data_use_note": "Web-verified 2026-06: OpenAI-compatible (swap base_url+key), JSON mode + function calling (strict mode) supported, V4 Flash 1M ctx @ $0.14/$0.28, cache-hit $0.0028 (98% off). Cheapest credible frontier-class route. China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: high."
+    },
+    {
+      "provider_id": "qwen_modelstudio_intl",
+      "display_name": "Alibaba Qwen / Model Studio (International, Singapore)",
+      "lane": "lowcost/global-cheap",
+      "adapter": "openai_compatible",
+      "base_url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+      "model": "qwen-flash",
+      "cost_per_mtok_usd": {
+        "input": 0.05,
+        "output": 0.2
+      },
+      "context_window": 1000000,
+      "capabilities": [
+        "chat",
+        "json_mode",
+        "function_calling",
+        "tool_use",
+        "long_context",
+        "multimodal",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "intl-singapore",
+        "us",
+        "eu",
+        "cn-mainland"
+      ],
+      "data_residency": "International mode: endpoint + data storage in Singapore; inference scheduled globally EXCLUDING Chinese Mainland. China mode (dashscope.aliyuncs.com) is PRC-resident \u2014 use intl base_url for the safe-region lane.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/qwen_modelstudio_intl",
+      "admit_tier": "admit_first",
+      "status": "candidate",
+      "data_use_note": "Web-verified 2026-06: OpenAI-compatible base_url above; International mode keeps data in Singapore (not PRC) \u2014 cleanest safe-region cheap route. qwen-flash $0.05/$0.20, qwen-plus $0.40/$1.20. Region modes US/EU/Singapore/China selectable. Confidence: high."
+    },
+    {
+      "provider_id": "siliconflow",
+      "display_name": "SiliconFlow (aggregator)",
+      "lane": "lowcost/global-cheap",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.siliconflow.com/v1",
+      "model": "deepseek-ai/DeepSeek-V3.2 (and Qwen, gpt-oss, etc.)",
+      "cost_per_mtok_usd": {
+        "input": 0.13,
+        "output": 0.28
+      },
+      "context_window": 163840,
+      "capabilities": [
+        "chat",
+        "json_mode",
+        "function_calling",
+        "tool_use",
+        "aggregator",
+        "embeddings",
+        "rerank",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "intl",
+        "cn-mainland"
+      ],
+      "data_residency": "api.siliconflow.com = international endpoint; api.siliconflow.cn = China endpoint. AGGREGATOR: verify which upstream actually serves a given model + its residency before relying on region.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/siliconflow",
+      "admit_tier": "admit_first",
+      "status": "candidate",
+      "data_use_note": "Web-verified 2026-06: fully OpenAI-compatible MaaS aggregator (200+ models incl. DeepSeek/Qwen/Moonshot/Tencent/gpt-oss). DeepSeek ~$0.13/$0.28, Qwen ~$0.26/$2.08. AGGREGATOR/intermediary risk: confirm upstream provider + data handling per model. Confidence: high (compat); medium (per-model residency)."
+    },
+    {
+      "provider_id": "zai_glm",
+      "display_name": "Z.AI / GLM (BigModel)",
+      "lane": "lowcost/code-agent",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.z.ai/api/paas/v4",
+      "model": "glm-4.7-flash",
+      "cost_per_mtok_usd": {
+        "input": 0.06,
+        "output": 0.4
+      },
+      "context_window": 200000,
+      "capabilities": [
+        "chat",
+        "json_mode",
+        "function_calling",
+        "tool_use",
+        "reasoning",
+        "code",
+        "agentic"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland",
+        "intl"
+      ],
+      "data_residency": "Zhipu AI / Z.AI \u2014 China (PRC) origin; Z.AI international platform available. Treat as China jurisdiction unless an intl-residency tier is contracted.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/zai_glm",
+      "admit_tier": "admit_first",
+      "status": "candidate",
+      "data_use_note": "Web-verified 2026-06: OpenAI-compatible. GLM-4.7-Flash $0.06/$0.40 (cheapest current GLM flash); GLM-4.6 $0.43/$1.74 (200K ctx). Strong coding/agentic positioning. China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: high (pricing/compat); medium (exact base_url path \u2014 verify api.z.ai vs open.bigmodel.cn)."
+    },
+    {
+      "provider_id": "minimax",
+      "display_name": "MiniMax (M-series)",
+      "lane": "lowcost/long-context",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.minimax.io/v1",
+      "model": "MiniMax-M2",
+      "cost_per_mtok_usd": {
+        "input": 0.255,
+        "output": 1.0
+      },
+      "context_window": 204800,
+      "capabilities": [
+        "chat",
+        "function_calling",
+        "tool_use",
+        "long_context",
+        "agentic",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland",
+        "intl"
+      ],
+      "data_residency": "MiniMax \u2014 China (PRC) origin; platform.minimax.io serves international. Treat as China jurisdiction unless an intl-residency tier is contracted.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/minimax",
+      "admit_tier": "admit_first",
+      "status": "candidate",
+      "data_use_note": "Web-verified 2026-06: accessible via OpenAI SDK / Anthropic SDK / HTTP (OpenAI-format). M2 $0.255/$1.00, ~204K ctx (>200K long-context). China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: high (pricing/compat); medium (exact base_url)."
+    },
+    {
+      "provider_id": "moonshot_kimi",
+      "display_name": "Moonshot AI / Kimi",
+      "lane": "lowcost/long-context",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.moonshot.ai/v1",
+      "model": "kimi-k2.5",
+      "cost_per_mtok_usd": {
+        "input": 0.6,
+        "output": 3.0,
+        "cache_hit": 0.1
+      },
+      "context_window": 262144,
+      "capabilities": [
+        "chat",
+        "json_mode",
+        "function_calling",
+        "tool_use",
+        "long_context",
+        "agentic",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland",
+        "intl"
+      ],
+      "data_residency": "Moonshot AI \u2014 China (PRC) origin; api.moonshot.ai serves international. Treat as China jurisdiction.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/moonshot_kimi",
+      "admit_tier": "probation",
+      "status": "probation",
+      "data_use_note": "Web-verified 2026-06: OpenAI-compatible (api.moonshot.ai/v1). Kimi K2.5 $0.60/$3.00 (cache-hit $0.10), 262K ctx; K2.6 $0.95/$4.00. Output rate higher than DeepSeek/Qwen \u2192 probation (use for long-ctx where it earns lift). China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: high."
+    },
+    {
+      "provider_id": "stepfun",
+      "display_name": "StepFun (Step series, agent-positioned)",
+      "lane": "lowcost/code-agent",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.stepfun.com/v1",
+      "model": "step-3.5-flash",
+      "cost_per_mtok_usd": {
+        "input": 0.09,
+        "output": 0.3
+      },
+      "context_window": 256000,
+      "capabilities": [
+        "chat",
+        "function_calling",
+        "tool_use",
+        "multimodal",
+        "agentic",
+        "long_context",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland"
+      ],
+      "data_residency": "StepFun \u2014 China (PRC). PRC data jurisdiction applies.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/stepfun",
+      "admit_tier": "probation",
+      "status": "probation",
+      "data_use_note": "Web-verified 2026-06: OpenAI-compatible. Step 3.5 Flash $0.09/$0.30 (256K ctx), Step 3.7 Flash $0.20/$1.15. Agent/multimodal-positioned MoE. Newer/less-proven internationally \u2192 probation. China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: high (pricing); medium (intl access path)."
+    },
+    {
+      "provider_id": "baidu_qianfan_ernie",
+      "display_name": "Baidu Qianfan / ERNIE",
+      "lane": "lowcost/china-cheap",
+      "adapter": "openai_compatible",
+      "base_url": "https://qianfan.baidubce.com/v2",
+      "model": "ernie-4.5-turbo",
+      "cost_per_mtok_usd": {
+        "input": 0.55,
+        "output": 2.2
+      },
+      "context_window": 128000,
+      "capabilities": [
+        "chat",
+        "function_calling",
+        "tool_use",
+        "reasoning",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland"
+      ],
+      "data_residency": "Baidu Qianfan (Baidu AI Cloud) \u2014 China (PRC). Hosted-only on Qianfan/ernie.baidu.com.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/baidu_qianfan_ernie",
+      "admit_tier": "probation",
+      "status": "probation",
+      "data_use_note": "Web-verified 2026-06: Qianfan documents OpenAI-compatible request format (Bearer auth; base-URL+key swap). ERNIE 4.5 ~$0.55/$2.20; ERNIE 5.1 ~$0.59/$2.65. China platform + onboarding friction for intl \u2192 probation. China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: medium (exact compat base_url path \u2014 verify in Qianfan console)."
+    },
+    {
+      "provider_id": "tencent_hunyuan",
+      "display_name": "Tencent Hunyuan",
+      "lane": "lowcost/china-cheap",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.hunyuan.cloud.tencent.com/v1",
+      "model": "hunyuan-a13b-instruct",
+      "cost_per_mtok_usd": {
+        "input": 0.14,
+        "output": 0.57
+      },
+      "context_window": 256000,
+      "capabilities": [
+        "chat",
+        "function_calling",
+        "tool_use",
+        "multimodal",
+        "reasoning",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-mainland"
+      ],
+      "data_residency": "Tencent Cloud \u2014 China (PRC). Native Tencent Cloud SDK is the preferred path; OpenAI-compatible endpoint available.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/tencent_hunyuan",
+      "admit_tier": "watchlist",
+      "status": "watchlist",
+      "data_use_note": "Web-verified 2026-06: OpenAI-compatible endpoint exists but Tencent's SDK is the preferred/full path (compat partial for multimodal). HY3 Preview ~$0.063/$0.210; A13B ~$0.14/$0.57. SDK-first + China onboarding \u2192 watchlist. China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: medium."
+    },
+    {
+      "provider_id": "volcengine_ark_doubao",
+      "display_name": "Volcengine Ark / Doubao (ByteDance)",
+      "lane": "lowcost/china-cheap",
+      "adapter": "openai_compatible",
+      "base_url": "https://ark.cn-beijing.volces.com/api/v3",
+      "model": "doubao-seed-1.6-flash",
+      "cost_per_mtok_usd": {
+        "input": 0.022,
+        "output": 0.219
+      },
+      "context_window": 256000,
+      "capabilities": [
+        "chat",
+        "function_calling",
+        "tool_use",
+        "multimodal",
+        "reasoning",
+        "code"
+      ],
+      "cost_class": "lowcost_usd",
+      "provider_regions": [
+        "cn-beijing"
+      ],
+      "data_residency": "Volcengine (ByteDance), Beijing \u2014 China (PRC). Strict real-name verification; registration may require a Chinese phone number.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/volcengine_ark_doubao",
+      "admit_tier": "watchlist",
+      "status": "watchlist",
+      "data_use_note": "Web-verified 2026-06: OpenAI-SDK-compatible (base-URL+key swap), ark.cn-beijing.volces.com/api/v3. Doubao Seed 1.6 Flash $0.022/$0.219 \u2014 the cheapest verified route here \u2014 but China-Beijing residency + real-name/Chinese-phone barrier blocks most international direct signup \u2192 watchlist. China jurisdiction \u2192 public/internal_non_sensitive ONLY. Confidence: high (pricing/compat); access barrier is the gating factor."
+    },
+    {
+      "provider_id": "together_ai",
+      "display_name": "Together AI (NOT in this catalog as free)",
+      "lane": "paid/safe",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.together.xyz/v1",
+      "model": "deepseek-ai/DeepSeek-V3 (and 200+ open models)",
+      "cost_per_mtok_usd": {
+        "input": 0.0,
+        "output": 0.0
+      },
+      "context_window": 131072,
+      "capabilities": [
+        "chat",
+        "function_calling",
+        "tool_use",
+        "aggregator",
+        "code"
+      ],
+      "cost_class": "paid",
+      "provider_regions": [
+        "us"
+      ],
+      "data_residency": "Together AI \u2014 US-based hosting (non-China). Prepaid; positive credit balance required.",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://llm/lowcost/together_ai",
+      "admit_tier": "exclude",
+      "status": "exclude",
+      "data_use_note": "Web-verified 2026-06: EXCLUDED from this Chinese-lowcost catalog \u2014 listed only to pin the boundary. Together AI is US-based (good jurisdiction) but is NOT free: no free trial, requires a minimum $5 credit purchase (signup credits exist but it is prepaid). It is neither China-adjacent nor a free tier, so it belongs in neither this lane nor the free registry as 'free'. cost_per_mtok set to 0.0 sentinel (no single canonical per-token price catalogued here \u2014 see together.ai/pricing per model). Confidence: high (policy)."
+    },
+    {
+      "provider_id": "cloudflare_workers_ai",
+      "display_name": "Cloudflare Workers AI (edge LLMs, BYO key)",
+      "lane": "lowcost/edge-byo",
+      "adapter": "openai_compatible",
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1",
+      "model": "@cf/meta/llama-3.3-70b-instruct (example)",
+      "cost_per_mtok_usd": {
+        "input": 0.0,
+        "output": 0.0,
+        "note": "billed on the CUSTOMER's Cloudflare account (BYO)"
+      },
+      "context_window": 128000,
+      "capabilities": [
+        "chat",
+        "json_mode",
+        "edge",
+        "byo_compute"
+      ],
+      "cost_class": "byo_customer_account",
+      "provider_regions": [
+        "edge-global"
+      ],
+      "data_residency": "customer Cloudflare account (data stays on their infra \u2014 locality axis)",
+      "allowed_data_classes": [
+        "public",
+        "internal_non_sensitive"
+      ],
+      "production_allowed": false,
+      "secret_ref": "vault://tenant/{id}/cloudflare_api_token",
+      "admit_tier": "exclude",
+      "status": "candidate",
+      "data_use_note": "BYO via a customer-supplied Cloudflare API token; Teleon dispatches, the customer runs+pays; FleetLedger stays our truth. [cost_class=paid: billed to the customer's own Cloudflare account; BYO key in vault.]"
+    }
+  ]
+}

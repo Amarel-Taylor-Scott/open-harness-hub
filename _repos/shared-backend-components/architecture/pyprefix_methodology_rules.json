@@ -1,0 +1,48 @@
+{
+  "serves_truth": false,
+  "purpose": "Machine-readable rules for the AI-first pyprefix migration: full repo-wide migration must be deterministic, scoped to owned Python source, package-sized, proof-gated, and contract-aware.",
+  "source_of_truth": "scripts/pyprefix.py",
+  "methodology_doc": "docs/codex/ai-first-naming-and-graph-spec.md",
+  "rules": [
+    {
+      "id": "owned-source-only",
+      "rule": "Repo-wide scans and migrations must exclude virtualenvs, _reference, archive, generated dist/site/artifacts, data, caches, and assistant scratch directories.",
+      "check": "scripts/pyprefix.py audit ."
+    },
+    {
+      "id": "package-sized-migration",
+      "rule": "Do not apply a broad whole-repo codemod. Migrate one package or bounded slice, dry-run first, then apply and run the full proof gate.",
+      "check": "manual_protocol"
+    },
+    {
+      "id": "proof-gate-is-oracle",
+      "rule": "compile() verifies syntax only; scripts/run_proofs.py is the runtime oracle after every applied package migration.",
+      "check": "PYTHONPATH=. python3 scripts/run_proofs.py"
+    },
+    {
+      "id": "migrated-means-zero-violations",
+      "rule": "A path may enter architecture/pyprefix_migration.json migrated only after pyprefix check reports 0 violations and the full proof gate is green.",
+      "check": "scripts/check_pyprefix_conformance.py"
+    },
+    {
+      "id": "dynamic-refs-are-unresolved",
+      "rule": "getattr/setattr/hasattr, globals/locals, eval/exec, importlib.import_module, string dispatch, and JSON/string-key surfaces are unresolved risk until a deterministic rewrite proves otherwise.",
+      "check": "scripts/pyprefix.py audit . && scripts/pyprefix.py contract-report <path>"
+    },
+    {
+      "id": "contract-renames-are-coordinated",
+      "rule": "Args with keyword or **kwargs callers, protocol/interface methods, dataclass fields, class attributes, constructor keywords, and string-key surfaces must be migrated with all their callers/implementers/surfaces as one contract.",
+      "check": "scripts/pyprefix.py arg-report <path> && scripts/pyprefix.py contract-report <path>"
+    },
+    {
+      "id": "external-entrypoints-use-shims",
+      "rule": "Names required by external runtimes or specs, such as CLI main, test discovery names, template run(inputs), API serve/handle, and framework hooks, must be preserved only as exempt compatibility wrappers that delegate to typed implementations.",
+      "check": "manual_protocol"
+    },
+    {
+      "id": "names-are-meaningful-not-hashes",
+      "rule": "Identifier uniqueness must live in meaningful py_<kind>_<file>__<scope>__<name> names, not hashes or opaque IDs.",
+      "check": "scripts/pyprefix.py check <path>"
+    }
+  ]
+}

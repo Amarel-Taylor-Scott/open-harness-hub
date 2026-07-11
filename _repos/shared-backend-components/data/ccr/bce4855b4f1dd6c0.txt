@@ -1,0 +1,46 @@
+MODULE src/teleon/inference/model_efficiency.py
+## API signatures
+```python
+"""src.teleon.inference.model_efficiency — rank models by MEASURED efficiency per task class, so
+OIPS picks the cheapest CAPABLE model instead of a fixed preference list (the "auto-pick the most
+efficient model" / ClawWork-style intelligence — built INTO routing, not a new surface)."""
+DEFAULT_WEIGHTS = ...
+EXTERNAL_SIGNAL_WEIGHT = ...
+MIN_SAMPLES_FOR_RANK = ...
+def _safe_float(v: Any, default: float=0.0) -> float
+def load_receipts(path: Path | str) -> list[dict]
+    # Read a ModelInvocationReceipt JSONL sink (the model-receipts plane). Missing ⇒ [].
+def _aggregate(receipts: Iterable[dict]) -> dict[tuple[str, str], dict]
+    # Aggregate receipts by (model, task_class) → {n, total_cost, total_latency, fallbacks}.
+def _normalize(values: dict[str, float]) -> dict[str, float]
+    # Min-max to [0,1] within a class; all-equal ⇒ 0 (no spurious spread).
+def rank_models(receipts: Iterable[dict], *, task_class: str | None=None, weights: dict | None=None, quality: dict[tuple[str, str], float] | None=None, external: dict[tuple[str, str], float] | None=None) -> list[dict]
+    # Rank models for a task class by MEASURED efficiency. Returns a sorted list (best first) of
+def efficiency_order(eligible_node_ids: list[str], ranking: list[dict]) -> list[str]
+    # THE OIPS CONSUMPTION POINT: reorder the already-eligible nodes (oips._eligible decided WHICH are
+def ingest_external_ranking(source: str, entries: list[dict], *, now: str) -> dict
+    # Wrap an EXTERNAL leaderboard (e.g. HKUDS/ClawWork) as a CANDIDATE signal — provenance-tagged,
+DEFAULT_EXTERNAL_LEADERBOARD = ...
+def quality_from_receipts(receipts: Iterable[dict]) -> dict[tuple[str, str], float]
+    # The QUALITY producer: per-(model, class) mean quality from receipts that carry a
+def external_signals_for_ranking(record: dict) -> dict[tuple[str, str], float]
+    # Convert an ``ingest_external_ranking`` record's ``'model::klass'`` signal keys into the
+def load_external_leaderboard(path: Path | str=DEFAULT_EXTERNAL_LEADERBOARD, *, now: str='1970-01-01T00:00:00Z') -> dict[tuple[str, str], float]
+    # Load the committed leaderboard fixture → the ``(model, class)`` external map for
+def _self_test() -> int
+```
+## intra-module call edges
+src.teleon.inference.model_efficiency._aggregate -> src.teleon.inference.model_efficiency._safe_float
+src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.efficiency_order
+src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.external_signals_for_ranking
+src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.ingest_external_ranking
+src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.load_external_leaderboard
+src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.quality_from_receipts
+src.teleon.inference.model_efficiency._self_test -> src.teleon.inference.model_efficiency.rank_models
+src.teleon.inference.model_efficiency.external_signals_for_ranking -> src.teleon.inference.model_efficiency._safe_float
+src.teleon.inference.model_efficiency.ingest_external_ranking -> src.teleon.inference.model_efficiency._safe_float
+src.teleon.inference.model_efficiency.load_external_leaderboard -> src.teleon.inference.model_efficiency.external_signals_for_ranking
+src.teleon.inference.model_efficiency.load_external_leaderboard -> src.teleon.inference.model_efficiency.ingest_external_ranking
+src.teleon.inference.model_efficiency.quality_from_receipts -> src.teleon.inference.model_efficiency._safe_float
+src.teleon.inference.model_efficiency.rank_models -> src.teleon.inference.model_efficiency._aggregate
+src.teleon.inference.model_efficiency.rank_models -> src.teleon.inference.model_efficiency._normalize

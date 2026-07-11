@@ -1,0 +1,31 @@
+MODULE src/teleon/synthesis/primitive_blocks.py
+## API signatures
+```python
+"""AI-first primitive blocks for Teleon-generated code."""
+def py_function_src_teleon_synthesis_primitive_blocks__normalize_to_sequence(py_arg_value, py_arg_none_policy='empty', py_arg_dict_policy='single')
+    # Return a normalized list plus shape metadata for scalar-or-array codegen.
+def py_function_src_teleon_synthesis_primitive_blocks__wrap_candidate_result(py_arg_value, py_arg_status='ok', py_arg_index=None, py_arg_error=None)
+    # Return a uniform candidate envelope for generated-code steps.
+def py_function_src_teleon_synthesis_primitive_blocks__map_sequence(py_arg_items, py_arg_step_function, py_arg_context=None, py_arg_stop_on_error=False)
+    # Apply a step function to every item and return candidate envelopes.
+def py_function_src_teleon_synthesis_primitive_blocks__lift_scalar_step_to_sequence_step(py_arg_step_function)
+    # Wrap a scalar step so callers can pass either one item or many items.
+def py_function_src_teleon_synthesis_primitive_blocks__loop_until_stable(py_arg_seed, py_arg_step_function, py_arg_is_stable_function=None, py_arg_max_iterations=py_const_src_teleon_synthesis_primitive_blocks__DEFAULT_MAX_ITERATIONS)
+    # Run a bounded candidate loop until the state is stable or max_iterations is reached.
+def py_function_src_teleon_synthesis_primitive_blocks__dispatch_by_key(py_arg_key, py_arg_dispatch_table, py_arg_payload=None, py_arg_default_key=None)
+    # Use a dispatch table instead of a rigid if/elif branch chain.
+def py_function_src_teleon_synthesis_primitive_blocks__generated_code_contract(py_arg_purpose, py_arg_input_shape='scalar_or_sequence', py_arg_output_shape='candidate_envelope_or_sequence', py_arg_uses=None)
+    # Return a standard contract object to embed beside generated code.
+def py_function_src_teleon_synthesis_primitive_blocks___self_test()
+```
+## intra-module call edges
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks___self_test -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__dispatch_by_key
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks___self_test -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__generated_code_contract
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks___self_test -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__lift_scalar_step_to_sequence_step
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks___self_test -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__loop_until_stable
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks___self_test -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__normalize_to_sequence
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__dispatch_by_key -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__wrap_candidate_result
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__lift_scalar_step_to_sequence_step -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__map_sequence
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__lift_scalar_step_to_sequence_step__py_function_sequence_wrapper -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__map_sequence
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__map_sequence -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__normalize_to_sequence
+src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__map_sequence -> src.teleon.synthesis.primitive_blocks.py_function_src_teleon_synthesis_primitive_blocks__wrap_candidate_result

@@ -1,0 +1,7593 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Host-agnostic catalog of harnesses, knowledge objects, logic and rule packs, tools, pipelines, and benchmarks — reusable AI-pipeline components admitted only on measured capability lift over a bare LLM.">
+      
+      
+      
+        <link rel="canonical" href="https://Amarel-Taylor-Scott.github.io/open-harness-hub/codex/aidevexplorer-real-world-task-benchmark/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>AIDevExplorer Real-World Task Benchmark - OpenHubForAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#aidevexplorer-real-world-task-benchmark" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenHubForAI" class="md-header__button md-logo" aria-label="OpenHubForAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenHubForAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              AIDevExplorer Real-World Task Benchmark
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to light"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Amarel-Taylor-Scott/open-harness-hub" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Amarel-Taylor-Scott/open-harness-hub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../howto/run-pipeline/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Get started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../use-cases/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Use cases
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../strategy/product-market-monetization-brief/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Strategy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../catalog/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Catalog
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../spec/HARNESS_HUB_SPEC.md" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../about/project/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenHubForAI" class="md-nav__button md-logo" aria-label="OpenHubForAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenHubForAI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Amarel-Taylor-Scott/open-harness-hub" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Amarel-Taylor-Scott/open-harness-hub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/run-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run a pipeline locally
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/llm-assemble-pipeline-from-task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Assemble a pipeline from a task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/add-component/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy the hub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/integrating-hackathon-submissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrate a hackathon submission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../use-cases/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use cases
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Use cases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/more-ideas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    More ideas (30+)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/personal-llm-companion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Personal LLM companion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/illicit-content-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Illicit content + platform moderation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/cost-aware-pipeline-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cost-aware pipeline generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/llm-pipeline-saas-blueprint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM pipeline SaaS blueprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/local-sentence-to-pipeline-demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local sentence-to-pipeline demo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/human-trafficking-ugc-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Human-trafficking signal triage (UGC, Gemma-4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/document-to-knowledge-graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document to knowledge graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/local-first-research-wiki/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local-first research wiki
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/qa-on-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Q&A on documents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/deep-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/code-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code review with security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/customer-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Customer support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/clinical-decision-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clinical decision support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aml-screening/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AML screening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/image-gen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/llm-red-team/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM red-teaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/esg-supply-chain-due-diligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ESG supply-chain DD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/refugee-bureaucracy-translation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Refugee bureaucracy translation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Strategy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Strategy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/product-market-monetization-brief/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product market monetization brief
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/baltor-gtm-fundraising-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor GTM fundraising plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/baltor-cloud-cost-pricing-pro-forma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor cloud cost pricing pro forma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/gtm-launch-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GTM launch guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../catalog/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Catalog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../catalog/browser.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Browse (interactive)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../library/by-capability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    By capability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spec/HARNESS_HUB_SPEC.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Harness Hub spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/vocabularies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vocabularies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/schemas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schemas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Codex operating guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_4" id="__nav_6_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Codex operating guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-done-right-family-polish-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Done Right family polish goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../goals/aidoneright-portfolio-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Done Right parser-safe goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/handoff-freshness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handoff freshness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/claude-code-max-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Code Max transfer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/codex-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Codex transfer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/openhub-surface-counts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenHub surface counts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../baltor-clean-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor clean context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../repo-polish-loop-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repo polish loop goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../baltor-autonomous-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor autonomous goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../billion-component-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Billion component goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../million-object-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Million object goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../no-magic-values/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    No magic values
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../daily-production-targets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily production targets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../speed-guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speed guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../claude-agent-efficiency/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude agent efficiency
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../object-factory-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object factory workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quality-gates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi-day-goal-runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-day goal runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../autonomous-session-runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous session runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/system-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System overview (everything end-to-end)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/taxonomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Taxonomy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/layers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers & primitives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/pre-post-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pre/post-API processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/compiling-capabilities-into-bounded-dags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compiling capabilities into bounded DAGs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/primitive-platform-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primitive platform backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/saas-operating-platform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SaaS operating platform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/service-auth-and-consumption-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service auth and consumption model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-dev-tunnels-and-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local dev tunnels and auth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/north-star-platform-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    North star platform architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/teleon-universal-computation-compiler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teleon as a universal computation compiler (13+ systems)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hundred-million-component-infrastructure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100M component infrastructure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/database-backed-component-store/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database-backed component store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-store-candidate-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component store candidate load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/off-the-shelf-component-pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Off-the-shelf component pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-template-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component template load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/promotion-decision-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Promotion decision load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/approved-component-promotion-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approved component promotion plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/dedupe-resolution-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dedupe resolution plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/content-approval-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content approval plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-codebase-cleanup-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor codebase cleanup plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-model-and-document-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor model and document pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-stateless-worker-standard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor stateless worker standard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-worker-operating-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor worker operating model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-conversation-research-synthesis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor conversation research synthesis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-context-and-agent-cicd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor context and agent CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-backend-infrastructure-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor backend infrastructure stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-backend-tooling-research-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor backend tooling research map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-free-llm-demo-routing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor free LLM demo routing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-queue-priority-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor queue priority orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-source-trust-and-adoption-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor source trust and adoption policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-cdc-versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component CDC versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-sync-versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source sync versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-admin-demo-console/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor admin demo console
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/promotion-cdc-bridge-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Promotion CDC bridge plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/approved-promotion-smoke-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approved promotion smoke test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-thousand-component-factory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily thousand component factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-partition-load-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily partition load audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-showcase-pipeline-factory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily showcase pipeline factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/showcase-candidate-coverage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase candidate coverage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/showcase-gap-feedback-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase gap feedback loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-component-production-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily component production run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-production-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily production scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-stage-ledger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily stage ledger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/duplicate-collapse-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Duplicate collapse report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-promotion-readiness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily promotion readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/index-coverage-repair/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index coverage repair
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-embedding-execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily embedding execution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-embedding-worker-contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local embedding worker contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-hash-embedding-worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local hash embedding worker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/pgvector-embedding-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pgvector embedding load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/embedding-committed-load-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Embedding committed load audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-pgvector-embedding-smoke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local pgvector embedding smoke
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/edge-ai-semantic-gap-guardrail-components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Edge AI semantic gap guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-to-component-factory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory to component factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-batch-governance-bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory batch governance bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-vector-readiness-to-pgvector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory vector readiness to pgvector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-local-postgres-smoke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory local Postgres smoke
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/low-cost-hosting-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Low-cost hosting plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hybrid-postgres-bigquery-hosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid Postgres BigQuery hosting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/incremental-catalog-builds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental catalog builds
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/fast-factory-closeout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fast factory closeout
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/model-runtime-training-and-federated-sharing-components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model runtime, training, and federated sharing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/partitioned-index-deltas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partitioned index deltas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/partition-registry-replay-audits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partition registry replay audits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/promotion-index-deltas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Promotion index deltas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/object-factory-worker-fleet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object factory worker fleet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/containerized-object-factory-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Containerized object factory orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-governance-and-entity-resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source governance + entity resolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hybrid-label-dimensional-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid label dimensional search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/use-case-seed-label-dimension-rows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use case seed label rows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/use-case-seed-entity-ref-rows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use case seed entity refs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/use-case-seed-embedding-buckets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use case seed embedding buckets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/embedding-execution-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Embedding execution plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/vector-readiness-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector readiness audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-surface-seed-row-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source surface seed row emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-surface-scan-partitions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source surface scan partitions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-scan-job-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source scan job emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-job-replay-runner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source job replay runner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-replay-row-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source replay row emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-surface-execution-summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source surface execution summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/staged-vs-committed-load-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Staged versus committed load audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/postgres-load-execution-and-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Postgres load execution and audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/specialized-model-card-scan-jobs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model card scan jobs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/specialized-model-card-row-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model card row emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/specialized-model-card-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model card load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/generated-object-storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generated object storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/object-counts-and-db-bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object counts + DB bootstrap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/postgres-pgvector-bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Postgres pgvector bootstrap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/bulk-generated-object-loads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bulk generated object loads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/canonical-factory-row-coverage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canonical factory row coverage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agentic-orchestration-harnesses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic orchestration harnesses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/multimodal-public-service-harnesses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal public service harnesses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/context-control-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context control loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/prompt-abi-and-cache-shaped-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompt ABI and token-efficient context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/context-worker-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context worker registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/trajectory-fragment-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trajectory fragment cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/signed-knowledge-network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signed knowledge network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/procedure-knowledge-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Procedure knowledge objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/costed-blueprint-route-matrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Costed blueprint route matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-blueprint-output-records/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local blueprint output records
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-blueprint-record-persistence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local blueprint record persistence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/expert-email-and-grounded-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expert email + grounded verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/verification-packet-record-persistence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Verification packet persistence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/resumable-object-comparison-jobs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resumable object comparison jobs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hybrid-comparison-blocking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid comparison blocking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database representations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/industry-agnostic-pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Industry-agnostic pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparison/peer-registries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Peer registries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparison/google-agent-builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google Agent Builder comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparison/workflow-builders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow builder inspiration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Playground & sample runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/baltor-public-source-demo-catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor public source demo catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/cfpb-consumer-complaints-context-demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CFPB complaints context demo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/standards-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standards landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/baltor-worker-orchestration-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor worker orchestration research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/claude-code-skills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Code skills overlap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/openharness-zip-integration-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenHarness zip integration review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/capability-gap-discovery-browsers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capability gap discovery browsers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/primitive-source-surface-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primitive source surface map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/esoteric-industry-source-surfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esoteric industry source surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/community-moderation-knowledge-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community moderation knowledge objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/specialized-model-signal-surfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model signal surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/public-source-blueprint-catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source blueprint catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/occupation-to-procedure-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupation to procedure objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/standards-regulatory-source-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standards regulatory source map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-workflow-system-reference-intake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent workflow system intake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/task-marketplace-archetype-intake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Task marketplace archetype intake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/candidate-primitive-promotion-scoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Candidate primitive promotion scoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/cross-domain-use-case-seed-surfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-domain use case seed surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/github-hosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub hosting plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/antigravity-ingest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Antigravity 2.0 ingest plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-the-tasks-represent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What The Tasks Represent
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#row-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Row Shape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-decomposition-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark Decomposition Layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#runtime-shape-reuse-corpus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runtime-Shape Reuse Corpus
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#primitive-kind-family-cards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primitive-Kind Family Cards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#source-backed-group-cards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source-Backed Group Cards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proof-bundle-and-promotion-gate-lane" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proof Bundle And Promotion Gate Lane
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark Loop
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#success-criteria" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success Criteria
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#foundry-ingestion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Foundry Ingestion
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="aidevexplorer-real-world-task-benchmark">AIDevExplorer Real-World Task Benchmark<a class="headerlink" href="#aidevexplorer-real-world-task-benchmark" title="Permanent link">&para;</a></h1>
+<p>Last updated: 2026-07-01</p>
+<p>This pack creates a 10,000-row corpus of realistic software/business build tasks for testing whether AIDevExplorer is faster, more reliable, and less token-wasteful than a generic AI coding flow.</p>
+<p>The benchmark is candidate evidence, not truth:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>candidate=true
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>serves_truth=false
+</code></pre></div>
+<h2 id="files">Files<a class="headerlink" href="#files" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>catalog/knowledge-packs/data/aidevexplorer-real-world-build-tasks/tasks.jsonl</code>
+  10,000 task rows compatible with the existing public-codegen use-case ingestion path.</li>
+<li><code>catalog/knowledge-packs/data/aidevexplorer-real-world-build-tasks/manifest.json</code>
+  Corpus manifest with row, family, industry, and audience counts.</li>
+<li><code>data/dev-intel/aidevexplorer_task_benchmarks/2026-06-30/suites.jsonl</code>
+  100 benchmark suites, each containing 100 task IDs.</li>
+<li><code>data/dev-intel/aidevexplorer_task_benchmarks/2026-06-30/manifest.json</code>
+  Suite manifest.</li>
+<li><code>data/dev-intel/aidevexplorer_task_benchmarks/2026-07-01/task_decompositions.jsonl</code>
+  Task-level primitive-component decompositions for benchmark runs, one row per task.</li>
+<li><code>data/dev-intel/aidevexplorer_task_benchmarks/2026-07-01/task_decompositions_manifest.json</code>
+  Decomposition manifest with benchmark-lens coverage, component counts, and estimate-only token plan status.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/benchmark_decomposition_cards.jsonl</code>
+  Compact AIDevObserver search cards generated from benchmark decompositions: one card per benchmark lens, task family, expected primitive, and expected primitive group.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/benchmark_decomposition_cards_manifest.json</code>
+  Benchmark decomposition card manifest with source-row coverage and card-kind counts.</li>
+<li><code>catalog/knowledge-packs/data/aidevexplorer-runtime-shape-tasks/tasks.jsonl</code>
+  10,000 runtime-shape reuse rows: 1,000 core business tasks crossed with 10 deployable/callable surfaces.</li>
+<li><code>catalog/knowledge-packs/data/aidevexplorer-runtime-shape-tasks/manifest.json</code>
+  Runtime-shape corpus manifest with per-shape and per-primitive-kind counts.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/runtime_shape_primitive_cards.jsonl</code>
+  200 compact AIDevObserver reuse cards: 20 task families crossed with 10 runtime shapes.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/runtime_shape_primitive_cards_manifest.json</code>
+  Runtime-shape card manifest.</li>
+<li><code>catalog/knowledge-packs/data/aidevexplorer-primitive-kind-families/families.jsonl</code>
+  Primitive-kind family catalog for API, service, webhook, queue, cron, workflow, integration, database, DevOps, security, RAG/agent, UI, testing, and operations primitives.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/primitive_kind_family_cards.jsonl</code>
+  41 compact AIDevObserver reuse cards generated from the primitive-kind family catalog.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/source_backed_primitive_group_cards.jsonl</code>
+  Source-backed Teleon primitive group cards for deterministic implementations with unit-test proof refs.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/source_backed_primitive_group_cards_manifest.json</code>
+  Source-backed card manifest; row counts are computed here rather than hand-typed in prose.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/curated_primitive_groups.jsonl</code>
+  Earlier curated source-backed Teleon group cards loaded by AIDevObserver search.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/source_backed_primitive_group_proof_bundles.jsonl</code>
+  Database-shaped proof bundles for all loaded source-backed group records, one per primitive group.</li>
+<li><code>data/dev-intel/aidevobserver_edge_foundry/source_backed_primitive_group_promotion_gates.jsonl</code>
+  Promotion gate rows for each source-backed group; proofed candidates remain blocked pending owner review.</li>
+</ul>
+<h2 id="what-the-tasks-represent">What The Tasks Represent<a class="headerlink" href="#what-the-tasks-represent" title="Permanent link">&para;</a></h2>
+<p>The corpus is built from real recurring work patterns developers, freelancers, dev teams, and architects spend time on:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>CRUD APIs
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>webhook ingestion
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>tenant settings
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>admin dashboards
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>customer onboarding portals
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>frontend quality gates
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>CSV import pipelines
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>warehouse ELT
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>data quality incidents
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>docs RAG
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>knowledge-base migration
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>prompt/model evals
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>agent tool permissioning
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>CI hardening
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>deployment readiness
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>Kubernetes validation
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>security alert triage
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>dependency exceptions
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>invoice approval workflows
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>contract obligation tracking
+</code></pre></div>
+<p>Those patterns are crossed with 99 business contexts and 10 delivery variants, then capped at 10,000 rows.</p>
+<h2 id="row-shape">Row Shape<a class="headerlink" href="#row-shape" title="Permanent link">&para;</a></h2>
+<p>Each task row includes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>id
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>title
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>audience
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>task_family
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>industry
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>business_area
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>team_context
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>intent
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>expected_template
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>expected_primitives
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>expected_primitive_groups
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>expected_deliverables
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>acceptance_criteria
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>observed_reinvention_patterns
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>common_pitfalls
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>aidevexplorer_eval_hooks
+</code></pre></div>
+<p>The important fields for AIDevExplorer are <code>expected_primitives</code>, <code>expected_primitive_groups</code>, and <code>aidevexplorer_eval_hooks</code>.</p>
+<h2 id="benchmark-decomposition-layer">Benchmark Decomposition Layer<a class="headerlink" href="#benchmark-decomposition-layer" title="Permanent link">&para;</a></h2>
+<p>Benchmark tasks should not remain opaque prompts. Each task should be split into logical primitive components so a runner can measure where tokens are spent:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>BenchmarkTaskIntent+TeamContext -&gt; TaskAcceptanceContract
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>TaskAcceptanceContract+PrimitiveRegistry -&gt; PrimitiveRouteCandidateSet
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>TaskAcceptanceContract+PrimitiveInput -&gt; PrimitiveReceipt
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>PrimitiveRouteCandidateSet+Template -&gt; AssembledPrimitiveRoute
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>AssembledPrimitiveRoute+AcceptanceCriteria -&gt; BenchmarkProofReceipt
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>BaselineTrace+PrimitiveRouteTrace+ComponentAttribution -&gt; TokenComparisonReceipt
+</code></pre></div>
+<p>The decomposition rows cover these benchmark lenses:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>agent_tooling_benchmark
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>api_application_benchmark
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>business_workflow_benchmark
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>ci_devops_benchmark
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>cloud_infra_benchmark
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>configuration_benchmark
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>content_migration_benchmark
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>data_import_benchmark
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>data_quality_benchmark
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>data_warehouse_benchmark
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>deployment_readiness_benchmark
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>event_integration_benchmark
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>frontend_quality_benchmark
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>llm_eval_benchmark
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>rag_retrieval_benchmark
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>security_governance_benchmark
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>security_triage_benchmark
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>ui_application_benchmark
+</code></pre></div>
+<p>The token comparison rows are intentionally estimate-only:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>estimate_only=true
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>actual_run_required=true
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>candidate=true
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>serves_truth=false
+</code></pre></div>
+<p>That keeps the planner honest: estimated savings can choose a benchmark batch, but only paired baseline and primitive-route traces can prove real token reduction.</p>
+<p>Measured token proof uses a separate source-backed group:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>BaselineTrace+PrimitiveRouteTrace+TracePolicy -&gt; BenchmarkTracePairEvaluationReceipt
+</code></pre></div>
+<p>That evaluator requires actual token counts, same-task trace pairs, component attribution, primitive usage, proof refs, successful runs, and the candidate boundary. It rejects estimated token traces as promotion evidence.</p>
+<p>The decomposition-card build step makes those benchmark groups searchable without loading all 10,000 rows into AIDevObserver search. It emits compact candidate cards for:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>benchmark.decomposition.lens
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>benchmark.decomposition.task_family
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>benchmark.decomposition.expected_primitive
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>benchmark.decomposition.expected_group
+</code></pre></div>
+<p>The expected-primitive and expected-group cards are the important bridge from broad benchmark tasks to reusable capability search. They let AIDevObserver answer queries like "CSV import token proof", "RAG citation benchmark", "OpenAPI schema validation", or "queue worker idempotency" with a compact benchmark decomposition route instead of forcing the agent to inspect every task row.</p>
+<p>These cards answer queries like:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>api benchmark decomposition token usage primitive components
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>csv import benchmark task family token comparison visible edges
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>file.read_csv_artifact record.identity_dedupe token comparison
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>rag retrieval benchmark decomposition proof token plan
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>grp:rag.docs_search@candidate retrieve.search_index citation coverage
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>api.validate_json_schema OpenAPI endpoint benchmark proof
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>queue.enqueue_job webhook idempotency token attribution
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>security triage benchmark primitive components token attribution
+</code></pre></div>
+<p>They stay candidate-only and point back to the full decomposition corpus. The search cards are route-selection aids, not measured lift evidence.</p>
+<h2 id="runtime-shape-reuse-corpus">Runtime-Shape Reuse Corpus<a class="headerlink" href="#runtime-shape-reuse-corpus" title="Permanent link">&para;</a></h2>
+<p>The runtime-shape corpus tests a different question than the broad task list:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Can AIDevExplorer find one reusable core group edge and expose it through the right runtime wrapper without rebuilding the hidden logic?
+</code></pre></div>
+<p>It uses this matrix:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>1,000 base business tasks
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>x 10 runtime shapes
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>= 10,000 rows
+</code></pre></div>
+<p>The 10 runtime shapes are:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>py.fn
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>api.endpoint
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>microservice
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>webhook.handler
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>queue.consumer
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>cron.job
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>cli.command
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>workflow.automation
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>kubernetes.job
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>dashboard.report
+</code></pre></div>
+<p>Each row declares the deployable surface separately from the reusable core:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>primitive_kind
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>runtime_shape
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>input_edge
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>output_edge
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>core_group_edge
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>wrapper_edges
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>hidden_member_edges
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>adapter_mutators
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>effects
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>proof_requirements
+</code></pre></div>
+<p>For example, an API endpoint row can expose:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>HttpRequest[RawCsvArtifact+ImportPolicy] -&gt; HttpResponse[ValidatedImportReceipt]
+</code></pre></div>
+<p>while preserving the core group edge:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>RawCsvArtifact+ImportPolicy -&gt; ValidatedImportReceipt
+</code></pre></div>
+<p>The wrapper edges handle transport/auth/response shape; hidden member edges keep parse, validate, dedupe, persist, and receipt behavior attached to the core group.</p>
+<p>Microservices are modeled as <code>service.group</code> rows, not as one giant function. The visible edge stays compact, while endpoint handlers, queues, persistence, retries, idempotency, observability, and audit receipts stay behind hidden member edges.</p>
+<p>The runtime-shape task rows are intentionally not loaded directly into AIDevObserver search. A compact card build step aggregates them into one candidate reuse card per <code>(task_family, runtime_shape)</code>. Those 200 cards are loaded through the normal edge-foundry search path when the generated card file exists.</p>
+<h2 id="primitive-kind-family-cards">Primitive-Kind Family Cards<a class="headerlink" href="#primitive-kind-family-cards" title="Permanent link">&para;</a></h2>
+<p>Runtime shapes answer how a reusable edge is exposed. Primitive-kind family cards answer what kind of reusable thing is being searched for. This lane currently covers:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>api.endpoint
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>service.group
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>webhook.handler
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>queue.consumer
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>queue.producer
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>event.handler
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>cron.job
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>workflow.step
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>workflow.group
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>integration.connector
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>sdk.client
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>cli.command
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>shell.script
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>container.job
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>kubernetes.job
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>kubernetes.controller
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>terraform.module
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>github.action
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>db.migration
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>sql.view
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>sql.proc
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>etl.pipeline
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>elt.model
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>data.quality.rule
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>rag.pipeline
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a>vector.indexer
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a>llm.tool
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a>policy.rule
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a>auth.middleware
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a>rate.limit.middleware
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a>ui.component
+<a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a>ui.route
+<a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a>dashboard
+<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a>alert.rule
+<a id="__codelineno-15-35" name="__codelineno-15-35" href="#__codelineno-15-35"></a>runbook
+<a id="__codelineno-15-36" name="__codelineno-15-36" href="#__codelineno-15-36"></a>security.compliance.workflow
+<a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a>test.fixture
+<a id="__codelineno-15-38" name="__codelineno-15-38" href="#__codelineno-15-38"></a>contract.test
+<a id="__codelineno-15-39" name="__codelineno-15-39" href="#__codelineno-15-39"></a>mock.server
+<a id="__codelineno-15-40" name="__codelineno-15-40" href="#__codelineno-15-40"></a>graphql.resolver
+<a id="__codelineno-15-41" name="__codelineno-15-41" href="#__codelineno-15-41"></a>grpc.method
+</code></pre></div>
+<p>Each primitive-kind card carries:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>visible input/output edge
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>hidden member edges
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>effects
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>runtime targets
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>adapter mutators
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>proof requirements
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>promotion blockers
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>common pitfalls
+</code></pre></div>
+<p>These cards are candidate-only family guides. They make AIDevObserver return the right reusable surface family for queries like database migrations, SaaS integration connectors, RAG pipelines, and agent-callable tools before any implementation is promoted.</p>
+<h2 id="source-backed-group-cards">Source-Backed Group Cards<a class="headerlink" href="#source-backed-group-cards" title="Permanent link">&para;</a></h2>
+<p>The source-backed card lane binds selected family cards to real deterministic implementations in <code>src/teleon/primitives/groups.py</code>. AIDevObserver currently loads source-backed group rows from both <code>curated_primitive_groups.jsonl</code> and <code>source_backed_primitive_group_cards.jsonl</code>.</p>
+<p>Current source-backed group records include:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>grp:teleon.record_import.prepare@1
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>grp:teleon.exact_edge_route.compile@1
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>grp:teleon.route_to_group_card.collapse@1
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>grp:teleon.file.guarded_replace@1
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>grp:teleon.policy_api_request.evaluate@1
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>grp:teleon.tenant_settings.resolve@1
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>grp:teleon.deployment_readiness.evaluate@1
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>grp:teleon.prompt_model_outputs.evaluate@1
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a>grp:teleon.database_migration.plan@1
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a>grp:teleon.integration_sync.compile@1
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>grp:teleon.cited_answer.assemble@1
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>grp:teleon.webhook_event.verify@1
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a>grp:teleon.queue_job.plan@1
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>grp:teleon.queue_payload_contract.plan@1
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>grp:teleon.queue_ack_policy.plan@1
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>grp:teleon.queue_poison_message_policy.plan@1
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a>grp:teleon.queue_batch_consumer.plan@1
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a>grp:teleon.queue_ordering_policy.plan@1
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a>grp:teleon.worker_autoscale_policy.plan@1
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>grp:teleon.scheduled_job_tick.evaluate@1
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a>grp:teleon.cli_command.compile@1
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a>grp:teleon.kubernetes_job.plan@1
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a>grp:teleon.dashboard_snapshot.build@1
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>grp:teleon.auth_middleware.evaluate@1
+<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a>grp:teleon.rate_limit.evaluate@1
+<a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a>grp:teleon.tool_invocation.plan@1
+<a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a>grp:teleon.workflow_step.evaluate@1
+<a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a>grp:teleon.event_publish.plan@1
+<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a>grp:teleon.domain_event_handler.evaluate@1
+<a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a>grp:teleon.sdk_client_request.plan@1
+<a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a>grp:teleon.terraform_module.plan@1
+<a id="__codelineno-17-32" name="__codelineno-17-32" href="#__codelineno-17-32"></a>grp:teleon.github_action_workflow.plan@1
+<a id="__codelineno-17-33" name="__codelineno-17-33" href="#__codelineno-17-33"></a>grp:teleon.data_quality_rule.evaluate@1
+<a id="__codelineno-17-34" name="__codelineno-17-34" href="#__codelineno-17-34"></a>grp:teleon.vector_index_build.plan@1
+<a id="__codelineno-17-35" name="__codelineno-17-35" href="#__codelineno-17-35"></a>grp:teleon.compliance_evidence.compile@1
+<a id="__codelineno-17-36" name="__codelineno-17-36" href="#__codelineno-17-36"></a>grp:teleon.graphql_resolver.plan@1
+<a id="__codelineno-17-37" name="__codelineno-17-37" href="#__codelineno-17-37"></a>grp:teleon.grpc_method.plan@1
+<a id="__codelineno-17-38" name="__codelineno-17-38" href="#__codelineno-17-38"></a>grp:teleon.sql_view.plan@1
+<a id="__codelineno-17-39" name="__codelineno-17-39" href="#__codelineno-17-39"></a>grp:teleon.sql_procedure.plan@1
+<a id="__codelineno-17-40" name="__codelineno-17-40" href="#__codelineno-17-40"></a>grp:teleon.etl_pipeline.plan@1
+<a id="__codelineno-17-41" name="__codelineno-17-41" href="#__codelineno-17-41"></a>grp:teleon.elt_model.plan@1
+<a id="__codelineno-17-42" name="__codelineno-17-42" href="#__codelineno-17-42"></a>grp:teleon.alert_rule.evaluate@1
+<a id="__codelineno-17-43" name="__codelineno-17-43" href="#__codelineno-17-43"></a>grp:teleon.runbook.compile@1
+<a id="__codelineno-17-44" name="__codelineno-17-44" href="#__codelineno-17-44"></a>grp:teleon.incident_triage.plan@1
+<a id="__codelineno-17-45" name="__codelineno-17-45" href="#__codelineno-17-45"></a>grp:teleon.oncall_escalation.plan@1
+<a id="__codelineno-17-46" name="__codelineno-17-46" href="#__codelineno-17-46"></a>grp:teleon.status_page_update.plan@1
+<a id="__codelineno-17-47" name="__codelineno-17-47" href="#__codelineno-17-47"></a>grp:teleon.maintenance_window.plan@1
+<a id="__codelineno-17-48" name="__codelineno-17-48" href="#__codelineno-17-48"></a>grp:teleon.postmortem_actions.plan@1
+<a id="__codelineno-17-49" name="__codelineno-17-49" href="#__codelineno-17-49"></a>grp:teleon.test_fixture.build@1
+<a id="__codelineno-17-50" name="__codelineno-17-50" href="#__codelineno-17-50"></a>grp:teleon.mock_server.plan@1
+<a id="__codelineno-17-51" name="__codelineno-17-51" href="#__codelineno-17-51"></a>grp:teleon.policy_rule.evaluate@1
+<a id="__codelineno-17-52" name="__codelineno-17-52" href="#__codelineno-17-52"></a>grp:teleon.shell_script.plan@1
+<a id="__codelineno-17-53" name="__codelineno-17-53" href="#__codelineno-17-53"></a>grp:teleon.kubernetes_controller.plan@1
+<a id="__codelineno-17-54" name="__codelineno-17-54" href="#__codelineno-17-54"></a>grp:teleon.workflow_group.plan@1
+<a id="__codelineno-17-55" name="__codelineno-17-55" href="#__codelineno-17-55"></a>grp:teleon.ui_component.plan@1
+<a id="__codelineno-17-56" name="__codelineno-17-56" href="#__codelineno-17-56"></a>grp:teleon.ui_route.plan@1
+<a id="__codelineno-17-57" name="__codelineno-17-57" href="#__codelineno-17-57"></a>grp:teleon.ui_api_binding.plan@1
+<a id="__codelineno-17-58" name="__codelineno-17-58" href="#__codelineno-17-58"></a>grp:teleon.ui_form_validation.plan@1
+<a id="__codelineno-17-59" name="__codelineno-17-59" href="#__codelineno-17-59"></a>grp:teleon.ui_table_state.plan@1
+<a id="__codelineno-17-60" name="__codelineno-17-60" href="#__codelineno-17-60"></a>grp:teleon.dashboard_filter_contract.plan@1
+<a id="__codelineno-17-61" name="__codelineno-17-61" href="#__codelineno-17-61"></a>grp:teleon.ui_accessibility_interaction.plan@1
+<a id="__codelineno-17-62" name="__codelineno-17-62" href="#__codelineno-17-62"></a>grp:teleon.api_resource_group.plan@1
+<a id="__codelineno-17-63" name="__codelineno-17-63" href="#__codelineno-17-63"></a>grp:teleon.microservice_bundle.plan@1
+<a id="__codelineno-17-64" name="__codelineno-17-64" href="#__codelineno-17-64"></a>grp:teleon.service_boundary_contract.plan@1
+<a id="__codelineno-17-65" name="__codelineno-17-65" href="#__codelineno-17-65"></a>grp:teleon.service_surface_inventory.plan@1
+<a id="__codelineno-17-66" name="__codelineno-17-66" href="#__codelineno-17-66"></a>grp:teleon.service_data_ownership.plan@1
+<a id="__codelineno-17-67" name="__codelineno-17-67" href="#__codelineno-17-67"></a>grp:teleon.service_startup_order.plan@1
+<a id="__codelineno-17-68" name="__codelineno-17-68" href="#__codelineno-17-68"></a>grp:teleon.service_secret_binding.plan@1
+<a id="__codelineno-17-69" name="__codelineno-17-69" href="#__codelineno-17-69"></a>grp:teleon.service_backpressure_policy.plan@1
+<a id="__codelineno-17-70" name="__codelineno-17-70" href="#__codelineno-17-70"></a>grp:teleon.openapi_operations.extract@1
+<a id="__codelineno-17-71" name="__codelineno-17-71" href="#__codelineno-17-71"></a>grp:teleon.asyncapi_operations.extract@1
+<a id="__codelineno-17-72" name="__codelineno-17-72" href="#__codelineno-17-72"></a>grp:teleon.cloudevent.normalize@1
+<a id="__codelineno-17-73" name="__codelineno-17-73" href="#__codelineno-17-73"></a>grp:teleon.serverless_function.plan@1
+<a id="__codelineno-17-74" name="__codelineno-17-74" href="#__codelineno-17-74"></a>grp:teleon.observability_instrumentation.plan@1
+<a id="__codelineno-17-75" name="__codelineno-17-75" href="#__codelineno-17-75"></a>grp:teleon.api_contract_test_suite.plan@1
+<a id="__codelineno-17-76" name="__codelineno-17-76" href="#__codelineno-17-76"></a>grp:teleon.feature_flag.plan@1
+<a id="__codelineno-17-77" name="__codelineno-17-77" href="#__codelineno-17-77"></a>grp:teleon.secret_rotation.plan@1
+<a id="__codelineno-17-78" name="__codelineno-17-78" href="#__codelineno-17-78"></a>grp:teleon.agent_tool_schema.openapi_compile@1
+<a id="__codelineno-17-79" name="__codelineno-17-79" href="#__codelineno-17-79"></a>grp:teleon.sdk_package.plan@1
+<a id="__codelineno-17-80" name="__codelineno-17-80" href="#__codelineno-17-80"></a>grp:teleon.dockerfile.plan@1
+<a id="__codelineno-17-81" name="__codelineno-17-81" href="#__codelineno-17-81"></a>grp:teleon.docker_compose_stack.plan@1
+<a id="__codelineno-17-82" name="__codelineno-17-82" href="#__codelineno-17-82"></a>grp:teleon.helm_chart.plan@1
+<a id="__codelineno-17-83" name="__codelineno-17-83" href="#__codelineno-17-83"></a>grp:teleon.rbac_policy_matrix.plan@1
+<a id="__codelineno-17-84" name="__codelineno-17-84" href="#__codelineno-17-84"></a>grp:teleon.pii_redaction_policy.plan@1
+<a id="__codelineno-17-85" name="__codelineno-17-85" href="#__codelineno-17-85"></a>grp:teleon.connector_auth_binding.plan@1
+<a id="__codelineno-17-86" name="__codelineno-17-86" href="#__codelineno-17-86"></a>grp:teleon.idempotency_policy.plan@1
+<a id="__codelineno-17-87" name="__codelineno-17-87" href="#__codelineno-17-87"></a>grp:teleon.pagination_contract.plan@1
+<a id="__codelineno-17-88" name="__codelineno-17-88" href="#__codelineno-17-88"></a>grp:teleon.cors_security_headers.plan@1
+<a id="__codelineno-17-89" name="__codelineno-17-89" href="#__codelineno-17-89"></a>grp:teleon.audit_log_policy.plan@1
+<a id="__codelineno-17-90" name="__codelineno-17-90" href="#__codelineno-17-90"></a>grp:teleon.tenant_isolation.plan@1
+<a id="__codelineno-17-91" name="__codelineno-17-91" href="#__codelineno-17-91"></a>grp:teleon.event_schema_compatibility.evaluate@1
+<a id="__codelineno-17-92" name="__codelineno-17-92" href="#__codelineno-17-92"></a>grp:teleon.dead_letter_replay.plan@1
+<a id="__codelineno-17-93" name="__codelineno-17-93" href="#__codelineno-17-93"></a>grp:teleon.cache_invalidation.plan@1
+<a id="__codelineno-17-94" name="__codelineno-17-94" href="#__codelineno-17-94"></a>grp:teleon.document_chunking.plan@1
+<a id="__codelineno-17-95" name="__codelineno-17-95" href="#__codelineno-17-95"></a>grp:teleon.retrieval_rerank_policy.plan@1
+<a id="__codelineno-17-96" name="__codelineno-17-96" href="#__codelineno-17-96"></a>grp:teleon.citation_coverage.evaluate@1
+<a id="__codelineno-17-97" name="__codelineno-17-97" href="#__codelineno-17-97"></a>grp:teleon.agent_tool_permission_matrix.plan@1
+<a id="__codelineno-17-98" name="__codelineno-17-98" href="#__codelineno-17-98"></a>grp:teleon.model_routing_policy.plan@1
+<a id="__codelineno-17-99" name="__codelineno-17-99" href="#__codelineno-17-99"></a>grp:teleon.prompt_regression_suite.plan@1
+<a id="__codelineno-17-100" name="__codelineno-17-100" href="#__codelineno-17-100"></a>grp:teleon.memory_retention_policy.plan@1
+<a id="__codelineno-17-101" name="__codelineno-17-101" href="#__codelineno-17-101"></a>grp:teleon.vector_index_freshness.evaluate@1
+<a id="__codelineno-17-102" name="__codelineno-17-102" href="#__codelineno-17-102"></a>grp:teleon.canary_release.plan@1
+<a id="__codelineno-17-103" name="__codelineno-17-103" href="#__codelineno-17-103"></a>grp:teleon.blue_green_deployment.plan@1
+<a id="__codelineno-17-104" name="__codelineno-17-104" href="#__codelineno-17-104"></a>grp:teleon.slo_error_budget_policy.plan@1
+<a id="__codelineno-17-105" name="__codelineno-17-105" href="#__codelineno-17-105"></a>grp:teleon.dependency_vulnerability_exception.evaluate@1
+<a id="__codelineno-17-106" name="__codelineno-17-106" href="#__codelineno-17-106"></a>grp:teleon.secret_scan_findings.evaluate@1
+<a id="__codelineno-17-107" name="__codelineno-17-107" href="#__codelineno-17-107"></a>grp:teleon.sbom_generation.plan@1
+<a id="__codelineno-17-108" name="__codelineno-17-108" href="#__codelineno-17-108"></a>grp:teleon.license_compliance.plan@1
+<a id="__codelineno-17-109" name="__codelineno-17-109" href="#__codelineno-17-109"></a>grp:teleon.backup_restore.plan@1
+<a id="__codelineno-17-110" name="__codelineno-17-110" href="#__codelineno-17-110"></a>grp:teleon.circuit_breaker.plan@1
+<a id="__codelineno-17-111" name="__codelineno-17-111" href="#__codelineno-17-111"></a>grp:teleon.retry_backoff_policy.plan@1
+<a id="__codelineno-17-112" name="__codelineno-17-112" href="#__codelineno-17-112"></a>grp:teleon.timeout_budget.plan@1
+<a id="__codelineno-17-113" name="__codelineno-17-113" href="#__codelineno-17-113"></a>grp:teleon.concurrency_limit.plan@1
+<a id="__codelineno-17-114" name="__codelineno-17-114" href="#__codelineno-17-114"></a>grp:teleon.health_probe_contract.plan@1
+<a id="__codelineno-17-115" name="__codelineno-17-115" href="#__codelineno-17-115"></a>grp:teleon.dependency_readiness.plan@1
+<a id="__codelineno-17-116" name="__codelineno-17-116" href="#__codelineno-17-116"></a>grp:teleon.graceful_shutdown.plan@1
+<a id="__codelineno-17-117" name="__codelineno-17-117" href="#__codelineno-17-117"></a>grp:teleon.chaos_experiment.plan@1
+<a id="__codelineno-17-118" name="__codelineno-17-118" href="#__codelineno-17-118"></a>grp:teleon.openapi_compatibility.evaluate@1
+<a id="__codelineno-17-119" name="__codelineno-17-119" href="#__codelineno-17-119"></a>grp:teleon.api_versioning_policy.plan@1
+<a id="__codelineno-17-120" name="__codelineno-17-120" href="#__codelineno-17-120"></a>grp:teleon.api_deprecation_notice.plan@1
+<a id="__codelineno-17-121" name="__codelineno-17-121" href="#__codelineno-17-121"></a>grp:teleon.error_envelope_contract.plan@1
+<a id="__codelineno-17-122" name="__codelineno-17-122" href="#__codelineno-17-122"></a>grp:teleon.request_signing_policy.plan@1
+<a id="__codelineno-17-123" name="__codelineno-17-123" href="#__codelineno-17-123"></a>grp:teleon.api_usage_plan.plan@1
+<a id="__codelineno-17-124" name="__codelineno-17-124" href="#__codelineno-17-124"></a>grp:teleon.api_key_rotation.plan@1
+<a id="__codelineno-17-125" name="__codelineno-17-125" href="#__codelineno-17-125"></a>grp:teleon.response_cache_policy.plan@1
+<a id="__codelineno-17-126" name="__codelineno-17-126" href="#__codelineno-17-126"></a>grp:teleon.api_request_validation.plan@1
+<a id="__codelineno-17-127" name="__codelineno-17-127" href="#__codelineno-17-127"></a>grp:teleon.api_auth_scope_matrix.plan@1
+<a id="__codelineno-17-128" name="__codelineno-17-128" href="#__codelineno-17-128"></a>grp:teleon.api_async_job_endpoint.plan@1
+<a id="__codelineno-17-129" name="__codelineno-17-129" href="#__codelineno-17-129"></a>grp:teleon.api_bulk_operation.plan@1
+<a id="__codelineno-17-130" name="__codelineno-17-130" href="#__codelineno-17-130"></a>grp:teleon.api_operation_example_coverage.plan@1
+<a id="__codelineno-17-131" name="__codelineno-17-131" href="#__codelineno-17-131"></a>grp:teleon.api_endpoint_telemetry.plan@1
+<a id="__codelineno-17-132" name="__codelineno-17-132" href="#__codelineno-17-132"></a>grp:teleon.cdc_capture.plan@1
+<a id="__codelineno-17-133" name="__codelineno-17-133" href="#__codelineno-17-133"></a>grp:teleon.stream_watermark.plan@1
+<a id="__codelineno-17-134" name="__codelineno-17-134" href="#__codelineno-17-134"></a>grp:teleon.partition_strategy.plan@1
+<a id="__codelineno-17-135" name="__codelineno-17-135" href="#__codelineno-17-135"></a>grp:teleon.data_lineage_contract.plan@1
+<a id="__codelineno-17-136" name="__codelineno-17-136" href="#__codelineno-17-136"></a>grp:teleon.outbox_publication.plan@1
+<a id="__codelineno-17-137" name="__codelineno-17-137" href="#__codelineno-17-137"></a>grp:teleon.inbox_deduplication.plan@1
+<a id="__codelineno-17-138" name="__codelineno-17-138" href="#__codelineno-17-138"></a>grp:teleon.materialized_view_refresh.plan@1
+<a id="__codelineno-17-139" name="__codelineno-17-139" href="#__codelineno-17-139"></a>grp:teleon.data_quarantine_policy.plan@1
+<a id="__codelineno-17-140" name="__codelineno-17-140" href="#__codelineno-17-140"></a>grp:teleon.task_lease.plan@1
+<a id="__codelineno-17-141" name="__codelineno-17-141" href="#__codelineno-17-141"></a>grp:teleon.worker_heartbeat.plan@1
+<a id="__codelineno-17-142" name="__codelineno-17-142" href="#__codelineno-17-142"></a>grp:teleon.queue_visibility_timeout.plan@1
+<a id="__codelineno-17-143" name="__codelineno-17-143" href="#__codelineno-17-143"></a>grp:teleon.cron_catchup_window.plan@1
+<a id="__codelineno-17-144" name="__codelineno-17-144" href="#__codelineno-17-144"></a>grp:teleon.workflow_compensation.plan@1
+<a id="__codelineno-17-145" name="__codelineno-17-145" href="#__codelineno-17-145"></a>grp:teleon.batch_checkpoint.plan@1
+<a id="__codelineno-17-146" name="__codelineno-17-146" href="#__codelineno-17-146"></a>grp:teleon.run_artifact_manifest.plan@1
+<a id="__codelineno-17-147" name="__codelineno-17-147" href="#__codelineno-17-147"></a>grp:teleon.execution_audit_trail.plan@1
+<a id="__codelineno-17-148" name="__codelineno-17-148" href="#__codelineno-17-148"></a>grp:teleon.api_gateway_route.plan@1
+<a id="__codelineno-17-149" name="__codelineno-17-149" href="#__codelineno-17-149"></a>grp:teleon.service_discovery_registration.plan@1
+<a id="__codelineno-17-150" name="__codelineno-17-150" href="#__codelineno-17-150"></a>grp:teleon.service_dependency_contract.plan@1
+<a id="__codelineno-17-151" name="__codelineno-17-151" href="#__codelineno-17-151"></a>grp:teleon.runtime_config_schema.plan@1
+<a id="__codelineno-17-152" name="__codelineno-17-152" href="#__codelineno-17-152"></a>grp:teleon.environment_promotion.plan@1
+<a id="__codelineno-17-153" name="__codelineno-17-153" href="#__codelineno-17-153"></a>grp:teleon.webhook_delivery_policy.plan@1
+<a id="__codelineno-17-154" name="__codelineno-17-154" href="#__codelineno-17-154"></a>grp:teleon.consumer_group_offset.plan@1
+<a id="__codelineno-17-155" name="__codelineno-17-155" href="#__codelineno-17-155"></a>grp:teleon.service_ownership_runbook.plan@1
+<a id="__codelineno-17-156" name="__codelineno-17-156" href="#__codelineno-17-156"></a>grp:teleon.schema_drift_gate.plan@1
+<a id="__codelineno-17-157" name="__codelineno-17-157" href="#__codelineno-17-157"></a>grp:teleon.migration_lock.plan@1
+<a id="__codelineno-17-158" name="__codelineno-17-158" href="#__codelineno-17-158"></a>grp:teleon.data_retention_enforcement.plan@1
+<a id="__codelineno-17-159" name="__codelineno-17-159" href="#__codelineno-17-159"></a>grp:teleon.tenant_data_boundary.plan@1
+<a id="__codelineno-17-160" name="__codelineno-17-160" href="#__codelineno-17-160"></a>grp:teleon.backup_restore_drill.plan@1
+<a id="__codelineno-17-161" name="__codelineno-17-161" href="#__codelineno-17-161"></a>grp:teleon.access_review_evidence.plan@1
+<a id="__codelineno-17-162" name="__codelineno-17-162" href="#__codelineno-17-162"></a>grp:teleon.data_deletion_workflow.plan@1
+<a id="__codelineno-17-163" name="__codelineno-17-163" href="#__codelineno-17-163"></a>grp:teleon.privileged_access_approval.plan@1
+<a id="__codelineno-17-164" name="__codelineno-17-164" href="#__codelineno-17-164"></a>grp:teleon.connector_cursor_checkpoint.plan@1
+<a id="__codelineno-17-165" name="__codelineno-17-165" href="#__codelineno-17-165"></a>grp:teleon.connector_field_mapping.plan@1
+<a id="__codelineno-17-166" name="__codelineno-17-166" href="#__codelineno-17-166"></a>grp:teleon.external_identity_map.plan@1
+<a id="__codelineno-17-167" name="__codelineno-17-167" href="#__codelineno-17-167"></a>grp:teleon.sync_conflict_resolution.plan@1
+<a id="__codelineno-17-168" name="__codelineno-17-168" href="#__codelineno-17-168"></a>grp:teleon.connector_rate_limit_budget.plan@1
+<a id="__codelineno-17-169" name="__codelineno-17-169" href="#__codelineno-17-169"></a>grp:teleon.webhook_replay_window.plan@1
+<a id="__codelineno-17-170" name="__codelineno-17-170" href="#__codelineno-17-170"></a>grp:teleon.connector_error_quarantine.plan@1
+<a id="__codelineno-17-171" name="__codelineno-17-171" href="#__codelineno-17-171"></a>grp:teleon.sync_reconciliation_report.plan@1
+<a id="__codelineno-17-172" name="__codelineno-17-172" href="#__codelineno-17-172"></a>grp:teleon.primitive_candidate_intake.plan@1
+<a id="__codelineno-17-173" name="__codelineno-17-173" href="#__codelineno-17-173"></a>grp:teleon.primitive_reuse_observation.plan@1
+<a id="__codelineno-17-174" name="__codelineno-17-174" href="#__codelineno-17-174"></a>grp:teleon.primitive_proof_coverage_matrix.plan@1
+<a id="__codelineno-17-175" name="__codelineno-17-175" href="#__codelineno-17-175"></a>grp:teleon.primitive_promotion_review.plan@1
+<a id="__codelineno-17-176" name="__codelineno-17-176" href="#__codelineno-17-176"></a>grp:teleon.registry_publish_manifest.plan@1
+<a id="__codelineno-17-177" name="__codelineno-17-177" href="#__codelineno-17-177"></a>grp:teleon.benchmark_run_arm.plan@1
+<a id="__codelineno-17-178" name="__codelineno-17-178" href="#__codelineno-17-178"></a>grp:teleon.primitive_lift_comparison.plan@1
+<a id="__codelineno-17-179" name="__codelineno-17-179" href="#__codelineno-17-179"></a>grp:teleon.token_savings_attribution.plan@1
+<a id="__codelineno-17-180" name="__codelineno-17-180" href="#__codelineno-17-180"></a>grp:teleon.pitfall_avoidance_matrix.plan@1
+<a id="__codelineno-17-181" name="__codelineno-17-181" href="#__codelineno-17-181"></a>grp:teleon.route_promotion_evidence_pack.plan@1
+<a id="__codelineno-17-182" name="__codelineno-17-182" href="#__codelineno-17-182"></a>grp:teleon.runtime_shape_adapter.plan@1
+<a id="__codelineno-17-183" name="__codelineno-17-183" href="#__codelineno-17-183"></a>grp:teleon.runtime_shape_adapter_matrix.plan@1
+<a id="__codelineno-17-184" name="__codelineno-17-184" href="#__codelineno-17-184"></a>grp:teleon.openapi_endpoint_cards.compile@1
+<a id="__codelineno-17-185" name="__codelineno-17-185" href="#__codelineno-17-185"></a>grp:teleon.asyncapi_event_cards.compile@1
+<a id="__codelineno-17-186" name="__codelineno-17-186" href="#__codelineno-17-186"></a>grp:teleon.service_surface_cards.compile@1
+<a id="__codelineno-17-187" name="__codelineno-17-187" href="#__codelineno-17-187"></a>grp:teleon.benchmark_primitive_decomposition.plan@1
+<a id="__codelineno-17-188" name="__codelineno-17-188" href="#__codelineno-17-188"></a>grp:teleon.benchmark_route_token_usage.compare@1
+<a id="__codelineno-17-189" name="__codelineno-17-189" href="#__codelineno-17-189"></a>grp:teleon.benchmark_trace_pairs.ingest@1
+<a id="__codelineno-17-190" name="__codelineno-17-190" href="#__codelineno-17-190"></a>grp:teleon.benchmark_trace_pair.evaluate@1
+<a id="__codelineno-17-191" name="__codelineno-17-191" href="#__codelineno-17-191"></a>grp:teleon.benchmark_route_promotion_candidate.evaluate@1
+<a id="__codelineno-17-192" name="__codelineno-17-192" href="#__codelineno-17-192"></a>grp:teleon.primitive_consumer_readiness.evaluate@1
+<a id="__codelineno-17-193" name="__codelineno-17-193" href="#__codelineno-17-193"></a>grp:teleon.primitive_registry_expansion_coverage.evaluate@1
+<a id="__codelineno-17-194" name="__codelineno-17-194" href="#__codelineno-17-194"></a>grp:teleon.primitive_graph_runtime.plan@1
+<a id="__codelineno-17-195" name="__codelineno-17-195" href="#__codelineno-17-195"></a>grp:teleon.container_runtime_cards.compile@1
+<a id="__codelineno-17-196" name="__codelineno-17-196" href="#__codelineno-17-196"></a>grp:teleon.kubernetes_workload_cards.compile@1
+<a id="__codelineno-17-197" name="__codelineno-17-197" href="#__codelineno-17-197"></a>grp:teleon.terraform_module_cards.compile@1
+<a id="__codelineno-17-198" name="__codelineno-17-198" href="#__codelineno-17-198"></a>grp:teleon.ci_workflow_cards.compile@1
+</code></pre></div>
+<p>Each card carries a source function reference, hidden member edges, adapter mutators, proof requirements, and unit-test proof refs. They are still candidate cards:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>candidate=true
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>serves_truth=false
+</code></pre></div>
+<p>This lane is the bridge from abstract primitive-kind families to implementation-backed reuse. It lets AIDevObserver prefer source-backed groups for queries such as database migrations, integration syncs, and cited RAG answers while still requiring proof bundles and promotion review before any truth claim.</p>
+<p>The registry-governance group records cover the primitive database lifecycle itself: candidate intake, runtime-shape reuse observation, proof coverage matrices, promotion review, and registry publish manifests. These are deliberately modeled as candidate-only primitives so AIDevObserver can explain why a route is searchable, proofed, or still blocked without converting a candidate row into truth.</p>
+<p>The experiment-scorecard group records cover the benchmark loop around AiDevExplorer itself: planning baseline and primitive-first run arms, comparing measured lift, attributing token savings to primitive reuse, proving common pitfalls were avoided, and packaging route-promotion evidence. These also stay candidate-only; a winning scorecard can feed promotion review, but it does not promote a primitive by itself.</p>
+<p>The surface-card compiler group records cover the practical handoff from machine-readable software surfaces to AIDevObserver search cards: OpenAPI operations become candidate endpoint cards, AsyncAPI operations become candidate event cards, service-surface inventories become candidate microservice surface cards, and runtime-shape adapter matrices prove that only wrappers changed while the core group edge stayed reusable.</p>
+<p>The benchmark decomposition group records make benchmark tasks more useful than pass/fail prompts. They split each task into logical primitive components, preserve each component's visible edge and proof requirements, and compare token usage of the primitive route against baseline or alternate routes with component-level attribution.</p>
+<p>The benchmark trace-pair ingestion group is the bridge from raw run artifacts to measured evidence:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>BenchmarkRunArtifactSet+TraceIngestionPolicy -&gt; BenchmarkTraceIngestionReceipt
+</code></pre></div>
+<p>It pairs baseline and primitive artifacts by task ID, checks trace refs, actual token counts, successful runs, primitive IDs, component attribution, proof refs, route reuse, and candidate/truth boundaries, then emits evaluator-ready trace pairs.</p>
+<p>The benchmark trace-pair evaluator is the bridge from ingested trace pairs to scored evidence. It verifies same-task baseline and primitive traces, rejects estimate-only token counts, requires component attribution and proof refs, and emits a candidate receipt that can feed promotion review without setting <code>serves_truth=true</code>.</p>
+<p>The benchmark route-promotion candidate evaluator aggregates repeated measured wins:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>BenchmarkTraceEvaluationSet+RoutePromotionPolicy -&gt; BenchmarkRoutePromotionCandidateReceipt
+</code></pre></div>
+<p>It checks run count, task coverage, runtime-shape coverage, tool-consumer coverage, actual token-savings distribution, route reuse, proof refs, unresolved pitfalls, and candidate/truth boundaries. The current source-backed proof covers Codex, Claude Code, Kimi, GLM, and Gemma 4 as development-tool consumers, so AIDevExplorer can ask whether a primitive route wins across tools rather than only in one agent trace. The result is promotion evidence, not automatic promotion.</p>
+<p>The primitive consumer-readiness evaluator is the gate before graph assembly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>PrimitiveEdgeCardSet+ConsumerSurfacePolicy -&gt; PrimitiveConsumerReadinessReceipt
+</code></pre></div>
+<p>It checks whether candidate edge cards are compact, searchable, proof-aware, runtime-targeted, remixable, and safe for product/tool consumers. The current tool-consumer gates explicitly include Codex, Claude Code, Kimi, GLM, and Gemma 4, so AIDevExplorer can test whether baseline coding tools get short reusable edge cards rather than full implementation dumps.</p>
+<p>The primitive registry expansion coverage evaluator audits whether the primitive database actually covers the intended family/runtime surface:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>PrimitiveRegistrySnapshot+ExpansionCoveragePolicy -&gt; PrimitiveRegistryExpansionCoverageReceipt
+</code></pre></div>
+<p>It checks required primitive kinds, runtime targets, source families, proof-bundle coverage, search-smoke coverage, and candidate/truth boundaries. This is the guard against vanity row growth: AIDevExplorer should verify coverage for API endpoints, microservices, webhooks, queue workers, cron jobs, CLI commands, workflow automations, Kubernetes jobs, dashboards, RAG/agent tools, database migrations, DevOps/IaC, security/policy, and integration connectors before treating the benchmark registry as representative.</p>
+<p>The primitive graph-runtime planner is the bridge from benchmark decomposition cards to executable route plans:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>UserIntent+PrimitiveEdgeCardSet+GraphPolicy -&gt; PrimitiveGraphRuntimePlanReceipt
+</code></pre></div>
+<p>It consumes compact primitive cards rather than full source code, orders visible edges from <code>start_edge</code> to <code>goal_edge</code>, carries hidden member edges forward for drill-down, inserts runtime adapter mutators, preserves proof/effect/runtime-target requirements, and blocks unsafe routes that cross the candidate/truth boundary. That is the shape AIDevExplorer should benchmark: baseline agent reads and writes broadly, while the primitive-first run searches edge cards, orders a graph, proves it, and only expands implementation details where needed.</p>
+<p>The deployment-surface compiler group records do the same for runtime artifacts: container services, Kubernetes workloads, Terraform resources, and CI workflows can be compiled into candidate registry cards with runtime safety checks, proof requirements, and promotion gates.</p>
+<p>The current source-backed implementation coverage includes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>api.endpoint
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>service.group
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>service.boundary_contract
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>service.surface_inventory
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>service.data_ownership
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>service.startup_order
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>service.secret_binding
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>service.backpressure_policy
+<a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a>container.job
+<a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a>contract.test
+<a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a>db.migration
+<a id="__codelineno-24-12" name="__codelineno-24-12" href="#__codelineno-24-12"></a>integration.connector
+<a id="__codelineno-24-13" name="__codelineno-24-13" href="#__codelineno-24-13"></a>rag.pipeline
+<a id="__codelineno-24-14" name="__codelineno-24-14" href="#__codelineno-24-14"></a>webhook.handler
+<a id="__codelineno-24-15" name="__codelineno-24-15" href="#__codelineno-24-15"></a>queue.consumer
+<a id="__codelineno-24-16" name="__codelineno-24-16" href="#__codelineno-24-16"></a>queue.payload_contract
+<a id="__codelineno-24-17" name="__codelineno-24-17" href="#__codelineno-24-17"></a>queue.ack_policy
+<a id="__codelineno-24-18" name="__codelineno-24-18" href="#__codelineno-24-18"></a>queue.poison_message_policy
+<a id="__codelineno-24-19" name="__codelineno-24-19" href="#__codelineno-24-19"></a>queue.batch_consumer
+<a id="__codelineno-24-20" name="__codelineno-24-20" href="#__codelineno-24-20"></a>queue.ordering_policy
+<a id="__codelineno-24-21" name="__codelineno-24-21" href="#__codelineno-24-21"></a>worker.autoscale_policy
+<a id="__codelineno-24-22" name="__codelineno-24-22" href="#__codelineno-24-22"></a>cron.job
+<a id="__codelineno-24-23" name="__codelineno-24-23" href="#__codelineno-24-23"></a>cli.command
+<a id="__codelineno-24-24" name="__codelineno-24-24" href="#__codelineno-24-24"></a>kubernetes.job
+<a id="__codelineno-24-25" name="__codelineno-24-25" href="#__codelineno-24-25"></a>dashboard
+<a id="__codelineno-24-26" name="__codelineno-24-26" href="#__codelineno-24-26"></a>auth.middleware
+<a id="__codelineno-24-27" name="__codelineno-24-27" href="#__codelineno-24-27"></a>rate.limit.middleware
+<a id="__codelineno-24-28" name="__codelineno-24-28" href="#__codelineno-24-28"></a>llm.tool
+<a id="__codelineno-24-29" name="__codelineno-24-29" href="#__codelineno-24-29"></a>workflow.step
+<a id="__codelineno-24-30" name="__codelineno-24-30" href="#__codelineno-24-30"></a>queue.producer
+<a id="__codelineno-24-31" name="__codelineno-24-31" href="#__codelineno-24-31"></a>event.handler
+<a id="__codelineno-24-32" name="__codelineno-24-32" href="#__codelineno-24-32"></a>sdk.client
+<a id="__codelineno-24-33" name="__codelineno-24-33" href="#__codelineno-24-33"></a>terraform.module
+<a id="__codelineno-24-34" name="__codelineno-24-34" href="#__codelineno-24-34"></a>github.action
+<a id="__codelineno-24-35" name="__codelineno-24-35" href="#__codelineno-24-35"></a>data.quality.rule
+<a id="__codelineno-24-36" name="__codelineno-24-36" href="#__codelineno-24-36"></a>vector.indexer
+<a id="__codelineno-24-37" name="__codelineno-24-37" href="#__codelineno-24-37"></a>security.compliance.workflow
+<a id="__codelineno-24-38" name="__codelineno-24-38" href="#__codelineno-24-38"></a>graphql.resolver
+<a id="__codelineno-24-39" name="__codelineno-24-39" href="#__codelineno-24-39"></a>grpc.method
+<a id="__codelineno-24-40" name="__codelineno-24-40" href="#__codelineno-24-40"></a>sql.view
+<a id="__codelineno-24-41" name="__codelineno-24-41" href="#__codelineno-24-41"></a>sql.proc
+<a id="__codelineno-24-42" name="__codelineno-24-42" href="#__codelineno-24-42"></a>etl.pipeline
+<a id="__codelineno-24-43" name="__codelineno-24-43" href="#__codelineno-24-43"></a>elt.model
+<a id="__codelineno-24-44" name="__codelineno-24-44" href="#__codelineno-24-44"></a>alert.rule
+<a id="__codelineno-24-45" name="__codelineno-24-45" href="#__codelineno-24-45"></a>runbook
+<a id="__codelineno-24-46" name="__codelineno-24-46" href="#__codelineno-24-46"></a>ops.incident_triage
+<a id="__codelineno-24-47" name="__codelineno-24-47" href="#__codelineno-24-47"></a>ops.oncall_escalation
+<a id="__codelineno-24-48" name="__codelineno-24-48" href="#__codelineno-24-48"></a>ops.status_page_update
+<a id="__codelineno-24-49" name="__codelineno-24-49" href="#__codelineno-24-49"></a>ops.maintenance_window
+<a id="__codelineno-24-50" name="__codelineno-24-50" href="#__codelineno-24-50"></a>ops.postmortem_actions
+<a id="__codelineno-24-51" name="__codelineno-24-51" href="#__codelineno-24-51"></a>test.fixture
+<a id="__codelineno-24-52" name="__codelineno-24-52" href="#__codelineno-24-52"></a>mock.server
+<a id="__codelineno-24-53" name="__codelineno-24-53" href="#__codelineno-24-53"></a>policy.rule
+<a id="__codelineno-24-54" name="__codelineno-24-54" href="#__codelineno-24-54"></a>shell.script
+<a id="__codelineno-24-55" name="__codelineno-24-55" href="#__codelineno-24-55"></a>kubernetes.controller
+<a id="__codelineno-24-56" name="__codelineno-24-56" href="#__codelineno-24-56"></a>workflow.group
+<a id="__codelineno-24-57" name="__codelineno-24-57" href="#__codelineno-24-57"></a>ui.component
+<a id="__codelineno-24-58" name="__codelineno-24-58" href="#__codelineno-24-58"></a>ui.route
+<a id="__codelineno-24-59" name="__codelineno-24-59" href="#__codelineno-24-59"></a>ui.api_binding
+<a id="__codelineno-24-60" name="__codelineno-24-60" href="#__codelineno-24-60"></a>ui.form_validation
+<a id="__codelineno-24-61" name="__codelineno-24-61" href="#__codelineno-24-61"></a>ui.table_state
+<a id="__codelineno-24-62" name="__codelineno-24-62" href="#__codelineno-24-62"></a>dashboard.filter_contract
+<a id="__codelineno-24-63" name="__codelineno-24-63" href="#__codelineno-24-63"></a>ui.accessibility_interaction
+<a id="__codelineno-24-64" name="__codelineno-24-64" href="#__codelineno-24-64"></a>api.resource.group
+<a id="__codelineno-24-65" name="__codelineno-24-65" href="#__codelineno-24-65"></a>api.openapi.extractor
+<a id="__codelineno-24-66" name="__codelineno-24-66" href="#__codelineno-24-66"></a>event.asyncapi.extractor
+<a id="__codelineno-24-67" name="__codelineno-24-67" href="#__codelineno-24-67"></a>event.cloudevents.normalizer
+<a id="__codelineno-24-68" name="__codelineno-24-68" href="#__codelineno-24-68"></a>serverless.function
+<a id="__codelineno-24-69" name="__codelineno-24-69" href="#__codelineno-24-69"></a>observability.instrumentation
+<a id="__codelineno-24-70" name="__codelineno-24-70" href="#__codelineno-24-70"></a>feature.flag
+<a id="__codelineno-24-71" name="__codelineno-24-71" href="#__codelineno-24-71"></a>security.secret.rotation
+<a id="__codelineno-24-72" name="__codelineno-24-72" href="#__codelineno-24-72"></a>llm.tool.schema
+<a id="__codelineno-24-73" name="__codelineno-24-73" href="#__codelineno-24-73"></a>sdk.package
+<a id="__codelineno-24-74" name="__codelineno-24-74" href="#__codelineno-24-74"></a>container.dockerfile
+<a id="__codelineno-24-75" name="__codelineno-24-75" href="#__codelineno-24-75"></a>container.compose
+<a id="__codelineno-24-76" name="__codelineno-24-76" href="#__codelineno-24-76"></a>helm.chart
+<a id="__codelineno-24-77" name="__codelineno-24-77" href="#__codelineno-24-77"></a>rbac.policy
+<a id="__codelineno-24-78" name="__codelineno-24-78" href="#__codelineno-24-78"></a>privacy.pii.redaction
+<a id="__codelineno-24-79" name="__codelineno-24-79" href="#__codelineno-24-79"></a>integration.connector.auth
+<a id="__codelineno-24-80" name="__codelineno-24-80" href="#__codelineno-24-80"></a>api.idempotency.policy
+<a id="__codelineno-24-81" name="__codelineno-24-81" href="#__codelineno-24-81"></a>api.pagination.contract
+<a id="__codelineno-24-82" name="__codelineno-24-82" href="#__codelineno-24-82"></a>api.security_headers.cors
+<a id="__codelineno-24-83" name="__codelineno-24-83" href="#__codelineno-24-83"></a>audit.log.policy
+<a id="__codelineno-24-84" name="__codelineno-24-84" href="#__codelineno-24-84"></a>tenancy.isolation
+<a id="__codelineno-24-85" name="__codelineno-24-85" href="#__codelineno-24-85"></a>event.schema.compatibility
+<a id="__codelineno-24-86" name="__codelineno-24-86" href="#__codelineno-24-86"></a>queue.dead_letter_replay
+<a id="__codelineno-24-87" name="__codelineno-24-87" href="#__codelineno-24-87"></a>cache.invalidation
+<a id="__codelineno-24-88" name="__codelineno-24-88" href="#__codelineno-24-88"></a>rag.document_chunking
+<a id="__codelineno-24-89" name="__codelineno-24-89" href="#__codelineno-24-89"></a>rag.retrieval_rerank
+<a id="__codelineno-24-90" name="__codelineno-24-90" href="#__codelineno-24-90"></a>rag.citation_coverage
+<a id="__codelineno-24-91" name="__codelineno-24-91" href="#__codelineno-24-91"></a>agent.tool_permission_matrix
+<a id="__codelineno-24-92" name="__codelineno-24-92" href="#__codelineno-24-92"></a>llm.model_routing.policy
+<a id="__codelineno-24-93" name="__codelineno-24-93" href="#__codelineno-24-93"></a>eval.prompt_regression
+<a id="__codelineno-24-94" name="__codelineno-24-94" href="#__codelineno-24-94"></a>agent.memory_retention
+<a id="__codelineno-24-95" name="__codelineno-24-95" href="#__codelineno-24-95"></a>vector.index_freshness
+<a id="__codelineno-24-96" name="__codelineno-24-96" href="#__codelineno-24-96"></a>release.canary
+<a id="__codelineno-24-97" name="__codelineno-24-97" href="#__codelineno-24-97"></a>release.blue_green
+<a id="__codelineno-24-98" name="__codelineno-24-98" href="#__codelineno-24-98"></a>observability.slo_error_budget
+<a id="__codelineno-24-99" name="__codelineno-24-99" href="#__codelineno-24-99"></a>security.dependency_exception
+<a id="__codelineno-24-100" name="__codelineno-24-100" href="#__codelineno-24-100"></a>security.secret_scan
+<a id="__codelineno-24-101" name="__codelineno-24-101" href="#__codelineno-24-101"></a>supply_chain.sbom
+<a id="__codelineno-24-102" name="__codelineno-24-102" href="#__codelineno-24-102"></a>supply_chain.license_compliance
+<a id="__codelineno-24-103" name="__codelineno-24-103" href="#__codelineno-24-103"></a>ops.backup_restore
+<a id="__codelineno-24-104" name="__codelineno-24-104" href="#__codelineno-24-104"></a>resilience.circuit_breaker
+<a id="__codelineno-24-105" name="__codelineno-24-105" href="#__codelineno-24-105"></a>resilience.retry_backoff
+<a id="__codelineno-24-106" name="__codelineno-24-106" href="#__codelineno-24-106"></a>resilience.timeout_budget
+<a id="__codelineno-24-107" name="__codelineno-24-107" href="#__codelineno-24-107"></a>resilience.concurrency_limit
+<a id="__codelineno-24-108" name="__codelineno-24-108" href="#__codelineno-24-108"></a>resilience.health_probe
+<a id="__codelineno-24-109" name="__codelineno-24-109" href="#__codelineno-24-109"></a>resilience.dependency_readiness
+<a id="__codelineno-24-110" name="__codelineno-24-110" href="#__codelineno-24-110"></a>resilience.graceful_shutdown
+<a id="__codelineno-24-111" name="__codelineno-24-111" href="#__codelineno-24-111"></a>resilience.chaos_experiment
+<a id="__codelineno-24-112" name="__codelineno-24-112" href="#__codelineno-24-112"></a>api.openapi.compatibility
+<a id="__codelineno-24-113" name="__codelineno-24-113" href="#__codelineno-24-113"></a>api.versioning_policy
+<a id="__codelineno-24-114" name="__codelineno-24-114" href="#__codelineno-24-114"></a>api.deprecation_notice
+<a id="__codelineno-24-115" name="__codelineno-24-115" href="#__codelineno-24-115"></a>api.error_envelope
+<a id="__codelineno-24-116" name="__codelineno-24-116" href="#__codelineno-24-116"></a>api.request_signing
+<a id="__codelineno-24-117" name="__codelineno-24-117" href="#__codelineno-24-117"></a>api.usage_plan
+<a id="__codelineno-24-118" name="__codelineno-24-118" href="#__codelineno-24-118"></a>api.key_rotation
+<a id="__codelineno-24-119" name="__codelineno-24-119" href="#__codelineno-24-119"></a>api.response_cache
+<a id="__codelineno-24-120" name="__codelineno-24-120" href="#__codelineno-24-120"></a>api.request_validation
+<a id="__codelineno-24-121" name="__codelineno-24-121" href="#__codelineno-24-121"></a>api.auth_scope_matrix
+<a id="__codelineno-24-122" name="__codelineno-24-122" href="#__codelineno-24-122"></a>api.async_job_endpoint
+<a id="__codelineno-24-123" name="__codelineno-24-123" href="#__codelineno-24-123"></a>api.bulk_operation
+<a id="__codelineno-24-124" name="__codelineno-24-124" href="#__codelineno-24-124"></a>api.operation_example_coverage
+<a id="__codelineno-24-125" name="__codelineno-24-125" href="#__codelineno-24-125"></a>api.endpoint_telemetry
+<a id="__codelineno-24-126" name="__codelineno-24-126" href="#__codelineno-24-126"></a>data.cdc_capture
+<a id="__codelineno-24-127" name="__codelineno-24-127" href="#__codelineno-24-127"></a>stream.watermark
+<a id="__codelineno-24-128" name="__codelineno-24-128" href="#__codelineno-24-128"></a>data.partition_strategy
+<a id="__codelineno-24-129" name="__codelineno-24-129" href="#__codelineno-24-129"></a>data.lineage_contract
+<a id="__codelineno-24-130" name="__codelineno-24-130" href="#__codelineno-24-130"></a>event.outbox_publication
+<a id="__codelineno-24-131" name="__codelineno-24-131" href="#__codelineno-24-131"></a>event.inbox_deduplication
+<a id="__codelineno-24-132" name="__codelineno-24-132" href="#__codelineno-24-132"></a>data.materialized_view_refresh
+<a id="__codelineno-24-133" name="__codelineno-24-133" href="#__codelineno-24-133"></a>data.quarantine_policy
+<a id="__codelineno-24-134" name="__codelineno-24-134" href="#__codelineno-24-134"></a>worker.task_lease
+<a id="__codelineno-24-135" name="__codelineno-24-135" href="#__codelineno-24-135"></a>worker.heartbeat
+<a id="__codelineno-24-136" name="__codelineno-24-136" href="#__codelineno-24-136"></a>queue.visibility_timeout
+<a id="__codelineno-24-137" name="__codelineno-24-137" href="#__codelineno-24-137"></a>cron.catchup_window
+<a id="__codelineno-24-138" name="__codelineno-24-138" href="#__codelineno-24-138"></a>workflow.compensation
+<a id="__codelineno-24-139" name="__codelineno-24-139" href="#__codelineno-24-139"></a>batch.checkpoint
+<a id="__codelineno-24-140" name="__codelineno-24-140" href="#__codelineno-24-140"></a>artifact.run_manifest
+<a id="__codelineno-24-141" name="__codelineno-24-141" href="#__codelineno-24-141"></a>audit.execution_trail
+<a id="__codelineno-24-142" name="__codelineno-24-142" href="#__codelineno-24-142"></a>api.gateway_route
+<a id="__codelineno-24-143" name="__codelineno-24-143" href="#__codelineno-24-143"></a>service.discovery_registration
+<a id="__codelineno-24-144" name="__codelineno-24-144" href="#__codelineno-24-144"></a>service.dependency_contract
+<a id="__codelineno-24-145" name="__codelineno-24-145" href="#__codelineno-24-145"></a>service.runtime_config_schema
+<a id="__codelineno-24-146" name="__codelineno-24-146" href="#__codelineno-24-146"></a>release.environment_promotion
+<a id="__codelineno-24-147" name="__codelineno-24-147" href="#__codelineno-24-147"></a>webhook.delivery_policy
+<a id="__codelineno-24-148" name="__codelineno-24-148" href="#__codelineno-24-148"></a>event.consumer_group_offset
+<a id="__codelineno-24-149" name="__codelineno-24-149" href="#__codelineno-24-149"></a>service.ownership_runbook
+<a id="__codelineno-24-150" name="__codelineno-24-150" href="#__codelineno-24-150"></a>db.schema_drift_gate
+<a id="__codelineno-24-151" name="__codelineno-24-151" href="#__codelineno-24-151"></a>db.migration_lock
+<a id="__codelineno-24-152" name="__codelineno-24-152" href="#__codelineno-24-152"></a>data.retention_enforcement
+<a id="__codelineno-24-153" name="__codelineno-24-153" href="#__codelineno-24-153"></a>tenancy.data_boundary
+<a id="__codelineno-24-154" name="__codelineno-24-154" href="#__codelineno-24-154"></a>ops.backup_restore_drill
+<a id="__codelineno-24-155" name="__codelineno-24-155" href="#__codelineno-24-155"></a>security.access_review_evidence
+<a id="__codelineno-24-156" name="__codelineno-24-156" href="#__codelineno-24-156"></a>privacy.data_deletion_workflow
+<a id="__codelineno-24-157" name="__codelineno-24-157" href="#__codelineno-24-157"></a>security.privileged_access_approval
+<a id="__codelineno-24-158" name="__codelineno-24-158" href="#__codelineno-24-158"></a>integration.connector_cursor_checkpoint
+<a id="__codelineno-24-159" name="__codelineno-24-159" href="#__codelineno-24-159"></a>integration.connector_field_mapping
+<a id="__codelineno-24-160" name="__codelineno-24-160" href="#__codelineno-24-160"></a>integration.external_identity_map
+<a id="__codelineno-24-161" name="__codelineno-24-161" href="#__codelineno-24-161"></a>integration.sync_conflict_resolution
+<a id="__codelineno-24-162" name="__codelineno-24-162" href="#__codelineno-24-162"></a>integration.connector_rate_limit_budget
+<a id="__codelineno-24-163" name="__codelineno-24-163" href="#__codelineno-24-163"></a>webhook.replay_window
+<a id="__codelineno-24-164" name="__codelineno-24-164" href="#__codelineno-24-164"></a>integration.connector_error_quarantine
+<a id="__codelineno-24-165" name="__codelineno-24-165" href="#__codelineno-24-165"></a>integration.sync_reconciliation_report
+<a id="__codelineno-24-166" name="__codelineno-24-166" href="#__codelineno-24-166"></a>artifact.primitive_group
+<a id="__codelineno-24-167" name="__codelineno-24-167" href="#__codelineno-24-167"></a>registry.primitive_candidate_intake
+<a id="__codelineno-24-168" name="__codelineno-24-168" href="#__codelineno-24-168"></a>registry.primitive_reuse_observation
+<a id="__codelineno-24-169" name="__codelineno-24-169" href="#__codelineno-24-169"></a>registry.primitive_proof_coverage
+<a id="__codelineno-24-170" name="__codelineno-24-170" href="#__codelineno-24-170"></a>registry.primitive_promotion_review
+<a id="__codelineno-24-171" name="__codelineno-24-171" href="#__codelineno-24-171"></a>registry.publish_manifest
+<a id="__codelineno-24-172" name="__codelineno-24-172" href="#__codelineno-24-172"></a>benchmark.run_arm
+<a id="__codelineno-24-173" name="__codelineno-24-173" href="#__codelineno-24-173"></a>benchmark.primitive_lift_comparison
+<a id="__codelineno-24-174" name="__codelineno-24-174" href="#__codelineno-24-174"></a>benchmark.token_savings_attribution
+<a id="__codelineno-24-175" name="__codelineno-24-175" href="#__codelineno-24-175"></a>benchmark.pitfall_avoidance_matrix
+<a id="__codelineno-24-176" name="__codelineno-24-176" href="#__codelineno-24-176"></a>benchmark.route_promotion_evidence_pack
+<a id="__codelineno-24-177" name="__codelineno-24-177" href="#__codelineno-24-177"></a>benchmark.route_promotion_candidate
+<a id="__codelineno-24-178" name="__codelineno-24-178" href="#__codelineno-24-178"></a>runtime_shape.adapter
+<a id="__codelineno-24-179" name="__codelineno-24-179" href="#__codelineno-24-179"></a>runtime_shape.adapter_matrix
+<a id="__codelineno-24-180" name="__codelineno-24-180" href="#__codelineno-24-180"></a>registry.openapi_endpoint_card_compiler
+<a id="__codelineno-24-181" name="__codelineno-24-181" href="#__codelineno-24-181"></a>registry.asyncapi_event_card_compiler
+<a id="__codelineno-24-182" name="__codelineno-24-182" href="#__codelineno-24-182"></a>registry.service_surface_card_compiler
+<a id="__codelineno-24-183" name="__codelineno-24-183" href="#__codelineno-24-183"></a>benchmark.primitive_decomposition
+<a id="__codelineno-24-184" name="__codelineno-24-184" href="#__codelineno-24-184"></a>benchmark.route_token_usage
+<a id="__codelineno-24-185" name="__codelineno-24-185" href="#__codelineno-24-185"></a>benchmark.trace_pair_ingestion
+<a id="__codelineno-24-186" name="__codelineno-24-186" href="#__codelineno-24-186"></a>benchmark.trace_pair_evaluation
+<a id="__codelineno-24-187" name="__codelineno-24-187" href="#__codelineno-24-187"></a>registry.container_runtime_card_compiler
+<a id="__codelineno-24-188" name="__codelineno-24-188" href="#__codelineno-24-188"></a>registry.kubernetes_workload_card_compiler
+<a id="__codelineno-24-189" name="__codelineno-24-189" href="#__codelineno-24-189"></a>registry.terraform_module_card_compiler
+<a id="__codelineno-24-190" name="__codelineno-24-190" href="#__codelineno-24-190"></a>registry.ci_workflow_card_compiler
+</code></pre></div>
+<h2 id="proof-bundle-and-promotion-gate-lane">Proof Bundle And Promotion Gate Lane<a class="headerlink" href="#proof-bundle-and-promotion-gate-lane" title="Permanent link">&para;</a></h2>
+<p>Source-backed cards get a companion proof lane:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>source-backed group record
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>-&gt; proof_bundle row
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>-&gt; promotion gate row
+</code></pre></div>
+<p>The proof bundle rows follow the <code>proof_bundle</code> table shape in <code>db/postgres/schema.sql</code>: <code>subject_id</code>, <code>subject_kind</code>, <code>proof_kind</code>, <code>status</code>, <code>proof_command</code>, artifact refs, input hashes, output hashes, and <code>proof_hash</code>.</p>
+<p>The promotion gate rows are deliberately stricter than a passing test run. They record that unit tests passed, contracts and hidden member edges are declared, and the candidate boundary is preserved, but they still block promotion:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>promotion_gate_status=blocked_pending_owner_review
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>promotion_allowed=false
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>promotable_without_review=false
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>candidate=true
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>serves_truth=false
+</code></pre></div>
+<p>AIDevObserver search loads the source-backed group records as candidate reuse cards. The proof bundles and promotion gates are not search cards; they are registry evidence and metadata for promotion review. The proof lane should cover every source-backed group record currently loaded by AIDevObserver.</p>
+<p>Compute the current proof lane count from the generated manifests:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>python3<span class="w"> </span>scripts/check_teleon_source_backed_primitive_group_cards.py
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>python3<span class="w"> </span>scripts/check_teleon_source_backed_primitive_group_proof_bundles.py
+</code></pre></div>
+<p>When a source-backed group has matching evidence, AIDevObserver attaches compact proof metadata to the reuse card:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>proof_status=pass
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>promotion_gate_status=blocked_pending_owner_review
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>promotion_allowed=false
+</code></pre></div>
+<p>Proofed source-backed candidates get a small ranking boost so reusable, tested groups are preferred over less-specific generated rows. The boost is only search ranking; it does not promote the record or set <code>serves_truth=true</code>.</p>
+<h2 id="benchmark-loop">Benchmark Loop<a class="headerlink" href="#benchmark-loop" title="Permanent link">&para;</a></h2>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>python3<span class="w"> </span>scripts/generate_aidevexplorer_real_world_task_corpus.py
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_real_world_task_corpus.py
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>python3<span class="w"> </span>scripts/build_aidevexplorer_task_benchmark_suites.py<span class="w"> </span>--date<span class="w"> </span><span class="m">2026</span>-06-30
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_task_benchmark_suites.py<span class="w"> </span>--date<span class="w"> </span><span class="m">2026</span>-06-30
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>python3<span class="w"> </span>scripts/build_aidevexplorer_benchmark_task_decompositions.py<span class="w"> </span>--date<span class="w"> </span><span class="m">2026</span>-07-01
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_benchmark_task_decompositions.py<span class="w"> </span>--date<span class="w"> </span><span class="m">2026</span>-07-01
+<a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>python3<span class="w"> </span>scripts/build_aidevexplorer_benchmark_decomposition_cards.py<span class="w"> </span>--date<span class="w"> </span><span class="m">2026</span>-07-01
+<a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_benchmark_decomposition_cards.py
+<a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a>python3<span class="w"> </span>scripts/generate_aidevexplorer_runtime_shape_task_corpus.py
+<a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_runtime_shape_task_corpus.py
+<a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a>python3<span class="w"> </span>scripts/build_aidevexplorer_runtime_shape_primitive_cards.py
+<a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_runtime_shape_primitive_cards.py
+<a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a>python3<span class="w"> </span>scripts/generate_aidevexplorer_primitive_kind_family_catalog.py
+<a id="__codelineno-29-14" name="__codelineno-29-14" href="#__codelineno-29-14"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_primitive_kind_family_catalog.py
+<a id="__codelineno-29-15" name="__codelineno-29-15" href="#__codelineno-29-15"></a>python3<span class="w"> </span>scripts/build_aidevexplorer_primitive_kind_cards.py
+<a id="__codelineno-29-16" name="__codelineno-29-16" href="#__codelineno-29-16"></a>python3<span class="w"> </span>scripts/check_aidevexplorer_primitive_kind_cards.py
+<a id="__codelineno-29-17" name="__codelineno-29-17" href="#__codelineno-29-17"></a>python3<span class="w"> </span>-m<span class="w"> </span>unittest<span class="w"> </span>tests/unit/test_teleon_primitive_groups.py
+<a id="__codelineno-29-18" name="__codelineno-29-18" href="#__codelineno-29-18"></a>python3<span class="w"> </span>scripts/build_teleon_source_backed_primitive_group_cards.py
+<a id="__codelineno-29-19" name="__codelineno-29-19" href="#__codelineno-29-19"></a>python3<span class="w"> </span>scripts/check_teleon_source_backed_primitive_group_cards.py
+<a id="__codelineno-29-20" name="__codelineno-29-20" href="#__codelineno-29-20"></a>python3<span class="w"> </span>scripts/build_teleon_source_backed_primitive_group_proof_bundles.py
+<a id="__codelineno-29-21" name="__codelineno-29-21" href="#__codelineno-29-21"></a>python3<span class="w"> </span>scripts/check_teleon_source_backed_primitive_group_proof_bundles.py
+<a id="__codelineno-29-22" name="__codelineno-29-22" href="#__codelineno-29-22"></a>python3<span class="w"> </span>scripts/primitive_source_lifecycle.py<span class="w"> </span>--self-test
+</code></pre></div>
+<p>Then run each suite twice:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>baseline: generic AI coding agent without primitive search
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>candidate: AIDevExplorer with primitive search and route assembly
+</code></pre></div>
+<p>For each task, collect:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>wall_clock_minutes
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>prompt_tokens
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>completion_tokens
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>files_touched
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>custom_code_lines
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>primitive_hits
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>primitive_groups_used
+<a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a>test_pass_rate
+<a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a>pitfalls_avoided
+<a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a>rework_loops
+</code></pre></div>
+<h2 id="success-criteria">Success Criteria<a class="headerlink" href="#success-criteria" title="Permanent link">&para;</a></h2>
+<p>AIDevExplorer should not just finish tasks. It should avoid predictable waste:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>find a reusable primitive or primitive group before writing custom code
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>compose visible edges into a route
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>use hidden member edges only when needed
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>emit proof/tests/receipts
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>avoid known pitfalls listed on the task row
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>reduce prompt tokens by at least 30 percent
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>reduce wall time by at least 25 percent
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>reduce repeated repair loops
+</code></pre></div>
+<p>Benchmark results remain evidence only. They cannot promote a primitive or claim product truth without separate review.</p>
+<h2 id="foundry-ingestion">Foundry Ingestion<a class="headerlink" href="#foundry-ingestion" title="Permanent link">&para;</a></h2>
+<p>The task corpus keeps <code>source_kind=curated_public_codegen_use_case</code>, so the existing context foundry can ingest it directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>python3<span class="w"> </span>scripts/aidevobserver_context_foundry_loop.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">  </span>--once<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">  </span>--public-use-case-seeds<span class="w"> </span>catalog/knowledge-packs/data/aidevexplorer-real-world-build-tasks/tasks.jsonl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">  </span>--use-case-limit<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">  </span>--skip-microsurface-atlas<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">  </span>--skip-source-discovery-search-seeds<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">  </span>--skip-multilingual-search-scopes<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="w">  </span>--skip-naics-search-scopes<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w">  </span>--skip-business-operation-search-scopes
+</code></pre></div>
+<p>Use a small <code>--use-case-limit</code> for smoke tests and raise it for batch runs.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

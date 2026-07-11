@@ -1,0 +1,31 @@
+MODULE src/teleon/purpose_tasks/adaptation_ladder.py
+## API signatures
+```python
+"""src.teleon.purpose_tasks.adaptation_ladder — classify a PurposeTask change by the risk-tiered ADAPTATION
+LADDER (L0..L5) and decide whether it may auto-promote or must be human-approved."""
+_LADDER_PATH = ...
+_UNKNOWN_LEVEL = ...
+def _ladder() -> dict
+def _index() -> dict[str, dict]
+    # change_type → its level record.
+def classify(change_type: str) -> dict
+    # Return {level, name, gate, requires_human, known} for a change type. Unknown → L5/human (deny-by-default).
+def is_forbidden_autonomous(change_type: str) -> bool
+    # True if the change may NEVER be an autonomous candidate adaptation (weakens the contract / hides truth).
+def is_ends_change(change_type: str) -> bool
+    # True if the change touches the task's ENDS (purpose/permissions/criteria/systems/risk) — human-gated.
+def may_auto_promote(change_type: str) -> bool
+    # A change may auto-promote ONLY if it is a known MEANS change (L0-L3), not human-gated, and not forbidden.
+def required_gate(change_type: str) -> str
+    # The gate a change must clear. Forbidden changes report 'forbidden_autonomous'.
+```
+## intra-module call edges
+src.teleon.purpose_tasks.adaptation_ladder._index -> src.teleon.purpose_tasks.adaptation_ladder._ladder
+src.teleon.purpose_tasks.adaptation_ladder.classify -> src.teleon.purpose_tasks.adaptation_ladder._index
+src.teleon.purpose_tasks.adaptation_ladder.is_ends_change -> src.teleon.purpose_tasks.adaptation_ladder._ladder
+src.teleon.purpose_tasks.adaptation_ladder.is_forbidden_autonomous -> src.teleon.purpose_tasks.adaptation_ladder._ladder
+src.teleon.purpose_tasks.adaptation_ladder.may_auto_promote -> src.teleon.purpose_tasks.adaptation_ladder.classify
+src.teleon.purpose_tasks.adaptation_ladder.may_auto_promote -> src.teleon.purpose_tasks.adaptation_ladder.is_ends_change
+src.teleon.purpose_tasks.adaptation_ladder.may_auto_promote -> src.teleon.purpose_tasks.adaptation_ladder.is_forbidden_autonomous
+src.teleon.purpose_tasks.adaptation_ladder.required_gate -> src.teleon.purpose_tasks.adaptation_ladder.classify
+src.teleon.purpose_tasks.adaptation_ladder.required_gate -> src.teleon.purpose_tasks.adaptation_ladder.is_forbidden_autonomous

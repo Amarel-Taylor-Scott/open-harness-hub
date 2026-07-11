@@ -1,0 +1,30 @@
+MODULE src/baltor/determinism/rule_promotion_gate.py
+## API signatures
+```python
+"""src.baltor.determinism.rule_promotion_gate — the M7 gate that promotes a candidate to a deterministic rule."""
+EPOCH = ...
+GLOBAL_PUBLIC = ...
+TENANT_PRIVATE = ...
+TRUTH_SERVING_PRECISION_BAR = ...
+ROUTING_PRECISION_BAR = ...
+_CANDIDATE_ID_PREFIX = ...
+def _canon(body: Any) -> bytes
+class GateCheck:
+    def to_dict(self) -> dict
+class RulePromotionReceipt:
+    # The receipt of a promotion DECISION. ``promoted`` may be False (a blocked candidate still gets a
+    def to_dict(self) -> dict
+def _is_schema_valid(rule: RuleCandidate) -> tuple[bool, str]
+    # Structural validity of a candidate (id shape, required fields present, declarative logic present).
+def _handles_preserved(rule: RuleCandidate) -> tuple[bool, str]
+    # A truth-serving rule must NOT drop the source handles its decision rests on. Every verified example /
+def evaluate(rule: RuleCandidate, *, replay_report: RuleReplayReport, shadow_report: ShadowRunReport | None=None, first_promotion: bool=True, human_review_signed: bool=False, source_traces_scope: str | None=None, now: str=EPOCH) -> RulePromotionReceipt
+    # Decide whether ``rule`` may be promoted. Returns a RulePromotionReceipt (promote OR block + reasons).
+```
+## intra-module call edges
+src.baltor.determinism.rule_promotion_gate.add -> src.baltor.determinism.rule_promotion_gate.GateCheck
+src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate.GateCheck
+src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate.RulePromotionReceipt
+src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._canon
+src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._handles_preserved
+src.baltor.determinism.rule_promotion_gate.evaluate -> src.baltor.determinism.rule_promotion_gate._is_schema_valid

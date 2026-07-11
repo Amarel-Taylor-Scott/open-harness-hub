@@ -1,0 +1,14 @@
+MODULE src/teleon/registry/populate.py
+## API signatures
+```python
+"""registry.populate — the DOGFOOD population pipeline: discovered signals -> governed registry RECORDS."""
+def py_function_src_teleon_registry_populate__repo_to_record(py_arg_src_teleon_registry_populate__py_function_src_teleon_registry_populate__repo_to_record__slug: str, *, source: str='harvest', desc: str='', stars: int | None=None, license_id: str | None=None) -> dict
+    # A GitHub repo slug ('owner/name') -> a candidate component record (no network).
+def py_function_src_teleon_registry_populate__fetch_repo_meta(py_arg_src_teleon_registry_populate__py_function_src_teleon_registry_populate__fetch_repo_meta__slug: str) -> dict
+    # OPTIONAL live enrichment via the GitHub API (keyless, honest-offline). Returns {} on any failure.
+def py_function_src_teleon_registry_populate__populate(py_arg_src_teleon_registry_populate__py_function_src_teleon_registry_populate__populate__slugs: list[str], *, py_arg_src_teleon_registry_populate__py_function_src_teleon_registry_populate__populate__source: str='harvest', py_arg_src_teleon_registry_populate__py_function_src_teleon_registry_populate__populate__live: bool=False) -> list[dict]
+    # Repo slugs -> ENRICHED candidate records for the component/tool registry.
+```
+## intra-module call edges
+src.teleon.registry.populate.py_function_src_teleon_registry_populate__populate -> src.teleon.registry.populate.py_function_src_teleon_registry_populate__fetch_repo_meta
+src.teleon.registry.populate.py_function_src_teleon_registry_populate__populate -> src.teleon.registry.populate.py_function_src_teleon_registry_populate__repo_to_record

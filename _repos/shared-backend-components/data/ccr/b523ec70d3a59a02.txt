@@ -1,0 +1,71 @@
+MODULE src/baltor/runtime/registry/capability_registry.py
+## API signatures
+```python
+"""src.baltor.runtime.registry.capability_registry — the single in-code reader of the External Capability
+Catalog (architecture/external_capability_catalog.json), the repo health policy, and the replacement matrix."""
+_REPO = ...
+_CATALOG_PATH = ...
+_HEALTH_PATH = ...
+_MATRIX_PATH = ...
+_BACKEND_TOOLS_PATH = ...
+VALID_STATUS = ...
+NON_ADOPTABLE_STATUS = ...
+VALID_ROLES = ...
+ADOPTED_ROLES = ...
+class UncatalogedRepoError:
+    # Raised when code reaches for a 3rd-party provider that has no card in the capability catalog.
+def _read(path: Path) -> dict
+def backend_tool_keys() -> list[str]
+    # The 13 capability keys, read from data/backend-tools.yaml (the verified seed — single source).
+def flagged_tool_names() -> list[str]
+    # The do-not-reintroduce names, read from the `flagged:` block of data/backend-tools.yaml (single source).
+def load_catalog() -> dict
+    # The External Capability Catalog manifest (architecture/external_capability_catalog.json).
+def load_health_policy() -> dict
+def load_matrix() -> dict
+class CapabilityRegistry:
+    # In-code view over the capability catalog: resolve adapters per slot, gate uncataloged imports, validate.
+    def __init__(self, catalog: dict | None=None, health: dict | None=None) -> None
+    def slots(self) -> list[dict]
+    def slot_names(self) -> list[str]
+    def get_by_capability_slot(self, slot: str) -> dict
+    def adapters_for(self, slot: str) -> list[dict]
+    def get_adapter(self, adapter_id: str) -> dict
+    def wired_adapter(self, slot: str) -> dict | None
+        # The adapter currently wired into the stdlib runtime for this slot (its working stub/active), if any.
+    def replacement_candidates(self, slot: str) -> list[dict]
+        # Adapters that could replace the wired one if a repo decays: fallbacks + stub (not the wired primary).
+    def preference_order(self, slot: str, *, health: dict | None=None, available: set | None=None, runnable_only: bool=False) -> list[dict]
+        # Adapters for `slot` ordered by NUMERIC priority (desc), not by brittle role strings. Adding or
+    def preference_graph(self, slot: str) -> dict
+        # Numeric graph view of `slot`'s adapters: nodes + falls_back_to/alternative_of edges by priority.
+    def import_modules(self) -> dict[str, dict]
+        # Map every declared python import-module → its adapter card. This IS the allowlist for 3rd-party imports.
+    def approved_adapter_paths(self) -> list[str]
+    def require_cataloged_repo(self, import_module: str) -> dict
+        # Gate: a 3rd-party provider package may only be used if it has a card. Raises otherwise.
+    def validate_catalog(self) -> list[str]
+        # Return a list of problems with the catalog; empty == valid. Pure-structural, deterministic, offline.
+    def covers_backend_tool_keys(self) -> list[str]
+        # Backend-tool capability keys NOT represented as a slot (catalog must build ON backend-tools.yaml).
+    def adopted_flagged_tools(self) -> list[str]
+        # Flagged (do-not-reintroduce) names that appear as an ADOPTED adapter provider — must be empty.
+def _main(argv: list[str] | None=None) -> int
+```
+## intra-module call edges
+src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.runtime.registry.capability_registry.load_catalog
+src.baltor.runtime.registry.capability_registry.__init__ -> src.baltor.runtime.registry.capability_registry.load_health_policy
+src.baltor.runtime.registry.capability_registry._main -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry
+src.baltor.runtime.registry.capability_registry.adapters_for -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot
+src.baltor.runtime.registry.capability_registry.adopted_flagged_tools -> src.baltor.runtime.registry.capability_registry.flagged_tool_names
+src.baltor.runtime.registry.capability_registry.covers_backend_tool_keys -> src.baltor.runtime.registry.capability_registry.backend_tool_keys
+src.baltor.runtime.registry.capability_registry.load_catalog -> src.baltor.runtime.registry.capability_registry._read
+src.baltor.runtime.registry.capability_registry.load_health_policy -> src.baltor.runtime.registry.capability_registry._read
+src.baltor.runtime.registry.capability_registry.load_matrix -> src.baltor.runtime.registry.capability_registry._read
+src.baltor.runtime.registry.capability_registry.preference_graph -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.adapters_for
+src.baltor.runtime.registry.capability_registry.preference_order -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.adapters_for
+src.baltor.runtime.registry.capability_registry.replacement_candidates -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot
+src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.import_modules
+src.baltor.runtime.registry.capability_registry.require_cataloged_repo -> src.baltor.runtime.registry.capability_registry.UncatalogedRepoError
+src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_adapter
+src.baltor.runtime.registry.capability_registry.wired_adapter -> src.baltor.runtime.registry.capability_registry.CapabilityRegistry.get_by_capability_slot

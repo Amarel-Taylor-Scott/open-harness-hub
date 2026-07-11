@@ -1,0 +1,16 @@
+MODULE src/teleon/io/event_io.py
+## API signatures
+```python
+"""src.teleon.io.event_io — project an internal EventBus event into a CloudEvents-compatible EventEnvelope."""
+_KEY_PREFIXES = ...
+_DSN_RE = ...
+_REDACTED = ...
+def _looks_secret(s: str) -> bool
+def redact_secrets(obj: Any) -> Any
+    # Deep-copy obj with any string value that looks like a raw secret replaced by [REDACTED].
+def project_event_envelope(internal_event: dict, *, source: str, now: str, tenant_id: str='', trace_id: str='', valid_kinds: set | frozenset | None=None) -> dict
+    # Project a bus event to a CloudEvents 1.0 envelope. Raises ValueError on an unknown kind (when valid_kinds
+```
+## intra-module call edges
+src.teleon.io.event_io.project_event_envelope -> src.teleon.io.event_io.redact_secrets
+src.teleon.io.event_io.redact_secrets -> src.teleon.io.event_io._looks_secret

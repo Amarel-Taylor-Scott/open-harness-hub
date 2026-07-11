@@ -1,0 +1,85 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Baltor — the engine that makes AI trustworthy</title><meta name=description content="Baltor governs what becomes true: provenance, verification, signed facts, CDC. Discovery is not trust."><style>
+*{box-sizing:border-box}
+body{margin:0;background:#fbfbfd;color:#0f1222;font-family:'Hanken Grotesk',system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.6}
+.mono{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace}
+.wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+section{padding:76px 0;border-bottom:1px solid #eef0f6}
+h1{font-size:clamp(38px,6.4vw,70px);line-height:1.03;letter-spacing:-.03em;margin:0 0 16px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:#6b7280;margin:0 0 8px}
+h3{font-size:clamp(24px,3.2vw,34px);letter-spacing:-.02em;margin:0 0 16px}
+p{font-size:18px;color:#33384a;max-width:680px}.lead{font-size:clamp(19px,2.4vw,25px);max-width:720px}
+.accent{color:#4f46e5}.ok{color:#16a34a}
+.nav{position:sticky;top:0;z-index:9;background:#fbfbfdee;backdrop-filter:blur(8px);border-bottom:1px solid #eef0f6}
+.nav .wrap{display:flex;justify-content:space-between;align-items:center;padding:14px 24px}
+.nav a{color:#0f1222;text-decoration:none;font-size:15px;margin-left:20px;font-weight:600}
+.nav a.brand{font-size:17px;margin:0;letter-spacing:-.01em}.nav a.on{color:#4f46e5}.nav a:hover{color:#4f46e5}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4f46e5;background:#4f46e510;border:1px solid #4f46e530;border-radius:999px;padding:6px 14px}
+.hero{color:#fff;padding:108px 0 96px;background-size:240% 240%;animation:grad 16s ease infinite}
+.hero.parent{background:linear-gradient(120deg,#0f1222,#1b1f3a 38%,#283a6b 68%,#4f46e5)}
+.hero.baltor{background:linear-gradient(120deg,#0d1b2a,#13324a 45%,#0e5a52 80%,#16a34a)}
+.hero.teleon{background:linear-gradient(120deg,#160f2a,#2a1f54 45%,#4f46e5 85%,#7c6cf5)}
+.hero.hubs{background:linear-gradient(120deg,#1a1226,#3a2150 45%,#7a3fb0 82%,#b06ad6)}
+.hero h1,.hero p{color:#fff}.hero .lead{color:#dfe3f7}
+@keyframes grad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.kpis{display:flex;flex-wrap:wrap;gap:14px;margin-top:32px}
+.kpi{background:#ffffff14;border:1px solid #ffffff2e;border-radius:14px;padding:15px 19px}
+.kpi b{display:block;font-size:28px;line-height:1}.kpi span{font-size:12.5px;color:#dfe3f7;letter-spacing:.03em}
+.grid{display:grid;gap:18px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:1fr 1fr}
+@media(max-width:760px){.g3,.g2{grid-template-columns:1fr}}
+.card{display:block;background:#fff;border:1px solid #e6e8ef;border-radius:18px;padding:24px;text-decoration:none;color:inherit;transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-4px);box-shadow:0 18px 40px -24px #4f46e580}
+.card h4{margin:0 0 6px;font-size:20px}.card p{font-size:15px;color:#5b6172;margin:0}.card .more{color:#4f46e5;font-weight:600;font-size:14px;display:inline-block;margin-top:10px}
+.pill{display:inline-block;border:1px solid #e6e8ef;border-radius:999px;padding:5px 13px;font-size:13px;margin:4px 6px 0 0;background:#fff}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.node{background:#fff;border:1px solid #e6e8ef;border-radius:12px;padding:11px 15px;font-weight:600;font-size:14px;animation:pulse 3s ease-in-out infinite}
+.node.alt{background:#4f46e5;color:#fff;border-color:#4f46e5}.arrow{color:#4f46e5;font-weight:800}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 #4f46e500}50%{box-shadow:0 0 0 6px #4f46e510}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}.reveal.in{opacity:1;transform:none}
+.rung{display:flex;align-items:center;gap:14px;padding:9px 0}.bar{height:14px;border-radius:8px;background:linear-gradient(90deg,#4f46e5,#8b84f5)}
+.rung span{font-size:14px;color:#5b6172;min-width:150px}.rung .c{font-size:13px;color:#9aa0b4}
+.cmp{display:flex;gap:14px;flex-wrap:wrap;margin-top:18px}
+.cmp .b{flex:1;min-width:170px;border:1px solid #e6e8ef;border-radius:14px;padding:18px;background:#fff}
+.cmp .b.win{border-color:#16a34a;background:#f0fdf4}.cmp .b b{font-size:30px;display:block}.cmp .b span{font-size:13px;color:#6b7280}
+.foot{padding:44px 0;color:#6b7280;font-size:14px}
+.note{background:#fff8e6;border:1px solid #f3e3a8;border-radius:12px;padding:13px 18px;font-size:14px;color:#7a6a2e;margin-top:22px}
+svg .floor{stroke:#16a34a;stroke-width:2;stroke-dasharray:6 6}
+svg .cost{stroke:#4f46e5;stroke-width:3;fill:none;stroke-dasharray:560;stroke-dashoffset:560;animation:draw 2.6s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+</style></head><body><nav class=nav><div class=wrap><a class="brand" href="index.html">AI Done Right</a><span><a class="on" href="baltor.html">Baltor</a><a class="" href="teleon.html">Teleon</a><a class="" href="hubs.html">OpenHubForAI</a></span></div></nav>
+<header class="hero baltor"><div class=wrap><span class=tag>Baltor · the trust engine</span>
+  <h1>Models don't fail.<br>Their <span style="text-decoration:underline;text-decoration-color:#6ee7b7">context</span> does.</h1>
+  <p class=lead>Baltor governs what becomes <b>true</b>: provenance, verification, signed facts, and change-data-capture.
+  Agents propose; Baltor disposes. Nothing serves as truth until it passes the verify gate.</p>
+</div></header>
+<section><div class="wrap reveal"><h2>How Baltor works</h2><h3>Propose &rarr; verify &rarr; serve (or hold out).</h3>
+  <div class=flow><div class=node>agent proposes a fact</div><span class=arrow>&rarr;</span>
+    <div class=node>verify vs the authoritative source</div><span class=arrow>&rarr;</span>
+    <div class="node alt">serve — or HELD OUT if unverified / stale</div></div>
+  <h3 style="margin-top:28px">Conflicting sources? Authority decides.</h3>
+  <div class=flow><div class=node>conflicting claims</div><span class=arrow>&rarr;</span>
+    <div class=node>rank by authority (SEC&nbsp;8-K &gt; press rumor)</div><span class=arrow>&rarr;</span>
+    <div class="node alt">the governing source wins</div></div>
+  <h3 style="margin-top:28px">Facts go stale? Held out, then re-verified.</h3>
+  <div class=flow><div class=node>fact bound to its source</div><span class=arrow>&rarr;</span>
+    <div class=node>source changes (CDC)</div><span class=arrow>&rarr;</span>
+    <div class=node>stale value HELD OUT</div><span class=arrow>&rarr;</span>
+    <div class="node alt">re-verified &amp; current</div></div>
+</div></section>
+<section><div class="wrap reveal"><h2>What Baltor does</h2><h3>Governed context, not guesses.</h3>
+  <div class="grid g2">
+    <div class=card><h4>Verify before serve</h4><p>Every fact is a candidate (<span class=mono>serves_truth=false</span>)
+      until it passes verification against an authoritative source.</p></div>
+    <div class=card><h4>Provenance + receipts</h4><p>Where each fact came from, when, and how it was checked — inspectable,
+      with a rollback target. Lossless: raw + lineage preserved.</p></div>
+    <div class=card><h4>Stays current</h4><p>Change-data-capture holds out stale facts and re-verifies when the source
+      changes — kept-up-to-date is the wedge.</p></div>
+    <div class=card><h4>Powered by Teleon</h4><p>Baltor runs on Teleon (a tenant) — trustworthy context, delivered the
+      efficient way.</p></div>
+  </div></div></section>
+<section><div class="wrap reveal"><h2>Examples</h2><h3>Regulated-fact verdicts you can prove.</h3>
+  <p>Each is a real governed pipeline: a verdict bound to an authoritative source, with stale/overclaimed inputs held
+  out — not an LLM guess.</p>
+  <div class="grid g2" style="margin-top:16px"><div class=card><h4>Sanctions screening (OFAC)</h4><p>Screen a name against the OFAC SDN list &rarr; a governed BLOCKED / CLEAR verdict with the matched entry + its source. The one place output IS truth — because it's verified.</p></div><div class=card><h4>Beneficial ownership + 50% rule</h4><p>Resolve the authoritative parent from CONFLICTING ownership claims (an SEC 8-K beats a press rumor), then propagate an SDN block down every &ge;50% ownership edge — an inherited block a bare model can't compute.</p></div><div class=card><h4>Drug-label claim review (FDA)</h4><p>Substantiate each promotional claim against the FDA-approved label; an efficacy overclaim is HELD OUT + escalated. Flip the source &rarr; the verdict flips.</p></div><div class=card><h4>Export-control screening (BIS)</h4><p>A stale vendor &lsquo;clear&rsquo; is HELD OUT; an export to a LISTED end-user REQUIRES A LICENSE. Authority is earned, not assumed.</p></div></div></div></section>
+<section><div class="wrap reveal"><h2>Why it matters</h2><h3>Discovery is not trust. Output is not truth.</h3>
+  <p>An LLM that sounds confident is not a source. Baltor is the rail that turns proposed context into governed,
+  provable truth — so the agents built on top can be relied on.</p></div></section><div class="wrap foot"><p style="margin-top:18px">AI Done Right · <span class=mono>aidoneright.dev</span> — build AI the efficient, appropriate way, made easy. Figures computed by scripts/build_intro_site.py.</p></div><script>const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in')})},{threshold:.12});document.querySelectorAll('.reveal').forEach(el=>io.observe(el));</script></body></html>

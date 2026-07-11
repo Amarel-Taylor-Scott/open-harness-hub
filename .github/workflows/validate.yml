@@ -14,12 +14,16 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install pyyaml jsonschema
+      - name: Python 3.11 syntax gate (compileall — catches 3.12-only syntax on the pinned interpreter)
+        run: |
+          python -m compileall -q _repos/shared-backend-components/scripts
+          for d in _repos/*/backend/src; do [ -d "$d" ] && python -m compileall -q "$d"; done
       - name: Validate all manifests
-        run: python scripts/validate.py
+        run: python _repos/shared-backend-components/scripts/validate.py
       - name: Refresh INDEX.md (verify no drift)
         run: |
-          python scripts/build_index_page.py
-          git diff --exit-code docs/INDEX.md || (echo "::error::docs/INDEX.md is out of sync — run scripts/build_index_page.py and commit" && exit 1)
+          python _repos/shared-backend-components/scripts/build_index_page.py
+          git diff --exit-code _repos/shared-backend-components/docs/INDEX.md || (echo "::error::_repos/shared-backend-components/docs/INDEX.md is out of sync — run _repos/shared-backend-components/scripts/build_index_page.py and commit" && exit 1)
 
   demos:
     runs-on: ubuntu-latest
@@ -49,7 +53,7 @@ jobs:
           python-version: '3.11'
       - run: pip install pyyaml
       - name: Run ${{ matrix.demo }}
-        run: python scripts/${{ matrix.demo }}.py
+        run: python _repos/shared-backend-components/scripts/${{ matrix.demo }}.py
       - name: Verify expected severity counts
         run: |
           python - <<'PY'
@@ -57,7 +61,7 @@ jobs:
           # finding on a flagged sample, and 0 hits on the clean sample.
           # If a demo drifts (rule regression), this CI step catches it.
           import subprocess, sys
-          out = subprocess.run(['python', 'scripts/${{ matrix.demo }}.py'],
+          out = subprocess.run(['python', '_repos/shared-backend-components/scripts/${{ matrix.demo }}.py'],
                                capture_output=True, text=True)
           stdout = out.stdout
           if 'sample-clean' in stdout:
@@ -91,6 +95,6 @@ jobs:
           python-version: '3.11'
       - run: pip install pyyaml
       - name: Vertical-pipeline regression bench
-        run: python scripts/bench_pipelines.py
+        run: python _repos/shared-backend-components/scripts/bench_pipelines.py
       - name: Checklist-gate regression bench
-        run: python scripts/bench_checklist_gates.py
+        run: python _repos/shared-backend-components/scripts/bench_checklist_gates.py

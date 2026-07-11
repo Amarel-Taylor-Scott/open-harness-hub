@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schemas/llm_provider_capability.schema.json",
+  "title": "llm_provider_capability_registry",
+  "description": "Capability registry over the EXISTING _llm_client.PROVIDERS lanes (ollama/openrouter/openwebui/nvidia/omniroute). One entry per generation LANE: what models it serves, its context/output ceiling, structured-output/json/batch/caching support, rate/token/concurrency limits, cost, the data classes it is allowed to see, timeout, and status. Consumed by scripts/llm_capability_router.py (job-type -> lane routing) and scripts/model_lane_bakeoff.py. This registry is DATA (rpm/tpm/cost/data-class policy that lives nowhere else); model ids + endpoints are mirrored from scripts/_config.py and scripts/_llm_client.PROVIDERS and are drift-gated at runtime by the router self-test (every entry's provider_id must be a key of _llm_client.PROVIDERS; every referenced model must appear in its lane's models[]). serves_truth=false at this layer.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["registry_version", "data_classes", "providers"],
+  "properties": {
+    "registry_version": { "type": "string" },
+    "data_classes": {
+      "type": "array",
+      "description": "Ordered data-sensitivity vocabulary, least->most sensitive. A lane may only see a data class listed in its allowed_data_classes; sensitive/restricted route LOCAL-first.",
+      "items": { "type": "string", "enum": ["public", "synthetic", "internal", "sensitive", "restricted"] },
+      "minItems": 1
+    },
+    "providers": {
+      "type": "object",
+      "description": "Map of unique lane id -> capability entry. Two entries may share a provider_id (e.g. Ollama Cloud vs local) but each lane id is unique.",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/capability" }
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "provider_id", "endpoint_type", "models", "context_window", "max_output_tokens",
+        "supports_structured_output", "supports_json_mode", "supports_batch", "supports_prompt_caching",
+        "rpm_limit", "tpm_limit", "concurrency_limit", "cost_input_per_million", "cost_output_per_million",
+        "allowed_data_classes", "default_timeout_seconds", "status"
+      ],
+      "properties": {
+        "provider_id": {
+          "type": "string",
+          "$comment": "MUST be a key of scripts/_llm_client.PROVIDERS (enforced at runtime by the router self-test; this enum is the static mirror).",
+          "enum": ["ollama", "openrouter", "openwebui", "nvidia", "omniroute"]
+        },
+        "endpoint_type": {
+          "type": "string",
+          "enum": ["openrouter", "openai_compatible", "ollama_local", "omniroute", "custom_http", "nvidia"]
+        },
+        "models": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "primary_model": { "type": "string" },
+        "base_url_override": { "type": "string" },
+        "context_window": { "type": "integer", "minimum": 1 },
+        "max_output_tokens": { "type": "integer", "minimum": 1 },
+        "supports_structured_output": { "type": "boolean" },
+        "supports_json_mode": { "type": "boolean" },
+        "supports_batch": { "type": "boolean" },
+        "supports_prompt_caching": { "type": "boolean" },
+        "rpm_limit": { "type": ["integer", "null"], "minimum": 0 },
+        "tpm_limit": { "type": ["integer", "null"], "minimum": 0 },
+        "concurrency_limit": { "type": ["integer", "null"], "minimum": 0 },
+        "cost_input_per_million": { "type": "number", "minimum": 0 },
+        "cost_output_per_million": { "type": "number", "minimum": 0 },
+        "allowed_data_classes": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["public", "synthetic", "internal", "sensitive", "restricted"] },
+          "minItems": 1
+        },
+        "default_timeout_seconds": { "type": "integer", "minimum": 1 },
+        "status": {
+          "type": "string",
+          "enum": ["active", "active_capped", "available_if_running", "degraded", "disabled"]
+        },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

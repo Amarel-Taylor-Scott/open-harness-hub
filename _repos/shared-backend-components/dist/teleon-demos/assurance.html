@@ -1,0 +1,66 @@
+<!doctype html><meta charset=utf-8><title>Teleon — Capability Assurance (live)</title>
+<style>body{font:15px/1.5 -apple-system,system-ui,sans-serif;max-width:1000px;margin:2rem auto;padding:0 1rem;color:#111}
+h1{margin:.2em 0}.sub{color:#555}.stats{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.2rem 0}
+.stat{background:#f4f6f8;border-radius:10px;padding:.7rem 1rem;min-width:120px}.stat b{font-size:1.5rem;display:block}
+.stat span{color:#666;font-size:.8rem}.cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.card{border:1px solid #e3e6ea;border-radius:10px;padding:1rem}.card.ok{border-left:4px solid #1a8}.card.no{border-left:4px solid #c84}
+.v{font-weight:600;color:#1a8;margin:.2em 0}pre{background:#0d1117;color:#c9d1d9;padding:.6rem;border-radius:7px;overflow:auto;font-size:11px}
+ul{columns:2}li.ok{color:#1a8}li.no{color:#a66}</style>
+<h1>Teleon — Capability Assurance</h1>
+<p class=sub>Live, governed, working — every number below is COMPUTED at build / read from a real run receipt (no marketing fiction). serves_truth=false.</p>
+<div class=stats><div class="stat"><b>30</b><span>planes</span></div><div class="stat"><b>254</b><span>curated tools</span></div><div class="stat"><b>1269</b><span>staged tools</span></div><div class="stat"><b>430</b><span>promoted tools</span></div><div class="stat"><b>17</b><span>ladders</span></div><div class="stat"><b>439</b><span>indexed components</span></div><div class="stat"><b>25</b><span>ml model types</span></div><div class="stat"><b>1058</b><span>proofs</span></div></div>
+<h2>Live-verified capabilities</h2><div class=cards><div class="card ok"><h3>Live LLM inference</h3><p class="v">✓ LIVE-VERIFIED</p><pre>{
+ "seam": "live LLM inference",
+ "lane": "ollama-cloud (OH_LLM_*)",
+ "model": "gemma4:31b",
+ "prompt_tokens": 38,
+ "completion_tokens": 7,
+ "output": "TELEON_LIVE_OK",
+ "verified": true,
+ "serves_truth": false,
+ "note": "live inference smoke \u2014 the primary lane does NOT degrade to provider_unavailable"
+}</pre></div><div class="card ok"><h3>Live distillation (LLM→deterministic rule)</h3><p class="v">✓ LIVE-VERIFIED</p><pre>{
+ "seam": "real distillation (LLM -> deterministic rule generation)",
+ "accepted": true,
+ "holdout_accuracy": 1.0,
+ "rule": {
+  "rules": [
+   {
+    "if": [
+     {
+      "field": "amount",
+      "op": "<=",
+      "value": 30
+     },
+     {
+      "field": "days",
+      "op": "<=",
+      "value": 30
+     }
+    ],
+    "then": "approve"
+   }
+  ],
+  "default": "deny"
+ },
+ "n_train": 8,
+ "n_holdout": 4,
+ "verified": true,
+</pre></div><div class="card ok"><h3>Live A/B eval (vs real ground truth)</h3><p class="v">✓ LIVE-VERIFIED</p><pre>{
+ "seam": "real per-vertical eval data",
+ "vertical": "policy_adjudication",
+ "rule_accuracy": 1.0,
+ "llm_accuracy": 1.0,
+ "n": 15,
+ "verified": true,
+ "serves_truth": false,
+ "note": "MEASURED against a real ground-truth eval set (not a representative/rigged baseline)"
+}</pre></div><div class="card ok"><h3>Live source fetch + CDC freshness</h3><p class="v">✓ LIVE-VERIFIED</p><pre>{
+ "source": "us_federal_register:cfpb",
+ "kind": "new",
+ "content_hash": "a3356e7b4c0d63a1"
+}</pre></div></div>
+<h2>Go-live readiness — 7/10 seams closed</h2>
+<ul><li class=ok>✓ live LLM inference</li><li class=ok>✓ live source fetch + CDC freshness</li><li class=ok>✓ real distillation (LLM -> deterministic rule generation)</li><li class=ok>✓ real per-vertical eval data</li><li class=ok>✓ vetting workflow (the vetted_only producer)</li><li class=ok>✓ observability/monitoring in prod</li><li class=ok>✓ demo/showcase surface (Capability Assurance Portal)</li><li class=no>○ Postgres/pgvector load + live promotion boundary (owner-gated)</li><li class=no>○ auth + tenancy (separate realms) (owner-gated)</li><li class=no>○ hosting deploy executed + verified (owner-gated)</li></ul>
+<p class=sub>The descent: every capability starts unbounded (frontier LLM) and is compiled toward the cheapest bounded
+deterministic path — proven here by a live distillation (LLM→rule) that matches the model at ~$0 on a real eval.</p>

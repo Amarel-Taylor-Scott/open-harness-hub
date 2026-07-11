@@ -1,0 +1,50 @@
+{
+  "candidate": true,
+  "per_task_type_winner_slots": [
+    "best_for_repeated_promoted_route",
+    "best_for_near_match_schema_variants",
+    "best_for_new_marketplace_surface",
+    "best_for_high_risk_regulated_domain",
+    "best_for_large_tool_graph",
+    "best_for_repo_repair",
+    "best_for_data_science_search",
+    "best_for_browser_or_terminal_workflow"
+  ],
+  "policy_id": "policy:champion_challenger_retirement",
+  "ranking": {
+    "contextual": true,
+    "multi_objective_features": [
+      "success_rate",
+      "proof_strength",
+      "cost",
+      "latency",
+      "source_escalation_depth",
+      "privacy_risk",
+      "side_effect_risk",
+      "maintenance_cost",
+      "reuse_count",
+      "freshness",
+      "human_review_burden"
+    ],
+    "note": "best-to-worst is explicit per comparable path family but contextual by task type; one global winner is never declared"
+  },
+  "record_type": "compiled_primitive_champion_challenger_policy",
+  "serves_truth": false,
+  "task_family_policy": {
+    "challenger_routes": "challengers sampled at the genome exploration_rate",
+    "champion_route": "one current champion per task family, served by default",
+    "exploration_rate_default": 0.05,
+    "promotion_gate": [
+      "held_out_task_wins",
+      "proof_receipts",
+      "no_regression_on_replay",
+      "adapter_receipts_for_any_benchmark_claim"
+    ],
+    "retirement_gate": [
+      "sustained_loss_to_champion",
+      "repeated_negative_memory",
+      "freshness_violation"
+    ],
+    "rollback_path": "previous champion PlanLock retained losslessly; retirement is reversible"
+  }
+}

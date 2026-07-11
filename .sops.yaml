@@ -1,0 +1,12 @@
+# SOPS creation rules — age recipients for the platform secrets vault.
+# SOPS searches UPWARD from an encrypted file, so this root placement governs every encrypted
+# file in the tree. Encrypt VALUES only; dotenv KEYS stay grep-visible (grep-as-audit).
+#
+# Replace the placeholder recipient with the owner's REAL age PUBLIC key (`age-keygen`).
+# The matching age PRIVATE key is the GitHub Environment secret SOPS_AGE_KEY (never committed).
+creation_rules:
+  - path_regex: _repos/shared-backend-components/secrets/.*\.env$
+    # dotenv: encrypt every value, keep the keys visible for grep-as-audit
+    age: >-
+      age1PLACEHOLDER_replace_with_owner_age_public_key_from_age-keygen
+    unencrypted_regex: '^(#.*)$'

@@ -1,0 +1,24 @@
+MODULE src/teleon/lift/normalize.py
+## API signatures
+```python
+"""src.teleon.lift.normalize — normalize provider-native workloads into a canonical ImportedWorkload."""
+_IMPORTED_WORKLOAD_SCHEMA = ...
+def _redact_env_list(env: list[dict] | None) -> list[str]
+    # Kubernetes-style env ([{name,value|valueFrom}, ...]) → sorted KEY NAMES only (values dropped).
+def _redact_env_map(env: dict | None) -> list[str]
+    # Lambda-style env ({KEY: value}) → sorted KEY NAMES only (values dropped).
+def _workload(source: str, native_kind: str, native_name: str, *, runtime_class_guess: str | None, interpretation: str, interpretation_note: str, imported_at: str, account: str='', region: str='', namespace: str='', tags: dict | None=None, runtime: dict | None=None, triggers: list[dict] | None=None, identity: str='', env_keys: list[str] | None=None, connected_systems: list[str] | None=None, telemetry: dict | None=None, repo: str='') -> dict[str, Any]
+def normalize_k8s(resource: dict, *, imported_at: str) -> dict[str, Any]
+    # A (simplified) Kubernetes resource → ImportedWorkload. Honors the K8s interpretation table.
+def normalize_lambda(resource: dict, *, imported_at: str) -> dict[str, Any]
+    # An AWS Lambda (or GCP/Azure function — same shape) config → ImportedWorkload (cloud-function class).
+def normalize(resource: dict, *, imported_at: str) -> dict[str, Any]
+    # Dispatch by source/shape: a dict with a K8s `kind` → normalize_k8s; otherwise a function → normalize_lambda.
+```
+## intra-module call edges
+src.teleon.lift.normalize.normalize -> src.teleon.lift.normalize.normalize_k8s
+src.teleon.lift.normalize.normalize -> src.teleon.lift.normalize.normalize_lambda
+src.teleon.lift.normalize.normalize_k8s -> src.teleon.lift.normalize._redact_env_list
+src.teleon.lift.normalize.normalize_k8s -> src.teleon.lift.normalize._workload
+src.teleon.lift.normalize.normalize_lambda -> src.teleon.lift.normalize._redact_env_map
+src.teleon.lift.normalize.normalize_lambda -> src.teleon.lift.normalize._workload

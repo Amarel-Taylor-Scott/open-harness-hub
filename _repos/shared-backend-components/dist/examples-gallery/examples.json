@@ -1,0 +1,130 @@
+{
+  "examples": [
+    {
+      "id": "sanctions_aml_screening",
+      "title": "Sanctions / AML \u2014 the OFAC 50% Rule",
+      "domain": "Financial crime \u00b7 compliance",
+      "durability": "Aggregation",
+      "status": "block",
+      "verdict": "BLOCKED \u2014 aggregate listed ownership 54% \u2265 50% rule",
+      "has_evidence": true
+    },
+    {
+      "id": "related_party_network",
+      "title": "Related-party / shell-network discovery",
+      "domain": "Financial crime \u00b7 KYB \u00b7 entity resolution",
+      "durability": "Aggregation",
+      "status": "block",
+      "verdict": "1 shell network(s) flagged",
+      "has_evidence": true
+    },
+    {
+      "id": "cve_dependency_triage",
+      "title": "CVE / dependency vulnerability triage",
+      "domain": "Software supply chain \u00b7 security",
+      "durability": "Freshness + exactness",
+      "status": "block",
+      "verdict": "AFFECTED \u2014 KEV (exploited in the wild)",
+      "has_evidence": true
+    },
+    {
+      "id": "common_control_resolver",
+      "title": "Common control from M&A news",
+      "domain": "Financial crime \u00b7 audit \u00b7 M&A",
+      "durability": "Aggregation + freshness",
+      "status": "block",
+      "verdict": "RELATED-PARTY \u2014 both controlled by ParentCo",
+      "has_evidence": true
+    },
+    {
+      "id": "beneficial_ownership_resolver",
+      "title": "Beneficial ownership + OFAC 50% rule",
+      "domain": "Sanctions \u00b7 KYC \u00b7 M&A roll-ups",
+      "durability": "Aggregation + freshness + source-authority",
+      "status": "block",
+      "verdict": "2 BLOCKED BY INHERITANCE (OFAC 50% rule): Apex Staffing, Meridian Staffing Holdings",
+      "has_evidence": true
+    },
+    {
+      "id": "fda_labeling_claim_review",
+      "title": "FDA labeling: off-label overclaims",
+      "domain": "Pharma \u00b7 regulatory \u00b7 promo review",
+      "durability": "Source-authority + freshness",
+      "status": "block",
+      "verdict": "2 promotional claim(s) HELD OUT (off-label / contradicts the FDA label)",
+      "has_evidence": true
+    },
+    {
+      "id": "export_control_screening",
+      "title": "BIS export-control screening",
+      "domain": "Trade compliance \u00b7 sanctions \u00b7 EAR",
+      "durability": "Source-authority + freshness",
+      "status": "block",
+      "verdict": "1 export(s) REQUIRE A LICENSE (end-user on the BIS Entity List)",
+      "has_evidence": true
+    },
+    {
+      "id": "icd10_coding",
+      "title": "ICD-10 coding \u2014 abstain over fabricate",
+      "domain": "Clinical \u00b7 medical coding",
+      "durability": "Coded vocabulary",
+      "status": "review",
+      "verdict": "2 coded \u00b7 1 abstained \u2192 proposed to a coder",
+      "has_evidence": true
+    },
+    {
+      "id": "procurement_collusion_ring",
+      "title": "Procurement bid-rigging ring",
+      "domain": "Public procurement \u00b7 fraud",
+      "durability": "Aggregation",
+      "status": "block",
+      "verdict": "BID-RIGGING RING \u2014 3 vendors, 100% cover-bid tenders",
+      "has_evidence": true
+    },
+    {
+      "id": "regulated_fact_qa",
+      "title": "Regulated-fact QA \u2014 state interest-rate caps",
+      "domain": "Consumer finance \u00b7 regulated facts",
+      "durability": "Precedence + freshness",
+      "status": "serve",
+      "verdict": "SERVED \u2014 cites the source of law",
+      "has_evidence": true
+    },
+    {
+      "id": "clinical_support",
+      "title": "Clinical decision support \u2014 propose, never act",
+      "domain": "Clinical \u00b7 patient safety",
+      "durability": "Safety + abstention",
+      "status": "block",
+      "verdict": "3 safety findings \u2192 ESCALATED (not autonomous)",
+      "has_evidence": false
+    },
+    {
+      "id": "low_resource_alert",
+      "title": "Disaster alert in a low-resource language",
+      "domain": "Public safety \u00b7 low-resource NLP",
+      "durability": "Low-resource + faithfulness",
+      "status": "review",
+      "verdict": "3 fields extracted \u2192 AWAITING HUMAN SIGN-OFF (nothing auto-broadcasts)",
+      "has_evidence": false
+    },
+    {
+      "id": "governed_rag",
+      "title": "Governed hybrid RAG \u2014 the general default",
+      "domain": "General \u00b7 grounded answering",
+      "durability": "Grounding",
+      "status": "serve",
+      "verdict": "GROUNDED ANSWER READY",
+      "has_evidence": true
+    },
+    {
+      "id": "context_efficiency_loop",
+      "title": "Usage-gated context efficiency",
+      "domain": "Runtime \u00b7 cost efficiency",
+      "durability": "Efficiency (consumer behaviour)",
+      "status": "info",
+      "verdict": "cohort \u201cpower_user_large_substrate\u201d \u00b7 predicted re-read savings 67%",
+      "has_evidence": false
+    }
+  ]
+}

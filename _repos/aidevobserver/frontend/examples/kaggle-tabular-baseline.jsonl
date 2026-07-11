@@ -1,0 +1,11 @@
+{"role":"user","content":"Build a baseline for a tabular Kaggle-style competition. The target is churn, the metric is AUC, and I need a submission CSV."}
+{"role":"assistant","content":"I will start a notebook from scratch, load train.csv and test.csv, inspect every column with the model, and write custom preprocessing helpers."}
+{"role":"assistant","content":"I am pasting the full 1,200-line data dictionary into context so I can remember every field while coding."}
+{"role":"assistant","content":"I am creating split_train_valid(), fill_missing_values(), encode_categoricals(), auc_score(), and write_submission_csv() in the notebook."}
+{"role":"assistant","content":"AIDevObserver note: this looks like a solved competition-baseline route. The primitive database already has dataset.inspect_schema, table.fill_missing_values, table.encode_categoricals, table.train_valid_split_seeded, metric.compute_auc, model.train_lightgbm, and submission.write_csv."}
+{"role":"assistant","content":"I normalized the session as KaggleBaselineRequest to SubmissionArtifact and found template tabular_competition_baseline."}
+{"role":"assistant","content":"CandidateBundle: inspect, split, impute, encode, train, evaluate, submit. The split must be seeded and the submission gate must verify row count and id column alignment."}
+{"role":"assistant","content":"PlanDelta {\"v\":1,\"p\":\"dense\",\"t\":0,\"b\":[0,0,0,0,0,0,0],\"r\":[[2,\"field\"],[3,\"field\"]],\"g\":[]}"}
+{"role":"assistant","content":"Compiler applies only registered field remixes for schema aliases, rejects target leakage features, and blocks submission until the AUC metric gate and submission-format gate pass."}
+{"role":"assistant","content":"Runtime stores the feature table, model, eval report, and submission CSV as ArtifactRefs and emits JSONL ledger events with runtime planner calls set to zero."}
+{"role":"assistant","content":"Promotion remains candidate-only: this is synthetic_from_public_project shape evidence, not registry truth."}

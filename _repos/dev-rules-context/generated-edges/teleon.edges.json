@@ -1,0 +1,63 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "teleon",
+  "repo": "aidoneright-teleon",
+  "role": "the purpose-driven, eval-gated, self-adaptive compute RUNTIME SaaS. Owns PurposeTask/CapabilityTask, runtime selection, evidence ledger, promotion/policy gates, adapters, the assurance dashboard. Reference implementation of the open spec.",
+  "exposes": [
+    "/api/teleon",
+    "PurposeTask",
+    "runtime-selector",
+    "evidence-ledger",
+    "promotion-gate",
+    "assurance-portal"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "exposes": [
+        "registry",
+        "primitives",
+        "codegraph",
+        "eval-harness",
+        "storage-tiers",
+        "credential-plane"
+      ],
+      "role": "the SUBSTRATE every product consumes \u2014 the primitive/component/template registry + factory + catalog, codegraph, naming "
+    },
+    {
+      "surface": "openhubforai",
+      "repo": "aidoneright-openhubforai",
+      "exposes": [
+        "capabilitytask-spec",
+        "eval-harnesses",
+        "task-templates",
+        "conformance-tests",
+        "skills"
+      ],
+      "role": "the OPEN ecosystem + the open CapabilityTask spec (CTS): primitives, primitive/task templates, eval harnesses, skills, c"
+    }
+  ],
+  "consumed_by": [
+    "aidoneright",
+    "baltor"
+  ],
+  "forbidden_from_me": [
+    {
+      "to": "baltor",
+      "why": "Teleon is reusable infrastructure, never Baltor-specific"
+    }
+  ],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

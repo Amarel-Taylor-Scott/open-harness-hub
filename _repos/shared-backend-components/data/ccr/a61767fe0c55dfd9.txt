@@ -1,0 +1,19 @@
+MODULE src/baltor/workers/batch_windows.py
+## API signatures
+```python
+"""src.baltor.workers.batch_windows — BATCH WINDOW evaluation (C-FLEET-2)."""
+_HIGH_PRIORITIES = ...
+WAIT = ...
+DISPATCH = ...
+DISPATCH_PARTIAL = ...
+BYPASS = ...
+def window_decision(tasks: list[dict], *, batch_min: int, max_wait_seconds: int, now: str) -> dict
+    # Decide a single batch group's fate. High-priority tasks bypass the window entirely.
+def partition(tasks: list[dict], group_by: str | None) -> dict
+    # Partition tasks into batch groups by tenant/domain/provider (or one group when group_by is None).
+def plan_dispatch(tasks: list[dict], *, batch_min: int, max_wait_seconds: int, now: str, group_by: str | None=None) -> list[dict]
+    # Evaluate every group and return the dispatchable ones, FAIREST FIRST (the group whose oldest task
+```
+## intra-module call edges
+src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.workers.batch_windows.partition
+src.baltor.workers.batch_windows.plan_dispatch -> src.baltor.workers.batch_windows.window_decision

@@ -1,0 +1,35 @@
+MODULE src/teleon/primitives/codeblock_runtime.py
+## API signatures
+```python
+"""Candidate primitive codeblock runtime."""
+RECEIPT_HASH_CHARS = ...
+UNKNOWN_EDGE = ...
+DEFAULT_STATUS = ...
+class PrimitiveCodeblockSpec:
+    # Compact generated primitive contract used by candidate codeblocks.
+class PrimitiveExecutionReceipt:
+    # Receipt returned by a candidate primitive codeblock invocation.
+    def to_dict(self) -> dict[str, Any]
+def _utc_now() -> str
+def _stable_json(value: Any) -> str
+def _digest(value: Any, chars: int=RECEIPT_HASH_CHARS) -> str
+def _tuple_of_strings(value: Any) -> tuple[str, ...]
+def _problem_solution_core(row: Mapping[str, Any]) -> dict[str, Any]
+def spec_from_candidate(row: Mapping[str, Any]) -> PrimitiveCodeblockSpec
+    # Create a candidate codeblock spec from a verified primitive row.
+def coerce_spec(spec: PrimitiveCodeblockSpec | Mapping[str, Any]) -> PrimitiveCodeblockSpec
+def execute_primitive_codeblock(spec: PrimitiveCodeblockSpec | Mapping[str, Any], payload: Mapping[str, Any] | None, *, policy: Mapping[str, Any] | None=None, context: Mapping[str, Any] | None=None) -> dict[str, Any]
+    # Validate one candidate invocation and emit a deterministic receipt.
+```
+## intra-module call edges
+src.teleon.primitives.codeblock_runtime._digest -> src.teleon.primitives.codeblock_runtime._stable_json
+src.teleon.primitives.codeblock_runtime._tuple_of_strings -> src.teleon.primitives.codeblock_runtime._stable_json
+src.teleon.primitives.codeblock_runtime.coerce_spec -> src.teleon.primitives.codeblock_runtime.PrimitiveCodeblockSpec
+src.teleon.primitives.codeblock_runtime.coerce_spec -> src.teleon.primitives.codeblock_runtime._tuple_of_strings
+src.teleon.primitives.codeblock_runtime.execute_primitive_codeblock -> src.teleon.primitives.codeblock_runtime.PrimitiveExecutionReceipt
+src.teleon.primitives.codeblock_runtime.execute_primitive_codeblock -> src.teleon.primitives.codeblock_runtime._digest
+src.teleon.primitives.codeblock_runtime.execute_primitive_codeblock -> src.teleon.primitives.codeblock_runtime._utc_now
+src.teleon.primitives.codeblock_runtime.execute_primitive_codeblock -> src.teleon.primitives.codeblock_runtime.coerce_spec
+src.teleon.primitives.codeblock_runtime.spec_from_candidate -> src.teleon.primitives.codeblock_runtime.PrimitiveCodeblockSpec
+src.teleon.primitives.codeblock_runtime.spec_from_candidate -> src.teleon.primitives.codeblock_runtime._problem_solution_core
+src.teleon.primitives.codeblock_runtime.spec_from_candidate -> src.teleon.primitives.codeblock_runtime._tuple_of_strings

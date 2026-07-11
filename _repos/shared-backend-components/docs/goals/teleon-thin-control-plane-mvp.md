@@ -1,0 +1,1 @@
+../../../teleon/context/goals/teleon-thin-control-plane-mvp.md

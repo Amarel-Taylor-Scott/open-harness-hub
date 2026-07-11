@@ -1,0 +1,24 @@
+MODULE src/teleon/registry/index.py
+## API signatures
+```python
+"""registry.index — the RECONCILED registry SPINE (owner 2026-06-25): ONE source unioning the ontology TYPES
+(registry_ontology.json) + the LIVE CATALOGS (port.all_catalogs), so browse / search / agent / API all read the SAME
+set. Every registry carries its metadata + catalog status + record count; every RECORD projects to the universal
+`RegistryObject` shape (id, name, type). This is the anti-fragme"""
+def py_function_src_teleon_registry_index__to_registry_object(py_arg_src_teleon_registry_index__py_function_src_teleon_registry_index__to_registry_object__rec: dict, py_arg_src_teleon_registry_index__py_function_src_teleon_registry_index__to_registry_object__registry_id: str, *, py_arg_src_teleon_registry_index__py_function_src_teleon_registry_index__to_registry_object__version: str='2026.06') -> dict
+    # Project ANY catalog record → a RegistryObject: a THIN, stable WRAPPER (id/type + the version label in METADATA,
+def py_function_src_teleon_registry_index__records(py_arg_src_teleon_registry_index__py_function_src_teleon_registry_index__records__registry_id: str, *, limit: int=200) -> list[dict]
+    # The registry's records, each projected to RegistryObject (uniform). [] if it's a definition-only type.
+def py_function_src_teleon_registry_index__reconciled_index() -> dict
+    # Union the ontology types + the live catalogs into ONE uniform registry list with status + record counts.
+def py_function_src_teleon_registry_index__get(py_arg_src_teleon_registry_index__py_function_src_teleon_registry_index__get__registry_id: str) -> dict | None
+def py_function_src_teleon_registry_index__self_test() -> int
+def main(py_arg_src_teleon_registry_index__main__argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.registry.index.main -> src.teleon.registry.index.py_function_src_teleon_registry_index__reconciled_index
+src.teleon.registry.index.main -> src.teleon.registry.index.py_function_src_teleon_registry_index__self_test
+src.teleon.registry.index.py_function_src_teleon_registry_index__get -> src.teleon.registry.index.py_function_src_teleon_registry_index__reconciled_index
+src.teleon.registry.index.py_function_src_teleon_registry_index__records -> src.teleon.registry.index.py_function_src_teleon_registry_index__to_registry_object
+src.teleon.registry.index.py_function_src_teleon_registry_index__self_test -> src.teleon.registry.index.py_function_src_teleon_registry_index__reconciled_index
+src.teleon.registry.index.py_function_src_teleon_registry_index__self_test -> src.teleon.registry.index.py_function_src_teleon_registry_index__records

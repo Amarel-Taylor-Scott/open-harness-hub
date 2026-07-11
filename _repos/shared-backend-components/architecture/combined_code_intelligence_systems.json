@@ -1,0 +1,132 @@
+{
+  "serves_truth": false,
+  "purpose": "Combined code-intelligence plan: keep the repo's AI-first long-name system as the source-level semantic layer, then add complementary deterministic systems for parsing, type analysis, linting, taint/data flow, language-server references, and LLM candidate review.",
+  "methodology_doc": "_repos/shared-backend-components/context/codex/combined-code-intelligence-research-plan.md",
+  "checker": "scripts/check_combined_code_intelligence_systems.py",
+  "source_name_position": "Keep meaningful long names. Source identifiers provide local context to LLMs, stack traces, grep, review packets, and graph nodes. Do not replace them with hashes or opaque IDs. Combine them with external analyzers so long names are validated by syntax/type/data-flow facts instead of pretending names alone are a complete resolver.",
+  "layers": [
+    {
+      "id": "semantic_source_names",
+      "role": "Human/LLM-visible semantic address layer",
+      "system": "pyprefix",
+      "repo_status": "built",
+      "what_it_adds": "py_<kind>_<file>__<scope>__<name> identifiers; exact grep; graph node meaning inside the source itself",
+      "keep": true,
+      "risk": "Very long names add token/line noise and can churn diffs; mitigate with generated-code contracts, wrappers for external APIs, and graph summaries."
+    },
+    {
+      "id": "python_ast_symtable",
+      "role": "Compiler-view binding and syntax layer",
+      "system": "Python ast + symtable",
+      "repo_status": "ast built; symtable next",
+      "what_it_adds": "definitions, scopes, free/local/global/nonlocal bindings, exact source locations, safe rewrite planning",
+      "keep": true,
+      "risk": "Python dynamic refs still require unresolved markers."
+    },
+    {
+      "id": "multi_language_parser",
+      "role": "JS/TS/HTML/CSS and template structural parsing",
+      "system": "tree-sitter or ast-grep/comby adapter",
+      "repo_status": "gap",
+      "what_it_adds": "frontend route/button/component graph; UI seam tracing; structural search outside Python",
+      "keep": true,
+      "risk": "Adds dependency/version pinning requirement; parser grammars must be locked for determinism."
+    },
+    {
+      "id": "code_property_graph",
+      "role": "Operation, control-flow, and data-flow layer",
+      "system": "pyprefix opgraph now; Joern/CodeQL-inspired CPG as next maturity",
+      "repo_status": "operation graph seed built",
+      "what_it_adds": "AST nodes, control edges, def-use/data-flow, taint-style source->sink paths, poor-logic queries",
+      "keep": true,
+      "risk": "Interprocedural data flow can be expensive; use resumable/bounded packet generation."
+    },
+    {
+      "id": "pattern_and_taint_rules",
+      "role": "Fast reusable quality/security rule layer",
+      "system": "Semgrep-style rules + repo-local deterministic rules",
+      "repo_status": "repo-local heuristics built in hybrid review; Semgrep adapter gap",
+      "what_it_adds": "magic literals, scalar-series, branch chains, dynamic refs, sources/sinks/sanitizers, autofix candidates",
+      "keep": true,
+      "risk": "False positives; findings are review packets until proofs pass."
+    },
+    {
+      "id": "lint_format_static_quality",
+      "role": "Fast hygiene and style quality layer",
+      "system": "Ruff-compatible adapter",
+      "repo_status": "gap",
+      "what_it_adds": "unused imports, broad exceptions, complexity smells, formatting, many standard Python rules",
+      "keep": true,
+      "risk": "Autofix can conflict with pyprefix codemods; route fixes through proof gate."
+    },
+    {
+      "id": "type_contract_layer",
+      "role": "Optional optimization-stage type and protocol layer",
+      "system": "mypy/Pyright-compatible adapters",
+      "repo_status": "gap",
+      "what_it_adds": "signature contracts, protocol conformance, TypedDict/dataclass field contracts, safer arg/method/field migration",
+      "keep": true,
+      "risk": "Do not force strict types too early in Teleon-generated code; infer/stabilize shape first."
+    },
+    {
+      "id": "language_server_references",
+      "role": "Find references, rename, call/type hierarchy layer",
+      "system": "LSP/LSIF/SCIP-compatible adapter",
+      "repo_status": "gap",
+      "what_it_adds": "editor-grade references and rename plans, especially for non-Python and cross-file contracts",
+      "keep": true,
+      "risk": "Server output must be cached/versioned and treated as evidence, not truth."
+    },
+    {
+      "id": "llm_candidate_review",
+      "role": "Explanation and remediation candidate layer",
+      "system": "hybrid_repo_review_pipeline",
+      "repo_status": "built",
+      "what_it_adds": "purpose, UX/product impact, recommended fixes, proof-to-run over deterministic packets",
+      "keep": true,
+      "risk": "LLM output is never authority; promotion requires deterministic check/proof."
+    }
+  ],
+  "rules": [
+    {
+      "id": "names_plus_analyzers_not_names_only",
+      "rule": "Long names remain the source-level context layer, but every edge/finding should be backed by parser/type/flow/lint evidence where available."
+    },
+    {
+      "id": "external_systems_are_evidence_layers",
+      "rule": "CodeQL/Joern/Semgrep/Ruff/mypy/Pyright/LSP outputs are normalized as evidence rows with tool/version/path/range/confidence, not blindly accepted as truth."
+    },
+    {
+      "id": "llm_reviews_are_candidate_only",
+      "rule": "LLM review enriches deterministic packets with purpose/risk/fix hypotheses; it cannot satisfy a contract by itself."
+    },
+    {
+      "id": "source_names_must_stay_meaningful",
+      "rule": "Do not replace meaningful names with hashes. If unique IDs are needed internally, store them as metadata while the source name remains semantic."
+    },
+    {
+      "id": "generated_code_uses_primitives",
+      "rule": "Teleon-generated code should use primitive blocks for scalar-to-sequence, bounded loops, dispatch, candidate envelopes, and purpose/input/output contracts."
+    },
+    {
+      "id": "query_bad_logic_as_graph_smells",
+      "rule": "Magic literals, scalar-series, branch chains, repeated calls, dynamic refs, broad exceptions, mutable defaults, and unbounded loops should be queryable findings."
+    },
+    {
+      "id": "proof_gate_promotes",
+      "rule": "Only registered deterministic checks and the proof gate promote a finding/fix from candidate to accepted."
+    }
+  ],
+  "source_references": [
+    {"id": "codeql_python_data_flow", "url": "https://codeql.github.com/docs/codeql-language-guides/analyzing-data-flow-in-python/"},
+    {"id": "joern_code_property_graph", "url": "https://docs.joern.io/code-property-graph/"},
+    {"id": "semgrep_taint_analysis", "url": "https://docs.semgrep.dev/writing-rules/data-flow/taint-mode/overview"},
+    {"id": "tree_sitter_using_parsers", "url": "https://tree-sitter.github.io/tree-sitter/using-parsers/"},
+    {"id": "lsp_3_17_spec", "url": "https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/"},
+    {"id": "ruff_docs", "url": "https://docs.astral.sh/ruff/"},
+    {"id": "mypy_type_hints", "url": "https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html"},
+    {"id": "identifier_semantics_paper", "url": "https://arxiv.org/abs/2007.08033"},
+    {"id": "llm_readability_identifier_paper", "url": "https://arxiv.org/abs/2507.05289"},
+    {"id": "semantic_code_graph_paper", "url": "https://arxiv.org/abs/2310.02128"}
+  ]
+}

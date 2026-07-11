@@ -1,0 +1,24 @@
+MODULE src/teleon/experiments/path_comparator.py
+## API signatures
+```python
+"""_repos/teleon/backend/src/teleon/experiments/path_comparator — judge each candidate against the baseline (never serve one)."""
+SCHEMA_VERSION = ...
+ACTION_PROMOTE = ...
+ACTION_KEEP = ...
+ACTION_INVESTIGATE = ...
+def _output_text(output: Any) -> str
+    # A deterministic, lower-cased string view of any JSON output, for held-out / unsafe substring checks.
+def _leaks_any(output: Any, needles: Iterable[str]) -> bool
+    # True iff any needle (case-insensitive) appears in the output's flattened text.
+def _facts_equivalent(baseline_output: Any, candidate_output: Any) -> bool
+    # Candidate's served facts are equivalent to the baseline's.
+def _verdict(*, baseline: dict[str, Any], cand: dict[str, Any], run_input_snapshot_hash: str, held_out_strings: list[str], unsafe_strings: list[str]) -> dict[str, Any]
+    # One per-candidate verdict with the gates + a recommended_action.
+def compare(run: dict[str, Any], *, now: str, held_out_strings: Iterable[str] | None=None, unsafe_strings: Iterable[str] | None=None, validate: bool=True) -> dict[str, Any]
+    # Compare every candidate in ``run`` against its baseline; return a ``PathComparisonReport`` dict.
+```
+## intra-module call edges
+src.teleon.experiments.path_comparator._leaks_any -> src.teleon.experiments.path_comparator._output_text
+src.teleon.experiments.path_comparator._verdict -> src.teleon.experiments.path_comparator._facts_equivalent
+src.teleon.experiments.path_comparator._verdict -> src.teleon.experiments.path_comparator._leaks_any
+src.teleon.experiments.path_comparator.compare -> src.teleon.experiments.path_comparator._verdict

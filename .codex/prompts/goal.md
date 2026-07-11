@@ -30,18 +30,18 @@ Read first:
 2. `README.md` and `taxonomy/SPEC.md`
 3. `docs/codex/baltor-clean-context.md`
 4. `docs/codex/baltor-context-control-current-state.md`
-5. `docs/codex/baltor-context-control-iteration-plan.md`
-6. `docs/codex/baltor-context-control-test-plan.md`
+5. `_repos/baltor/context/codex/baltor-context-control-iteration-plan.md`
+6. `_repos/baltor/context/codex/baltor-context-control-test-plan.md`
 7. `docs/codex/baltor-autonomous-goal.md`
-8. `docs/architecture/baltor-codebase-cleanup-plan.md`
-9. `docs/architecture/baltor-model-and-document-pipeline.md`
-10. `docs/architecture/baltor-stateless-worker-standard.md`
-11. `docs/architecture/baltor-queue-priority-orchestration.md`
-12. `docs/architecture/baltor-source-trust-and-adoption-policy.md`
-13. `docs/strategy/baltor-gtm-fundraising-plan.md`
-14. `docs/strategy/gtm-launch-guide.md`
-15. `docs/architecture/low-cost-hosting-plan.md`
-16. `docs/research/baltor-worker-orchestration-research.md`
+8. `_repos/baltor/context/architecture/baltor-codebase-cleanup-plan.md`
+9. `_repos/baltor/context/architecture/baltor-model-and-document-pipeline.md`
+10. `_repos/baltor/context/architecture/baltor-stateless-worker-standard.md`
+11. `_repos/baltor/context/architecture/baltor-queue-priority-orchestration.md`
+12. `_repos/baltor/context/architecture/baltor-source-trust-and-adoption-policy.md`
+13. `_repos/fundraising/context/baltor-gtm-fundraising-plan.md`
+14. `_repos/_shared/strategy/gtm-launch-guide.md`
+15. `_repos/shared-backend-components/context/architecture/low-cost-hosting-plan.md`
+16. `_repos/baltor/context/research/baltor-worker-orchestration-research.md`
 17. `OpenHarness.zip` design files, if present. Inspect safely in a temporary
     directory and incorporate useful design/layout/copy ideas without overwriting
     current work.
@@ -191,7 +191,7 @@ Build or improve clear pages/guides for:
 
 1. Split monoliths:
    - `scripts/showcase/server.py`
-   - `web/openhubforai/styles/admin-demo.css`
+   - `_repos/openhubforai/frontend/styles/admin-demo.css`
    - `scripts/context_workers/tasks.py`
 2. Improve the admin demo, source sync pages, processing pages, output pages,
    and downloadable package flows.
@@ -232,9 +232,9 @@ Build or improve clear pages/guides for:
 Use the smallest meaningful check set:
 
 ```bash
-node --check web/openhubforai/admin-demo.js
-node --check web/openhubforai/admin-demo-assets/app.js
-node --check web/openhubforai/admin-demo-assets/renderers.js
+node --check _repos/openhubforai/frontend/admin-demo.js
+node --check _repos/openhubforai/frontend/admin-demo-assets/app.js
+node --check _repos/openhubforai/frontend/admin-demo-assets/renderers.js
 python3 -m py_compile scripts/showcase/server.py
 python3 -m py_compile scripts/context_workers/*.py
 python3 -m scripts.context_workers.runner --self-test

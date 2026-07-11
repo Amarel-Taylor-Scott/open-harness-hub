@@ -1,0 +1,1 @@
+../../_shared/competitive-intelligence-vertical-ai-and-infra-map.md

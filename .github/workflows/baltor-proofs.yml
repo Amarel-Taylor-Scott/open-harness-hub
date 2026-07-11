@@ -1,7 +1,7 @@
 name: Baltor proofs (context engine)
 
 # Gates every PR (and feature-branch push) on the WHOLE Baltor proof suite — the same self-tests the
-# always-on flywheel watchdog runs (single source: scripts/baltor_flywheel.py PROOF_MODULES) — plus
+# always-on flywheel watchdog runs (single source: _repos/shared-backend-components/scripts/baltor_flywheel.py PROOF_MODULES) — plus
 # the committed-dashboard drift-check. Complements validate.yml (manifests/demos); does not replace it.
 
 on:
@@ -19,8 +19,8 @@ jobs:
           python-version: '3.11'
       - run: pip install pyyaml jsonschema
       - name: Flywheel proof suite (every PROOF_MODULES --self-test)
-        run: python scripts/baltor_flywheel.py --once
-      - name: Dashboard drift-check (web/baltor/*.json in sync with the export)
-        run: python scripts/demo_run_export.py --check-fresh
+        run: python _repos/shared-backend-components/scripts/baltor_flywheel.py --once
+      - name: Dashboard drift-check (_repos/baltor/frontend/*.json in sync with the export)
+        run: python _repos/shared-backend-components/scripts/demo_run_export.py --check-fresh
       - name: CI aggregate gate (flywheel + drift)
-        run: python scripts/ci_check.py
+        run: python _repos/shared-backend-components/scripts/ci_check.py

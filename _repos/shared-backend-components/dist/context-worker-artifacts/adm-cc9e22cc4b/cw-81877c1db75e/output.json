@@ -1,0 +1,649 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "adapter_status": "model_unreachable_or_failed",
+    "llm_error": "Selected route did not return a response.",
+    "llm_graph_enrichment": [],
+    "llm_proposed_edges": [],
+    "llm_proposed_nodes": [],
+    "model_route": {
+      "candidate_adapters": [
+        "ollama-gemma4-e2b-local",
+        "ollama-gemma4-e2b-mid",
+        "ollama-gemma4-e2b-large-placeholder"
+      ],
+      "cost_estimate": {
+        "estimated_cost_usd": 0.0
+      },
+      "fallbacks": [
+        {
+          "accepted": false,
+          "adapter": "ollama-gemma4-e2b-local",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        },
+        {
+          "accepted": true,
+          "adapter": "ollama-gemma4-e2b-mid",
+          "reason_codes": []
+        },
+        {
+          "accepted": false,
+          "adapter": "ollama-gemma4-e2b-large-placeholder",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        }
+      ],
+      "latency_budget_ms": null,
+      "modality": [
+        "text"
+      ],
+      "model_route_id": "mr-a9174645beb72190",
+      "policy": {
+        "allow_cloud": false,
+        "allow_frontier": false,
+        "capability": "structured_review",
+        "max_cost_usd": null,
+        "preferred_lane": "open_weight_medium",
+        "privacy_scope": "tenant",
+        "require_zero_data_retention": false,
+        "tenant_allowed_providers": []
+      },
+      "quality_tier": "mid_open_weight_cpu",
+      "route_reason": "selected_first_compliant_policy_route",
+      "selected_adapter": "ollama-gemma4-e2b-mid",
+      "selected_model": "batiai/gemma4-e2b:q4",
+      "selected_route": {
+        "adapter": "ollama-gemma4-e2b-mid",
+        "api_key_env": null,
+        "backend": "http-openai",
+        "base_url": "http://ollama:11434/v1",
+        "capabilities": [
+          "*"
+        ],
+        "data_retention": "local",
+        "enabled": true,
+        "estimated_cost_usd": 0.0,
+        "free_credit": false,
+        "lane": "open_weight_medium",
+        "latency_ms": null,
+        "modalities": [
+          "text"
+        ],
+        "model": "batiai/gemma4-e2b:q4",
+        "provider": "ollama",
+        "quality_tier": "mid_open_weight_cpu",
+        "trust_boundary": "local"
+      },
+      "task_type": "llm.graph.enrich",
+      "trust_boundary": "local"
+    },
+    "training_examples": [
+      {
+        "accepted": null,
+        "cascade": {
+          "escalation_reasons": [
+            "fragile_facts"
+          ],
+          "max_tier": 4,
+          "policy_version": "model-cascade-policy.v1",
+          "risk_signals": {
+            "ambiguous_count": 0,
+            "claim_count": 6,
+            "conflict_count": 0,
+            "fragile_count": 4,
+            "high_stakes": false,
+            "low_confidence": false,
+            "model_disagreement": false,
+            "user_facing": false
+          },
+          "selected_tiers": [
+            {
+              "examples": [
+                "Gemma 4 larger",
+                "Qwen 3.6 mid",
+                "medium open-weight reviewer"
+              ],
+              "fine_tune_targets": [
+                "edge extraction",
+                "evidence review",
+                "summary verification",
+                "contradiction candidates"
+              ],
+              "id": "mid_open_weight",
+              "lane": "open_weight_medium",
+              "model_policy": {
+                "capability": "structured_review",
+                "lane": "open_weight_medium"
+              },
+              "tier": 2,
+              "trainable": true
+            }
+          ],
+          "start_tier": 2,
+          "target_tier": 2,
+          "task_name": "llm.graph.enrich",
+          "training_task": "graph_enrichment"
+        },
+        "do_not_train_changing_facts_into_weights": true,
+        "input": {
+          "claims": [
+            {
+              "claim": "Baltor vendor policy requires supplier reviews every 90 days.",
+              "claim_id": "claim-001-e3cb1341",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "policy"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Baltor vendor policy requires supplier reviews every 90 days.",
+                "run_id": "adm-cc9e22cc4b",
+                "source_chunk": "chunk-001-3db8cab9"
+              },
+              "source_chunk": "chunk-001-3db8cab9",
+              "subject": "Baltor",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "SharePoint access must be reviewed before contractor onboarding.",
+              "claim_id": "claim-002-f3bfd7bd",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [],
+                "state": "allow_with_citation"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "positive",
+              "provenance": {
+                "evidence_span": "SharePoint access must be reviewed before contractor onboarding.",
+                "run_id": "adm-cc9e22cc4b",
+                "source_chunk": "chunk-001-3db8cab9"
+              },
+              "source_chunk": "chunk-001-3db8cab9",
+              "subject": "sharepoint access must reviewed before",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "The current escalation threshold is $25,000 as of 2026-05-31.",
+              "claim_id": "claim-003-0bce170c",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "as of",
+                  "current",
+                  "threshold"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "The current escalation threshold is $25,000 as of 2026-05-31.",
+                "run_id": "adm-cc9e22cc4b",
+                "source_chunk": "chunk-001-3db8cab9"
+              },
+              "source_chunk": "chunk-001-3db8cab9",
+              "subject": "the current escalation threshold",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "Northstar Staffing acquired Harbor Temps in 2022, then Harbor Temps merged with Lakeside Workforce in 2023.",
+              "claim_id": "claim-004-ba4a457f",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Northstar Staffing acquired Harbor Temps in 2022, then Harbor Temps merged with Lakeside Workforce in 2023.",
+                "run_id": "adm-cc9e22cc4b",
+                "source_chunk": "chunk-001-3db8cab9"
+              },
+              "source_chunk": "chunk-001-3db8cab9",
+              "subject": "Harbor Temps",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "A 2026 supplier portal export says CareShift Partners is independently owned, so ownership claims require a source date and refresh before current use.",
+              "claim_id": "claim-005-fd8e691d",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "current"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "A 2026 supplier portal export says CareShift Partners is independently owned, so ownership claims require a source date and refresh before current use.",
+                "run_id": "adm-cc9e22cc4b",
+                "source_chunk": "chunk-001-3db8cab9"
+              },
+              "source_chunk": "chunk-001-3db8cab9",
+              "subject": "Partners",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "According to https://example.com/source, the policy owner is Security Operations.",
+              "claim_id": "claim-006-e9781cf8",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "owner",
+                  "policy"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "According to https://example.com/source, the policy owner is Security Operations.",
+                "run_id": "adm-cc9e22cc4b",
+                "source_chunk": "chunk-001-3db8cab9"
+              },
+              "source_chunk": "chunk-001-3db8cab9",
+              "subject": "Security Operations",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            }
+          ],
+          "conflict_candidates": [],
+          "context_concerns": [],
+          "edges": [
+            {
+              "from": "entity-001-8cf86e13",
+              "to": "chunk-001-3db8cab9",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-002-36b05aa1",
+              "to": "chunk-001-3db8cab9",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-003-3276b98f",
+              "to": "chunk-001-3db8cab9",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-004-1b5f3ffd",
+              "to": "chunk-001-3db8cab9",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-005-dacaf791",
+              "to": "chunk-001-3db8cab9",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-006-aa16f0e5",
+              "to": "chunk-001-3db8cab9",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "claim-001-e3cb1341",
+              "to": "chunk-001-3db8cab9",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-001-e3cb1341",
+              "to": "entity-005-dacaf791",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-002-f3bfd7bd",
+              "to": "chunk-001-3db8cab9",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-003-0bce170c",
+              "to": "chunk-001-3db8cab9",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-004-ba4a457f",
+              "to": "chunk-001-3db8cab9",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-004-ba4a457f",
+              "to": "entity-001-8cf86e13",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-005-fd8e691d",
+              "to": "chunk-001-3db8cab9",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-005-fd8e691d",
+              "to": "entity-006-aa16f0e5",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-006-e9781cf8",
+              "to": "chunk-001-3db8cab9",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-006-e9781cf8",
+              "to": "entity-004-1b5f3ffd",
+              "type": "mentions"
+            }
+          ],
+          "nodes": [
+            {
+              "id": "entity-001-8cf86e13",
+              "label": "Harbor Temps",
+              "type": "entity"
+            },
+            {
+              "id": "entity-002-36b05aa1",
+              "label": "Lakeside Workforce",
+              "type": "entity"
+            },
+            {
+              "id": "entity-003-3276b98f",
+              "label": "Northstar Staffing",
+              "type": "entity"
+            },
+            {
+              "id": "entity-004-1b5f3ffd",
+              "label": "Security Operations",
+              "type": "entity"
+            },
+            {
+              "id": "entity-005-dacaf791",
+              "label": "Baltor",
+              "type": "entity"
+            },
+            {
+              "id": "entity-006-aa16f0e5",
+              "label": "Partners",
+              "type": "entity"
+            },
+            {
+              "id": "chunk-001-3db8cab9",
+              "label": "chunk-001-3db8cab9",
+              "type": "chunk",
+              "weight": 530
+            },
+            {
+              "id": "claim-001-e3cb1341",
+              "label": "Baltor",
+              "type": "claim"
+            },
+            {
+              "id": "claim-002-f3bfd7bd",
+              "label": "sharepoint access must reviewed before",
+              "type": "claim"
+            },
+            {
+              "id": "claim-003-0bce170c",
+              "label": "the current escalation threshold",
+              "type": "claim"
+            },
+            {
+              "id": "claim-004-ba4a457f",
+              "label": "Harbor Temps",
+              "type": "claim"
+            },
+            {
+              "id": "claim-005-fd8e691d",
+              "label": "Partners",
+              "type": "claim"
+            },
+            {
+              "id": "claim-006-e9781cf8",
+              "label": "Security Operations",
+              "type": "claim"
+            }
+          ]
+        },
+        "label_source": "pending_review",
+        "model_output": {
+          "adapter_status": "model_unreachable_or_failed",
+          "llm_error": "Selected route did not return a response.",
+          "llm_graph_enrichment": [],
+          "llm_proposed_edges": [],
+          "llm_proposed_nodes": [],
+          "model_route": {
+            "candidate_adapters": [
+              "ollama-gemma4-e2b-local",
+              "ollama-gemma4-e2b-mid",
+              "ollama-gemma4-e2b-large-placeholder"
+            ],
+            "cost_estimate": {
+              "estimated_cost_usd": 0.0
+            },
+            "fallbacks": [
+              {
+                "accepted": false,
+                "adapter": "ollama-gemma4-e2b-local",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              },
+              {
+                "accepted": true,
+                "adapter": "ollama-gemma4-e2b-mid",
+                "reason_codes": []
+              },
+              {
+                "accepted": false,
+                "adapter": "ollama-gemma4-e2b-large-placeholder",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              }
+            ],
+            "latency_budget_ms": null,
+            "modality": [
+              "text"
+            ],
+            "model_route_id": "mr-a9174645beb72190",
+            "policy": {
+              "allow_cloud": false,
+              "allow_frontier": false,
+              "capability": "structured_review",
+              "max_cost_usd": null,
+              "preferred_lane": "open_weight_medium",
+              "privacy_scope": "tenant",
+              "require_zero_data_retention": false,
+              "tenant_allowed_providers": []
+            },
+            "quality_tier": "mid_open_weight_cpu",
+            "route_reason": "selected_first_compliant_policy_route",
+            "selected_adapter": "ollama-gemma4-e2b-mid",
+            "selected_model": "batiai/gemma4-e2b:q4",
+            "selected_route": {
+              "adapter": "ollama-gemma4-e2b-mid",
+              "api_key_env": null,
+              "backend": "http-openai",
+              "base_url": "http://ollama:11434/v1",
+              "capabilities": [
+                "*"
+              ],
+              "data_retention": "local",
+              "enabled": true,
+              "estimated_cost_usd": 0.0,
+              "free_credit": false,
+              "lane": "open_weight_medium",
+              "latency_ms": null,
+              "modalities": [
+                "text"
+              ],
+              "model": "batiai/gemma4-e2b:q4",
+              "provider": "ollama",
+              "quality_tier": "mid_open_weight_cpu",
+              "trust_boundary": "local"
+            },
+            "task_type": "llm.graph.enrich",
+            "trust_boundary": "local"
+          }
+        },
+        "model_route": {
+          "candidate_adapters": [
+            "ollama-gemma4-e2b-local",
+            "ollama-gemma4-e2b-mid",
+            "ollama-gemma4-e2b-large-placeholder"
+          ],
+          "cost_estimate": {
+            "estimated_cost_usd": 0.0
+          },
+          "fallbacks": [
+            {
+              "accepted": false,
+              "adapter": "ollama-gemma4-e2b-local",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            },
+            {
+              "accepted": true,
+              "adapter": "ollama-gemma4-e2b-mid",
+              "reason_codes": []
+            },
+            {
+              "accepted": false,
+              "adapter": "ollama-gemma4-e2b-large-placeholder",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            }
+          ],
+          "latency_budget_ms": null,
+          "modality": [
+            "text"
+          ],
+          "model_route_id": "mr-a9174645beb72190",
+          "policy": {
+            "allow_cloud": false,
+            "allow_frontier": false,
+            "capability": "structured_review",
+            "max_cost_usd": null,
+            "preferred_lane": "open_weight_medium",
+            "privacy_scope": "tenant",
+            "require_zero_data_retention": false,
+            "tenant_allowed_providers": []
+          },
+          "quality_tier": "mid_open_weight_cpu",
+          "route_reason": "selected_first_compliant_policy_route",
+          "selected_adapter": "ollama-gemma4-e2b-mid",
+          "selected_model": "batiai/gemma4-e2b:q4",
+          "selected_route": {
+            "adapter": "ollama-gemma4-e2b-mid",
+            "api_key_env": null,
+            "backend": "http-openai",
+            "base_url": "http://ollama:11434/v1",
+            "capabilities": [
+              "*"
+            ],
+            "data_retention": "local",
+            "enabled": true,
+            "estimated_cost_usd": 0.0,
+            "free_credit": false,
+            "lane": "open_weight_medium",
+            "latency_ms": null,
+            "modalities": [
+              "text"
+            ],
+            "model": "batiai/gemma4-e2b:q4",
+            "provider": "ollama",
+            "quality_tier": "mid_open_weight_cpu",
+            "trust_boundary": "local"
+          },
+          "task_type": "llm.graph.enrich",
+          "trust_boundary": "local"
+        },
+        "reviewed_output": null,
+        "run_id": "adm-cc9e22cc4b",
+        "task": "llm.graph.enrich",
+        "training_example_id": "training-example-001-8d3358fe",
+        "training_task": "graph_enrichment"
+      }
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+MODULE src/baltor/workers/control_plane.py
+## API signatures
+```python
+"""src.baltor.workers.control_plane — one COMPOSED control-plane tick (C-FLEET-3 + C-FLEET-2 glue)."""
+_A = ...
+def _load(name: str, key: str) -> dict
+def _caps() -> dict
+def control_plane_tick(*, supervisor_ledger, fleet_ledger, supervisor_id: str, now: str, owned_shards: list[str], lease_name: str='global', ttl_seconds: int=30, interval_ms: int=10000, tick_duration_ms: int=100) -> dict
+    # Run one control-plane tick for `supervisor_id` over the capability shards it owns.
+```
+## intra-module call edges
+src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.control_plane._caps
+src.baltor.workers.control_plane.control_plane_tick -> src.baltor.workers.control_plane._load

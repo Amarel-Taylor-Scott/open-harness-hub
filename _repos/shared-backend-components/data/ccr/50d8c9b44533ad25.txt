@@ -1,0 +1,24 @@
+MODULE src/teleon/workers/execution_dispatch.py
+## API signatures
+```python
+"""src.teleon.workers.execution_dispatch — wire the ExecutionBackendSelector into the LIVE dispatch path."""
+_MATRIX = ...
+_EXECUTOR_DRAIN = ...
+def _candidate_local_equivalents() -> dict
+def _executor_for_backend(backend: str) -> str | None
+    # The drain executor ('function'/'job'/'pool') for a chosen backend, derived from the policy matrix: a
+SHARD_BUCKET = ...
+def _now_epoch(now) -> int
+def _route_and_drain(backend: str, db: str, capability: str) -> dict
+    # Drain the durable queue for `capability` via the local executor the POLICY MATRIX maps `backend` to.
+def dispatch_capability(store, db: str, *, capability: str, bucket: str='utility', now=None, available_creds: set | None=None, provider_health: dict | None=None, policy_override: dict | None=None, run: bool=True) -> dict
+    # Select the execution backend for `capability`'s queued durable work, record the decision, and (if
+def dispatch_owned_shards(store, db: str, *, owned: list[str], now=None, run: bool=True, available_creds: set | None=None, provider_health: dict | None=None) -> list[dict]
+    # Live-path entry: dispatch every owned capability shard that has queued durable work.
+```
+## intra-module call edges
+src.teleon.workers.execution_dispatch._executor_for_backend -> src.teleon.workers.execution_dispatch._candidate_local_equivalents
+src.teleon.workers.execution_dispatch._route_and_drain -> src.teleon.workers.execution_dispatch._executor_for_backend
+src.teleon.workers.execution_dispatch.dispatch_capability -> src.teleon.workers.execution_dispatch._now_epoch
+src.teleon.workers.execution_dispatch.dispatch_capability -> src.teleon.workers.execution_dispatch._route_and_drain
+src.teleon.workers.execution_dispatch.dispatch_owned_shards -> src.teleon.workers.execution_dispatch.dispatch_capability

@@ -1,5 +1,5 @@
 {
-  "$comment": "Project hooks. (1) PostToolUse: scripts/hooks/hygiene_guard.py is a FAIL-OPEN advisory that runs after Edit/Write/MultiEdit and warns (never blocks) on placeholder content in surfaces, magic-number bursts in source, and broken repo references in docs — the edit-time half of the hygiene contract (the gate's check_* are the other half; /hygiene is the manual sweep). (2) Stop drives the north-star self-prompting loop IN-SESSION, OFF + harmless by default: scripts/hooks/north_star_stop_hook.py exits 0 unless .agent/LOOP_ACTIVE exists. Owner opt-in: `touch .agent/LOOP_ACTIVE` to loop; `touch .agent/STOP_REQUESTED` to stop. Fail-open: any hook error allows the action. Disable either by removing its entry below.",
+  "$comment": "Project hooks. (1) PostToolUse: scripts/hooks/hygiene_guard.py is a FAIL-OPEN advisory that runs after Edit/Write/MultiEdit and warns (never blocks) on placeholder content in surfaces, magic-number bursts in source, and broken repo references in docs \u2014 the edit-time half of the hygiene contract (the gate's check_* are the other half; /hygiene is the manual sweep). (2) Stop drives the north-star self-prompting loop IN-SESSION, OFF + harmless by default: scripts/hooks/north_star_stop_hook.py exits 0 unless .agent/LOOP_ACTIVE exists. Owner opt-in: `touch .agent/LOOP_ACTIVE` to loop; `touch .agent/STOP_REQUESTED` to stop. Fail-open: any hook error allows the action. Disable either by removing its entry below.",
   "hooks": {
     "PostToolUse": [
       {
@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/hygiene_guard.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/_repos/shared-backend-components/scripts/hooks/hygiene_guard.py\""
           }
         ]
       }
@@ -18,7 +18,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/north_star_stop_hook.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/_repos/shared-backend-components/scripts/hooks/north_star_stop_hook.py\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/username/ai_harness_and_knowledge_facts_and_logic_website_sharing/_repos/shared-backend-components/scripts/aidevobserver_hook.py"
           }
         ]
       }

@@ -1,0 +1,17 @@
+MODULE src/teleon/evolution/source_poller.py
+## API signatures
+```python
+"""src.teleon.evolution.source_poller — poll a REAL authoritative source, detect change, emit a genuine CDC event."""
+_STREAM = ...
+def content_hash(text: str) -> str
+def _last_hash(source_id: str) -> str | None
+def poll_source(source_id: str, fetcher, *, now: str) -> dict
+    # Fetch -> hash -> compare to the last recorded hash -> emit a real CDC event. Returns the event (kind: new |
+def reheal_from_event(capability, event: dict, *, now: str) -> dict
+    # Feed a 'changed'/'new' CDC event into a freshness-tracked capability: hold the stale answer out until re-sync.
+def real_federal_register_fetcher(query: str='consumer financial protection', *, limit: int=3)
+    # A live, keyless authoritative source (US Federal Register). Returns a stable text blob to hash. Network-gated.
+```
+## intra-module call edges
+src.teleon.evolution.source_poller.poll_source -> src.teleon.evolution.source_poller._last_hash
+src.teleon.evolution.source_poller.poll_source -> src.teleon.evolution.source_poller.content_hash

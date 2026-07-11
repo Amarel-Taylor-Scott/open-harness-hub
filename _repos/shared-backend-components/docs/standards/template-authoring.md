@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/standards/template-authoring.md

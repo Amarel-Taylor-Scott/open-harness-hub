@@ -1,0 +1,32 @@
+MODULE src/teleon/egress/policy.py
+## API signatures
+```python
+"""Teleon egress intent and route-policy decisions."""
+_REPO = ...
+_ROUTE_POLICY_PATH = ...
+INTENT_SCHEMA_VERSION = ...
+ROUTE_DECISION_SCHEMA_VERSION = ...
+DEFAULT_ROUTE_POLICY_ID = ...
+BLOCKED_ROUTE_POLICY_ID = ...
+ALLOWED_TRANSPORT_KIND = ...
+class EgressPolicyError:
+    # Raised when an egress intent or route policy is malformed.
+def _redact_url_for_policy(url: str) -> dict[str, str]
+def route_policy_taxonomy() -> dict[str, Any]
+def route_policies_by_id() -> dict[str, dict[str, Any]]
+def approval_required_route_ids(policies: dict[str, dict[str, Any]] | None=None) -> set[str]
+    # Routes that need an explicit approval ref before they may be allowed — DERIVED from the taxonomy (the
+def _query_id(tenant_id: str, run_id: str, query_text: str) -> str
+def make_egress_intent(*, tenant_id: str, run_id: str, worker_id: str, worker_kind: str, operation: str, destination_url: str, method: str='GET', query_text: str='', query_id: str='', route_policy_id: str=DEFAULT_ROUTE_POLICY_ID, request_summary: dict[str, Any] | None=None, requested_at: str, tool_name: str='', trace_id: str='') -> dict[str, Any]
+def decide_route(intent: dict[str, Any], *, approved_route_refs: set[str] | None=None, now: str, policies: dict[str, dict[str, Any]] | None=None) -> dict[str, Any]
+    # Return an ``EgressRouteDecision`` for ``intent``.
+```
+## intra-module call edges
+src.teleon.egress.policy.approval_required_route_ids -> src.teleon.egress.policy.route_policies_by_id
+src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.EgressPolicyError
+src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.route_policies_by_id
+src.teleon.egress.policy.decide_route -> src.teleon.egress.policy.route_policy_taxonomy
+src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy.EgressPolicyError
+src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy._query_id
+src.teleon.egress.policy.make_egress_intent -> src.teleon.egress.policy._redact_url_for_policy
+src.teleon.egress.policy.route_policies_by_id -> src.teleon.egress.policy.route_policy_taxonomy

@@ -1,0 +1,1 @@
+../../../teleon/context/standards/capability-task-architecture-doctrine.md

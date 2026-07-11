@@ -1,0 +1,1 @@
+../../../_shared/standards/standards-linter.md

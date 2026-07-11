@@ -1,0 +1,1 @@
+../../baltor/context/baltor-k8s-cloudfunction-template-factory.md

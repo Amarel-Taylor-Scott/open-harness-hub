@@ -1,0 +1,17 @@
+MODULE src/teleon/stateful_swarms/cfpb_evidence_demo.py
+## API signatures
+```python
+"""src.teleon.stateful_swarms.cfpb_evidence_demo — the Baltor GOVERNED-BLACKBOARD demo (``blackboard.baltor.cfpb_evidence@v1``)."""
+DEMO_ID = ...
+CFPB_TENANT_SCOPE = ...
+STALE_FAQ_HANDLE = ...
+SOP_CODE_HANDLE = ...
+def build_cfpb_swarm_fixture(*, cfpb_fixture: dict | None=None) -> dict
+    # Build the swarm fixture from the planted CFPB Reg E facts.
+def run_cfpb_evidence_demo(*, now: str, blackboard: py_class_src_teleon_blackboard_local_sqlite_blackboard__LocalSqliteBlackboard | None=None, cfpb_fixture: dict | None=None) -> dict
+    # Run ``blackboard.baltor.cfpb_evidence@v1``: the swarm over the CFPB Reg E fixture on a governed blackboard.
+def describe() -> dict
+    # Card for the Baltor governed-blackboard demo (local-first; serves_truth False; Teleon infra, no src.baltor).
+```
+## intra-module call edges
+src.teleon.stateful_swarms.cfpb_evidence_demo.run_cfpb_evidence_demo -> src.teleon.stateful_swarms.cfpb_evidence_demo.build_cfpb_swarm_fixture

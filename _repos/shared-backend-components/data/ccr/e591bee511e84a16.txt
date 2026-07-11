@@ -1,0 +1,25 @@
+MODULE src/teleon/registry/composition_affinity.py
+## API signatures
+```python
+"""Composition affinity — LEARNED connection strengths between primitive edges (W1, 2026-07-01)."""
+def py_function_src_teleon_registry_composition_affinity__pair_id(py_arg_src_teleon_registry_composition_affinity__pair_id__producer_edge: str, py_arg_src_teleon_registry_composition_affinity__pair_id__consumer_edge: str) -> str
+    # Deterministic id for an ordered (producer_edge, consumer_edge) pair.
+def py_function_src_teleon_registry_composition_affinity__seed_pairs_from_group_cards(py_arg_src_teleon_registry_composition_affinity__seed_pairs_from_group_cards__path: Path | str | None=None) -> dict[str, dict]
+    # Count consecutive member-edge pairs across source-backed group cards (known-good chains).
+def py_function_src_teleon_registry_composition_affinity__record_composition(py_arg_src_teleon_registry_composition_affinity__record_composition__producer_edge: str, py_arg_src_teleon_registry_composition_affinity__record_composition__consumer_edge: str, py_arg_src_teleon_registry_composition_affinity__record_composition__outcome: str, *, py_arg_src_teleon_registry_composition_affinity__record_composition__at: float | None=None, py_arg_src_teleon_registry_composition_affinity__record_composition__ledger_path: Path | str | None=None) -> dict
+    # Append one composition outcome to the ledger (append-only; the ledger is the learning memory).
+def py_function_src_teleon_registry_composition_affinity__load_affinity_table(*, py_arg_src_teleon_registry_composition_affinity__load_affinity_table__ledger_path: Path | str | None=None, py_arg_src_teleon_registry_composition_affinity__load_affinity_table__group_cards_path: Path | str | None=None, py_arg_src_teleon_registry_composition_affinity__load_affinity_table__now: float | None=None) -> dict[str, dict]
+    # Fold seeds + decayed ledger outcomes into {pair_id -> row with 'affinity' score}.
+def py_function_src_teleon_registry_composition_affinity__affinity_boost(py_arg_src_teleon_registry_composition_affinity__affinity_boost__producer_edge: str, py_arg_src_teleon_registry_composition_affinity__affinity_boost__consumer_edge: str, py_arg_src_teleon_registry_composition_affinity__affinity_boost__table: dict[str, dict]) -> float
+    # Ranking BOOST for a candidate pair (0.0 for unknown pairs; never a compatibility override).
+def py_function_src_teleon_registry_composition_affinity__self_test() -> int
+```
+## intra-module call edges
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__affinity_boost -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__pair_id
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__load_affinity_table -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__seed_pairs_from_group_cards
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__record_composition -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__pair_id
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__seed_pairs_from_group_cards -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__pair_id
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__self_test -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__affinity_boost
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__self_test -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__load_affinity_table
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__self_test -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__record_composition
+src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__self_test -> src.teleon.registry.composition_affinity.py_function_src_teleon_registry_composition_affinity__seed_pairs_from_group_cards

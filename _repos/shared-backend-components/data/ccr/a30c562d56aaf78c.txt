@@ -1,0 +1,123 @@
+MODULE src/teleon/observer/router.py
+## API signatures
+```python
+"""observer.router — the Spotter ROUTER over the intervention TAXONOMY (the memo's central architecture, made real)."""
+_REPO = ...
+_HEURISTICS_PATH = ...
+ACTIONS = ...
+MODES = ...
+_MODE_CAP = ...
+_LIVE_BUDGET = ...
+_CHARS_PER_TOKEN = ...
+_OVERSIZED_TOKENS = ...
+_DUP_PREFIX_CHARS = ...
+_DUP_MIN_TOKENS = ...
+_CONF_REINVENTION = ...
+_CONF_OVERSIZED = ...
+_CONF_DUPLICATE = ...
+_CONF_STACK = ...
+_CONF_ML_COMPETITION_ROUTE = ...
+_CONF_MANUAL_CONTEXT_WASTE = ...
+_SHORTCUT_REPEAT = ...
+_PER_TYPE_FLOOR = ...
+_ML_COMPETITION_ROUTES = ...
+_MANUAL_CONTEXT_WASTE_PATTERNS = ...
+def _weaker(a: str, b: str) -> str
+def _approx_tokens(text: str) -> int
+def _token_savings(tokens_avoided: int, *, basis: str, model_calls_avoided: int=0) -> dict
+    # Transparent estimated savings payload. This is a heuristic/reporting estimate, not a billing receipt.
+def _savings_summary(findings: list[dict]) -> dict
+def _load_heuristics() -> list[dict]
+def _iv(type_: str, confidence: float, message: str, evidence: str, suggestion: str, max_action: str, source_ref: dict | None=None, dedup_id: str | None=None, savings: dict | None=None) -> dict
+    # A governed candidate intervention. `outcome` (accepted|reused|dismissed|ignored) is the accept/reject SIGNAL
+class InterventionModule:
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ReinventionModule:
+    # Single-message reinvention, GROUNDED in the federation (the reference module — wraps reinvention_guard).
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class MLCompetitionReinventionModule:
+    # Narrow AIDevObserver route finder for common Kaggle-style competition baselines.
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ManualContextWasteModule:
+    # Detect avoidable context dumps where a compact schema/manifest/sample summary primitive should be used.
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class FootgunModule:
+    # Deterministic secret/destructive pattern scan — high-trust, may BLOCK. Evidence is REDACTED (no-store-secrets).
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class AdversarialModule:
+    # Challenge an assumption BEFORE wasted work — keyed to question templates. Never blocks; failure = irrelevance.
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ReinventionClusterModule:
+    # Session-level: a SEQUENCE of build-signals that together predict rebuilding common infrastructure (§6).
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class StackReinventionModule:
+    # Stack-level reinvention, GROUNDED in the dependency graph (#101): 'this whole dependency stack already provides
+    def __init__(self)
+    def _caps_in(self, text: str) -> list[str]
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class OversizedContextModule:
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class DuplicateContextModule:
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class GuidanceModule:
+    # Best-practice / convention violations (bare except, mutable default, print-debug). Regex rules; NOTICE-only;
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class AlternativeModule:
+    # A simpler/more idiomatic approach exists (os.path->pathlib, manual sum->sum()). Keyword rules; NOTICE-only;
+    def __init__(self, heuristics: list[dict])
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ShortcutModule:
+    # Observed repetition: the same tool used >= _SHORTCUT_REPEAT times in a session -> 'batch/script it'. Grounded
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+class ProductReinventionModule:
+    # Product-level reinvention, GROUNDED in latent product space (#102): 'build an AI coding assistant' overlaps
+    def __init__(self, embed_fn=None)
+    def _space_(self)
+    def plausible(self, text: str, state: dict) -> bool
+    def ground(self, text: str, state: dict) -> list[dict]
+def default_modules(embed_fn=None) -> list[InterventionModule]
+    # The full taxonomy. embed_fn is threaded into the embedding-backed module (product_reinvention): None ->
+def _message_text(m: dict) -> str
+def _apply_budget(findings: list[dict], mode: str) -> list[dict]
+    # The GLOBAL interruption budget. Footguns (protective) always surface; other types compete for _LIVE_BUDGET
+def route_session(events: list[dict], mode: str='review_only', modules: list[InterventionModule] | None=None) -> dict
+    # Run the router over a session. mode picks the restraint level; review_only = the exhaustive post-session report
+```
+## intra-module call edges
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.AdversarialModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.AlternativeModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.DuplicateContextModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.FootgunModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.GuidanceModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.MLCompetitionReinventionModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ManualContextWasteModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.OversizedContextModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ProductReinventionModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ReinventionClusterModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ReinventionModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.ShortcutModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router.StackReinventionModule
+src.teleon.observer.router.default_modules -> src.teleon.observer.router._load_heuristics
+src.teleon.observer.router.ground -> src.teleon.observer.router.ProductReinventionModule._space_
+src.teleon.observer.router.ground -> src.teleon.observer.router.StackReinventionModule._caps_in
+src.teleon.observer.router.ground -> src.teleon.observer.router._approx_tokens
+src.teleon.observer.router.ground -> src.teleon.observer.router._iv
+src.teleon.observer.router.ground -> src.teleon.observer.router._token_savings
+src.teleon.observer.router.plausible -> src.teleon.observer.router.StackReinventionModule._caps_in

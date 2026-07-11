@@ -1,0 +1,10 @@
+MODULE src/baltor/graph/temporal/policy.py
+## API signatures
+```python
+"""src.baltor.graph.temporal.policy — the governed current-state projection."""
+def _is_stale(node, now: str) -> bool
+def project_current(store: TemporalGraphStore, *, canonical_fact_key: str, tenant_id: str, now: str=EPOCH, write_edges: bool=True) -> dict
+    # Project the governed current state for a fact_key. Sets node.current_state on every candidate and
+```
+## intra-module call edges
+src.baltor.graph.temporal.policy.project_current -> src.baltor.graph.temporal.policy._is_stale

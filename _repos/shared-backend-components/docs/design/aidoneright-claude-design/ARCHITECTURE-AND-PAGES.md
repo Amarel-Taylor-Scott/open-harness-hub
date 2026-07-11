@@ -1,0 +1,1 @@
+../../../../_shared/design/aidoneright-claude-design/ARCHITECTURE-AND-PAGES.md

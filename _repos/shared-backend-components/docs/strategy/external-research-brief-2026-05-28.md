@@ -1,0 +1,1 @@
+../../../_shared/strategy/external-research-brief-2026-05-28.md

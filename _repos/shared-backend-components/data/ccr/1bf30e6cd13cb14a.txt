@@ -1,0 +1,50 @@
+MODULE _repos/teleon/backend/src/teleon/agents/agent_runtime_provider.py
+## API signatures
+```python
+"""src.teleon.agents.agent_runtime_provider — the SHARED AI-AGENT RUNTIME port (canonical TELEON home)."""
+class py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeRequest:
+    # A bounded request to run an agent. ``runtime_id`` selects a catalog runtime; ``bounds`` caps the run;
+class py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeResult:
+    # The structured outcome of an agent run on a provisioned backend. ``serves_truth`` is pinned False: the
+class py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeUnavailableResult:
+    # Returned (NOT raised) by :func:`dispatch_agent_request` when the selected runtime is a candidate with no
+class py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeUnavailable:
+    # A candidate agent runtime (ClawLess/OpenClaw/Hermes/...) is not imported/executed in this repo. Carries
+    def __init__(self, runtime_id: str, runtime_ref: str | None, detail: str='') -> None
+class py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeProviderPort:
+    # One agent runtime. ``run_agent`` runs a bounded agent task on a provisioned backend and returns an
+    def describe(self) -> dict
+    def status(self) -> dict
+    def run_agent(self, py_arg_src_teleon_agents_agent_runtime_provider__py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeProviderPort_run_agent__request: 'AgentRuntimeRequest', *, backend: str, now: str) -> 'AgentRuntimeResult'
+def py_function_src_teleon_agents_agent_runtime_provider__load_catalog(*, py_arg_src_teleon_agents_agent_runtime_provider__py_function_src_teleon_agents_agent_runtime_provider__load_catalog__catalog_bytes: bytes | None=None) -> dict
+    # Return the agent-runtime catalog dict. ``catalog_bytes`` may be injected (tests/offline).
+def py_function_src_teleon_agents_agent_runtime_provider__runtime_card(py_arg_src_teleon_agents_agent_runtime_provider__py_function_src_teleon_agents_agent_runtime_provider__runtime_card__runtime_id: str, *, catalog: dict | None=None) -> dict | None
+class py_class_src_teleon_agents_agent_runtime_provider__LocalEmulatorAgentRuntime:
+    # The offline correctness invariant: runs a bounded deterministic agent task with NO network and NO real
+    def describe(self) -> dict
+    def status(self) -> dict
+    def run_agent(self, py_arg_src_teleon_agents_agent_runtime_provider__py_class_src_teleon_agents_agent_runtime_provider__LocalEmulatorAgentRuntime_run_agent__request: py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeRequest, *, backend: str, now: str) -> py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeResult
+class py_class_src_teleon_agents_agent_runtime_provider__CandidateAgentRuntime:
+    # A candidate runtime (ClawLess/OpenClaw, Hermes, ...) built from a catalog card. NEVER imported/executed:
+    def __init__(self, card: dict) -> None
+    def describe(self) -> dict
+    def status(self) -> dict
+    def run_agent(self, py_arg_src_teleon_agents_agent_runtime_provider__py_class_src_teleon_agents_agent_runtime_provider__CandidateAgentRuntime_run_agent__request: py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeRequest, *, backend: str, now: str) -> py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeResult
+def py_function_src_teleon_agents_agent_runtime_provider__get_runtime(py_arg_src_teleon_agents_agent_runtime_provider__py_function_src_teleon_agents_agent_runtime_provider__get_runtime__runtime_id: str, *, catalog: dict | None=None)
+    # Return a provider for ``runtime_id``: the live LocalEmulator for the active runtime, else a
+def py_function_src_teleon_agents_agent_runtime_provider___selector_task(py_arg_src_teleon_agents_agent_runtime_provider__py_function_src_teleon_agents_agent_runtime_provider__selector_task__request: py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeRequest) -> dict
+    # Project an agent request onto the execution_backend_selector's task shape (so the SAME numeric policy /
+def py_function_src_teleon_agents_agent_runtime_provider__dispatch_agent_request(py_arg_src_teleon_agents_agent_runtime_provider__py_function_src_teleon_agents_agent_runtime_provider__dispatch_agent_request__request: py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeRequest, *, now: str, catalog: dict | None=None, policy_matrix: dict | None=None, pricebook: dict | None=None, provider_health: dict | None=None, available_creds: set | None=None, policy_override: dict | None=None) -> dict
+    # RECEIVE a bounded agent request → SELECT a Teleon execution backend (the 'set up appropriate cloud
+```
+## intra-module call edges
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeUnavailableResult
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider___selector_task
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__get_runtime
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__dispatch_agent_request -> src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__load_catalog
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__get_runtime -> src.teleon.agents.agent_runtime_provider.py_class_src_teleon_agents_agent_runtime_provider__CandidateAgentRuntime
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__get_runtime -> src.teleon.agents.agent_runtime_provider.py_class_src_teleon_agents_agent_runtime_provider__LocalEmulatorAgentRuntime
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__get_runtime -> src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__runtime_card
+src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__runtime_card -> src.teleon.agents.agent_runtime_provider.py_function_src_teleon_agents_agent_runtime_provider__load_catalog
+src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.agents.agent_runtime_provider.py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeResult
+src.teleon.agents.agent_runtime_provider.run_agent -> src.teleon.agents.agent_runtime_provider.py_class_src_teleon_agents_agent_runtime_provider__AgentRuntimeUnavailable

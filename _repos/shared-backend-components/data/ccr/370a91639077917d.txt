@@ -1,0 +1,41 @@
+MODULE src/teleon/synthesis/component_plan_compiler.py
+## API signatures
+```python
+"""Deterministic ComponentCard -> PipelinePlan compiler for Teleon."""
+def py_function_src_teleon_synthesis_component_plan_compiler__stable_json(py_arg_value) -> str
+    # Return deterministic JSON for lock ids and provenance diffs.
+def py_function_src_teleon_synthesis_component_plan_compiler__stable_digest(py_arg_value) -> str
+    # Return a short deterministic digest for registry snapshots and lock ids.
+def py_function_src_teleon_synthesis_component_plan_compiler__parse_component_ref(py_arg_ref: str) -> tuple[str, str | None]
+    # Parse `component.id@version` into `(component_id, version)`.
+def py_function_src_teleon_synthesis_component_plan_compiler__contract_fields(py_arg_contract: dict) -> set[str]
+    # Extract deterministic field names from a lightweight input/output contract.
+def py_function_src_teleon_synthesis_component_plan_compiler__contract_shape(py_arg_contract: dict) -> str
+    # Extract a coarse shape/type from a lightweight contract.
+def py_function_src_teleon_synthesis_component_plan_compiler__component_key(py_arg_card: dict) -> str
+def py_function_src_teleon_synthesis_component_plan_compiler__index_component_cards(py_arg_component_cards: list[dict]) -> tuple[dict[str, dict], list[str]]
+    # Validate and index ComponentCards by id and id@version.
+def py_function_src_teleon_synthesis_component_plan_compiler__binding_dependency(py_arg_source: str) -> tuple[str | None, str | None]
+    # Return `(node_id, output_name)` for `$nodes.<node>.outputs.<field>` bindings.
+def py_function_src_teleon_synthesis_component_plan_compiler__validate_binding_source(py_arg_source: str) -> bool
+def py_function_src_teleon_synthesis_component_plan_compiler__topological_order(py_arg_nodes: list[dict], py_arg_extra_edges: list[tuple[str, str]] | None=None) -> tuple[list[str], list[str]]
+    # Return deterministic topological node order and validation errors.
+def py_function_src_teleon_synthesis_component_plan_compiler__node_has_side_effect(py_arg_card: dict, py_arg_node: dict) -> bool
+def py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan(py_arg_pipeline_plan: dict, py_arg_component_cards: list[dict], py_arg_retrieved_component_ids: set[str] | None=None) -> dict
+    # Validate a candidate PipelinePlan and emit a deterministic lockfile-shaped dict.
+def py_function_src_teleon_synthesis_component_plan_compiler___self_test() -> int
+```
+## intra-module call edges
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler___self_test -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__index_component_cards -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__component_key
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__stable_digest -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__stable_json
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__binding_dependency
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__component_key
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__contract_fields
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__contract_shape
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__index_component_cards
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__node_has_side_effect
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__parse_component_ref
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__stable_digest
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__topological_order
+src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_and_lock_pipeline_plan -> src.teleon.synthesis.component_plan_compiler.py_function_src_teleon_synthesis_component_plan_compiler__validate_binding_source

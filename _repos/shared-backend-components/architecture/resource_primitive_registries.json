@@ -1,0 +1,49 @@
+{
+  "version": "0.1",
+  "updated": "2026-06-25",
+  "principle": "Owner-requested 2026-06-25: registries for the BASIC PRIMITIVES the descent reasons about — compression, the units of compute/network/storage, and encryption. Each is a POINTER + SHAPE (per the 'a registry = pointer + shape; RECORDS come from population' lesson); the ingestion engine populates them from seed_sources (PyPI/Docker/awesome lists/vendor pricing). The unit registries feed the cost model the Teleon descent already uses (_repos/teleon/backend/src/teleon/economics) — DO NOT duplicate that math; these supply the typed units it prices. serves_truth=false.",
+  "serves_truth": false,
+  "registries": {
+    "compression": {
+      "kind": "static",
+      "what": "compression codecs + 'compression records' (semantic/learned compression, quantization, distillation)",
+      "shape": ["id", "name", "family(lossless|lossy|semantic|quantization)", "ratio_typical", "speed_tier", "cpu_cost", "library", "license", "use_when"],
+      "seed_examples": ["zstd", "lz4", "brotli", "gzip", "snappy", "xz", "zlib", "model-quantization(gguf/awq/gptq)", "prompt/context-distillation"],
+      "populate_via": ["pypi", "dockerhub", "github_search:topics/compression"],
+      "links": ["_repos/baltor/backend/src/baltor/distillation (semantic compression — lossless clause)"]
+    },
+    "compute_unit": {
+      "kind": "static",
+      "what": "basic units of compute the cost model prices",
+      "shape": ["id", "unit", "definition", "typical_cost_usd", "provider_ref", "freshness"],
+      "seed_examples": ["FLOP", "vCPU-second", "core-second", "GPU-hour", "llm_token", "request", "container-second", "wasm-invocation"],
+      "populate_via": ["openrouter-models", "cloudflare-ai-docs", "modal-docs", "vendor pricing pages"],
+      "links": ["_repos/teleon/backend/src/teleon/economics (cost_model — consumes these units)", "architecture/model_index.json"]
+    },
+    "network_transfer": {
+      "kind": "static",
+      "what": "units of network/data transfer",
+      "shape": ["id", "unit", "definition", "typical_cost_usd", "direction(ingress|egress|internal)", "provider_ref"],
+      "seed_examples": ["byte", "GB-egress", "request", "rtt-ms", "bandwidth-mbps", "cdn-hit"],
+      "populate_via": ["cloudflare-ai-docs", "vendor pricing pages"],
+      "links": ["_repos/teleon/backend/src/teleon/economics"]
+    },
+    "storage": {
+      "kind": "static",
+      "what": "units + tiers of storage",
+      "shape": ["id", "unit", "tier(hot|warm|cold|archive)", "typical_cost_usd", "durability", "provider_ref"],
+      "seed_examples": ["byte", "GB-month", "IOPS", "object", "db-row", "vector(embedding)", "blob"],
+      "populate_via": ["vendor pricing pages", "pypi:storage-sdks"],
+      "links": ["architecture/storage_tier_policy.json", "_repos/teleon/backend/src/teleon/storage/record_store.py"]
+    },
+    "encryption": {
+      "kind": "static",
+      "what": "encryption/crypto primitives + libraries",
+      "shape": ["id", "name", "family(symmetric|asymmetric|hash|kdf|signature|kem)", "strength_bits", "library", "fips", "use_when"],
+      "seed_examples": ["AES-256-GCM", "ChaCha20-Poly1305", "RSA-4096", "ECDSA-P256", "Ed25519", "X25519", "Argon2id", "SHA-256", "libsodium", "age", "envelope-encryption(KMS)", "TLS1.3"],
+      "populate_via": ["pypi", "npm", "github_search:topics/cryptography"],
+      "links": ["architecture/credential_registry.json (SecretRef)", "docs/architecture/service-auth-and-consumption-model.md"]
+    }
+  },
+  "note": "These join the registry federation (architecture/registry_ontology.json). Add as ontology entries when populated; do not hand-build records here — that is the ingestion engine's job."
+}

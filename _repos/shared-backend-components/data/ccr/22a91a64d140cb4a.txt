@@ -1,0 +1,10 @@
+MODULE _repos/teleon/backend/src/teleon/evolution/descent.py
+## API signatures
+```python
+"""src.teleon.evolution.descent — the PROACTIVE descent decision: how far to push a capability toward determinism."""
+_DET_EPS = ...
+def descent_decision(objective, *, model_metrics, rule_metrics, model_id: str='model', rule_id: str='distilled_rule') -> dict
+    # Objective-gated fork-vs-hold. Score the non-deterministic runner (``model_metrics``) against its distilled
+def plan_descent_to_determinism(graph, *, min_coverage: float=0.0) -> dict
+    # Over a capability's evolution graph, the most-deterministic runner that still meets ``min_coverage`` —
+```

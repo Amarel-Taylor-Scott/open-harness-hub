@@ -1,0 +1,23 @@
+MODULE src/teleon/dag/pipeline_dag.py
+## API signatures
+```python
+"""src.teleon.dag.pipeline_dag — a flexible DAG of reusable STEPS for extraction/enrichment (not a linear cascade)."""
+class DAGError:
+    # Raised on a malformed graph: a missing producer, an unsatisfiable consume, or a cycle.
+class Node:
+    # One step in a pipeline DAG. ``fn(bus) -> value`` computes the artifact named ``produces`` from the bus.
+class DAG:
+    def by_id(self) -> dict
+    def choose(self, inputs: dict, *, floor: float=0.0) -> tuple[set, dict]
+        # Resolve choice-points: every non-alternative node is active; for each alt_group pick the CHEAPEST node that
+    def run(self, inputs: dict, *, floor: float=0.0) -> dict
+        # Execute the chosen sub-graph in data-flow order. Returns the bus + a receipt (path, per-node cost,
+def linear(nodes: list[Node]) -> DAG
+    # Convenience: a DAG (order is resolved by data-flow, not list position).
+```
+## intra-module call edges
+src.teleon.dag.pipeline_dag.choose -> src.teleon.dag.pipeline_dag.DAGError
+src.teleon.dag.pipeline_dag.linear -> src.teleon.dag.pipeline_dag.DAG
+src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAG.by_id
+src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAG.choose
+src.teleon.dag.pipeline_dag.run -> src.teleon.dag.pipeline_dag.DAGError

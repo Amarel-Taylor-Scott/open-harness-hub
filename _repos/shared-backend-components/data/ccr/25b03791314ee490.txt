@@ -1,0 +1,14 @@
+MODULE src/baltor/sales/diagnostics/runner.py
+## API signatures
+```python
+"""src.baltor.sales.diagnostics.runner — resolve a configurable engagement mode and gate a diagnostic run."""
+_A = ...
+def load_modes() -> dict
+def resolve_mode(name: str | None=None) -> tuple[str, dict]
+def _rid(*parts: str) -> str
+def start_diagnostic(*, tool: str, mode: str | None, authorization_basis: str, input_source: str, is_live_probe: bool, company_id: str | None, now: str) -> tuple[dict | None, list[str]]
+```
+## intra-module call edges
+src.baltor.sales.diagnostics.runner.resolve_mode -> src.baltor.sales.diagnostics.runner.load_modes
+src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.diagnostics.runner._rid
+src.baltor.sales.diagnostics.runner.start_diagnostic -> src.baltor.sales.diagnostics.runner.resolve_mode

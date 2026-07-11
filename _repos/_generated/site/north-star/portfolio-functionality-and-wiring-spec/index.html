@@ -1,0 +1,7293 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Host-agnostic catalog of harnesses, knowledge objects, logic and rule packs, tools, pipelines, and benchmarks — reusable AI-pipeline components admitted only on measured capability lift over a bare LLM.">
+      
+      
+      
+        <link rel="canonical" href="https://Amarel-Taylor-Scott.github.io/open-harness-hub/north-star/portfolio-functionality-and-wiring-spec/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>AI Done Right — Portfolio Functionality + Wiring Spec - OpenHubForAI</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ai-done-right-portfolio-functionality-wiring-spec" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenHubForAI" class="md-header__button md-logo" aria-label="OpenHubForAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenHubForAI
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              AI Done Right — Portfolio Functionality + Wiring Spec
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to dark"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="teal"  aria-label="Switch to light"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Amarel-Taylor-Scott/open-harness-hub" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Amarel-Taylor-Scott/open-harness-hub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../howto/run-pipeline/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Get started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../use-cases/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Use cases
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../strategy/product-market-monetization-brief/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Strategy
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../catalog/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Catalog
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../spec/HARNESS_HUB_SPEC.md" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../about/project/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenHubForAI" class="md-nav__button md-logo" aria-label="OpenHubForAI" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenHubForAI
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Amarel-Taylor-Scott/open-harness-hub" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Amarel-Taylor-Scott/open-harness-hub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/run-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run a pipeline locally
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/llm-assemble-pipeline-from-task/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Assemble a pipeline from a task
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/add-component/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/deploy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deploy the hub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/integrating-hackathon-submissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrate a hackathon submission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../use-cases/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use cases
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Use cases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/more-ideas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    More ideas (30+)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/personal-llm-companion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Personal LLM companion
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--archived_tombstone"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/illicit-content-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Illicit content + platform moderation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/cost-aware-pipeline-generation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cost-aware pipeline generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/llm-pipeline-saas-blueprint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM pipeline SaaS blueprint
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/local-sentence-to-pipeline-demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local sentence-to-pipeline demo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/human-trafficking-ugc-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Human-trafficking signal triage (UGC, Gemma-4)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/document-to-knowledge-graph/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Document to knowledge graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/local-first-research-wiki/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local-first research wiki
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/qa-on-documents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Q&A on documents
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/deep-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Deep research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/code-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code review with security
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/customer-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Customer support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/clinical-decision-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clinical decision support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aml-screening/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AML screening
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/image-gen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/llm-red-team/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM red-teaming
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/esg-supply-chain-due-diligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ESG supply-chain DD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/refugee-bureaucracy-translation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Refugee bureaucracy translation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Strategy
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Strategy
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/product-market-monetization-brief/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Product market monetization brief
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/baltor-gtm-fundraising-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor GTM fundraising plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/baltor-cloud-cost-pricing-pro-forma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor cloud cost pricing pro forma
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../strategy/gtm-launch-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GTM launch guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../catalog/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Catalog
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Catalog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../catalog/browser.html" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Browse (interactive)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../library/by-capability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    By capability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../spec/HARNESS_HUB_SPEC.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Harness Hub spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/vocabularies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vocabularies
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--archived_tombstone"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/schemas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Schemas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../codex/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Codex operating guide
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6_4" id="__nav_6_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Codex operating guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/ai-done-right-family-polish-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Done Right family polish goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../goals/aidoneright-portfolio-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Done Right parser-safe goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/handoff-freshness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handoff freshness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/claude-code-max-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Code Max transfer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/codex-transfer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Codex transfer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../handoff/openhub-surface-counts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenHub surface counts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/baltor-clean-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor clean context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/repo-polish-loop-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repo polish loop goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/baltor-autonomous-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor autonomous goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/billion-component-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Billion component goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/million-object-goal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Million object goal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/no-magic-values/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    No magic values
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/daily-production-targets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily production targets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/speed-guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Speed guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/claude-agent-efficiency/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude agent efficiency
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/object-factory-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object factory workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/quality-gates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quality gates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/multi-day-goal-runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-day goal runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../codex/autonomous-session-runbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autonomous session runbook
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/system-overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System overview (everything end-to-end)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/taxonomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Taxonomy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/layers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layers & primitives
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/pre-post-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pre/post-API processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/compiling-capabilities-into-bounded-dags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compiling capabilities into bounded DAGs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/primitive-platform-backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primitive platform backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/saas-operating-platform/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SaaS operating platform
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/service-auth-and-consumption-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service auth and consumption model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-dev-tunnels-and-auth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local dev tunnels and auth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/north-star-platform-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    North star platform architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/teleon-universal-computation-compiler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teleon as a universal computation compiler (13+ systems)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hundred-million-component-infrastructure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100M component infrastructure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/database-backed-component-store/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database-backed component store
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-store-candidate-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component store candidate load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/off-the-shelf-component-pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Off-the-shelf component pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-template-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component template load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/promotion-decision-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Promotion decision load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/approved-component-promotion-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approved component promotion plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/dedupe-resolution-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dedupe resolution plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/content-approval-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Content approval plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-codebase-cleanup-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor codebase cleanup plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-model-and-document-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor model and document pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-stateless-worker-standard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor stateless worker standard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-worker-operating-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor worker operating model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-conversation-research-synthesis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor conversation research synthesis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-context-and-agent-cicd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor context and agent CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-backend-infrastructure-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor backend infrastructure stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-backend-tooling-research-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor backend tooling research map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-free-llm-demo-routing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor free LLM demo routing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-queue-priority-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor queue priority orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-source-trust-and-adoption-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor source trust and adoption policy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/component-cdc-versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Component CDC versioning
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--archived_tombstone"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-sync-versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source sync versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/baltor-admin-demo-console/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor admin demo console
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/promotion-cdc-bridge-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Promotion CDC bridge plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/approved-promotion-smoke-test/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Approved promotion smoke test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-thousand-component-factory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily thousand component factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-partition-load-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily partition load audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-showcase-pipeline-factory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily showcase pipeline factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/showcase-candidate-coverage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase candidate coverage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/showcase-gap-feedback-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Showcase gap feedback loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-component-production-run/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily component production run
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-production-scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily production scheduler
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-stage-ledger/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily stage ledger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/duplicate-collapse-report/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Duplicate collapse report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-promotion-readiness/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily promotion readiness
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/index-coverage-repair/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Index coverage repair
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/daily-embedding-execution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Daily embedding execution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-embedding-worker-contract/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local embedding worker contract
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-hash-embedding-worker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local hash embedding worker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/pgvector-embedding-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pgvector embedding load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/embedding-committed-load-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Embedding committed load audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-pgvector-embedding-smoke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local pgvector embedding smoke
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/edge-ai-semantic-gap-guardrail-components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Edge AI semantic gap guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-to-component-factory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory to component factory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-batch-governance-bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory batch governance bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-vector-readiness-to-pgvector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory vector readiness to pgvector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/theory-local-postgres-smoke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Theory local Postgres smoke
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/low-cost-hosting-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Low-cost hosting plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hybrid-postgres-bigquery-hosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid Postgres BigQuery hosting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/incremental-catalog-builds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Incremental catalog builds
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/fast-factory-closeout/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fast factory closeout
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/model-runtime-training-and-federated-sharing-components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model runtime, training, and federated sharing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/partitioned-index-deltas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partitioned index deltas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/partition-registry-replay-audits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Partition registry replay audits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/promotion-index-deltas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Promotion index deltas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/object-factory-worker-fleet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object factory worker fleet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/containerized-object-factory-orchestration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Containerized object factory orchestration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-governance-and-entity-resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source governance + entity resolution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hybrid-label-dimensional-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid label dimensional search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/use-case-seed-label-dimension-rows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use case seed label rows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/use-case-seed-entity-ref-rows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use case seed entity refs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/use-case-seed-embedding-buckets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use case seed embedding buckets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/embedding-execution-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Embedding execution plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/vector-readiness-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector readiness audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-surface-seed-row-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source surface seed row emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-surface-scan-partitions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source surface scan partitions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-scan-job-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source scan job emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-job-replay-runner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source job replay runner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-replay-row-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source replay row emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/public-source-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/source-surface-execution-summary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source surface execution summary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/staged-vs-committed-load-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Staged versus committed load audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/postgres-load-execution-and-audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Postgres load execution and audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/specialized-model-card-scan-jobs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model card scan jobs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/specialized-model-card-row-emission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model card row emission
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/specialized-model-card-load-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model card load plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/generated-object-storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generated object storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/object-counts-and-db-bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Object counts + DB bootstrap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/postgres-pgvector-bootstrap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Postgres pgvector bootstrap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/bulk-generated-object-loads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bulk generated object loads
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/canonical-factory-row-coverage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Canonical factory row coverage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/agentic-orchestration-harnesses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic orchestration harnesses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/multimodal-public-service-harnesses/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal public service harnesses
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/context-control-loop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context control loop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/prompt-abi-and-cache-shaped-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prompt ABI and token-efficient context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/context-worker-registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Context worker registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/trajectory-fragment-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Trajectory fragment cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/signed-knowledge-network/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Signed knowledge network
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/procedure-knowledge-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Procedure knowledge objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/costed-blueprint-route-matrix/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Costed blueprint route matrix
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-blueprint-output-records/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local blueprint output records
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/local-blueprint-record-persistence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local blueprint record persistence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/expert-email-and-grounded-verification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Expert email + grounded verification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/verification-packet-record-persistence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Verification packet persistence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/resumable-object-comparison-jobs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Resumable object comparison jobs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/hybrid-comparison-blocking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hybrid comparison blocking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/databases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database representations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/industry-agnostic-pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Industry-agnostic pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparison/peer-registries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Peer registries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparison/google-agent-builder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google Agent Builder comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../comparison/workflow-builders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow builder inspiration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Playground & sample runs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/baltor-public-source-demo-catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor public source demo catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/cfpb-consumer-complaints-context-demo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CFPB complaints context demo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/standards-landscape/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standards landscape
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/baltor-worker-orchestration-research/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Baltor worker orchestration research
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/claude-code-skills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Claude Code skills overlap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/openharness-zip-integration-review/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenHarness zip integration review
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/capability-gap-discovery-browsers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Capability gap discovery browsers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/primitive-source-surface-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Primitive source surface map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/esoteric-industry-source-surfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Esoteric industry source surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/community-moderation-knowledge-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community moderation knowledge objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/specialized-model-signal-surfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Specialized model signal surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/public-source-blueprint-catalog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Public source blueprint catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/occupation-to-procedure-objects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Occupation to procedure objects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/standards-regulatory-source-map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Standards regulatory source map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/agent-workflow-system-reference-intake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent workflow system intake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/task-marketplace-archetype-intake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Task marketplace archetype intake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/candidate-primitive-promotion-scoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Candidate primitive promotion scoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/cross-domain-use-case-seed-surfaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-domain use case seed surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/github-hosting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub hosting plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../research/antigravity-ingest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Antigravity 2.0 ingest plan
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/project/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="ai-done-right-portfolio-functionality-wiring-spec">AI Done Right — Portfolio Functionality + Wiring Spec<a class="headerlink" href="#ai-done-right-portfolio-functionality-wiring-spec" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Generated from the wiring-review workflow (wf_52602c56-586), then maintained by hand. It traces, for every surface page/view/button, the full loop (UI handler -&gt; seam -&gt; backend handler -&gt; state) with file:line evidence, and gives each element its purpose, problem, solution, product-market fit, dependencies, what it communicates with, wiring status (wired/partial/stub/broken), and gap.</p>
+<p>The machine-checkable slice of this lives in <code>architecture/required_functionality.json</code> (checked by <code>scripts/check_required_functionality.py</code>): 'page X requires functionality Y' as graph nodes with deterministic check-edges. Update both when a gap is closed.</p>
+</blockquote>
+<hr />
+<h1 id="ai-done-right-product-wiring-spec-by-surface-by-page-by-flow">AI Done Right — Product + Wiring Spec (by Surface · by Page · by Flow)<a class="headerlink" href="#ai-done-right-product-wiring-spec-by-surface-by-page-by-flow" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>Source: per-area page/flow traces for the three live surfaces. All wiring facts (seam paths, backend <code>file:line</code>, status) are taken verbatim from the traces. Purpose / Problem / PMF framing is product articulation layered on top of those facts. Where a trace says "none"/"NONE", no seam or backend was found — not inferred.</p>
+</blockquote>
+<p>Status legend: <strong>wired</strong> = UI→seam→backend→persist all present and exercised · <strong>partial</strong> = seam + backend exist but UI under-calls them or falls back to fixtures · <strong>stub</strong> = UI-only theater, no seam/backend · <strong>broken</strong> = control exists but handler is a dead no-op.</p>
+<hr />
+<h2 id="surface-1-identity-accounts-cross-cutting">SURFACE 1 — Identity &amp; Accounts (cross-cutting)<a class="headerlink" href="#surface-1-identity-accounts-cross-cutting" title="Permanent link">&para;</a></h2>
+<p>Bundle: <code>dist/sites/aidoneright-design</code> (kit <code>oh-site.jsx</code>, client <code>oh-identity.js</code>) → backend <code>scripts/identity_local_service.py</code> over <code>/api/identity/&lt;realm&gt;/*</code>. 24 realms from <code>architecture/identity_realm_registry.json</code>. This is the only genuinely production-shaped backend in the portfolio (hash-only key storage, sliding-window throttle, append-only audit ledger, atomic persistence, real <code>--self-test</code>).</p>
+<h3 id="pages">Pages<a class="headerlink" href="#pages" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Component</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/signup</td>
+<td>OhAuth (signup)</td>
+<td>Create a realm-scoped account</td>
+</tr>
+<tr>
+<td>/signin</td>
+<td>OhAuth (signin)</td>
+<td>Log into a realm; per-realm session in localStorage</td>
+</tr>
+<tr>
+<td>/forgot</td>
+<td>OhAuth (forgot)</td>
+<td>Password-reset request</td>
+</tr>
+<tr>
+<td>/dashboard</td>
+<td>OhDashboard</td>
+<td>Signed-in landing (stats/activity/plan/quick-start)</td>
+</tr>
+<tr>
+<td>/onboarding</td>
+<td>OhOnboarding</td>
+<td>Post-signup checklist</td>
+</tr>
+<tr>
+<td>/keys</td>
+<td>OhApiKeys</td>
+<td>Mint / list / revoke per-realm API keys</td>
+</tr>
+<tr>
+<td>/team</td>
+<td>OhTeam</td>
+<td>Invite teammates, manage roles</td>
+</tr>
+<tr>
+<td>/billing</td>
+<td>OhBilling</td>
+<td>Plan, usage meter, invoices</td>
+</tr>
+<tr>
+<td>/usage</td>
+<td>OhUsage</td>
+<td>Activity metrics for billing period</td>
+</tr>
+<tr>
+<td>/settings</td>
+<td>OhSettings</td>
+<td>Profile / preferences</td>
+</tr>
+<tr>
+<td>/audit</td>
+<td>OhAuditLog</td>
+<td>Receipts: served packs, verifications, key actions</td>
+</tr>
+<tr>
+<td>/notifications</td>
+<td>OhNotifications</td>
+<td>Inbox of changes/escalations/results</td>
+</tr>
+<tr>
+<td>/contact</td>
+<td>OhContact</td>
+<td>Contact / sales form</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flows">Flows<a class="headerlink" href="#flows" title="Permanent link">&para;</a></h3>
+<p><strong>Register / signup</strong> — <code>wired</code>
+- Purpose: create a real per-realm account and land authenticated.
+- Problem solved: a tenant needs a durable identity scoped to one product realm (no cross-realm SSO leakage).
+- Solution: <code>submitAuth</code> validates email + ≥8-char pass, pings <code>available()</code>, then <code>OHIdentity.signup</code> chains <code>register</code> → per-step <code>onboard</code> → <code>login</code> (<code>oh-identity.js:40-47</code>); backend <code>_dispatch 'register'</code> → kit <code>realm.register</code> + <code>rt.save()</code> + verify-email port (<code>identity_local_service.py:391-402</code>).
+- PMF: every B2B AI tenant needs accounts; realm scoping is the table-stakes entry to the paid plane.
+- Dependencies: identity service, realm registry, verify-email port, kit OhAuth.
+- Communicates with: <code>POST /api/identity/&lt;realm&gt;/register</code> then <code>/onboard</code> then <code>/login</code> → <code>identity_local_service.py:391-407</code>.
+- Status: <strong>wired</strong> (confirmed <code>realm-baltor.json</code> has real <code>acct_*</code> rows; audit row appended).
+- Gap: signup <strong>Name</strong> field (<code>oh-site.jsx:439</code>) is collected but never sent (register takes only identifier+secret) — display name dropped. Verify-email uses a console adapter that renders-but-does-not-send and keys the link on <code>account_id</code> (no one-time token). Onboarding steps auto-complete silently.</p>
+<p><strong>Login</strong> — <code>wired</code>
+- Purpose / Problem: authenticate an existing user against the correct realm with brute-force protection.
+- Solution: <code>submitAuth → OHIdentity.login</code> (<code>oh-site.jsx:405</code>) → <code>_dispatch 'login'</code> sliding-window throttle + <code>realm.login</code>, generic 401 (<code>identity_local_service.py:408-424</code>).
+- PMF: secure login is non-negotiable for any account that holds API keys / governed data.
+- Communicates with: <code>POST /api/identity/&lt;realm&gt;/login</code> → <code>:408-424</code>.
+- Status: <strong>wired</strong>. Gap: no UI surfaces lockout state; error copy generic.</p>
+<p><strong>Logout</strong> — <code>wired</code> · <code>POST /api/identity/&lt;realm&gt;/logout</code> → <code>:425-429</code>. Server pops <code>realm.sessions[session_id]</code> + saves; client clears localStorage best-effort. Gap: client clears even if network call fails (server pop is real).</p>
+<p><strong>Session persistence / validate</strong> — <code>wired</code> (but not enforced)
+- Purpose: re-verify session on load, degrade to signed-out if expired (TTL 3600s).
+- Communicates with: <code>POST /api/identity/&lt;realm&gt;/session/validate</code> → <code>:430-436</code>.
+- Status: <strong>wired</strong> mechanism. Gap: <strong>no route GATES /dashboard on <code>validate()</code></strong> — an unauthenticated user reaching /dashboard directly still renders the fixture-filled console. Validation available, not enforced.</p>
+<p><strong>Preview-mode fallback (service down)</strong> — <code>wired</code>
+- Purpose: when identity is unreachable, honestly flag an unsaved preview instead of faking an account.
+- Solution: <code>enterPreview</code> sets <code>sessionStorage 'oh-preview'='1'</code>, navigates /dashboard, <code>OhPreviewBanner</code> warns (<code>oh-site.jsx:270-281</code>); only probe is <code>GET /api/identity/health</code> (<code>:511-513</code>).
+- Status: <strong>wired</strong> (honest). Gap: by design /dashboard still renders fully populated with fixtures for a never-authenticated user.</p>
+<p><strong>API key — mint</strong> — <code>wired</code>
+- Purpose / Problem: a signed-in user needs a real per-realm secret services can verify.
+- Solution: <code>OhApiKeys.mint → OHIdentity.mintKey(realm,['read'])</code> (<code>oh-site.jsx:678-695</code>) → <code>_dispatch 'api-keys/mint'</code> validate_session + <code>rt.mint_key</code> (hash-only at rest, raw shown once) + save (<code>identity_local_service.py:437-445</code>).
+- PMF: programmatic access is how AI customers actually consume; revocable keys are an audit requirement.
+- Communicates with: <code>POST /api/identity/&lt;realm&gt;/api-keys/mint</code>.
+- Status: <strong>wired</strong>. Gap: realm inferred by scanning localStorage for first <code>oh-session-*</code> (<code>:662-673</code>); no scope picker (hardcoded <code>['read']</code>).</p>
+<p><strong>API key — list</strong> — <code>partial</code>
+- Purpose: on open, show the account's REAL keys (prefix/created/last-used/revoked).
+- Communicates with: <code>OHIdentity.listKeys</code> (<code>oh-identity.js:61</code>) + backend <code>api-keys/list</code> (<code>:446-453</code>) — <strong>both exist, UI never calls listKeys on mount</strong>.
+- Status: <strong>partial</strong>. Gap: a real key minted in a prior session vanishes after reload while 3 fake <code>sk_live_9f2c / sk_live_3b71 / sk_test_a1f0</code> always show. Fix = one <code>useEffect</code>.</p>
+<p><strong>API key — revoke</strong> — <code>partial</code>
+- Communicates with: <code>POST /api/identity/&lt;realm&gt;/api-keys/revoke</code> → validate_session + ownership check + <code>revoked_at</code> + save (<code>:461-471</code>).
+- Status: <strong>partial</strong>. Gap: revoke only wired on <code>k.real</code> rows; the always-present fixture rows render a "Revoke" link with <code>onClick</code> undefined (dead).</p>
+<p><strong>Onboarding checklist page</strong> — <code>stub</code>
+- Purpose: drive real <code>onboarding_steps</code> from the account record, mark each via <code>/onboard</code>, gate the app until done.
+- UI: <code>OhOnboarding</code> "Start" → <code>navigate('/app')</code>, no per-step call (<code>oh-site.jsx:902-923</code>). Backend <code>/onboard</code> exists (<code>:403-407</code>) but this page never calls it.
+- Status: <strong>stub</strong>. Gap: decorative; first step hardcoded "Done"; signup() already auto-completes all steps so the page can never reflect real progress.</p>
+<p><strong>Password reset / forgot</strong> — <code>stub</code>
+- Purpose: issue a one-time token, deliver via email port, accept new passphrase, rotate credential ref.
+- UI: <code>onClick={() =&gt; setSent(true)}</code> flips to "check your email"; <strong>no client method, no backend endpoint</strong> (grep: zero reset/forgot in <code>oh-identity.js</code>; no reset route in <code>identity_local_service.py</code>).
+- Status: <strong>stub</strong> (pure theater). Gap: a real-account user genuinely cannot recover a password. <strong>Highest-severity account gap.</strong></p>
+<p><strong>Team / member management</strong> — <code>stub</code>
+- Purpose: invite teammates (email→pending member), assign roles, manage/remove, scoped sessions.
+- UI: no handlers on any control; renders 4 fixtures (Ada Lovelace / Alan Turing / Grace Hopper / invited@company.com). No member/team/invite endpoint exists; no multi-user-per-account concept in backend.
+- Status: <strong>stub</strong>.</p>
+<p><strong>Billing</strong> — <code>stub</code> · plan/usage/invoices are hardcoded caller props (<code>teleon-main.jsx:415</code>: Team $249, usagePct 62, three "Paid" invoices). "Manage plan"/"Download" have no onClick. No billing service.</p>
+<p><strong>Usage metrics</strong> — <code>stub</code> · <code>OhUsage</code> renders hardcoded props (<code>teleon-main.jsx:417</code>: Runs 4,120 / Promotions 38 / Rollbacks 6 / Eval hrs 212). No fetch.</p>
+<p><strong>Settings</strong> — <code>stub</code> · inputs are <code>defaultValue</code> only, prefilled "Ada Lovelace"/"ada@company.com"; <code>OhSwitch onToggle={() =&gt; {}}</code>. No profile/settings endpoint. Nothing persists.</p>
+<p><strong>Audit log</strong> — <code>stub</code> (closest-to-wirable)
+- Purpose: surface the account's REAL signed receipt stream.
+- Backend: audit IS written (<code>IdentityService.audit → audit-events.jsonl</code>, <code>:313-317</code>; ~255KB real events) but <strong>no list/read endpoint</strong> and no client method.
+- Status: <strong>stub</strong>. Gap: genuine append-only ledger exists; UI shows 5 fixture rows. Needs a read endpoint + a <code>useEffect</code>.</p>
+<p><strong>Notifications</strong> — <code>stub</code> · no onClick on "Mark all read"; fixtures incl. "API key used from a new IP · 8.8.8.8". No backend.</p>
+<p><strong>Contact / sales form</strong> — <code>stub</code> · <code>onClick={() =&gt; setSent(true)}</code> only; fields uncontrolled; nothing leaves the browser.</p>
+<p><strong>Service-to-service connection (handshake/verify/revoke)</strong> — <code>wired</code> (no UI)
+- Purpose: cross-realm service auth (Baltor→Teleon) with scoped tokens + receipts.
+- Communicates with: <code>POST /api/identity/&lt;from&gt;/service/{handshake,connections,verify,revoke}</code> (Bearer secret) → <code>IdentityService.service_handshake/_dispatch_service</code> (<code>:264-387</code>); persists to <code>service-connections.json</code>, token shown once, receipts issued.
+- Status: <strong>wired</strong> backend, proof-tested. Gap: <strong>no front-end surface</strong> — operators cannot mint/list/revoke service connections from any page.</p>
+<hr />
+<h2 id="surface-2-teleon-runtime-saas">SURFACE 2 — Teleon (runtime SaaS)<a class="headerlink" href="#surface-2-teleon-runtime-saas" title="Permanent link">&para;</a></h2>
+<p>Served app: <code>web/teleon/teleon-main.jsx</code> over the showcase (<code>scripts/showcase/server.py:125-127</code>), kit <code>web/teleon/kit/oh-site.jsx</code>, single real seam <code>window.TeleonLive</code> (<code>web/teleon/teleon-live.js</code>) → <code>/api/teleon/*</code> → <code>scripts/teleon_local_runtime.py</code>. (Note: <code>dist/sites/aidoneright-design/teleon/teleon-main.jsx</code> is the DESIGN HANDOFF spec — fully hardcoded, NOT served, NOT wired.)</p>
+<h3 id="pages_1">Pages<a class="headerlink" href="#pages_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Name</th>
+<th>Purpose</th>
+<th>Wiring note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/ /how /lifecycle</td>
+<td>Landing</td>
+<td>Hero/How/Lifecycle/Ecosystem/CTA; "Start free"→/signup</td>
+<td>static</td>
+</tr>
+<tr>
+<td>/fits</td>
+<td>Where Teleon fits</td>
+<td>Honest landscape vs LangGraph/Temporal/DSPy</td>
+<td>static</td>
+</tr>
+<tr>
+<td>/signin /signup /forgot</td>
+<td>Auth</td>
+<td>OhAuth vs realm identity (<code>oh-identity.js</code>)</td>
+<td>the session gate the runtime validates</td>
+</tr>
+<tr>
+<td>/dashboard</td>
+<td>Dashboard</td>
+<td>Stats + activity + plan mini + quick start</td>
+<td>partial</td>
+</tr>
+<tr>
+<td>/app</td>
+<td>Capabilities table</td>
+<td>Rollup + caps table</td>
+<td>wired read</td>
+</tr>
+<tr>
+<td>/runs</td>
+<td>Build a capability</td>
+<td>Purpose textarea + criteria toggles + Build</td>
+<td>partial</td>
+</tr>
+<tr>
+<td>/evidence</td>
+<td>Evidence</td>
+<td>Static prose; no receipts rendered</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/keys</td>
+<td>API keys</td>
+<td>OhApiKeys real mint/revoke + 3 fixtures</td>
+<td>partial</td>
+</tr>
+<tr>
+<td>/team</td>
+<td>Team</td>
+<td>Hardcoded members + dead buttons</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/audit</td>
+<td>Audit log</td>
+<td>Hardcoded receipt rows</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/notifications</td>
+<td>Inbox</td>
+<td>Hardcoded notifications</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/billing</td>
+<td>Billing</td>
+<td>Hardcoded Team $249 + 3 invoices</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/usage</td>
+<td>Usage</td>
+<td>Real sparkline via TeleonLive.usage() else fixtures</td>
+<td>partial</td>
+</tr>
+<tr>
+<td>/settings</td>
+<td>Settings</td>
+<td>Hardcoded Ada profile + 2 no-op switches</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/onboarding</td>
+<td>Onboarding</td>
+<td>OhOnboarding (kit)</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/registry</td>
+<td>Library</td>
+<td>Static prose; never queries /registry seam</td>
+<td>stub</td>
+</tr>
+<tr>
+<td>/pricing</td>
+<td>Pricing</td>
+<td>Static Starter $0 / Team $249 / Enterprise</td>
+<td>static</td>
+</tr>
+<tr>
+<td>/docs /status /changelog /terms /privacy /about /contact /cases</td>
+<td>Marketing/info</td>
+<td>shared kit</td>
+<td>static</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flows_1">Flows<a class="headerlink" href="#flows_1" title="Permanent link">&para;</a></h3>
+<p><strong>Build a capability (Build button)</strong> — <code>partial</code> — the core write path
+- Purpose: type a purpose + criteria → synthesize a NEW capability, run on real examples, train+holdout gate, promote or roll back.
+- Problem solved: teams want verified, versioned capability units instead of unaudited prompt-in-app.
+- Solution (what actually runs): <code>onClick</code> sets <code>phase='running'</code>, animates 6 LIFECYCLE rows via setTimeout (cosmetic, <code>teleon-main.jsx:296-300</code>), AND calls <code>TeleonLive.run()</code> <strong>with no argument</strong> → <code>POST /api/teleon/teleon/runs {capability_id:'cap-dates', session_id}</code> (<code>teleon-live.js:76-93</code>) → <code>Handler.do_POST</code> validates session, <code>RT.submit_run(background=False)</code> → <code>_run_to_completion</code> executes the cap-dates suite, applies train+holdout gate (PROMOTE_AT 0.90), bumps version, on promotion auto-compiles+registers a deployable unit (<code>teleon_local_runtime.py:755-794, 502-604, 621-643</code>). Persists caps/runs/receipts/compiled-units to <code>dist/local-services-state/teleon-runtime/</code>.
+- PMF: the eval-gated promotion + receipts are the differentiator vs raw orchestration frameworks; this is what a compliance-minded buyer pays for.
+- Dependencies: teleon runtime, identity session, a healthy model route (else falls to deterministic reference impl), state dir.
+- Communicates with: <code>POST /api/teleon/teleon/runs</code> → <code>teleon_local_runtime.py:755-794</code>.
+- Status: <strong>partial</strong>. Gap: the <strong>purpose textarea + 3 criteria toggles are purely cosmetic — never sent</strong>; <code>run()</code> called with no id so it ALWAYS re-runs the global pre-seeded <code>cap-dates</code> and <strong>never builds the typed purpose</strong>. The 6 lifecycle rows are setTimeout theater independent of the real run. No new capability is ever created.</p>
+<p><strong>Capabilities table load</strong> — <code>wired</code> (read) but global
+- Communicates with: <code>GET /api/teleon/teleon/capabilities</code> (open read, no session) → <code>teleon_local_runtime.py:737-738</code>.
+- Status: <strong>wired</strong> read. Gap: caps are <strong>GLOBAL</strong> (one <code>capabilities.json</code>, no session scoping) — every account sees the same 4 seeded caps (cap-dates/redact/json-guard/cite). "Evidence →" just <code>navigate('/evidence')</code> with no cap id. Runtime-down → marketing CAPS fixtures (cap-usury v12 etc.).</p>
+<p><strong>Dashboard stats + Recent activity</strong> — <code>partial</code>
+- Communicates with: stats from cached caps; activity/usage <code>GET /api/teleon/teleon/runs?session_id=…</code> (session-gated) → <code>:739-751</code>.
+- Status: <strong>partial</strong>. Gap: <code>stats()</code> falls back to fixtures (38 promotions, avg 0.90) when runtime down; <code>activity()</code> returns null for a brand-new (zero-run) account → <strong>fake fixtures incl. "State usury-rate finder promoted 0.96" and "Invoice paid $249.00"</strong> (<code>teleon-main.jsx:397-402</code>). Plan mini <code>{name:'Team', usagePct:62}</code> ALWAYS hardcoded — no seam (<code>:403</code>).</p>
+<p><strong>Create / revoke API key</strong> — <code>partial</code> — same identity plane as Surface 1. Real mint/revoke via <code>OHIdentity.mintKey/revokeKey</code> (realm "teleon"); 3 fixture rows always prepended (<code>kit/oh-site.jsx:652-656</code>), their Revoke inert.</p>
+<p><strong>Billing / Plan / invoices</strong> — <code>stub</code> · no seam, no billing service. Hardcoded Team $249/mo, 62%, invoices May/Apr/Mar 2026 all $249 Paid; "Manage plan"/"Download" dead. Shown to brand-new accounts.</p>
+<p><strong>Team / members / invite</strong> — <code>stub</code> · no seam/backend. Hardcoded Ada/Turing/Hopper/invited; all buttons inert.</p>
+<p><strong>Audit log</strong> — <code>stub</code> · runtime DOES persist <code>receipts.jsonl</code> + run events but UI never reads them here. Hardcoded Baltor-flavored rows; footer falsely claims "signed and exportable."</p>
+<p><strong>Notifications / Inbox</strong> — <code>stub</code> · hardcoded ("38 promotions·6 rollbacks", "API key used from 8.8.8.8"); Mark-all-read inert.</p>
+<p><strong>Settings (profile + preferences)</strong> — <code>stub</code> · <code>defaultValue</code> inputs hardcoded "Ada Lovelace"/"ada@company.com"; <code>onToggle={() =&gt; {}}</code>. "Auto-rollback" shown ON but changes nothing in the runtime gate.</p>
+<p><strong>Evidence / review</strong> — <code>stub</code>
+- Purpose: per-capability evidence trail — each version tried, train/holdout pass-rates, per-example receipts with input/output hashes + promote/rollback decision.
+- Communicates with: backend EXPOSES <code>GET /api/teleon/teleon/evidence?run_id=…</code> → <code>RT.receipts_for(run_id)</code> (<code>teleon_local_runtime.py:752-753, 684-687</code>) — <strong>UI never calls it</strong>; the link passes no cap/run id.
+- Status: <strong>stub</strong> (real receipts exist on disk + over seam, never displayed). Review/HITL approval not built.</p>
+<p><strong>Usage charts</strong> — <code>partial</code> · <code>GET /runs?session_id=…</code> gives real run count / exec time / 7-bucket spark when runs exist. Gap: zero-run account → fixtures leak ("4,120 Runs·30d", "212 Eval hrs"); "Eval compute (hrs)" is a fixture metric the seam never provides.</p>
+<p><strong>New capability / Quick-start CTAs</strong> — <code>wired</code> · pure client navigation to /runs, /evidence, /keys (<code>teleon-main.jsx:271,404-407,439</code>). Correct.</p>
+<p><strong>Library / registry page</strong> — <code>stub</code> · static prose; a <code>/registry</code> proxy exists in the showcase but this page never queries it. No bill-of-materials of components a capability used.</p>
+<hr />
+<h2 id="surface-3-baltor-applied-context-product">SURFACE 3 — Baltor (applied context product)<a class="headerlink" href="#surface-3-baltor-applied-context-product" title="Permanent link">&para;</a></h2>
+<p>Static design-handoff prototype at <code>dist/sites/aidoneright-design/context-enrichment/</code>. <code>Context Enrichment.html</code> loads React + in-browser Babel from unpkg and transpiles <code>ce-*.jsx</code> client-side. <strong>ZERO network calls anywhere</strong> (grep for fetch/XHR/api returns only display strings). ALL data is fixtures in <code>ce-store.jsx</code> + inline literals. README states it outright ("All data is fixtures… Wire these to real services"). No auth gate — the entire logged-in workspace renders unauthenticated as one hardcoded "Acme · Compliance" Pro tenant.</p>
+<h3 id="pages_2">Pages<a class="headerlink" href="#pages_2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th>Name</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/</td>
+<td>Landing</td>
+<td>Hero/how/verify-moat/commons/tiers/serve-preview/CTA; Hero A/B via window.OHExp</td>
+</tr>
+<tr>
+<td>/why</td>
+<td>WhyPage</td>
+<td>Marketing positioning</td>
+</tr>
+<tr>
+<td>/engine</td>
+<td>EngineMarketing</td>
+<td>Animated canvas context-lifecycle (6 stages) over ENG_STAGES</td>
+</tr>
+<tr>
+<td>/pricing</td>
+<td>PricingPage</td>
+<td>3 hardcoded PLANS; every CTA → /ingest</td>
+</tr>
+<tr>
+<td>/docs</td>
+<td>DocsPage</td>
+<td>Overview/Guides/Reference/Demos/API tabs (intended REST contract, not live)</td>
+</tr>
+<tr>
+<td>/signin /signup /forgot</td>
+<td>Auth (kit)</td>
+<td>Kit.OhAuth under Baltor scope; no Baltor-side network code</td>
+</tr>
+<tr>
+<td>/contact /about /cases /cases/:id</td>
+<td>Marketing</td>
+<td>OhContact/OhAbout/OhCaseStudies fed CASES.baltor fixtures</td>
+</tr>
+<tr>
+<td>/dashboard /app</td>
+<td>DashboardPage</td>
+<td>OhDashboard + 4-stage engine grid, hardcoded</td>
+</tr>
+<tr>
+<td>/sources</td>
+<td>SourcesPage</td>
+<td>Connect-source form + linked-sources from SOURCES const</td>
+</tr>
+<tr>
+<td>/pipeline</td>
+<td>PipelinePage</td>
+<td>6-stage engine RAF progress over PIPE_STAGES</td>
+</tr>
+<tr>
+<td>/pipeline/:id</td>
+<td>PipelineStage</td>
+<td>Per-stage detail from PIPE_STAGES</td>
+</tr>
+<tr>
+<td>/corpora</td>
+<td>CorporaPage</td>
+<td>6 hardcoded CORPORA + ROLLUP</td>
+</tr>
+<tr>
+<td>/ingest</td>
+<td>IngestPage</td>
+<td>Add-a-source wizard: setup→refining(timer)→done(hardcoded sizes)</td>
+</tr>
+<tr>
+<td>/c/:id</td>
+<td>CorpusDetail</td>
+<td>Tiers/Provenance/Serve/Compliance/Settings from CORPUS_BY_ID</td>
+</tr>
+<tr>
+<td>/serve</td>
+<td>ServePage</td>
+<td>Serve console → MOCK_CHUNKS + fake 7/7 pipeline</td>
+</tr>
+<tr>
+<td>/verify</td>
+<td>VerifyPage</td>
+<td>Reconciliation queue over CONFLICTS fixture</td>
+</tr>
+<tr>
+<td>/commons</td>
+<td>CommonsPage</td>
+<td>Oracle-corpus marketplace from COMMONS fixture</td>
+</tr>
+<tr>
+<td>/governance</td>
+<td>GovernancePage</td>
+<td>Provenance/audit derived from CORPORA fixture</td>
+</tr>
+<tr>
+<td>/audit</td>
+<td>AuditPage</td>
+<td>OhAuditLog, 5 hardcoded rows</td>
+</tr>
+<tr>
+<td>/settings</td>
+<td>SettingsPage</td>
+<td>OhSettings, toggles local useState</td>
+</tr>
+<tr>
+<td>/billing</td>
+<td>BillingPage</td>
+<td>OhBilling, hardcoded plan + 4 invoices</td>
+</tr>
+<tr>
+<td>/usage</td>
+<td>UsagePage</td>
+<td>OhUsage, hardcoded rollup + spark bars</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flows_2">Flows<a class="headerlink" href="#flows_2" title="Permanent link">&para;</a></h3>
+<p><strong>Ingest / connect a source (core write path)</strong> — <code>stub</code>
+- Purpose: turn a source descriptor into a real corpus (fetch→parse→chunk→fingerprint→raw/compressed/hyper tiers→citation anchors→persisted row).
+- Problem solved: regulated teams need governed, tiered, provenance-anchored corpora — not a raw RAG dump.
+- Solution today: <code>IngestPage.start()</code> sets <code>phase='refining'</code>; a <code>useEffect</code> + <code>setTimeout(620ms)</code> walks step 0→6 over REFINE_STEPS, then <code>setPhase('done')</code> (<code>ce-app.jsx:51-124</code>). Done panel shows hardcoded raw 1.18GB/compressed 402MB/hyper 91MB (<code>:112</code>); "Open corpus →" → fixture <code>/c/acme-policy</code> (<code>:117</code>).
+- PMF: this IS the product's value creation; nothing is paid for until ingest is real.
+- Communicates with: <strong>none</strong> — input value never read after typing.
+- Status: <strong>stub</strong>. Gap: timed animation; no upload/crawl/parse/persist/real sizes. The 4 checkboxes are decorative <code>defaultChecked</code> with no handler.
+- North star: <code>POST /api/baltor/ingest</code> (or <code>/v1/corpora</code>) → fetch+parse+chunk+fingerprint, build tiers, anchor citations, write Postgres + object storage; progress via SSE/websocket; "Open corpus" opens the new id.</p>
+<p><strong>Connect source on /sources + "Link &amp; run engine"</strong> — <code>stub</code> · button <code>onClick={() =&gt; navigate('/pipeline')}</code> (<code>ce-pipeline.jsx:57</code>); linked-sources table is static SOURCES (<code>:31-36</code>); typed value discarded. No connector handshake/persistence. North star: connector OAuth via the credential plane, persist source record, kick real engine run.</p>
+<p><strong>Engine pipeline run</strong> — <code>stub</code> · <code>usePipelineProgress()</code> RAF fills bars to fixed targets over ~6s (<code>ce-pipeline.jsx:81-100</code>); <code>EngineCanvas()</code> animates particles (<code>ce-engine.jsx:33-61</code>). Metrics ("44 conflicts","13× tokens","21.6k packs/day") are literals. No engine, run record, or receipts.</p>
+<p><strong>Serve console — run a query</strong> — <code>stub</code>
+- Purpose: retrieve from selected corpus/tier, rerank, freshness-check, verify each chunk vs live sources, return cited chunks + receipt, hold contradicted/stale chunks out.
+- Solution today: <code>setRan(true)</code> (<code>ce-app.jsx:271</code>); 7-step pipeline flips all ✓; renders the 3-element MOCK_CHUNKS (<code>:228-232</code>), identical regardless of corpus/tier/destination/query. The shown <code>GET /v1/corpora/{id}/serve?...</code> is a syntax-highlighted <code>&lt;div&gt;</code> (<code>:272-275</code>), not a request.
+- PMF: verified-at-serve-time citation is the entire moat claim; this is what agents would pay to call.
+- Communicates with: <strong>none</strong>.
+- Status: <strong>stub</strong>. Gap: query ignored; same 3 chunks always; no retrieval/verification/real citations.</p>
+<p><strong>Verification / reconciliation queue (HITL)</strong> — <code>stub</code>
+- Purpose: resolve a conflict → update/quarantine affected chunks, record who/what/policy, emit audit receipt; reg-change feed + watched-source freshness from a live CDC/watcher.
+- Solution today: <code>act(id, how)</code> sets a local <code>resolved</code> map; card renders "✔ update applied" (<code>ce-app.jsx:316-318, 379-389</code>). Code comment literally says "so the actions feel live."
+- Communicates with: <strong>none</strong>. CONFLICTS/VERIFY_ROLLUP/REG_CHANGES/WATCHED are fixtures in <code>ce-store.jsx</code>.
+- Status: <strong>stub</strong>. Gap: the whole adversarial-verification moat is hardcoded conflict cards; lost on refresh.</p>
+<p><strong>Corpus detail — Download bundle / Download tier / Emit artifact</strong> — <code>broken</code>
+- Purpose: stream a signed corpus bundle / tier export / compliance artifact (AIBOM CycloneDX, EU AI Act dossier, C2PA manifest, fidelity record).
+- UI: these <code>&lt;button&gt;</code>s have <strong>NO onClick</strong> (<code>ce-app.jsx:149, 170, 209</code>).
+- Status: <strong>broken</strong> (dead buttons). The regulator-facing deliverable is non-functional.</p>
+<p><strong>Commons — Add to workspace / Verify by hash</strong> — <code>stub</code> · "Add to workspace" → <code>navigate('/ingest')</code> (<code>ce-app.jsx:457</code>); "Verify by hash" has <strong>NO onClick</strong> (<code>:458</code>) despite being the central trust claim. COMMONS hashes/subscriber counts/lastVerified are fixtures.</p>
+<p><strong>Authentication (sign in / sign up / forgot)</strong> — <code>stub</code> · routes to <code>Kit.OhAuth brand=Baltor</code> (<code>ce-main.jsx:31-41</code>); <strong>no fetch in any ce-*.jsx</strong>, no <code>/api/identity</code> seam referenced. <strong>No auth gate</strong>: every workspace route renders fully unauthenticated showing the same Acme tenant.</p>
+<p><strong>Settings — toggles / rotate keys / edit fields</strong> — <code>stub</code> · <code>OhSwitch</code> flips local <code>tog</code> useState (<code>ce-app.jsx:474-475</code>); "Rotate keys" has <strong>NO onClick</strong> (<code>:489</code>); inputs uncontrolled <code>defaultValue</code> never read; serving token <code>ctx-••••••••a41e</code> and <code>mcp.baltor.ai/acme</code> are static strings.</p>
+<p><strong>Billing / Usage / Dashboard / Audit</strong> — <code>stub</code> · shared Oh* components fed inline literal props (<code>ce-app.jsx:501-518, 593-641</code>). Every invoice, usage bar, activity row ("Served acme-policy to Claude Code · 40s ago"), audit receipt is fabricated. No telemetry pipeline.</p>
+<p><strong>Theme toggle</strong> — <code>wired</code> · <code>useTheme().toggle</code> → <code>localStorage('baltor-theme')</code> (<code>ce-store.jsx:30-38</code>); survives refresh. The ONLY genuinely persisted action in the whole surface.</p>
+<hr />
+<h2 id="a-north-star-per-product">(A) North-star per product<a class="headerlink" href="#a-north-star-per-product" title="Permanent link">&para;</a></h2>
+<p><strong>Identity &amp; Accounts</strong> — A cross-cutting, realm-scoped identity plane where every AI Done Right product gets durable accounts, recoverable credentials, revocable API keys with real scopes, a multi-user org model (invite→role→scoped session), and a single signed audit/receipt stream — all gated so no authenticated view ever renders before the session is validated, and no account ever sees another tenant's data. The backend is already production-shaped; the north star is to finish the read paths (key list, audit read), the recovery path (password reset), the org model (teams), and to enforce the session gate.</p>
+<p><strong>Teleon</strong> — A purpose-driven, eval-gated capability runtime where typing a NEW purpose + success criteria synthesizes a NEW, per-account capability, runs it on real examples under a train+holdout promotion gate, promotes or rolls back with versioned receipts, and exposes the full capability experience — generated code, version/fork history, guardrail/license selection, exports, runtime metadata, and a component bill-of-materials. The runtime/eval/gate/promote engine is real for the seeded <code>cap-dates</code>; the north star is to make the Build form actually drive synthesis, scope capabilities per account, and surface the evidence/metadata the backend already persists.</p>
+<p><strong>Baltor</strong> — A governed context product where a tenant ingests real sources into tiered, provenance-anchored corpora; a six-stage engine reconciles/hardens/optimizes them against live authoritative sources; a serve console returns verified, cited chunks (holding stale/contradicted content out) with receipts; and compliance artifacts (AIBOM, EU AI Act dossier, C2PA, fidelity record) are emitted on demand and signed. Today it is a fixture prototype; the north star is to replace every fixture in <code>ce-store.jsx</code> with real ingest/engine/serve/verify/artifact services behind <code>/api/baltor/*</code> seams, add an auth gate, and scope all data to the authenticated tenant.</p>
+<hr />
+<h2 id="b-teleon-capability-experience-owner-requested">(B) Teleon capability experience (owner-requested)<a class="headerlink" href="#b-teleon-capability-experience-owner-requested" title="Permanent link">&para;</a></h2>
+<p>Each richer feature with Purpose / Problem / PMF / Exists today? / Gap. Grounded in the Teleon trace's north-star (a–f) findings.</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Purpose</th>
+<th>Problem solved</th>
+<th>PMF</th>
+<th>Exists today?</th>
+<th>Gap</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>(a) Generated-code review</strong></td>
+<td>View the code a capability synthesized</td>
+<td>Buyers won't trust an opaque "promoted" badge; they must read what runs</td>
+<td>Compliance/eng leads who must review before deploy</td>
+<td><strong>No UI.</strong> Runtime uses pure-Python impls; no view of generated code</td>
+<td>Build never synthesizes typed purpose (<code>teleon-main.jsx:311</code>, <code>run()</code> called with no id), so there's nothing to show; need a code-render panel fed from the compiled unit</td>
+</tr>
+<tr>
+<td><strong>(b) GitHub/GitLab-style code + forks + versions + history browser</strong></td>
+<td>Browse versions, diffs, forks of a capability</td>
+<td>Teams need lineage and the ability to branch a capability safely</td>
+<td>Platform teams standardizing capabilities</td>
+<td><strong>Partial backend, no UI.</strong> Runtime keeps a version number + <code>runs.jsonl</code> event log; <strong>no forks, no history UI</strong></td>
+<td>Build a version/history/diff browser; add a fork concept (backend has neither forks nor a diff surface)</td>
+</tr>
+<tr>
+<td><strong>(c) License / guardrail / preference selection</strong></td>
+<td>Choose allowable licenses, guardrails, prefs that bind the build</td>
+<td>Orgs must enforce policy (license, auto-rollback) at synthesis time</td>
+<td>Regulated buyers; procurement</td>
+<td><strong>No.</strong> The only toggles (Settings, criteria) are no-ops; criteria toggles ignored</td>
+<td>Criteria toggles cosmetic (never sent); Settings <code>onToggle={() =&gt; {}}</code>; "Auto-rollback" ON changes nothing in the gate — wire toggles into the run request + runtime gate</td>
+</tr>
+<tr>
+<td><strong>(d) Export of code / capability / diagram</strong></td>
+<td>Export the capability as code, a portable unit, or a diagram</td>
+<td>Customers need to take artifacts to deploy/audit elsewhere</td>
+<td>Buyers needing AIBOM/portability</td>
+<td><strong>No.</strong> Audit claims "exportable" but nothing exports</td>
+<td>No export path; backend compiled unit exists (<code>exec_target</code> fly_machine/k8s_job/local_process) but no UI export action</td>
+</tr>
+<tr>
+<td><strong>(e) Capability runtime metadata (trigger, runtime, inputs/outputs, cloud-function vs docker, language)</strong></td>
+<td>Show how/where a capability runs</td>
+<td>Operators must know trigger, I/O contract, and execution target before relying on it</td>
+<td>DevOps / platform buyers</td>
+<td><strong>Partial backend, not surfaced.</strong> Compiled unit carries <code>exec_target</code> (fly_machine/k8s_job/local_process), purpose/criteria/examples, expected I/O</td>
+<td>UI shows only name/status/score/version — no trigger/runtime/inputs-outputs/cloud-vs-docker/language surface</td>
+</tr>
+<tr>
+<td><strong>(f) Component bill-of-materials / diagram</strong></td>
+<td>Show which registry components a capability used/edited/generated</td>
+<td>Reuse-first governance ("don't reinvent"); supply-chain audit</td>
+<td>Governance/security buyers</td>
+<td><strong>No.</strong> Runtime uses pure-Python impls, not registry components; nothing surfaced</td>
+<td>No BOM, no diagram; /registry page is static prose and never queries the <code>/registry</code> seam</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="c-prioritized-remediation-backlog-highest-user-impact-first">(C) Prioritized remediation backlog (highest user impact first)<a class="headerlink" href="#c-prioritized-remediation-backlog-highest-user-impact-first" title="Permanent link">&para;</a></h2>
+<p>Ordering principle: (1) trust-breaking demo-data leaking into brand-new accounts, (2) account flows a real user is blocked on, (3) broken/dead handlers, (4) the capability-experience build-out. Each item names the file to change.</p>
+<p><strong>P0 — Demo data leaking into every new account (trust-breaking; do first)</strong></p>
+<ol>
+<li><strong>Teleon dashboard fake activity/stats/plan for zero-run accounts</strong> — <code>activity()</code> null → "$249.00 invoice paid" / "usury-rate finder promoted 0.96"; stats fallback 38 promotions; plan mini always <code>{Team,62}</code>. Fix <code>web/teleon/teleon-main.jsx:396-403</code> to render real empty states (no fixtures when runtime up / account new).</li>
+<li><strong>API-key fixtures shown to all accounts</strong> — 3 fake <code>sk_live_9f2c / sk_live_3b71 / sk_test_a1f0</code> always prepended. Remove fixtures and call <code>listKeys()</code> on mount. Fix <code>kit/oh-site.jsx:652-656</code> (+ wire <code>oh-identity.js:61</code> listKeys via a <code>useEffect</code>; backend <code>identity_local_service.py:446-453</code> already exists).</li>
+<li><strong>Audit log shows fiction over a real ledger</strong> — fixture receipts (<code>oh-site.jsx:775-781</code>) while <code>audit-events.jsonl</code> (255KB real) exists. Add a read endpoint to <code>scripts/identity_local_service.py</code> (and <code>teleon_local_runtime.py</code> receipts for /audit), add client method + <code>useEffect</code>, drop fixtures.</li>
+<li><strong>Team / Billing / Usage / Settings fixtures everywhere</strong> — Ada Lovelace / Turing / Hopper, Team $249 invoices, "4,120 Runs", "ada@company.com". Replace with real-or-empty: <code>kit/oh-site.jsx:737-742, 515-550</code>; props at <code>teleon-main.jsx:415-428</code>; Baltor <code>ce-app.jsx:501-518, 593-641</code> + <code>ce-store.jsx</code> (CORPORA/CONFLICTS/COMMONS/etc.). For Baltor, removing fixtures also requires the backends below.</li>
+<li><strong>Baltor renders one tenant's data unauthenticated</strong> — whole workspace shows "Acme · Compliance / Pro" with no login. Add the identity seam + an auth gate in <code>ce-main.jsx:31-41</code> / <code>ce-shell.jsx:121</code>.</li>
+</ol>
+<p><strong>P1 — Account flows a real user is blocked on</strong></p>
+<ol>
+<li><strong>Password reset is pure theater (no recovery possible)</strong> — add a one-time-token reset endpoint to <code>scripts/identity_local_service.py</code>, a client method in <code>oh-identity.js</code> (none exists), and replace the local <code>setSent(true)</code> at <code>oh-site.jsx:417-431</code>.</li>
+<li><strong>/dashboard is not gated on session validate</strong> — an unauthenticated user reaches the fixture console. Add a route guard calling <code>OHIdentity.validate(realm)</code> (<code>oh-identity.js:56-59</code>; backend <code>:430-436</code> exists) before rendering account routes.</li>
+<li><strong>Signup Name dropped</strong> — <code>oh-site.jsx:439</code> collects a display name the register call never sends. Extend the register payload + <code>realm.register</code> (<code>identity_local_service.py:391-402</code>) to persist it.</li>
+<li><strong>Onboarding checklist disconnected</strong> — drive real <code>onboarding_steps</code> per step via <code>/onboard</code> (<code>identity_local_service.py:403-407</code>) from <code>oh-site.jsx:902-923</code>; stop signup auto-completing all steps so progress is real.</li>
+</ol>
+<p><strong>P2 — Broken / dead handlers (controls that lie about working)</strong></p>
+<ol>
+<li><strong>Baltor Download bundle / Download tier / Emit artifact</strong> — dead <code>&lt;button&gt;</code>s <code>ce-app.jsx:149, 170, 209</code>; wire to an artifact service (signed bundle / tier export / compliance artifact).</li>
+<li><strong>Baltor "Verify by hash" (the central trust claim) and "Rotate keys"</strong> — no onClick <code>ce-app.jsx:458, 489</code>; wire to an attestation check and a real token rotate.</li>
+<li><strong>Fixture-row "Revoke" links inert</strong> — <code>oh-site.jsx</code> revoke only on <code>k.real</code>; once #2 drops fixtures this resolves, but verify no dead Revoke remains.</li>
+<li><strong>Identity service-connection console missing</strong> — backend <code>service_handshake</code> (<code>identity_local_service.py:264-387</code>) is wired and proof-tested but has no UI; add an operator page to mint/list/verify/revoke service connections.</li>
+</ol>
+<p><strong>P3 — Baltor core write paths (make the product real)</strong></p>
+<ol>
+<li><strong>Ingest</strong> — replace the <code>setTimeout</code> walk (<code>ce-app.jsx:51-124</code>) with <code>POST /api/baltor/ingest</code>; real parse/chunk/fingerprint/tiers/persist; "Open corpus" opens the new id.</li>
+<li><strong>Engine pipeline run</strong> — replace RAF fill (<code>ce-pipeline.jsx:81-100</code>) with a real engine service streaming per-stage counts + run records/receipts.</li>
+<li><strong>Serve console</strong> — replace MOCK_CHUNKS (<code>ce-app.jsx:228-232, 271</code>) with a real retrieve→rerank→freshness→verify→cite call returning a receipt.</li>
+<li><strong>Verify/reconciliation HITL</strong> — replace the local <code>resolved</code> map (<code>ce-app.jsx:316-318</code>) with a PATCH to a reconciliation service that updates/quarantines chunks + emits a receipt; feed REG_CHANGES/WATCHED from a live CDC.</li>
+</ol>
+<p><strong>P4 — Teleon capability experience (owner a–f)</strong></p>
+<ol>
+<li><strong>Make Build actually synthesize the typed purpose</strong> — <code>run()</code> is called with no id (<code>teleon-main.jsx:311</code>), always re-running global <code>cap-dates</code>; send the textarea + criteria toggles; remove the setTimeout lifecycle theater (<code>:296-300</code>) and reflect the real run phases.</li>
+<li><strong>Per-account capability scoping</strong> — <code>capabilities.json</code> is global, open-read (<code>teleon_local_runtime.py:294-301, 737-738</code>); scope reads by session so a new account starts empty.</li>
+<li><strong>Evidence page wiring</strong> — call <code>GET /api/teleon/teleon/evidence?run_id=…</code> (<code>teleon_local_runtime.py:752-753, 684-687</code>) with a real id from the capabilities row link (<code>teleon-main.jsx:283</code>); render version-by-version train/holdout receipts.</li>
+<li><strong>Capability metadata + code + history + BOM + export</strong> — surface compiled-unit metadata (<code>exec_target</code>, I/O, language) and add the generated-code view, version/fork/history browser, guardrail/license/preference selection (wire the no-op toggles <code>teleon-main.jsx:426</code>), export, and a component bill-of-materials/diagram (the /registry page <code>teleon-main.jsx:417</code> never queries the <code>/registry</code> seam).</li>
+</ol>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

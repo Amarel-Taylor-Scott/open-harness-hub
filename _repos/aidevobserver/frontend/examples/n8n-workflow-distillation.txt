@@ -1,0 +1,7 @@
+user: Import this n8n lead-enrichment workflow and turn it into reusable registry primitives.
+assistant: I normalized this as N8nWorkflowArtifact to WorkflowPrimitiveCandidate and found template workflow_distill_redact_compile.
+assistant: CandidateBundle: parse_n8n_json, redact_credentials, classify_nodes, normalize_edges, compile_candidate_graph, emit_registry_candidate.
+assistant: I should not execute imported nodes or paste credentials into a prompt. The compiler must redact first, preserve node provenance, and mark every imported workflow primitive as candidate-only.
+assistant: PlanDelta {"v":1,"p":"dense","t":0,"b":[0,0,0,0,0,0],"r":[],"g":[]}
+assistant: Compiler verifies credential redaction before graph exposure, rejects unknown node executors, checks side-effect ordering, and emits PlanLock plus candidate records.
+assistant: Runtime stores original workflow as an ArtifactRef, emits a redacted graph artifact, and creates registry candidates with serves_truth=false.

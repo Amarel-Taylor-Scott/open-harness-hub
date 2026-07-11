@@ -1,0 +1,20 @@
+MODULE src/teleon/runtime/key_holder.py
+## API signatures
+```python
+"""src.teleon.runtime.key_holder — the runtime KEY HOLDER (developer-key side of the credential plane)."""
+class py_class_src_teleon_runtime_key_holder__KeyHolder:
+    # Holds + resolves developer/platform keys for the pipeline. No values are stored on the instance; each call reads
+    def held(self, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_held__env: dict | None=None, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_held__tenant_keys: set | None=None) -> set[str]
+        # Service ids whose key is currently available (a developer added it, or it's keyless/platform-within-limits).
+    def resolve(self, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_resolve__service_id: str, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_resolve__env: dict | None=None, *, tenant_keys: set | None=None, principal=None) -> str | None
+        # The secret VALUE for a reachable service (its first env var), or None. NEVER log the return value. When a
+    def auth_headers(self, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_auth_headers__service_id: str, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_auth_headers__env: dict | None=None, *, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_auth_headers__tenant_keys: set | None=None) -> dict
+        # Ready-to-use auth header(s) for the service ({} if no key is held) — so callers never touch the raw value.
+    def missing(self, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_missing__service_id: str, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_missing__env: dict | None=None) -> list[str]
+        # The env var(s) a developer must set to enable this service ([] if held). For honest 'needs X' messages.
+    def status(self, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_status__env: dict | None=None, py_arg_src_teleon_runtime_key_holder__py_class_src_teleon_runtime_key_holder__KeyHolder_status__tenant_keys: set | None=None, *, principal=None) -> dict
+        # REDACTED snapshot for display: which services are held vs missing, the mode (byo/platform), limits, and — when
+```
+## intra-module call edges
+src.teleon.runtime.key_holder.auth_headers -> src.teleon.runtime.key_holder.py_class_src_teleon_runtime_key_holder__KeyHolder.resolve
+src.teleon.runtime.key_holder.status -> src.teleon.runtime.key_holder.py_class_src_teleon_runtime_key_holder__KeyHolder.held

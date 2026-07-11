@@ -1,0 +1,42 @@
+MODULE src/teleon/governance/org_policy.py
+## API signatures
+```python
+"""src.teleon.governance.org_policy — ORG guardrail policy: the confines a capability unit (and the AI that
+heals/evolves it) must stay within."""
+_POLICY_PATH = ...
+_DET_EPS = ...
+_INTERNAL_DOMAINS = ...
+_UNKNOWN_LICENSES = ...
+class OrgPolicyError:
+    # Raised on an unknown policy_id or a malformed policy — never a silent allow.
+class PolicyDecision:
+    def as_dict(self) -> dict
+class OrgGuardrailPolicy:
+    def from_dict(policy_id: str, d: dict) -> 'OrgGuardrailPolicy'
+def _load(registry: dict | None=None) -> dict
+def policy_ids(*, registry: dict | None=None) -> list[str]
+def load_policy(policy_id: str, *, registry: dict | None=None) -> OrgGuardrailPolicy
+def _domain_matches(domain: str, pattern: str) -> bool
+    # Exact match, or a leading-wildcard suffix match (``*.gov`` matches ``api.weather.gov`` and ``weather.gov``).
+def evaluate(attrs: dict, policy: OrgGuardrailPolicy) -> PolicyDecision
+    # Evaluate a candidate's attributes against the org policy. ``attrs`` may carry: license, source_domain,
+def evaluate_endpoint(endpoint, policy: OrgGuardrailPolicy) -> PolicyDecision
+    # A provider endpoint is a deterministic API/library call (determinism 1.0, no LLM); check its license,
+def evaluate_runner(runner, policy: OrgGuardrailPolicy) -> PolicyDecision
+    # An evolution/heal RUNNER (a RunnerNode or a dict): check its determinism/kind against the methodology
+def forbidden_endpoints(capability_slot: str, policy: OrgGuardrailPolicy, *, registry: dict | None=None) -> set
+    # The endpoint_ids the policy disallows for a capability — feed straight into
+def bounds_runner_change(runner, policy: OrgGuardrailPolicy) -> PolicyDecision
+    # May the AI promote / fork / heal TO this runner under the org policy? If not, the self-heal or evolution
+```
+## intra-module call edges
+src.teleon.governance.org_policy.bounds_runner_change -> src.teleon.governance.org_policy.evaluate_runner
+src.teleon.governance.org_policy.evaluate -> src.teleon.governance.org_policy.PolicyDecision
+src.teleon.governance.org_policy.evaluate -> src.teleon.governance.org_policy._domain_matches
+src.teleon.governance.org_policy.evaluate_endpoint -> src.teleon.governance.org_policy.evaluate
+src.teleon.governance.org_policy.evaluate_runner -> src.teleon.governance.org_policy.evaluate
+src.teleon.governance.org_policy.forbidden_endpoints -> src.teleon.governance.org_policy.evaluate_endpoint
+src.teleon.governance.org_policy.from_dict -> src.teleon.governance.org_policy.OrgGuardrailPolicy
+src.teleon.governance.org_policy.load_policy -> src.teleon.governance.org_policy.OrgPolicyError
+src.teleon.governance.org_policy.load_policy -> src.teleon.governance.org_policy._load
+src.teleon.governance.org_policy.policy_ids -> src.teleon.governance.org_policy._load

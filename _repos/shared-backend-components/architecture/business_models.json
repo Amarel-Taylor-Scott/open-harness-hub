@@ -1,0 +1,17 @@
+{
+  "registry": "business_models",
+  "serves_truth": false,
+  "description": "Business model patterns — how a product captures value. A registry of model SPECS (the value-capture mechanism, the economic unit, when it fits, the main risk), not advice; pointers, never truth. Public/illustrative patterns only. Composes with vertical_playbooks (the go-to-market), formulas (unit economics), and the portfolio strategy. Useful as a 'don't reinvent the wheel' reference + a structured option set; serves_truth=false.",
+  "stage": "strategy",
+  "models": [
+    {"id": "saas_subscription", "name": "SaaS subscription", "value_capture": "recurring fee for ongoing access", "unit": "seat or workspace / month", "fits": "sticky software with continuous value", "risk": "churn; CAC payback", "examples_class": "B2B tools"},
+    {"id": "usage_based", "name": "Usage-based / metered", "value_capture": "pay per unit consumed", "unit": "API call / token / GB / job", "fits": "variable consumption, infra/AI; aligns cost to value", "risk": "revenue volatility; metering complexity", "note": "the AI Done Right consumption model"},
+    {"id": "freemium", "name": "Freemium", "value_capture": "free tier funnels to paid", "unit": "conversion rate x ARPU", "fits": "viral/self-serve with a clear upgrade trigger", "risk": "free-rider cost; weak conversion"},
+    {"id": "marketplace", "name": "Marketplace", "value_capture": "take-rate on transactions between two sides", "unit": "GMV x take-rate", "fits": "fragmented supply + demand needing matching", "risk": "chicken-and-egg liquidity; disintermediation"},
+    {"id": "open_core", "name": "Open core", "value_capture": "open base, paid proprietary/enterprise layer", "unit": "conversion of OSS users -> paid", "fits": "developer adoption flywheel + an enterprise wedge", "risk": "where to draw the open/paid line", "note": "the OpenHubForAI exports-free / governed-layer-paid pattern"},
+    {"id": "transaction_fee", "name": "Transaction fee", "value_capture": "fee per processed transaction", "unit": "volume x fee", "fits": "payments/movement of value", "risk": "thin margins; scale-dependent"},
+    {"id": "licensing", "name": "Licensing / royalty", "value_capture": "fee to use IP/tech/brand", "unit": "license or % royalty", "fits": "valuable IP others embed", "risk": "enforcement; commoditization"},
+    {"id": "data_monetization", "name": "Governed data product", "value_capture": "sell access to verified/current/provable data", "unit": "subscription or per-query", "fits": "a governed truth layer others trust", "risk": "provenance/compliance; privacy", "note": "the Baltor governed-context wedge; serves_truth=true only for verified, governed output"},
+    {"id": "services_attach", "name": "Services attach", "value_capture": "implementation/support attached to a product", "unit": "project or retainer", "fits": "complex products needing onboarding", "risk": "low margin; doesn't scale alone"}
+  ]
+}

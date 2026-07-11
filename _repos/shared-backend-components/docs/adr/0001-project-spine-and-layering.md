@@ -1,0 +1,1 @@
+../../../_shared/adr/0001-project-spine-and-layering.md

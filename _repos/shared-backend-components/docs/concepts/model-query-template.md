@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/concepts/model-query-template.md

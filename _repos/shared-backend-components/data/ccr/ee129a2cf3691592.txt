@@ -1,0 +1,867 @@
+MODULE src/teleon/primitives/groups.py
+## API signatures
+```python
+"""Larger deterministic primitive groups."""
+SCHEMA_FINGERPRINT_CHARS = ...
+IDEMPOTENCY_DIGEST_CHARS = ...
+FILE_DIGEST_CHARS = ...
+RECEIPT_DIGEST_CHARS = ...
+MANIFEST_NAME = ...
+DEFAULT_ROUTE_MAX_STEPS = ...
+NO_ROUTE_REASON = ...
+KEEP_FIRST = ...
+KEEP_LAST = ...
+_FIRST_CAP_RE = ...
+_ALL_CAP_RE = ...
+_NON_ALNUM_RE = ...
+class FieldMapping:
+    # How one source field was normalized inside a record import group.
+class FieldCollision:
+    # A normalized field collision that was preserved under a suffixed name.
+class InvalidRecord:
+    # A row that is missing one or more required normalized fields.
+class DuplicateRecord:
+    # A duplicate row found by identity fields.
+class PreparedRecordImport:
+    # Normalized, validated, deduped, and fingerprinted record-import packet.
+class RouteComponent:
+    # One exact-edge component candidate for a deterministic route.
+class RoutePlan:
+    # Compiled route over component input/output edges.
+class PrimitiveGraphRuntimePlanReceipt:
+    # Ordered primitive graph plan assembled from compact edge cards.
+class PrimitiveConsumerReadinessReceipt:
+    # Cross-surface readiness check for compact primitive edge cards.
+class PrimitiveRegistryExpansionCoverageReceipt:
+    # Coverage audit for required primitive families and runtime shapes.
+class GuardedWriteReceipt:
+    # Receipt for a file write that archived the previous content first.
+class ContractViolation:
+    # A deterministic contract/schema violation for a grouped primitive.
+class PolicyApiRequestDecision:
+    # Request validation, scope check, idempotency, and receipt in one edge.
+class SettingSource:
+    # Where one effective setting value came from.
+class TenantSettingsResolution:
+    # Merged settings with validation errors, sources, and redacted view.
+class DeploymentReadinessCheck:
+    # One deterministic deployment readiness check result.
+class DeploymentReadinessReport:
+    # Deployment readiness decision with blockers and receipt hash.
+class PromptEvalCaseResult:
+    # One deterministic prompt/model eval case result.
+class PromptEvalReport:
+    # Aggregate deterministic prompt/model eval report.
+class DatabaseMigrationOperation:
+    # One normalized migration operation with risk annotations.
+class DatabaseMigrationReceipt:
+    # Migration plan with rollback, integrity checks, blockers, and receipt.
+class IntegrationMutation:
+    # One deterministic target-system mutation derived from source delta.
+class IntegrationSyncReceipt:
+    # Integration sync plan with idempotency and skipped-record accounting.
+class Citation:
+    # Source span used by a cited answer receipt.
+class CitedAnswerReceipt:
+    # Deterministic cited answer packet assembled from retrieved evidence.
+class WebhookEventReceipt:
+    # Verified webhook event mapped to a compact domain-event receipt.
+class QueueJobExecutionReceipt:
+    # Queue worker decision with retry/dead-letter and idempotency metadata.
+class QueuePayloadContractPlanReceipt:
+    # Queue payload contract plan with schema, required fields, headers, and fixture gates.
+class QueueAckPolicyPlanReceipt:
+    # Queue ack/nack policy plan with ack mode, failure action, timeout, and receipt gates.
+class QueuePoisonMessagePolicyPlanReceipt:
+    # Queue poison-message policy with threshold, quarantine sink, alert, and replay gates.
+class QueueBatchConsumerPlanReceipt:
+    # Queue batch-consumer plan with batch size, wait window, partial failure, and per-item gates.
+class QueueOrderingPolicyPlanReceipt:
+    # Queue ordering policy with ordering key, mode, partitioning, and gap-detection gates.
+class ScheduledJobReceipt:
+    # Cron/scheduled-job decision with lock key and skip reason.
+class CliCommandReceipt:
+    # Normalized CLI command plan that avoids shell-string execution.
+class KubernetesJobPlanReceipt:
+    # Kubernetes job readiness plan with safety blockers and manifest digest.
+class DashboardTile:
+    # One deterministic dashboard tile value.
+class DashboardSnapshotReceipt:
+    # Dashboard/report snapshot with required-metric and freshness checks.
+class AuthMiddlewareReceipt:
+    # Authentication/authorization middleware decision receipt.
+class RateLimitDecisionReceipt:
+    # Rate-limit middleware decision with remaining quota and reset time.
+class ToolInvocationPlanReceipt:
+    # Agent tool-call plan with policy blockers and audit key.
+class WorkflowStepReceipt:
+    # Workflow step transition decision and emitted domain events.
+class PublishedEventReceipt:
+    # Queue/event producer receipt with topic, partition key, and idempotency.
+class EventHandlerReceipt:
+    # Domain event handler decision with emitted follow-up commands.
+class SdkRequestPlanReceipt:
+    # Typed SDK/API client request plan with idempotency and retry policy.
+class TerraformModulePlanReceipt:
+    # Terraform module plan with variable validation and policy blockers.
+class GithubActionWorkflowReceipt:
+    # GitHub Actions workflow plan with permissions and trigger checks.
+class DataQualityRuleReceipt:
+    # Deterministic data quality evaluation summary.
+class VectorIndexPlanReceipt:
+    # Vector index build plan with chunking, embedding, and dimension checks.
+class ComplianceEvidenceReceipt:
+    # Security/compliance evidence workflow receipt.
+class GraphqlResolverReceipt:
+    # GraphQL resolver plan with selection and auth decisions.
+class GrpcMethodReceipt:
+    # gRPC method invocation plan with service/method and metadata checks.
+class SqlViewPlanReceipt:
+    # SQL view planning receipt with source tables and policy blockers.
+class SqlProcedurePlanReceipt:
+    # Stored procedure plan with parameter and mutation policy checks.
+class EtlPipelinePlanReceipt:
+    # ETL pipeline plan with extract/transform/load and checkpoint checks.
+class EltModelPlanReceipt:
+    # ELT/dbt-style model plan with dependency and test checks.
+class AlertRuleReceipt:
+    # Monitoring alert rule decision with routing and threshold checks.
+class RunbookPlanReceipt:
+    # Operational runbook plan with required action/evidence checks.
+class IncidentTriagePlanReceipt:
+    # Incident triage plan with severity, ownership, and impact gates.
+class OncallEscalationPlanReceipt:
+    # On-call escalation plan with channel, target, and ack checks.
+class StatusPageUpdatePlanReceipt:
+    # Status-page update plan with component, audience, and approval checks.
+class MaintenanceWindowPlanReceipt:
+    # Maintenance window plan with duration, notification, and rollback checks.
+class PostmortemActionPlanReceipt:
+    # Postmortem action plan with owned prevention and verification tasks.
+class TestFixtureReceipt:
+    # Test fixture generation receipt with schema and redaction checks.
+class MockServerPlanReceipt:
+    # Mock server plan with route and example-response validation.
+class PolicyRuleDecisionReceipt:
+    # Policy rule decision with reason codes and required context checks.
+class ShellScriptPlanReceipt:
+    # Shell command plan that validates argv without executing it.
+class KubernetesControllerPlanReceipt:
+    # Kubernetes controller plan with watch and reconcile checks.
+class WorkflowGroupPlanReceipt:
+    # Multi-step workflow group plan with edge and required-step checks.
+class UiComponentPlanReceipt:
+    # UI component plan with props, state, and accessibility checks.
+class UiRoutePlanReceipt:
+    # UI route/page plan with path, data, and component checks.
+class UiApiBindingPlanReceipt:
+    # UI-to-API binding plan with operation, state, and auth checks.
+class UiFormValidationPlanReceipt:
+    # UI form validation plan with field, validator, and error-state checks.
+class UiTableStatePlanReceipt:
+    # UI table state plan for columns, row identity, and list controls.
+class DashboardFilterContractPlanReceipt:
+    # Dashboard filter contract plan for metric/filter bindings.
+class UiAccessibilityInteractionPlanReceipt:
+    # UI accessibility interaction plan with keyboard, focus, and ARIA gates.
+class ApiResourceGroupPlanReceipt:
+    # Resource API group plan across CRUD/search/export operations.
+class MicroserviceBundlePlanReceipt:
+    # Microservice bundle plan with callable surfaces and runtime proof gates.
+class ServiceBoundaryContractPlanReceipt:
+    # Service boundary contract with bounded context, owned capabilities, and dependency gates.
+class ServiceSurfaceInventoryPlanReceipt:
+    # Service surface inventory with endpoint, worker, event, and public-auth gates.
+class ServiceDataOwnershipPlanReceipt:
+    # Service data ownership plan with owned stores, read-only dependencies, and lifecycle gates.
+class ServiceStartupOrderPlanReceipt:
+    # Service startup order plan with dependency checks, migration gate, readiness, and timing gates.
+class ServiceSecretBindingPlanReceipt:
+    # Service secret binding plan with secret refs, providers, rotation, and runtime identity gates.
+class ServiceBackpressurePolicyPlanReceipt:
+    # Service backpressure plan with inflight, queue, overload, and retry/degrade gates.
+class OpenApiOperationPrimitiveSetReceipt:
+    # OpenAPI operation extraction receipt for endpoint primitive candidates.
+class AsyncApiOperationPrimitiveSetReceipt:
+    # AsyncAPI operation extraction receipt for event primitive candidates.
+class CloudEventEnvelopeReceipt:
+    # Normalized CloudEvents-style envelope with idempotency metadata.
+class ServerlessFunctionPlanReceipt:
+    # Serverless/cloud-function plan with trigger and runtime blockers.
+class ObservabilityInstrumentationReceipt:
+    # Telemetry instrumentation plan for traces, metrics, logs, and redaction.
+class ApiContractTestSuiteReceipt:
+    # API contract test-suite plan generated from operations and fixtures.
+class FeatureFlagPlanReceipt:
+    # Feature-flag rollout plan with audience, owner, and kill-switch gates.
+class SecretRotationPlanReceipt:
+    # Secret rotation plan with interval, rollback, and zero-downtime gates.
+class AgentToolSchemaReceipt:
+    # Agent tool schema plan derived from an API operation contract.
+class SdkPackagePlanReceipt:
+    # SDK package generation plan with operation and auth coverage gates.
+class DockerfilePlanReceipt:
+    # Dockerfile plan with base image, command, port, and safety gates.
+class DockerComposePlanReceipt:
+    # Docker Compose stack plan with service, secret, and health gates.
+class HelmChartPlanReceipt:
+    # Helm chart plan with templates, values, resource, and probe gates.
+class RbacPolicyPlanReceipt:
+    # RBAC policy matrix plan with role/action and wildcard checks.
+class PiiRedactionPlanReceipt:
+    # PII redaction policy plan over schema fields and masking methods.
+class ConnectorAuthBindingReceipt:
+    # Integration connector auth binding with secret refs and scope checks.
+class IdempotencyPolicyPlanReceipt:
+    # Idempotency policy plan with key, store, TTL, and replay gates.
+class PaginationContractPlanReceipt:
+    # API pagination contract plan with cursor, limit, and ordering gates.
+class CorsSecurityHeadersPlanReceipt:
+    # CORS and HTTP security headers plan for endpoint surfaces.
+class AuditLogPolicyPlanReceipt:
+    # Audit logging policy plan with actor, action, resource, and retention gates.
+class TenantIsolationPlanReceipt:
+    # Tenant isolation policy plan for scoped storage, auth, and query filters.
+class EventSchemaCompatibilityReceipt:
+    # Event schema compatibility check with breaking-change blockers.
+class DeadLetterReplayPlanReceipt:
+    # Dead-letter replay plan with batch, dedupe, throttle, and audit gates.
+class CacheInvalidationPlanReceipt:
+    # Cache invalidation plan with key pattern, trigger, and TTL gates.
+class DocumentChunkingPlanReceipt:
+    # Document chunking plan with size, overlap, and metadata gates.
+class RetrievalRerankPlanReceipt:
+    # Retrieval and rerank plan with top-k, model, and source-diversity gates.
+class CitationCoverageReceipt:
+    # Citation coverage check for generated answers and retrieved evidence.
+class AgentToolPermissionMatrixReceipt:
+    # Agent tool permission matrix with role, scope, and approval gates.
+class ModelRoutingPolicyReceipt:
+    # Model routing policy with route, fallback, budget, and data-class gates.
+class PromptRegressionSuitePlanReceipt:
+    # Prompt regression suite plan with fixtures, metrics, and threshold gates.
+class MemoryRetentionPolicyPlanReceipt:
+    # Agent memory retention plan with scope, TTL, PII, and deletion gates.
+class VectorIndexFreshnessReceipt:
+    # Vector-index freshness check with stale-document and rebuild gates.
+class CanaryReleasePlanReceipt:
+    # Canary release plan with traffic, metrics, rollback, and health gates.
+class BlueGreenDeploymentPlanReceipt:
+    # Blue/green deployment plan with target color, smoke, and switch gates.
+class SloErrorBudgetPolicyReceipt:
+    # SLO/error-budget policy with target, window, alert, and runbook gates.
+class DependencyVulnerabilityExceptionReceipt:
+    # Dependency vulnerability exception decision with expiry and control gates.
+class SecretScanFindingReceipt:
+    # Secret-scan finding evaluation with confirmed secret blockers.
+class SbomGenerationPlanReceipt:
+    # SBOM generation plan with component, format, and provenance gates.
+class LicenseCompliancePlanReceipt:
+    # License compliance check with restricted-license and attribution gates.
+class BackupRestorePlanReceipt:
+    # Backup/restore plan with frequency, RPO/RTO, restore-test, and encryption gates.
+class CircuitBreakerPlanReceipt:
+    # Circuit-breaker plan with fallback, threshold, timeout, and metric gates.
+class RetryBackoffPolicyReceipt:
+    # Retry/backoff policy with attempt, delay, jitter, and idempotency gates.
+class TimeoutBudgetPlanReceipt:
+    # Timeout-budget plan with total and per-phase budget gates.
+class ConcurrencyLimitPlanReceipt:
+    # Concurrency-limit/bulkhead plan with resource, queue, and metric gates.
+class HealthProbePlanReceipt:
+    # Health-probe contract with readiness, liveness, startup, and dependency gates.
+class DependencyReadinessPlanReceipt:
+    # Dependency-readiness plan with healthcheck, timeout, and fallback gates.
+class GracefulShutdownPlanReceipt:
+    # Graceful-shutdown plan with drain timeout, hooks, signal, and request gates.
+class ChaosExperimentPlanReceipt:
+    # Chaos-experiment plan with blast-radius, hypothesis, abort, and rollback gates.
+class OpenApiCompatibilityReceipt:
+    # OpenAPI compatibility result with removed and changed operation blockers.
+class ApiVersioningPlanReceipt:
+    # API versioning plan with semver, changelog, migration, and compatibility gates.
+class ApiDeprecationNoticeReceipt:
+    # API deprecation notice plan with sunset, replacement, docs, and header gates.
+class ErrorEnvelopeContractReceipt:
+    # Error-envelope contract plan with required field and code gates.
+class RequestSigningPolicyReceipt:
+    # Request-signing policy with algorithm, header, replay, and rotation gates.
+class ApiUsagePlanReceipt:
+    # API usage-plan policy with quota, period, burst, scope, and alert gates.
+class ApiKeyRotationPlanReceipt:
+    # API key rotation plan with secret reference, overlap, owner, and revoke gates.
+class ResponseCachePolicyReceipt:
+    # Response-cache policy with TTL, vary-header, privacy, and invalidation gates.
+class ApiRequestValidationPlanReceipt:
+    # API request validation plan with method, schema, body, and receipt gates.
+class ApiAuthScopeMatrixPlanReceipt:
+    # API authorization scope matrix with action, scope, and tenant-claim gates.
+class ApiAsyncJobEndpointPlanReceipt:
+    # API async-job endpoint plan with job, status, cancel, TTL, and receipt gates.
+class ApiBulkOperationPlanReceipt:
+    # API bulk-operation plan with batch, partial-failure, and per-item result gates.
+class ApiOperationExampleCoverageReceipt:
+    # API operation example coverage with required status-code and example-type gates.
+class ApiEndpointTelemetryPlanReceipt:
+    # API endpoint telemetry plan with span, metric, trace-context, and redaction gates.
+class CdcCapturePlanReceipt:
+    # CDC capture plan with cursor, primary key, snapshot, and checkpoint gates.
+class StreamWatermarkPlanReceipt:
+    # Stream watermark plan with event-time, lateness, sink, and skew gates.
+class PartitionStrategyPlanReceipt:
+    # Dataset partition strategy with field, retention, compaction, and skew gates.
+class DataLineageContractReceipt:
+    # Data lineage contract with input, output, owner, run, and column lineage gates.
+class OutboxPublicationPlanReceipt:
+    # Transactional outbox publication plan with table, topic, checkpoint, and receipt gates.
+class InboxDeduplicationPlanReceipt:
+    # Inbox deduplication plan with dedupe key, TTL, conflict, and replay gates.
+class MaterializedViewRefreshPlanReceipt:
+    # Materialized-view refresh plan with staleness, dependency, backfill, and swap gates.
+class DataQuarantinePlanReceipt:
+    # Data quarantine plan with finding, sink, triage, and release gates.
+class TaskLeasePlanReceipt:
+    # Task-lease plan with TTL, renewal, owner-token, and fencing gates.
+class WorkerHeartbeatPlanReceipt:
+    # Worker heartbeat plan with interval, stale threshold, liveness, and restart gates.
+class WorkerAutoscalePolicyPlanReceipt:
+    # Worker autoscale policy with queue metric, replica bounds, cooldown, and drain gates.
+class QueueVisibilityTimeoutPlanReceipt:
+    # Queue visibility-timeout plan with processing-time, extension, and DLQ gates.
+class CronCatchupPlanReceipt:
+    # Cron catch-up plan with catch-up window, max-run, misfire, and idempotency gates.
+class WorkflowCompensationPlanReceipt:
+    # Workflow compensation plan with compensating steps, ordering, and receipt gates.
+class BatchCheckpointPlanReceipt:
+    # Batch checkpoint plan with interval, store, resume, and checksum gates.
+class RunArtifactManifestReceipt:
+    # Run artifact manifest with artifact, digest, retention, and owner gates.
+class ExecutionAuditTrailPlanReceipt:
+    # Execution audit-trail plan with event, actor, trace, and sink gates.
+class ApiGatewayRoutePlanReceipt:
+    # API gateway route plan with upstream, method, auth, rate, and timeout gates.
+class ServiceDiscoveryRegistrationReceipt:
+    # Service discovery registration plan with endpoint, health check, TTL, and region gates.
+class ServiceDependencyContractReceipt:
+    # Service dependency contract with timeout, fallback, circuit breaker, and owner gates.
+class RuntimeConfigSchemaPlanReceipt:
+    # Runtime config schema plan with key, secret-ref, schema-version, and owner gates.
+class EnvironmentPromotionPlanReceipt:
+    # Environment promotion plan with source, target, artifact, migration, and rollback gates.
+class WebhookDeliveryPolicyPlanReceipt:
+    # Webhook delivery plan with HTTPS destination, signing, idempotency, retry, and DLQ gates.
+class ConsumerGroupOffsetPlanReceipt:
+    # Consumer group offset plan with strategy, checkpoint, replay, and lag alert gates.
+class ServiceOwnershipRunbookPlanReceipt:
+    # Service ownership runbook plan with owner, escalation, SLO, dashboard, and on-call gates.
+class SchemaDriftGateReceipt:
+    # Schema drift gate with expected schema, observed schema, compatibility, and owner gates.
+class MigrationLockPlanReceipt:
+    # Migration lock plan with lock key, owner, timeout, and stale-lock gates.
+class DataRetentionEnforcementPlanReceipt:
+    # Data retention enforcement plan with dataset, retention window, legal hold, and audit gates.
+class TenantDataBoundaryPlanReceipt:
+    # Tenant data boundary plan with tenant key, RLS, cross-tenant tests, and audit gates.
+class BackupRestoreDrillReceipt:
+    # Backup restore drill receipt with backup artifact, restore target, RPO/RTO, and checksum gates.
+class AccessReviewEvidenceReceipt:
+    # Access review evidence plan with actor, role, manager, decision, and revocation gates.
+class DataDeletionWorkflowPlanReceipt:
+    # Data deletion workflow plan with subject, scope, tombstone, propagation, and receipt gates.
+class PrivilegedAccessApprovalPlanReceipt:
+    # Privileged access approval plan with requester, role, duration, approval, and breakglass gates.
+class ConnectorCursorCheckpointPlanReceipt:
+    # Connector cursor checkpoint plan with cursor, checkpoint store, resume token, and receipt gates.
+class ConnectorFieldMappingPlanReceipt:
+    # Connector field mapping plan with source, target, required target fields, and transform gates.
+class ExternalIdentityMapPlanReceipt:
+    # External identity map plan with source, target, identity keys, mapping store, and collision gates.
+class SyncConflictResolutionPlanReceipt:
+    # Sync conflict resolution plan with conflict keys, strategy, precedence, and audit gates.
+class ConnectorRateLimitBudgetPlanReceipt:
+    # Connector rate-limit budget plan with request window, burst, retry-after, and alert gates.
+class WebhookReplayWindowPlanReceipt:
+    # Webhook replay window plan with replay horizon, dedupe key, signature, and receipt gates.
+class ConnectorErrorQuarantinePlanReceipt:
+    # Connector error quarantine plan with error classes, sink, triage, and replay gates.
+class SyncReconciliationReportPlanReceipt:
+    # Sync reconciliation report plan with counts, mismatch threshold, sample, and owner gates.
+class PrimitiveCandidateIntakeReceipt:
+    # Primitive candidate intake result with visible edge, hidden member, and proof gates.
+class PrimitiveReuseObservationReceipt:
+    # Primitive reuse observation with core edge, runtime-shape, and route-reuse gates.
+class PrimitiveProofCoverageMatrixReceipt:
+    # Primitive proof coverage matrix with per-candidate requirement blockers.
+class PrimitivePromotionReviewReceipt:
+    # Primitive promotion review result with proof, owner-review, and truth-boundary gates.
+class RegistryPublishManifestPlanReceipt:
+    # Registry publish manifest plan with card, proof, gate, and search-target coverage.
+class BenchmarkRunArmPlanReceipt:
+    # Benchmark run-arm plan with task, runner, metric, and artifact gates.
+class PrimitiveLiftComparisonReceipt:
+    # Baseline-vs-primitive lift comparison with dimension wins and blockers.
+class TokenSavingsAttributionReceipt:
+    # Token-savings attribution with baseline, candidate, primitive, and trace gates.
+class PitfallAvoidanceMatrixReceipt:
+    # Pitfall avoidance matrix with evidence-backed avoided and unresolved pitfalls.
+class RoutePromotionEvidencePackReceipt:
+    # Route promotion evidence pack with reuse, proof, lift, and owner gates.
+class BenchmarkPrimitiveDecompositionReceipt:
+    # Benchmark task decomposition into logical primitive components.
+class BenchmarkRouteTokenComparisonReceipt:
+    # Benchmark route token comparison with component-level attribution.
+class BenchmarkTraceIngestionReceipt:
+    # Normalized benchmark run artifacts paired into baseline-vs-primitive traces.
+class BenchmarkTracePairEvaluationReceipt:
+    # Measured baseline-vs-primitive benchmark trace pair evaluation.
+class BenchmarkRoutePromotionCandidateReceipt:
+    # Aggregated benchmark evidence for a reusable route promotion candidate.
+class RuntimeShapeAdapterPlanReceipt:
+    # Runtime-shape adapter plan preserving one core group edge.
+class RuntimeShapeAdapterMatrixReceipt:
+    # Runtime-shape adapter matrix proving wrapper-only reuse across surfaces.
+class SurfacePrimitiveRegistryCardSetReceipt:
+    # Candidate primitive registry cards compiled from API, event, or service surfaces.
+def normalize_field_name(name: object) -> str
+    # Normalize an external field label to snake_case ASCII.
+def prepare_record_import(rows: Sequence[Mapping[str, Any]], *, required_fields: Sequence[str]=(), identity_fields: Sequence[str]=(), field_aliases: Mapping[str, str] | None=None, sort_fields: Sequence[str]=(), keep: str=KEEP_FIRST) -> PreparedRecordImport
+    # Prepare raw rows for import as one deterministic grouped primitive.
+def compile_exact_edge_route(start_edge: str, goal_edge: str, components: Sequence[RouteComponent | Mapping[str, Any]], *, adapter_components: Sequence[RouteComponent | Mapping[str, Any]]=(), max_steps: int=DEFAULT_ROUTE_MAX_STEPS) -> RoutePlan
+    # Compile the shortest deterministic route across exact input/output edges.
+def collapse_route_to_group_card(plan: RoutePlan, *, group_id: str, title: str) -> dict[str, Any]
+    # Collapse a compiled route to one compact candidate card for LLM context.
+def plan_primitive_graph_runtime(route_spec: Mapping[str, Any], graph_policy: Mapping[str, Any]) -> PrimitiveGraphRuntimePlanReceipt
+    # Plan an executable primitive graph from compact edge cards, not source code.
+def evaluate_primitive_consumer_readiness(card_bundle: Mapping[str, Any], readiness_policy: Mapping[str, Any]) -> PrimitiveConsumerReadinessReceipt
+    # Check that compact primitive cards are consumable across product surfaces and coding tools.
+def evaluate_primitive_registry_expansion_coverage(registry_snapshot: Mapping[str, Any], coverage_policy: Mapping[str, Any]) -> PrimitiveRegistryExpansionCoverageReceipt
+    # Audit whether the candidate primitive registry covers required families and runtimes.
+def guarded_replace_file(target_path: Path, content: str, archive_dir: Path, *, reason: str) -> GuardedWriteReceipt
+    # Archive existing file content before replacing it with new content.
+def evaluate_policy_api_request(request_payload: Mapping[str, Any], schema: Mapping[str, Any], *, actor_scopes: Sequence[str]=(), required_scopes: Sequence[str]=(), idempotency_keys_seen: Sequence[str]=()) -> PolicyApiRequestDecision
+    # Validate an API request, enforce scopes, and emit a decision receipt.
+def resolve_tenant_settings(defaults: Mapping[str, Any], tenant_overrides: Mapping[str, Any], *, schema: Mapping[str, Any] | None=None, secret_fields: Sequence[str]=(), version: str='') -> TenantSettingsResolution
+    # Resolve tenant settings with override precedence, validation, and redaction.
+def evaluate_deployment_readiness(spec: Mapping[str, Any]) -> DeploymentReadinessReport
+    # Check deployment config, secrets, health probes, rollback, and limits.
+def evaluate_prompt_model_outputs(cases: Sequence[Mapping[str, Any]], outputs: Mapping[str, Any] | Sequence[Mapping[str, Any]]) -> PromptEvalReport
+    # Score fixed prompt/model outputs with deterministic required-term checks.
+def plan_database_migration(database_state: Mapping[str, Any], migration_spec: Mapping[str, Any]) -> DatabaseMigrationReceipt
+    # Build a deterministic migration plan with rollback and proof gates.
+def compile_integration_sync_plan(source_delta: Mapping[str, Any] | Sequence[Mapping[str, Any]], sync_policy: Mapping[str, Any]) -> IntegrationSyncReceipt
+    # Compile source-system deltas into deterministic target mutations.
+def assemble_cited_answer(question: str, evidence: Sequence[Mapping[str, Any]], *, retrieval_policy: Mapping[str, Any] | None=None) -> CitedAnswerReceipt
+    # Assemble a deterministic answer from retrieved evidence with citations.
+def verify_webhook_event(event_envelope: Mapping[str, Any], verification_policy: Mapping[str, Any]) -> WebhookEventReceipt
+    # Verify a webhook envelope, dedupe it, and map a domain event receipt.
+def plan_queue_job_execution(message: Mapping[str, Any], worker_policy: Mapping[str, Any]) -> QueueJobExecutionReceipt
+    # Plan queue-worker execution with validation, retry, and dead-letter rules.
+def plan_queue_payload_contract(queue_contract: Mapping[str, Any], contract_policy: Mapping[str, Any]) -> QueuePayloadContractPlanReceipt
+    # Plan a queue payload contract with schema, required fields, headers, and fixtures.
+def plan_queue_ack_policy(ack_spec: Mapping[str, Any], ack_policy: Mapping[str, Any]) -> QueueAckPolicyPlanReceipt
+    # Plan queue ack/nack behavior with timeout, failure action, visibility extension, and receipt gates.
+def plan_queue_poison_message_policy(poison_spec: Mapping[str, Any], poison_policy: Mapping[str, Any]) -> QueuePoisonMessagePolicyPlanReceipt
+    # Plan poison-message handling with threshold, quarantine, alerting, replay, and receipt gates.
+def plan_queue_batch_consumer(batch_spec: Mapping[str, Any], batch_policy: Mapping[str, Any]) -> QueueBatchConsumerPlanReceipt
+    # Plan queue batch consumption with batch size, wait window, partial failure, and checkpoint gates.
+def plan_queue_ordering_policy(ordering_spec: Mapping[str, Any], ordering_policy: Mapping[str, Any]) -> QueueOrderingPolicyPlanReceipt
+    # Plan queue ordering with ordering key, mode, partitioning, sequence checks, and gap handling.
+def evaluate_scheduled_job_tick(schedule_tick: Mapping[str, Any], job_policy: Mapping[str, Any]) -> ScheduledJobReceipt
+    # Evaluate whether a cron/scheduled job should run for one tick.
+def compile_cli_command_request(command_args: Mapping[str, Any], command_policy: Mapping[str, Any]) -> CliCommandReceipt
+    # Compile a CLI invocation as argv plus deterministic policy blockers.
+def plan_kubernetes_job(job_spec: Mapping[str, Any], runtime_policy: Mapping[str, Any]) -> KubernetesJobPlanReceipt
+    # Plan a Kubernetes Job manifest with safety and readiness blockers.
+def build_dashboard_metric_snapshot(metric_sources: Sequence[Mapping[str, Any]], dashboard_policy: Mapping[str, Any]) -> DashboardSnapshotReceipt
+    # Build a deterministic dashboard/report snapshot from metric sources.
+def evaluate_auth_middleware_request(request_context: Mapping[str, Any], credentials: Mapping[str, Any], auth_policy: Mapping[str, Any]) -> AuthMiddlewareReceipt
+    # Evaluate an auth middleware boundary without performing side effects.
+def evaluate_rate_limit_request(request_context: Mapping[str, Any], usage_window: Mapping[str, Any], quota_policy: Mapping[str, Any]) -> RateLimitDecisionReceipt
+    # Evaluate one rate-limit decision from a usage window and quota policy.
+def plan_tool_invocation(tool_input: Mapping[str, Any], tool_policy: Mapping[str, Any]) -> ToolInvocationPlanReceipt
+    # Plan an agent tool call with argument, scope, and allow-list gates.
+def evaluate_workflow_step_transition(workflow_state: Mapping[str, Any], step_input: Mapping[str, Any], workflow_policy: Mapping[str, Any]) -> WorkflowStepReceipt
+    # Evaluate one deterministic workflow transition and emitted events.
+def plan_event_publication(domain_event: Mapping[str, Any], publish_policy: Mapping[str, Any]) -> PublishedEventReceipt
+    # Plan a queue/event publication with topic and idempotency checks.
+def evaluate_domain_event_handler(domain_event: Mapping[str, Any], handler_policy: Mapping[str, Any]) -> EventHandlerReceipt
+    # Evaluate a domain event handler and emitted command plan.
+def plan_sdk_client_request(request_envelope: Mapping[str, Any], client_policy: Mapping[str, Any]) -> SdkRequestPlanReceipt
+    # Plan a typed SDK/API client request without making the network call.
+def plan_terraform_module(module_spec: Mapping[str, Any], infra_policy: Mapping[str, Any]) -> TerraformModulePlanReceipt
+    # Plan a Terraform module with required variables and resource policies.
+def plan_github_action_workflow(workflow_spec: Mapping[str, Any], workflow_policy: Mapping[str, Any]) -> GithubActionWorkflowReceipt
+    # Plan a GitHub Actions workflow with trigger, job, and permission checks.
+def evaluate_data_quality_rule(dataset: Sequence[Mapping[str, Any]], quality_rule: Mapping[str, Any]) -> DataQualityRuleReceipt
+    # Evaluate a deterministic data-quality rule over records.
+def plan_vector_index_build(documents: Sequence[Mapping[str, Any]], index_policy: Mapping[str, Any]) -> VectorIndexPlanReceipt
+    # Plan a vector index build with chunking and embedding-dimension checks.
+def compile_compliance_evidence_workflow(control_context: Mapping[str, Any], evidence_policy: Mapping[str, Any]) -> ComplianceEvidenceReceipt
+    # Compile a security/compliance evidence workflow receipt.
+def plan_graphql_resolver(operation: Mapping[str, Any], resolver_policy: Mapping[str, Any]) -> GraphqlResolverReceipt
+    # Plan a GraphQL resolver call with field and scope checks.
+def plan_grpc_method_call(request_envelope: Mapping[str, Any], method_policy: Mapping[str, Any]) -> GrpcMethodReceipt
+    # Plan a gRPC method call with metadata and message checks.
+def plan_sql_view(view_spec: Mapping[str, Any], sql_policy: Mapping[str, Any]) -> SqlViewPlanReceipt
+    # Plan a SQL view from selected columns and source tables.
+def plan_sql_procedure(procedure_spec: Mapping[str, Any], sql_policy: Mapping[str, Any]) -> SqlProcedurePlanReceipt
+    # Plan a stored procedure with parameter and mutation policy checks.
+def plan_etl_pipeline(pipeline_spec: Mapping[str, Any], pipeline_policy: Mapping[str, Any]) -> EtlPipelinePlanReceipt
+    # Plan an ETL pipeline with extract, transform, load, and checkpoint checks.
+def plan_elt_model(model_spec: Mapping[str, Any], model_policy: Mapping[str, Any]) -> EltModelPlanReceipt
+    # Plan an ELT/dbt-style model with dependency and test coverage gates.
+def evaluate_alert_rule(metric_window: Mapping[str, Any], alert_policy: Mapping[str, Any]) -> AlertRuleReceipt
+    # Evaluate an alert-rule definition with threshold and routing checks.
+def compile_runbook_plan(incident_context: Mapping[str, Any], runbook_policy: Mapping[str, Any]) -> RunbookPlanReceipt
+    # Compile an operational runbook plan with required sections.
+def plan_incident_triage(incident_signal: Mapping[str, Any], triage_policy: Mapping[str, Any]) -> IncidentTriagePlanReceipt
+    # Plan incident triage with severity, owner, impact, and runbook gates.
+def plan_oncall_escalation(escalation_spec: Mapping[str, Any], escalation_policy: Mapping[str, Any]) -> OncallEscalationPlanReceipt
+    # Plan on-call escalation with primary, backup, channel, and ack gates.
+def plan_status_page_update(status_spec: Mapping[str, Any], comms_policy: Mapping[str, Any]) -> StatusPageUpdatePlanReceipt
+    # Plan status-page/customer update with approval and next-update gates.
+def plan_maintenance_window(maintenance_spec: Mapping[str, Any], maintenance_policy: Mapping[str, Any]) -> MaintenanceWindowPlanReceipt
+    # Plan maintenance windows with timing, notification, and rollback gates.
+def plan_postmortem_action_items(postmortem_spec: Mapping[str, Any], action_policy: Mapping[str, Any]) -> PostmortemActionPlanReceipt
+    # Plan postmortem action items with owners, due dates, and verification.
+def build_test_fixture(fixture_policy: Mapping[str, Any], schema: Mapping[str, Any]) -> TestFixtureReceipt
+    # Build synthetic test fixture rows with required fields and redaction.
+def plan_mock_server(api_spec: Mapping[str, Any], mock_policy: Mapping[str, Any]) -> MockServerPlanReceipt
+    # Plan a mock server from route examples without opening sockets.
+def evaluate_policy_rule(action_context: Mapping[str, Any], policy_set: Mapping[str, Any]) -> PolicyRuleDecisionReceipt
+    # Evaluate a deterministic allow/deny policy rule with reason codes.
+def plan_shell_script(script_spec: Mapping[str, Any], script_policy: Mapping[str, Any]) -> ShellScriptPlanReceipt
+    # Plan a shell/script invocation as argv without executing a shell string.
+def plan_kubernetes_controller(controller_spec: Mapping[str, Any], controller_policy: Mapping[str, Any]) -> KubernetesControllerPlanReceipt
+    # Plan a Kubernetes controller reconcile loop without touching a cluster.
+def plan_workflow_group(workflow_spec: Mapping[str, Any], workflow_policy: Mapping[str, Any]) -> WorkflowGroupPlanReceipt
+    # Plan a multi-step workflow group with explicit step-edge validation.
+def plan_ui_component(component_spec: Mapping[str, Any], design_policy: Mapping[str, Any]) -> UiComponentPlanReceipt
+    # Plan a reusable UI component with props, states, and a11y gates.
+def plan_ui_route(route_spec: Mapping[str, Any], route_policy: Mapping[str, Any]) -> UiRoutePlanReceipt
+    # Plan a UI route/page with data dependencies and expected components.
+def plan_ui_api_binding(binding_spec: Mapping[str, Any], binding_policy: Mapping[str, Any]) -> UiApiBindingPlanReceipt
+    # Plan UI bindings to API operations with state, mutation, and auth gates.
+def plan_ui_form_validation(form_spec: Mapping[str, Any], validation_policy: Mapping[str, Any]) -> UiFormValidationPlanReceipt
+    # Plan UI form validation with client/server and accessible-error gates.
+def plan_ui_table_state(table_spec: Mapping[str, Any], table_policy: Mapping[str, Any]) -> UiTableStatePlanReceipt
+    # Plan reusable table state for columns, row keys, filters, and states.
+def plan_dashboard_filter_contract(dashboard_spec: Mapping[str, Any], filter_policy: Mapping[str, Any]) -> DashboardFilterContractPlanReceipt
+    # Plan dashboard filter contracts with metric bindings and reset behavior.
+def plan_ui_accessibility_interaction(interaction_spec: Mapping[str, Any], accessibility_policy: Mapping[str, Any]) -> UiAccessibilityInteractionPlanReceipt
+    # Plan UI interaction accessibility with keyboard, focus, and ARIA checks.
+def plan_api_resource_group(resource_spec: Mapping[str, Any], api_policy: Mapping[str, Any]) -> ApiResourceGroupPlanReceipt
+    # Plan a resource API group across CRUD/search/export operation contracts.
+def plan_microservice_bundle(service_spec: Mapping[str, Any], service_policy: Mapping[str, Any]) -> MicroserviceBundlePlanReceipt
+    # Plan a microservice bundle with endpoints, workers, storage, and proof gates.
+def plan_service_boundary_contract(service_spec: Mapping[str, Any], boundary_policy: Mapping[str, Any]) -> ServiceBoundaryContractPlanReceipt
+    # Plan service boundary ownership with bounded context, capabilities, and dependency contracts.
+def plan_service_surface_inventory(surface_spec: Mapping[str, Any], inventory_policy: Mapping[str, Any]) -> ServiceSurfaceInventoryPlanReceipt
+    # Plan service surface inventory with endpoint, worker, event, visibility, and auth gates.
+def plan_service_data_ownership(data_spec: Mapping[str, Any], ownership_policy: Mapping[str, Any]) -> ServiceDataOwnershipPlanReceipt
+    # Plan service data ownership with owned stores, read-only dependencies, and lifecycle proof.
+def plan_service_startup_order(startup_spec: Mapping[str, Any], startup_policy: Mapping[str, Any]) -> ServiceStartupOrderPlanReceipt
+    # Plan service startup order with dependency checks, migration gate, readiness, and timing.
+def plan_service_secret_binding(secret_spec: Mapping[str, Any], secret_policy: Mapping[str, Any]) -> ServiceSecretBindingPlanReceipt
+    # Plan service secret bindings with secret refs, providers, rotation policy, and runtime identity.
+def plan_service_backpressure_policy(backpressure_spec: Mapping[str, Any], backpressure_policy: Mapping[str, Any]) -> ServiceBackpressurePolicyPlanReceipt
+    # Plan service backpressure with inflight, queue policy, overload strategy, and retry/degrade proof.
+def extract_openapi_operations(openapi_doc: Mapping[str, Any], extraction_policy: Mapping[str, Any]) -> OpenApiOperationPrimitiveSetReceipt
+    # Extract endpoint primitive candidates from a small OpenAPI document.
+def extract_asyncapi_operations(asyncapi_doc: Mapping[str, Any], extraction_policy: Mapping[str, Any]) -> AsyncApiOperationPrimitiveSetReceipt
+    # Extract event/message primitive candidates from an AsyncAPI document.
+def normalize_cloudevent_envelope(raw_event: Mapping[str, Any], event_policy: Mapping[str, Any]) -> CloudEventEnvelopeReceipt
+    # Normalize an event payload into a CloudEvents-style envelope.
+def plan_serverless_function(function_spec: Mapping[str, Any], runtime_policy: Mapping[str, Any]) -> ServerlessFunctionPlanReceipt
+    # Plan a serverless/cloud function with trigger and runtime gates.
+def plan_observability_instrumentation(operation_contract: Mapping[str, Any], telemetry_policy: Mapping[str, Any]) -> ObservabilityInstrumentationReceipt
+    # Plan trace, metric, log, and redaction instrumentation for an operation.
+def plan_api_contract_test_suite(api_operations: Sequence[Mapping[str, Any]] | Mapping[str, Any], fixture_policy: Mapping[str, Any]) -> ApiContractTestSuiteReceipt
+    # Plan API contract tests from operation contracts and examples.
+def plan_feature_flag(flag_spec: Mapping[str, Any], rollout_policy: Mapping[str, Any]) -> FeatureFlagPlanReceipt
+    # Plan a feature flag rollout with owner, audience, and kill-switch gates.
+def plan_secret_rotation(secret_spec: Mapping[str, Any], rotation_policy: Mapping[str, Any]) -> SecretRotationPlanReceipt
+    # Plan secret rotation with rollback and zero-downtime checks.
+def compile_agent_tool_schema_from_openapi(operation_contract: Mapping[str, Any], tool_policy: Mapping[str, Any]) -> AgentToolSchemaReceipt
+    # Compile an agent-callable tool schema from an API operation contract.
+def plan_sdk_package(api_spec: Mapping[str, Any], sdk_policy: Mapping[str, Any]) -> SdkPackagePlanReceipt
+    # Plan an SDK package from API operations without generating files.
+def plan_dockerfile(app_spec: Mapping[str, Any], container_policy: Mapping[str, Any]) -> DockerfilePlanReceipt
+    # Plan a Dockerfile with base-image and runtime safety checks.
+def plan_docker_compose_stack(stack_spec: Mapping[str, Any], compose_policy: Mapping[str, Any]) -> DockerComposePlanReceipt
+    # Plan a Docker Compose stack with service and secret gates.
+def plan_helm_chart(chart_spec: Mapping[str, Any], helm_policy: Mapping[str, Any]) -> HelmChartPlanReceipt
+    # Plan a Helm chart with template, values, and workload policy checks.
+def plan_rbac_policy_matrix(access_matrix: Mapping[str, Any], rbac_policy: Mapping[str, Any]) -> RbacPolicyPlanReceipt
+    # Plan RBAC role/action bindings with least-privilege blockers.
+def plan_pii_redaction_policy(data_schema: Mapping[str, Any], redaction_policy: Mapping[str, Any]) -> PiiRedactionPlanReceipt
+    # Plan PII redaction coverage for schema fields.
+def plan_connector_auth_binding(connector_spec: Mapping[str, Any], auth_policy: Mapping[str, Any]) -> ConnectorAuthBindingReceipt
+    # Plan auth bindings for an integration connector without reading secrets.
+def plan_idempotency_policy(operation_contract: Mapping[str, Any], idempotency_policy: Mapping[str, Any]) -> IdempotencyPolicyPlanReceipt
+    # Plan idempotency behavior for an API, worker, or workflow operation.
+def plan_pagination_contract(resource_contract: Mapping[str, Any], pagination_policy: Mapping[str, Any]) -> PaginationContractPlanReceipt
+    # Plan a list/query pagination contract with stable ordering checks.
+def plan_cors_security_headers(endpoint_surface: Mapping[str, Any], header_policy: Mapping[str, Any]) -> CorsSecurityHeadersPlanReceipt
+    # Plan CORS and common HTTP security headers for API endpoints.
+def plan_audit_log_policy(event_contract: Mapping[str, Any], audit_policy: Mapping[str, Any]) -> AuditLogPolicyPlanReceipt
+    # Plan audit logging fields, retention, and tamper-evidence requirements.
+def plan_tenant_isolation(resource_contract: Mapping[str, Any], isolation_policy: Mapping[str, Any]) -> TenantIsolationPlanReceipt
+    # Plan tenant isolation checks for storage, auth context, and queries.
+def evaluate_event_schema_compatibility(previous_schema: Mapping[str, Any], next_schema: Mapping[str, Any], compatibility_policy: Mapping[str, Any]) -> EventSchemaCompatibilityReceipt
+    # Evaluate schema compatibility for event evolution.
+def plan_dead_letter_replay(dlq_spec: Mapping[str, Any], replay_policy: Mapping[str, Any]) -> DeadLetterReplayPlanReceipt
+    # Plan dead-letter queue replay with dedupe, throttle, and audit checks.
+def plan_cache_invalidation(cache_contract: Mapping[str, Any], cache_policy: Mapping[str, Any]) -> CacheInvalidationPlanReceipt
+    # Plan cache invalidation keys, triggers, TTLs, and stale-read safeguards.
+def plan_document_chunking(document_batch: Sequence[Mapping[str, Any]], chunking_policy: Mapping[str, Any]) -> DocumentChunkingPlanReceipt
+    # Plan deterministic document chunking with size and metadata checks.
+def plan_retrieval_rerank_policy(retrieval_spec: Mapping[str, Any], retrieval_policy: Mapping[str, Any]) -> RetrievalRerankPlanReceipt
+    # Plan retrieval and reranking with top-k and source-diversity gates.
+def evaluate_citation_coverage(answer_contract: Mapping[str, Any], coverage_policy: Mapping[str, Any]) -> CitationCoverageReceipt
+    # Evaluate whether answer claims are covered by citation records.
+def plan_agent_tool_permission_matrix(tool_registry: Mapping[str, Any], permission_policy: Mapping[str, Any]) -> AgentToolPermissionMatrixReceipt
+    # Plan agent tool permissions with role, scope, and approval checks.
+def plan_model_routing_policy(routing_spec: Mapping[str, Any], routing_policy: Mapping[str, Any]) -> ModelRoutingPolicyReceipt
+    # Plan model routing with fallback, budget, and data-class gates.
+def plan_prompt_regression_suite(suite_spec: Mapping[str, Any], regression_policy: Mapping[str, Any]) -> PromptRegressionSuitePlanReceipt
+    # Plan prompt regression fixtures, metrics, and thresholds.
+def plan_memory_retention_policy(memory_spec: Mapping[str, Any], retention_policy: Mapping[str, Any]) -> MemoryRetentionPolicyPlanReceipt
+    # Plan agent memory retention with TTL, consent, and deletion checks.
+def evaluate_vector_index_freshness(index_status: Mapping[str, Any], freshness_policy: Mapping[str, Any]) -> VectorIndexFreshnessReceipt
+    # Evaluate vector-index freshness and stale-document rebuild gates.
+def plan_canary_release(release_spec: Mapping[str, Any], release_policy: Mapping[str, Any]) -> CanaryReleasePlanReceipt
+    # Plan a canary release with traffic, health, metrics, and rollback checks.
+def plan_blue_green_deployment(deployment_spec: Mapping[str, Any], deployment_policy: Mapping[str, Any]) -> BlueGreenDeploymentPlanReceipt
+    # Plan a blue/green deployment with switch, smoke, and rollback gates.
+def plan_slo_error_budget_policy(slo_spec: Mapping[str, Any], slo_policy: Mapping[str, Any]) -> SloErrorBudgetPolicyReceipt
+    # Plan SLO and error-budget gates for a service.
+def evaluate_dependency_vulnerability_exception(exception_request: Mapping[str, Any], vulnerability_policy: Mapping[str, Any]) -> DependencyVulnerabilityExceptionReceipt
+    # Evaluate a dependency vulnerability exception request.
+def evaluate_secret_scan_findings(scan_result: Mapping[str, Any], scan_policy: Mapping[str, Any]) -> SecretScanFindingReceipt
+    # Evaluate secret-scan findings and remediation requirements.
+def plan_sbom_generation(package_spec: Mapping[str, Any], sbom_policy: Mapping[str, Any]) -> SbomGenerationPlanReceipt
+    # Plan SBOM generation with format, component, and provenance checks.
+def plan_license_compliance(dependency_inventory: Mapping[str, Any], license_policy: Mapping[str, Any]) -> LicenseCompliancePlanReceipt
+    # Plan license compliance with restricted-license and attribution checks.
+def plan_backup_restore(resource_spec: Mapping[str, Any], backup_policy: Mapping[str, Any]) -> BackupRestorePlanReceipt
+    # Plan backup and restore with RPO/RTO, encryption, and restore-test gates.
+def plan_circuit_breaker(service_contract: Mapping[str, Any], breaker_policy: Mapping[str, Any]) -> CircuitBreakerPlanReceipt
+    # Plan a circuit breaker with fallback, reset timeout, and metric gates.
+def plan_retry_backoff_policy(operation_contract: Mapping[str, Any], retry_policy: Mapping[str, Any]) -> RetryBackoffPolicyReceipt
+    # Plan retry/backoff behavior with jitter and idempotency gates.
+def plan_timeout_budget(operation_contract: Mapping[str, Any], timeout_policy: Mapping[str, Any]) -> TimeoutBudgetPlanReceipt
+    # Plan operation timeout budget with phase-level budget gates.
+def plan_concurrency_limit(resource_contract: Mapping[str, Any], concurrency_policy: Mapping[str, Any]) -> ConcurrencyLimitPlanReceipt
+    # Plan concurrency limit/bulkhead behavior with queue and overflow gates.
+def plan_health_probe_contract(service_contract: Mapping[str, Any], probe_policy: Mapping[str, Any]) -> HealthProbePlanReceipt
+    # Plan readiness/liveness/startup probe contract checks.
+def plan_dependency_readiness(service_contract: Mapping[str, Any], readiness_policy: Mapping[str, Any]) -> DependencyReadinessPlanReceipt
+    # Plan dependency readiness checks with timeout and fallback gates.
+def plan_graceful_shutdown(service_contract: Mapping[str, Any], shutdown_policy: Mapping[str, Any]) -> GracefulShutdownPlanReceipt
+    # Plan graceful shutdown with drain timeout, hooks, and signal gates.
+def plan_chaos_experiment(experiment_spec: Mapping[str, Any], chaos_policy: Mapping[str, Any]) -> ChaosExperimentPlanReceipt
+    # Plan a chaos experiment with blast-radius, observability, and rollback gates.
+def evaluate_openapi_compatibility(previous_spec: Mapping[str, Any], next_spec: Mapping[str, Any], compatibility_policy: Mapping[str, Any]) -> OpenApiCompatibilityReceipt
+    # Evaluate OpenAPI path and operation compatibility for endpoint evolution.
+def plan_api_versioning_policy(api_contract: Mapping[str, Any], version_policy: Mapping[str, Any]) -> ApiVersioningPlanReceipt
+    # Plan API version movement with changelog, migration, and compatibility gates.
+def plan_api_deprecation_notice(endpoint_contract: Mapping[str, Any], deprecation_policy: Mapping[str, Any]) -> ApiDeprecationNoticeReceipt
+    # Plan API deprecation notice with sunset and replacement gates.
+def plan_error_envelope_contract(endpoint_contract: Mapping[str, Any], error_policy: Mapping[str, Any]) -> ErrorEnvelopeContractReceipt
+    # Plan API error-envelope contract with required fields and code gates.
+def plan_request_signing_policy(endpoint_contract: Mapping[str, Any], signing_policy: Mapping[str, Any]) -> RequestSigningPolicyReceipt
+    # Plan request signing with algorithm, header, replay, and rotation gates.
+def plan_api_usage_plan(consumer_contract: Mapping[str, Any], usage_policy: Mapping[str, Any]) -> ApiUsagePlanReceipt
+    # Plan API consumer quota, burst, period, scope, and alert gates.
+def plan_api_key_rotation(key_contract: Mapping[str, Any], rotation_policy: Mapping[str, Any]) -> ApiKeyRotationPlanReceipt
+    # Plan API key rotation with secret reference, overlap, owner, and revoke gates.
+def plan_response_cache_policy(endpoint_contract: Mapping[str, Any], cache_policy: Mapping[str, Any]) -> ResponseCachePolicyReceipt
+    # Plan response cache policy with TTL, vary, privacy, and invalidation gates.
+def plan_api_request_validation(endpoint_contract: Mapping[str, Any], validation_policy: Mapping[str, Any]) -> ApiRequestValidationPlanReceipt
+    # Plan endpoint request validation with schema, content-type, size, and receipt gates.
+def plan_api_auth_scope_matrix(endpoint_contract: Mapping[str, Any], auth_policy: Mapping[str, Any]) -> ApiAuthScopeMatrixPlanReceipt
+    # Plan endpoint authorization matrix with scopes, tenant claims, roles, and denied examples.
+def plan_api_async_job_endpoint(endpoint_contract: Mapping[str, Any], async_policy: Mapping[str, Any]) -> ApiAsyncJobEndpointPlanReceipt
+    # Plan async endpoint behavior with job id, status route, cancel route, TTL, and receipts.
+def plan_api_bulk_operation(endpoint_contract: Mapping[str, Any], bulk_policy: Mapping[str, Any]) -> ApiBulkOperationPlanReceipt
+    # Plan bulk endpoint behavior with batch limits, partial failures, idempotency, and item results.
+def plan_api_operation_example_coverage(endpoint_contract: Mapping[str, Any], coverage_policy: Mapping[str, Any]) -> ApiOperationExampleCoverageReceipt
+    # Plan API example coverage for status codes, request/response examples, and negative cases.
+def plan_api_endpoint_telemetry(endpoint_contract: Mapping[str, Any], telemetry_policy: Mapping[str, Any]) -> ApiEndpointTelemetryPlanReceipt
+    # Plan endpoint telemetry with route span, metrics, trace context, and sensitive-field redaction.
+def plan_cdc_capture(source_spec: Mapping[str, Any], capture_policy: Mapping[str, Any]) -> CdcCapturePlanReceipt
+    # Plan CDC capture with cursor, primary key, snapshot, and checkpoint gates.
+def plan_stream_watermark(stream_spec: Mapping[str, Any], watermark_policy: Mapping[str, Any]) -> StreamWatermarkPlanReceipt
+    # Plan stream watermark behavior with lateness, sink, and skew gates.
+def plan_partition_strategy(dataset_spec: Mapping[str, Any], partition_policy: Mapping[str, Any]) -> PartitionStrategyPlanReceipt
+    # Plan dataset partitioning with retention, compaction, and skew guards.
+def plan_data_lineage_contract(lineage_spec: Mapping[str, Any], lineage_policy: Mapping[str, Any]) -> DataLineageContractReceipt
+    # Plan data lineage contract with owner, run, freshness, and column lineage gates.
+def plan_outbox_publication(outbox_spec: Mapping[str, Any], outbox_policy: Mapping[str, Any]) -> OutboxPublicationPlanReceipt
+    # Plan transactional outbox publication with checkpoint, idempotency, and receipt gates.
+def plan_inbox_deduplication(inbox_spec: Mapping[str, Any], inbox_policy: Mapping[str, Any]) -> InboxDeduplicationPlanReceipt
+    # Plan inbox deduplication with TTL, conflict, processed receipt, and replay gates.
+def plan_materialized_view_refresh(view_spec: Mapping[str, Any], refresh_policy: Mapping[str, Any]) -> MaterializedViewRefreshPlanReceipt
+    # Plan materialized-view refresh with staleness, dependency, backfill, and swap gates.
+def plan_data_quarantine_policy(finding_set: Mapping[str, Any], quarantine_policy: Mapping[str, Any]) -> DataQuarantinePlanReceipt
+    # Plan data quarantine with finding, sink, triage, release, and audit gates.
+def plan_task_lease(lease_spec: Mapping[str, Any], lease_policy: Mapping[str, Any]) -> TaskLeasePlanReceipt
+    # Plan task leasing with TTL, renewal, owner-token, and fencing gates.
+def plan_worker_heartbeat(worker_spec: Mapping[str, Any], heartbeat_policy: Mapping[str, Any]) -> WorkerHeartbeatPlanReceipt
+    # Plan worker heartbeat and stale-worker detection behavior.
+def plan_worker_autoscale_policy(autoscale_spec: Mapping[str, Any], autoscale_policy: Mapping[str, Any]) -> WorkerAutoscalePolicyPlanReceipt
+    # Plan worker autoscaling with queue metric, replica bounds, cooldown, and drain gates.
+def plan_queue_visibility_timeout(queue_spec: Mapping[str, Any], visibility_policy: Mapping[str, Any]) -> QueueVisibilityTimeoutPlanReceipt
+    # Plan queue visibility timeout with processing-time, extension, and DLQ gates.
+def plan_cron_catchup_window(job_spec: Mapping[str, Any], catchup_policy: Mapping[str, Any]) -> CronCatchupPlanReceipt
+    # Plan cron catch-up behavior with misfire and idempotency gates.
+def plan_workflow_compensation(workflow_spec: Mapping[str, Any], compensation_policy: Mapping[str, Any]) -> WorkflowCompensationPlanReceipt
+    # Plan workflow compensation with step coverage, ordering, and receipt gates.
+def plan_batch_checkpoint(batch_spec: Mapping[str, Any], checkpoint_policy: Mapping[str, Any]) -> BatchCheckpointPlanReceipt
+    # Plan batch checkpointing with interval, store, resume, and checksum gates.
+def plan_run_artifact_manifest(run_spec: Mapping[str, Any], artifact_policy: Mapping[str, Any]) -> RunArtifactManifestReceipt
+    # Plan run artifact manifest with artifact, digest, retention, and owner gates.
+def plan_execution_audit_trail(operation_spec: Mapping[str, Any], audit_policy: Mapping[str, Any]) -> ExecutionAuditTrailPlanReceipt
+    # Plan execution audit trail with event, actor, trace, sink, and retention gates.
+def plan_api_gateway_route(route_spec: Mapping[str, Any], gateway_policy: Mapping[str, Any]) -> ApiGatewayRoutePlanReceipt
+    # Plan an API gateway route with upstream, method, auth, rate, and timeout gates.
+def plan_service_discovery_registration(service_spec: Mapping[str, Any], discovery_policy: Mapping[str, Any]) -> ServiceDiscoveryRegistrationReceipt
+    # Plan service discovery registration with endpoint, health check, TTL, and region gates.
+def plan_service_dependency_contract(service_spec: Mapping[str, Any], dependency_policy: Mapping[str, Any]) -> ServiceDependencyContractReceipt
+    # Plan service dependency contracts with timeout, fallback, circuit breaker, and owner gates.
+def plan_runtime_config_schema(config_spec: Mapping[str, Any], config_policy: Mapping[str, Any]) -> RuntimeConfigSchemaPlanReceipt
+    # Plan runtime config schema with required config keys, secret refs, version, and owner gates.
+def plan_environment_promotion(promotion_spec: Mapping[str, Any], promotion_policy: Mapping[str, Any]) -> EnvironmentPromotionPlanReceipt
+    # Plan environment promotion with artifact, migration, rollback, and approval gates.
+def plan_webhook_delivery_policy(webhook_spec: Mapping[str, Any], delivery_policy: Mapping[str, Any]) -> WebhookDeliveryPolicyPlanReceipt
+    # Plan outbound webhook delivery with signing, idempotency, retry, and DLQ gates.
+def plan_consumer_group_offset(consumer_spec: Mapping[str, Any], offset_policy: Mapping[str, Any]) -> ConsumerGroupOffsetPlanReceipt
+    # Plan consumer group offset handling with checkpoint, replay, and lag alert gates.
+def plan_service_ownership_runbook(service_spec: Mapping[str, Any], ownership_policy: Mapping[str, Any]) -> ServiceOwnershipRunbookPlanReceipt
+    # Plan service ownership/runbook evidence with owner, escalation, SLO, dashboard, and on-call gates.
+def plan_schema_drift_gate(schema_observation: Mapping[str, Any], drift_policy: Mapping[str, Any]) -> SchemaDriftGateReceipt
+    # Evaluate schema drift against expected and observed field sets.
+def plan_migration_lock(migration_spec: Mapping[str, Any], lock_policy: Mapping[str, Any]) -> MigrationLockPlanReceipt
+    # Plan a database migration lock with owner, timeout, stale-lock, and advisory-lock gates.
+def plan_data_retention_enforcement(retention_spec: Mapping[str, Any], retention_policy: Mapping[str, Any]) -> DataRetentionEnforcementPlanReceipt
+    # Plan data retention enforcement with purge, legal hold, dry-run, and audit gates.
+def plan_tenant_data_boundary(boundary_spec: Mapping[str, Any], boundary_policy: Mapping[str, Any]) -> TenantDataBoundaryPlanReceipt
+    # Plan tenant data boundary controls with RLS, encryption scope, tests, and audit gates.
+def plan_backup_restore_drill(drill_spec: Mapping[str, Any], drill_policy: Mapping[str, Any]) -> BackupRestoreDrillReceipt
+    # Plan a backup restore drill with artifact, target, RPO/RTO, checksum, and evidence gates.
+def plan_access_review_evidence(review_spec: Mapping[str, Any], review_policy: Mapping[str, Any]) -> AccessReviewEvidenceReceipt
+    # Plan access review evidence with subject, role, manager, decision, and revocation gates.
+def plan_data_deletion_workflow(deletion_spec: Mapping[str, Any], deletion_policy: Mapping[str, Any]) -> DataDeletionWorkflowPlanReceipt
+    # Plan a data deletion workflow with identity proof, scope, tombstone, propagation, and receipt gates.
+def plan_privileged_access_approval(access_spec: Mapping[str, Any], access_policy: Mapping[str, Any]) -> PrivilegedAccessApprovalPlanReceipt
+    # Plan privileged access approval with requester, role, duration, approval, and breakglass gates.
+def plan_connector_cursor_checkpoint(checkpoint_spec: Mapping[str, Any], checkpoint_policy: Mapping[str, Any]) -> ConnectorCursorCheckpointPlanReceipt
+    # Plan connector cursor checkpointing with checkpoint interval, store, resume, and receipt gates.
+def plan_connector_field_mapping(mapping_spec: Mapping[str, Any], mapping_policy: Mapping[str, Any]) -> ConnectorFieldMappingPlanReceipt
+    # Plan connector field mapping with required target field coverage and transform gates.
+def plan_external_identity_map(identity_spec: Mapping[str, Any], identity_policy: Mapping[str, Any]) -> ExternalIdentityMapPlanReceipt
+    # Plan external identity mapping with key coverage, mapping store, uniqueness, and collision gates.
+def plan_sync_conflict_resolution(conflict_spec: Mapping[str, Any], conflict_policy: Mapping[str, Any]) -> SyncConflictResolutionPlanReceipt
+    # Plan sync conflict resolution with conflict keys, strategy, precedence, and audit gates.
+def plan_connector_rate_limit_budget(budget_spec: Mapping[str, Any], budget_policy: Mapping[str, Any]) -> ConnectorRateLimitBudgetPlanReceipt
+    # Plan connector rate-limit budget with window, burst, retry-after, and alert gates.
+def plan_webhook_replay_window(replay_spec: Mapping[str, Any], replay_policy: Mapping[str, Any]) -> WebhookReplayWindowPlanReceipt
+    # Plan webhook replay window with dedupe, signature, replay receipt, and source event store gates.
+def plan_connector_error_quarantine(quarantine_spec: Mapping[str, Any], quarantine_policy: Mapping[str, Any]) -> ConnectorErrorQuarantinePlanReceipt
+    # Plan connector error quarantine with error class routing, sink, triage, and replay gates.
+def plan_sync_reconciliation_report(report_spec: Mapping[str, Any], report_policy: Mapping[str, Any]) -> SyncReconciliationReportPlanReceipt
+    # Plan sync reconciliation reporting with count fields, mismatch threshold, sample, and owner gates.
+def plan_primitive_candidate_intake(candidate_card: Mapping[str, Any], intake_policy: Mapping[str, Any]) -> PrimitiveCandidateIntakeReceipt
+    # Plan registry intake for a candidate primitive while preserving the candidate boundary.
+def plan_primitive_reuse_observation(observation_spec: Mapping[str, Any], reuse_policy: Mapping[str, Any]) -> PrimitiveReuseObservationReceipt
+    # Plan primitive reuse observations across runtime shapes for one core group edge.
+def plan_primitive_proof_coverage_matrix(coverage_spec: Mapping[str, Any], coverage_policy: Mapping[str, Any]) -> PrimitiveProofCoverageMatrixReceipt
+    # Plan proof coverage for candidate primitive cards and proof bundle rows.
+def plan_primitive_promotion_review(review_spec: Mapping[str, Any], review_policy: Mapping[str, Any]) -> PrimitivePromotionReviewReceipt
+    # Plan a primitive promotion review without setting the candidate as truth.
+def plan_registry_publish_manifest(registry_spec: Mapping[str, Any], publish_policy: Mapping[str, Any]) -> RegistryPublishManifestPlanReceipt
+    # Plan an AIDevObserver-consumable registry publish manifest with proof and gate coverage.
+def plan_benchmark_run_arm(run_spec: Mapping[str, Any], arm_policy: Mapping[str, Any]) -> BenchmarkRunArmPlanReceipt
+    # Plan one baseline or primitive-first benchmark arm with metric and artifact gates.
+def plan_primitive_lift_comparison(comparison_spec: Mapping[str, Any], lift_policy: Mapping[str, Any]) -> PrimitiveLiftComparisonReceipt
+    # Plan baseline-vs-primitive lift comparison across scored dimensions.
+def plan_token_savings_attribution(token_trace: Mapping[str, Any], token_policy: Mapping[str, Any]) -> TokenSavingsAttributionReceipt
+    # Plan token-savings attribution for primitive-first benchmark runs.
+def plan_pitfall_avoidance_matrix(pitfall_spec: Mapping[str, Any], pitfall_policy: Mapping[str, Any]) -> PitfallAvoidanceMatrixReceipt
+    # Plan evidence-backed pitfall avoidance scoring for a benchmark run.
+def plan_route_promotion_evidence_pack(evidence_spec: Mapping[str, Any], evidence_policy: Mapping[str, Any]) -> RoutePromotionEvidencePackReceipt
+    # Plan a route promotion evidence pack from reuse, proof, lift, and owner artifacts.
+def decompose_benchmark_task_to_primitive_components(task_spec: Mapping[str, Any], decomposition_policy: Mapping[str, Any]) -> BenchmarkPrimitiveDecompositionReceipt
+    # Decompose one benchmark task into reusable primitive component edges.
+def compare_benchmark_route_token_usage(comparison_spec: Mapping[str, Any], token_policy: Mapping[str, Any]) -> BenchmarkRouteTokenComparisonReceipt
+    # Compare baseline route tokens against primitive-component route tokens.
+def _trace_token_total(trace: Mapping[str, Any]) -> int
+def ingest_benchmark_trace_pairs(artifact_spec: Mapping[str, Any], ingestion_policy: Mapping[str, Any]) -> BenchmarkTraceIngestionReceipt
+    # Normalize benchmark run artifacts into paired baseline and primitive traces.
+def evaluate_benchmark_trace_pair(trace_pair_spec: Mapping[str, Any], trace_policy: Mapping[str, Any]) -> BenchmarkTracePairEvaluationReceipt
+    # Evaluate actual baseline and primitive-route benchmark traces.
+def evaluate_benchmark_route_promotion_candidate(evidence_spec: Mapping[str, Any], promotion_policy: Mapping[str, Any]) -> BenchmarkRoutePromotionCandidateReceipt
+    # Aggregate benchmark runs into a candidate-only route promotion signal.
+def _visible_edge_parts(visible_edge: str, fallback_input: str, fallback_output: str) -> tuple[str, str]
+def _surface_card_primitive_id(prefix: str, *parts: object, version: str='1') -> str
+def plan_runtime_shape_adapter(route_spec: Mapping[str, Any], adapter_policy: Mapping[str, Any]) -> RuntimeShapeAdapterPlanReceipt
+    # Plan one runtime wrapper around a reusable core group edge.
+def plan_runtime_shape_adapter_matrix(matrix_spec: Mapping[str, Any], matrix_policy: Mapping[str, Any]) -> RuntimeShapeAdapterMatrixReceipt
+    # Plan reuse of one core group edge through multiple runtime-shape wrappers.
+def compile_openapi_endpoint_primitive_cards(operation_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile extracted OpenAPI operations into candidate endpoint primitive cards.
+def compile_asyncapi_event_primitive_cards(operation_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile extracted AsyncAPI operations into candidate event primitive cards.
+def compile_service_surface_primitive_cards(service_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile microservice surface inventory into candidate primitive cards.
+def compile_container_runtime_primitive_cards(runtime_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile Docker/Compose runtime surfaces into candidate primitive cards.
+def compile_kubernetes_workload_primitive_cards(workload_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile Kubernetes workload manifests into candidate primitive cards.
+def compile_terraform_module_primitive_cards(module_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile Terraform module resources into candidate infrastructure primitive cards.
+def compile_ci_workflow_primitive_cards(workflow_spec: Mapping[str, Any], card_policy: Mapping[str, Any]) -> SurfacePrimitiveRegistryCardSetReceipt
+    # Compile CI workflow definitions into candidate automation primitive cards.
+def _next_available_field_name(target: str, row: Mapping[str, Any]) -> str
+def _dedupe_rows(rows: Sequence[JsonRecord], identity_fields: tuple[str, ...], *, keep: str) -> tuple[list[JsonRecord], list[DuplicateRecord]]
+def _index_components(values: Sequence[RouteComponent | Mapping[str, Any]]) -> dict[str, tuple[RouteComponent, ...]]
+def _blank(value: Any) -> bool
+def _validate_schema_subset(payload: Mapping[str, Any], schema: Mapping[str, Any]) -> list[ContractViolation]
+def _json_type_matches(value: Any, expected: str) -> bool
+def _as_sequence(value: Any) -> tuple[Any, ...]
+def _as_mapping_sequence(value: Any) -> tuple[Mapping[str, Any], ...]
+def _operation_contract_signature(operation: Any) -> dict[str, Any]
+def _parse_semver(version: str) -> tuple[int, int, int] | None
+def _source_delta_records(source_delta: Mapping[str, Any] | Sequence[Mapping[str, Any]]) -> tuple[Mapping[str, Any], ...]
+def _migration_statement_hint(*, operation: str, table: str, column: str, row: Mapping[str, Any]) -> str
+def _valid_secret_ref(value: Any) -> bool
+def _outputs_by_case_id(outputs: Mapping[str, Any] | Sequence[Mapping[str, Any]]) -> dict[str, str]
+def _sort_value(value: Any) -> tuple[int, str, str]
+def _stable_json(value: Any) -> str
+def _digest(value: Any, *, chars: int) -> str
+def _bytes_digest(value: bytes) -> str
+def _utc_stamp() -> str
+def _append_manifest_event(path: Path, event: Mapping[str, Any]) -> None
+```
+## intra-module call edges
+src.teleon.primitives.groups._append_manifest_event -> src.teleon.primitives.groups._stable_json
+src.teleon.primitives.groups._dedupe_rows -> src.teleon.primitives.groups.DuplicateRecord
+src.teleon.primitives.groups._digest -> src.teleon.primitives.groups._stable_json
+src.teleon.primitives.groups._index_components -> src.teleon.primitives.groups.RouteComponent
+src.teleon.primitives.groups._sort_value -> src.teleon.primitives.groups._stable_json
+src.teleon.primitives.groups._surface_card_primitive_id -> src.teleon.primitives.groups._blank
+src.teleon.primitives.groups._surface_card_primitive_id -> src.teleon.primitives.groups.normalize_field_name
+src.teleon.primitives.groups._validate_schema_subset -> src.teleon.primitives.groups.ContractViolation
+src.teleon.primitives.groups._validate_schema_subset -> src.teleon.primitives.groups._blank
+src.teleon.primitives.groups._validate_schema_subset -> src.teleon.primitives.groups._json_type_matches
+src.teleon.primitives.groups.assemble_cited_answer -> src.teleon.primitives.groups.Citation
+src.teleon.primitives.groups.assemble_cited_answer -> src.teleon.primitives.groups.CitedAnswerReceipt
+src.teleon.primitives.groups.assemble_cited_answer -> src.teleon.primitives.groups._as_sequence
+src.teleon.primitives.groups.assemble_cited_answer -> src.teleon.primitives.groups._digest
+src.teleon.primitives.groups.assemble_cited_answer -> src.teleon.primitives.groups.normalize_field_name
+src.teleon.primitives.groups.build_dashboard_metric_snapshot -> src.teleon.primitives.groups.DashboardSnapshotReceipt
+src.teleon.primitives.groups.build_dashboard_metric_snapshot -> src.teleon.primitives.groups.DashboardTile
+src.teleon.primitives.groups.build_dashboard_metric_snapshot -> src.teleon.primitives.groups._as_sequence
+src.teleon.primitives.groups.build_dashboard_metric_snapshot -> src.teleon.primitives.groups._digest
+src.teleon.primitives.groups.build_test_fixture -> src.teleon.primitives.groups.TestFixtureReceipt

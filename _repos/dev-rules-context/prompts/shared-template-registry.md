@@ -1,0 +1,1 @@
+../../shared-backend-components/context/shared-template-registry.md

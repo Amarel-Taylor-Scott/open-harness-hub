@@ -1,0 +1,22 @@
+MODULE src/teleon/retrieval/reranker_port.py
+## API signatures
+```python
+"""src.teleon.retrieval.reranker_port — the RERANKER abstraction: any reranker behind ONE port (agnostic, registry-populated)."""
+class py_class_src_teleon_retrieval_reranker_port__RerankerPort:
+    def rank(self, py_arg_src_teleon_retrieval_reranker_port__py_class_src_teleon_retrieval_reranker_port__RerankerPort_rank__query: str, py_arg_src_teleon_retrieval_reranker_port__py_class_src_teleon_retrieval_reranker_port__RerankerPort_rank__docs: list[str], *, top_k: int | None=None) -> list[tuple[int, float]]
+class py_class_src_teleon_retrieval_reranker_port__LexicalReranker:
+    # Deterministic BM25-lite reranker (pure Python, ALWAYS available — the wired baseline). Returns (doc_index, score)
+    def rank(self, py_arg_src_teleon_retrieval_reranker_port__py_class_src_teleon_retrieval_reranker_port__LexicalReranker_rank__query: str, py_arg_src_teleon_retrieval_reranker_port__py_class_src_teleon_retrieval_reranker_port__LexicalReranker_rank__docs: list[str], *, top_k: int | None=None) -> list[tuple[int, float]]
+class py_class_src_teleon_retrieval_reranker_port__NotWiredReranker:
+    # A registry reranker whose model/key isn't present — honest, never fabricates a ranking.
+    def __init__(self, name: str)
+    def rank(self, py_arg_src_teleon_retrieval_reranker_port__py_class_src_teleon_retrieval_reranker_port__NotWiredReranker_rank__query: str, py_arg_src_teleon_retrieval_reranker_port__py_class_src_teleon_retrieval_reranker_port__NotWiredReranker_rank__docs: list[str], *, top_k: int | None=None)
+def py_function_src_teleon_retrieval_reranker_port__register_reranker_adapter(py_arg_src_teleon_retrieval_reranker_port__py_function_src_teleon_retrieval_reranker_port__register_reranker_adapter__name: str, py_arg_src_teleon_retrieval_reranker_port__py_function_src_teleon_retrieval_reranker_port__register_reranker_adapter__factory) -> None
+    # Future-proofing hook: wire a real reranker (e.g. a cross-encoder) by name; callers of select_reranker never change.
+def py_function_src_teleon_retrieval_reranker_port__available_rerankers() -> dict
+def py_function_src_teleon_retrieval_reranker_port__select_reranker(py_arg_src_teleon_retrieval_reranker_port__py_function_src_teleon_retrieval_reranker_port__select_reranker__name: str='auto') -> py_class_src_teleon_retrieval_reranker_port__RerankerPort
+    # Resolve a reranker by name/registry-id. 'auto' -> the always-available lexical baseline; a model reranker not yet
+```
+## intra-module call edges
+src.teleon.retrieval.reranker_port.py_function_src_teleon_retrieval_reranker_port__select_reranker -> src.teleon.retrieval.reranker_port.py_class_src_teleon_retrieval_reranker_port__LexicalReranker
+src.teleon.retrieval.reranker_port.py_function_src_teleon_retrieval_reranker_port__select_reranker -> src.teleon.retrieval.reranker_port.py_class_src_teleon_retrieval_reranker_port__NotWiredReranker

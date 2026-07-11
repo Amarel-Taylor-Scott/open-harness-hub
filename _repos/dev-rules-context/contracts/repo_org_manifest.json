@@ -1,0 +1,47 @@
+{
+  "$comment": "ORGANIZATION AS CODE. GitHub is flat (no folders/subgroups) — this manifest is the single source that makes the flat AIDoneRight org navigable + reproducible. Edit here, then run tools/apply_repo_org.py --write. Version lives in schema_version metadata, never a name.",
+  "schema_version": "2026-07-04",
+  "org": "AIDoneRight",
+  "naming_convention": "aidoneright-<full-word-name>  (the org prefix + the surface/tool name; no abbreviations)",
+  "property_axes": {
+    "layer": {
+      "description": "Architecture layer — the primary category (matches the surface-registry kind).",
+      "values": ["substrate", "product", "library", "devkit", "business", "infra", "meta"]
+    },
+    "domain": {
+      "description": "Functional domain — an orthogonal axis so a repo can be sliced by area, not just layer.",
+      "values": ["platform", "runtime", "governance", "ecosystem", "usage", "brand", "ingestion", "integration", "context", "business", "meta"]
+    },
+    "visibility-plan": {
+      "description": "Intended visibility. Everything is private today; this records the plan (what may open later).",
+      "values": ["private", "open-later", "public"]
+    }
+  },
+  "teams": {
+    "engineering": {"parent": null, "permission": "push", "description": "All engineers — every code repo."},
+    "products":    {"parent": "engineering", "permission": "push", "layers": ["product"], "description": "The five product surfaces."},
+    "libraries":   {"parent": "engineering", "permission": "push", "layers": ["library"], "description": "Reusable dev tools / adapters."},
+    "platform":    {"parent": "engineering", "permission": "push", "layers": ["substrate", "devkit", "infra", "meta"], "description": "Substrate, devkit, infra, org-meta."},
+    "business":    {"parent": "engineering", "permission": "push", "layers": ["business"], "description": "Fundraising / pitch / YC / business context."}
+  },
+  "template_repo": "aidoneright-dev-rules-context",
+  "repos": {
+    "aidoneright-shared-backend-components": {"layer": "substrate", "domain": "platform",    "visibility-plan": "private"},
+    "aidoneright-teleon":                    {"layer": "product",   "domain": "runtime",     "visibility-plan": "private"},
+    "aidoneright-baltor":                    {"layer": "product",   "domain": "governance",  "visibility-plan": "private"},
+    "aidoneright-openhubforai":              {"layer": "product",   "domain": "ecosystem",   "visibility-plan": "open-later"},
+    "aidoneright-aidevobserver":             {"layer": "product",   "domain": "usage",       "visibility-plan": "private"},
+    "aidoneright-aidoneright":               {"layer": "product",   "domain": "brand",       "visibility-plan": "private"},
+    "aidoneright-scraping":                  {"layer": "library",   "domain": "ingestion",   "visibility-plan": "private"},
+    "aidoneright-edge-graph-generator":      {"layer": "library",   "domain": "meta",        "visibility-plan": "open-later"},
+    "aidoneright-context-injection":         {"layer": "library",   "domain": "context",     "visibility-plan": "private"},
+    "aidoneright-api-endpoint-wrappers":     {"layer": "library",   "domain": "integration", "visibility-plan": "private"},
+    "aidoneright-dev-rules-context":         {"layer": "devkit",    "domain": "meta",        "visibility-plan": "open-later"},
+    "aidoneright-yc-applications":           {"layer": "business",  "domain": "business",    "visibility-plan": "private"},
+    "aidoneright-pitch-decks":               {"layer": "business",  "domain": "business",    "visibility-plan": "private"},
+    "aidoneright-fundraising":               {"layer": "business",  "domain": "business",    "visibility-plan": "private"},
+    "aidoneright-business-context":          {"layer": "business",  "domain": "business",    "visibility-plan": "private"},
+    "aidoneright-infra":                     {"layer": "infra",     "domain": "platform",    "visibility-plan": "private"},
+    ".github":                               {"layer": "meta",      "domain": "meta",        "visibility-plan": "open-later"}
+  }
+}

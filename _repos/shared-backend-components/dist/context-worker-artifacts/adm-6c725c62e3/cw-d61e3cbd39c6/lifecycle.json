@@ -1,0 +1,133 @@
+{
+  "kind": "context_worker.lifecycle.v1",
+  "lifecycle": {
+    "duration_ms": 1.82,
+    "runtime": {
+      "backend": "local",
+      "hostname": "3bf09c053ce5",
+      "image": "baltor-worker-research",
+      "ledger_path": "dist/context-workers-ledger.jsonl",
+      "lifecycle_version": "context-worker-lifecycle.v1",
+      "pid": 1,
+      "queue_key": "ohh:context:jobs"
+    },
+    "stages": [
+      {
+        "detail": {
+          "worker": "node.research.enrich"
+        },
+        "stage": "preflight",
+        "status": "started",
+        "ts": 1780339922
+      },
+      {
+        "detail": {
+          "checks": [
+            {
+              "name": "job_id_present",
+              "ok": true
+            },
+            {
+              "name": "task_matches_worker",
+              "ok": true
+            },
+            {
+              "name": "run_id_present",
+              "ok": true
+            },
+            {
+              "name": "tenant_id_present",
+              "ok": true
+            },
+            {
+              "name": "payload_is_object",
+              "ok": true
+            },
+            {
+              "name": "worker_has_output_contract",
+              "ok": true
+            },
+            {
+              "detail": {
+                "artifact_dir": "dist/context-worker-artifacts",
+                "heartbeat_dir": "dist/context-worker-runtime/heartbeats",
+                "idempotency_dir": "dist/context-worker-runtime/idempotency",
+                "ok": true,
+                "runtime_dir": "dist/context-worker-runtime",
+                "status_dir": "dist/context-worker-runtime/status"
+              },
+              "name": "runtime_paths_writable",
+              "ok": true
+            }
+          ],
+          "idempotent": true,
+          "lane": "research",
+          "max_retries": 2,
+          "ok": true,
+          "output_contract": "node_research_evidence.v1",
+          "worker": "node.research.enrich"
+        },
+        "stage": "preflight",
+        "status": "complete",
+        "ts": 1780339922
+      },
+      {
+        "detail": {
+          "payload_keys": [
+            "active_recon_authorized",
+            "authorized",
+            "candidate_tools",
+            "needed_facts",
+            "node"
+          ]
+        },
+        "stage": "load",
+        "status": "complete",
+        "ts": 1780339922
+      },
+      {
+        "detail": {
+          "lane": "research",
+          "worker": "node.research.enrich"
+        },
+        "stage": "execute",
+        "status": "started",
+        "ts": 1780339922
+      },
+      {
+        "detail": {
+          "ok": true,
+          "output_keys": [
+            "node_evidence",
+            "proposed_node_edges",
+            "verification_state"
+          ],
+          "warnings": 0
+        },
+        "stage": "execute",
+        "status": "complete",
+        "ts": 1780339922
+      },
+      {
+        "detail": {
+          "child_job_count": 0
+        },
+        "stage": "emit_followups",
+        "status": "complete",
+        "ts": 1780339922
+      },
+      {
+        "detail": {
+          "child_job_count": 0,
+          "duration_ms": 1.82,
+          "error": "",
+          "ok": true
+        },
+        "stage": "closeout",
+        "status": "complete",
+        "ts": 1780339922
+      }
+    ],
+    "version": "context-worker-lifecycle.v1"
+  }
+}

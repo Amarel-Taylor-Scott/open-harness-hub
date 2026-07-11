@@ -1,0 +1,16 @@
+MODULE src/teleon/synthesis/variation_store.py
+## API signatures
+```python
+"""src.teleon.synthesis.variation_store — store a capability's VARIATIONS in git (GitHub/GitLab) + the version log."""
+def py_function_src_teleon_synthesis_variation_store__version_hash(py_arg_src_teleon_synthesis_variation_store__version_hash__capability: str, py_arg_src_teleon_synthesis_variation_store__version_hash__decision_path: str) -> str
+def py_function_src_teleon_synthesis_variation_store__record_variations(py_arg_src_teleon_synthesis_variation_store__record_variations__capability: str, py_arg_src_teleon_synthesis_variation_store__record_variations__variations: list[dict]) -> dict
+    # Append each variation to the durable version_history stream (idempotent by version_hash; winners + losers kept).
+def py_function_src_teleon_synthesis_variation_store__list_variations(py_arg_src_teleon_synthesis_variation_store__list_variations__capability: str) -> list[dict]
+def py_function_src_teleon_synthesis_variation_store___branch(py_arg_src_teleon_synthesis_variation_store__branch__capability: str, py_arg_src_teleon_synthesis_variation_store__branch__v: dict) -> str
+def py_function_src_teleon_synthesis_variation_store__commit_to_git(py_arg_src_teleon_synthesis_variation_store__commit_to_git__capability: str, py_arg_src_teleon_synthesis_variation_store__commit_to_git__variations: list[dict], *, platform: str='internal', py_arg_src_teleon_synthesis_variation_store__commit_to_git__repo: str='capabilities', now: str, token_present: bool=False) -> dict
+    # Store variations in git: the WINNING variation -> main; each explored loser -> a PR branch (lossless review trail).
+```
+## intra-module call edges
+src.teleon.synthesis.variation_store.py_function_src_teleon_synthesis_variation_store___branch -> src.teleon.synthesis.variation_store.py_function_src_teleon_synthesis_variation_store__version_hash
+src.teleon.synthesis.variation_store.py_function_src_teleon_synthesis_variation_store__commit_to_git -> src.teleon.synthesis.variation_store.py_function_src_teleon_synthesis_variation_store___branch
+src.teleon.synthesis.variation_store.py_function_src_teleon_synthesis_variation_store__record_variations -> src.teleon.synthesis.variation_store.py_function_src_teleon_synthesis_variation_store__version_hash

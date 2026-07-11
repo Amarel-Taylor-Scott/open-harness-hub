@@ -1,0 +1,21 @@
+MODULE src/teleon/observer/corpus.py
+## API signatures
+```python
+"""observer.corpus — the consented-session corpus pipeline (stages 2-4 of the flywheel)."""
+_REDACT_RE = ...
+_ENV_RE = ...
+def redact_for_retention(text: str) -> tuple[str, int]
+    # Strip obvious secrets/PII. Returns (redacted_text, n_redactions). Mandatory before retention.
+def retain_session(store: ConsentStore, *, session_id: str, subject_id: str, subject_type: str, purpose: str, scope: str, messages: list[dict], now: float | None=None) -> dict | None
+    # STAGE 2 + GATE #0: keep a redacted CANDIDATE retention of a session — only if consent allows it.
+def mine_session(messages: list[dict]) -> dict
+    # STAGE 3: run the observer detectors over a session -> component candidates + research-queue entries.
+def standardize_candidate(candidate: dict, *, subject_id: str, session_id: str='') -> dict
+    # STAGE 4: shape a mined component candidate into a governed, REGISTRY-READY record. serves_truth=false,
+def _self_test() -> int
+```
+## intra-module call edges
+src.teleon.observer.corpus._self_test -> src.teleon.observer.corpus.mine_session
+src.teleon.observer.corpus._self_test -> src.teleon.observer.corpus.retain_session
+src.teleon.observer.corpus._self_test -> src.teleon.observer.corpus.standardize_candidate
+src.teleon.observer.corpus.retain_session -> src.teleon.observer.corpus.redact_for_retention

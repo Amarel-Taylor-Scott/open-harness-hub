@@ -1,0 +1,26 @@
+MODULE src/teleon/inference/api_projection.py
+## API signatures
+```python
+"""src.teleon.inference.api_projection — PROJECTION-ONLY read views for the shared LLM plane's /api/inference/*."""
+_A = ...
+ROUTES = ...
+def providers() -> list[dict]
+    # Provider nodes — numeric codes + has_secret_ref boolean ONLY (never a secret value or the ref string).
+def model_graph() -> dict
+def free_endpoints() -> list[dict]
+def preferences_coverage() -> dict
+def health() -> list[dict]
+    # ModelHealthSnapshot-ish — OFFLINE: local nodes healthy; external nodes report a non-live status (no probe).
+def receipts(receipt_store: list[dict] | None=None) -> list[dict]
+    # Projection of recorded ModelInvocationReceipts (caller-provided; no global mutable truth here).
+def resolve_preference(layers: list[dict]) -> dict
+def error_envelope(error_type: str, message: str, *, retryable: bool=False, error_id: str='inf_err') -> dict
+def all_projections() -> dict
+```
+## intra-module call edges
+src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.free_endpoints
+src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.health
+src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.model_graph
+src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.preferences_coverage
+src.teleon.inference.api_projection.all_projections -> src.teleon.inference.api_projection.providers
+src.teleon.inference.api_projection.model_graph -> src.teleon.inference.api_projection.providers

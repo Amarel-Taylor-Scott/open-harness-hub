@@ -1,0 +1,26 @@
+MODULE _repos/teleon/backend/src/teleon/endpoints/registry.py
+## API signatures
+```python
+"""src.teleon.endpoints.registry — interchangeable PROVIDER ENDPOINTS per capability, selected by objective."""
+_REGISTRY_PATH = ...
+_ENDPOINT_DETERMINISM = ...
+class EndpointError:
+    # Raised when a capability has no registered endpoints, or a registry row is malformed.
+class ProviderEndpoint:
+    # One provider that can serve a capability. ``cost`` = relative per-call units; ``latency_ms`` typical;
+    def metric_vector(self) -> MetricVector
+        # Endpoints differ on cost / latency / reliability; determinism is uniform (=1.0) and no LLM is used,
+    def as_dict(self) -> dict
+def _load(registry: dict | None=None) -> dict
+def registered_capabilities(*, registry: dict | None=None) -> list[str]
+def endpoints_for(capability_slot: str, *, registry: dict | None=None) -> list[ProviderEndpoint]
+    # Every registered endpoint for a capability (raises if none — never a silent empty selection).
+def select_endpoint(capability_slot: str, objective, *, forbidden: set | None=None, ledger=None, registry: dict | None=None) -> dict
+    # Pick the best provider endpoint for ``capability_slot`` under ``objective``. ``forbidden`` endpoint_ids
+```
+## intra-module call edges
+src.teleon.endpoints.registry.endpoints_for -> src.teleon.endpoints.registry.EndpointError
+src.teleon.endpoints.registry.endpoints_for -> src.teleon.endpoints.registry.ProviderEndpoint
+src.teleon.endpoints.registry.endpoints_for -> src.teleon.endpoints.registry._load
+src.teleon.endpoints.registry.registered_capabilities -> src.teleon.endpoints.registry._load
+src.teleon.endpoints.registry.select_endpoint -> src.teleon.endpoints.registry.endpoints_for

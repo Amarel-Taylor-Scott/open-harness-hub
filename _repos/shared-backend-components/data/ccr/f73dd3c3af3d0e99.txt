@@ -1,0 +1,20 @@
+MODULE src/baltor/distillation/lineage.py
+## API signatures
+```python
+"""src.baltor.distillation.lineage — the LineageBundle every promoted artifact must be able to produce."""
+class LineageBundle:
+    # The full backward lineage of one artifact — everything the promotability test asks for.
+    def reaches_raw(self) -> bool
+    def reaches_source(self) -> bool
+    def reaches(self, entry_id: str) -> bool
+        # True iff the backward walk from the artifact touched ``entry_id`` (e.g. a baseline, a loser).
+    def is_complete(self) -> bool
+        # A promoted artifact's bundle is complete iff it reaches raw AND source, carries ≥1 source handle,
+    def to_dict(self) -> dict
+    def build(store: LosslessStore, artifact_id: str, *, tenant: str | None=None) -> 'LineageBundle'
+        # Walk the store BACKWARD from ``artifact_id`` to raw/source, collecting the full lineage.
+```
+## intra-module call edges
+src.baltor.distillation.lineage.build -> src.baltor.distillation.lineage.LineageBundle
+src.baltor.distillation.lineage.is_complete -> src.baltor.distillation.lineage.LineageBundle.reaches_raw
+src.baltor.distillation.lineage.is_complete -> src.baltor.distillation.lineage.LineageBundle.reaches_source

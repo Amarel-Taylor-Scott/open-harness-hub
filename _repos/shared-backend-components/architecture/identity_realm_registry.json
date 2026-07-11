@@ -1,0 +1,194 @@
+{
+  "version": "1.0",
+  "updated": "2026-07-11",
+  "purpose": "Per-product identity realm registry for the AI Done Right portfolio. Each realm is a COMPLETELY SEPARATE, INDEPENDENT identity domain (own accounts, sessions, registration; no cross-realm account; no SSO) built from the one shared kit. Realms are data; the local service instantiates them.",
+  "kit": "_repos/openhubforai/backend/src/openhubforai/auth_kit",
+  "service": "scripts/identity_local_service.py",
+  "proof": "scripts/check_identity_local_service_runtime.py",
+  "policy_doc": "docs/architecture/auth-identity-kit.md",
+  "service_auth_policy": "architecture/service_auth_consumption_model.json",
+  "law": {
+    "separate_independent_realms": true,
+    "no_cross_realm_account": true,
+    "no_sso": true,
+    "credentials_are_one_way_refs": true,
+    "api_keys_hash_only_at_rest": true,
+    "private_bench_realms_local_only": "OWNER DIRECTION 2026-06-11: every surface (private bench included) carries a working LOCAL registration realm so the owner/team can sign up and use it; products.js keeps the bench status:'private' (banner + muted accent) and bench realms must NOT be exposed on public tunnels until the owner flips the hub live (supersedes the prior private_bench_hubs_excluded clause)"
+  },
+  "defaults": {
+    "session_ttl_seconds": 3600,
+    "api_key_ttl_seconds": 2592000,
+    "onboarding_steps": [
+      "verify_identifier",
+      "accept_terms",
+      "set_profile"
+    ],
+    "api_key_prefix": "ak",
+    "port": 9410,
+    "state_dir": "dist/identity"
+  },
+  "live_hub_realm_source": "dist/sites/aidoneright-design/shared/products.js",
+  "live_hub_realm_rule": "every Open*Hub with status 'live' in the owning products.js registry gets exactly one realm whose realm_id is the lowercased entity key; the proof fails on drift in either direction",
+  "realms": [
+    {
+      "realm_id": "aidoneright",
+      "display_name": "AI Done Right",
+      "layer": "parent",
+      "onboarding_steps": [
+        "verify_identifier",
+        "accept_terms"
+      ],
+      "session_ttl_seconds": 3600,
+      "notes": "parent/portfolio projection portal accounts; the parent owns no customer runtime truth"
+    },
+    {
+      "realm_id": "baltor",
+      "display_name": "Baltor",
+      "layer": "product",
+      "onboarding_steps": [
+        "verify_identifier",
+        "accept_terms",
+        "set_workspace"
+      ],
+      "session_ttl_seconds": 3600
+    },
+    {
+      "realm_id": "teleon",
+      "display_name": "Teleon",
+      "layer": "product",
+      "onboarding_steps": [
+        "verify_identifier",
+        "accept_terms",
+        "set_workspace"
+      ],
+      "session_ttl_seconds": 3600
+    },
+    {
+      "realm_id": "aidevobserver",
+      "display_name": "AIDevObserver",
+      "layer": "product",
+      "onboarding_steps": [
+        "verify_identifier",
+        "accept_terms",
+        "set_workspace"
+      ],
+      "session_ttl_seconds": 3600
+    },
+    {
+      "realm_id": "opencontexthub",
+      "display_name": "OpenContextHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "openskillshub",
+      "display_name": "OpenSkillsHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "opentoolshub",
+      "display_name": "OpenToolsHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "openskilltotool",
+      "display_name": "OpenSkillToTool",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "openmcphub",
+      "display_name": "OpenMCPHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "opencompressionhub",
+      "display_name": "OpenCompressionHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "openbenchmarkhub",
+      "display_name": "OpenBenchmarkHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "openreviewhub",
+      "display_name": "OpenReviewHub",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "openhubforai",
+      "display_name": "OpenHubForAI",
+      "layer": "open_hub_live"
+    },
+    {
+      "realm_id": "opentemplateshub",
+      "display_name": "OpenTemplatesHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openendpointhub",
+      "display_name": "OpenEndpointHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openenvironmenthub",
+      "display_name": "OpenEnvironmentHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "opensandboxhub",
+      "display_name": "OpenSandboxHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openagenthub",
+      "display_name": "OpenAgentHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openreceipthub",
+      "display_name": "OpenReceiptHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openstatehub",
+      "display_name": "OpenStateHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openroutinghub",
+      "display_name": "OpenRoutingHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openreconciliationhub",
+      "display_name": "OpenReconciliationHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openhardeninghub",
+      "display_name": "OpenHardeningHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openenrichmenthub",
+      "display_name": "OpenEnrichmentHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openoptimizationhub",
+      "display_name": "OpenOptimizationHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "openverificationhub",
+      "display_name": "OpenVerificationHub",
+      "layer": "open_hub_private_bench"
+    },
+    {
+      "realm_id": "taedri",
+      "display_name": "Taedri",
+      "layer": "product",
+      "notes": "Taedri capability gateway accounts (taedri.fly.dev; an aidonerightcorp product). Added 2026-07-11 when the gateway's default realm was renamed from the OpenHub-era 'openhubforai' label; realms are separate \u2014 accounts do not migrate automatically."
+    }
+  ]
+}

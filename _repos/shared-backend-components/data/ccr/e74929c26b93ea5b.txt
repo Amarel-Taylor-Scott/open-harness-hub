@@ -1,0 +1,15 @@
+MODULE src/teleon/experiments/path_costing.py
+## API signatures
+```python
+"""src/teleon/experiments/path_costing — relative-cost estimate for a path, from the pricebook CONFIG."""
+_REPO = ...
+PRICEBOOK_PATH = ...
+SCHEMA_VERSION = ...
+COST_CURRENCY = ...
+def load_pricebook(*, pricebook_bytes: bytes | None=None) -> dict[str, Any]
+    # Return the pricebook dict. ``pricebook_bytes`` may be injected (tests/offline); otherwise read CONFIG.
+def estimate(*, path_id: str, capability_slot: str, backend_id: str, estimated_duration_s: float, now: str, estimated_idle_s: float=0.0, baseline_cost: float | None=None, pricebook: dict[str, Any] | None=None, pricebook_bytes: bytes | None=None) -> dict[str, Any]
+    # Relative-cost ``PathCostReport`` for a path on ``backend_id``, from the pricebook CONFIG.
+```
+## intra-module call edges
+src.teleon.experiments.path_costing.estimate -> src.teleon.experiments.path_costing.load_pricebook

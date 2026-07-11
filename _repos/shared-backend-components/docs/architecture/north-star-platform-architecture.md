@@ -1,0 +1,1 @@
+../../../_shared/architecture/north-star-platform-architecture.md

@@ -1,0 +1,19 @@
+MODULE src/teleon/runtime/execution_providers/managed_venv.py
+## API signatures
+```python
+"""src.teleon.runtime.execution_providers.managed_venv — run container/image/function-style tasks LOCALLY
+without Docker or cloud. The local equivalent for container-image / function execution. Creates a cache
+dir under .agent/venvs/<key>/, runs the entrypoint as a bounded subprocess, captures stdout/stderr,
+enforces a timeout, returns a structured ExecutionResult (never truth). NEVER global pip / su"""
+class py_class_src_teleon_runtime_execution_providers_managed_venv__ManagedVenvProvider:
+    def describe(self) -> dict
+    def health(self) -> dict
+    def ensure_cache(self, py_arg_src_teleon_runtime_execution_providers_managed_venv__py_class_src_teleon_runtime_execution_providers_managed_venv__ManagedVenvProvider_ensure_cache__cache_key: str) -> Path
+    def run(self, *, cache_key: str, argv: list[str], task_id: str='venv-task', timeout_s: int=20, env: dict | None=None) -> py_class_src_teleon_runtime_execution_provider__ExecutionResult
+        # Run argv as a bounded local subprocess inside the venv cache dir. Structured failure on error/
+    def run_python(self, *, cache_key: str, code: str, task_id: str='venv-task', timeout_s: int=20) -> py_class_src_teleon_runtime_execution_provider__ExecutionResult
+        # Convenience: run a short python snippet locally (no install).
+```
+## intra-module call edges
+src.teleon.runtime.execution_providers.managed_venv.run -> src.teleon.runtime.execution_providers.managed_venv.py_class_src_teleon_runtime_execution_providers_managed_venv__ManagedVenvProvider.ensure_cache
+src.teleon.runtime.execution_providers.managed_venv.run_python -> src.teleon.runtime.execution_providers.managed_venv.py_class_src_teleon_runtime_execution_providers_managed_venv__ManagedVenvProvider.run

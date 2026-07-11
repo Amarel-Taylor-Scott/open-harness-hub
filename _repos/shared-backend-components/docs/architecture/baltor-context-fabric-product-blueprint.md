@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-context-fabric-product-blueprint.md

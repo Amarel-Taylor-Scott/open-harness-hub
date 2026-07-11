@@ -1,0 +1,16 @@
+MODULE src/teleon/synthesis/io_contracts.py
+## API signatures
+```python
+"""io_contracts — typed I/O contracts per tool-plane (the Haystack/Langflow pre-runtime type-check, grounded in our
+shared-I/O spine). Single source: architecture/plane_io_contracts.json. The compiler uses edge_compatible() to surface
+DAG edges that connect incompatible types (a producer whose output type no consumer input accepts) BEFORE running —
+the same guarantee Haystack gives by typing componen"""
+def py_function_src_teleon_synthesis_io_contracts__load_contracts() -> dict
+def py_function_src_teleon_synthesis_io_contracts__plane_io(py_arg_src_teleon_synthesis_io_contracts__plane_io__plane: str | None) -> dict | None
+    # The {consumes, produces} contract for a plane, or None if the plane is not (yet) typed.
+def py_function_src_teleon_synthesis_io_contracts__edge_compatible(py_arg_src_teleon_synthesis_io_contracts__edge_compatible__producer_plane: str | None, py_arg_src_teleon_synthesis_io_contracts__edge_compatible__consumer_plane: str | None) -> bool
+    # True iff the producer can feed the consumer: producer.produces ∩ consumer.consumes ≠ ∅. An edge touching an
+```
+## intra-module call edges
+src.teleon.synthesis.io_contracts.py_function_src_teleon_synthesis_io_contracts__edge_compatible -> src.teleon.synthesis.io_contracts.py_function_src_teleon_synthesis_io_contracts__plane_io
+src.teleon.synthesis.io_contracts.py_function_src_teleon_synthesis_io_contracts__plane_io -> src.teleon.synthesis.io_contracts.py_function_src_teleon_synthesis_io_contracts__load_contracts

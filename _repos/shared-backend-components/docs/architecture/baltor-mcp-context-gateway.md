@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-mcp-context-gateway.md

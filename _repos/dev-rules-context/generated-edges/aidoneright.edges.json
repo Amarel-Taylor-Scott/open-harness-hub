@@ -1,0 +1,79 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "aidoneright",
+  "repo": "aidoneright-parent",
+  "role": "the PARENT BRAND / portfolio umbrella (aidoneright.dev). References every surface's PUBLIC interface for the portfolio site; owns no product logic.",
+  "exposes": [
+    "portfolio-site",
+    "brand"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "teleon",
+      "repo": "aidoneright-teleon",
+      "exposes": [
+        "/api/teleon",
+        "PurposeTask",
+        "runtime-selector",
+        "evidence-ledger",
+        "promotion-gate",
+        "assurance-portal"
+      ],
+      "role": "the purpose-driven, eval-gated, self-adaptive compute RUNTIME SaaS. Owns PurposeTask/CapabilityTask, runtime selection, "
+    },
+    {
+      "surface": "baltor",
+      "repo": "aidoneright-baltor",
+      "exposes": [
+        "/api/baltor",
+        "context-engine",
+        "governance",
+        "customer-workflows",
+        "receipts"
+      ],
+      "role": "the applied, customer-facing CONTEXT product, powered by Teleon (a TENANT). Governance / provenance / signed facts / CDC"
+    },
+    {
+      "surface": "aidevobserver",
+      "repo": "aidoneright-aidevobserver",
+      "exposes": [
+        "/api/observer",
+        "session-review",
+        "mcp-server",
+        "cli",
+        "extension"
+      ],
+      "role": "the AI-USAGE layer \u2014 session/AI-usage coaching (not code review); MCP + CLI + extension + app + local service."
+    },
+    {
+      "surface": "openhubforai",
+      "repo": "aidoneright-openhubforai",
+      "exposes": [
+        "capabilitytask-spec",
+        "eval-harnesses",
+        "task-templates",
+        "conformance-tests",
+        "skills"
+      ],
+      "role": "the OPEN ecosystem + the open CapabilityTask spec (CTS): primitives, primitive/task templates, eval harnesses, skills, c"
+    }
+  ],
+  "consumed_by": [
+    "fundraising",
+    "pitch-decks",
+    "yc-applications"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

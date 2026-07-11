@@ -1,0 +1,17 @@
+MODULE src/teleon/seeds/profession_capability_seeder.py
+## API signatures
+```python
+"""src.teleon.seeds.profession_capability_seeder — generalize the DueCare template (governed source registry +
+screening + verification) from ONE vertical (migrant-worker recruitment) to ANY profession."""
+OCCUPATION_SPINE = ...
+class Profession:
+_BASE = ...
+def derive_for(p: Profession) -> list[dict]
+    # Derive the governed capability CANDIDATES a profession needs (base shape + profession-specific).
+def seed_professions() -> list[dict]
+    # Every profession's derived governed capability candidates (flattened).
+def build_feed() -> dict
+```
+## intra-module call edges
+src.teleon.seeds.profession_capability_seeder.build_feed -> src.teleon.seeds.profession_capability_seeder.seed_professions
+src.teleon.seeds.profession_capability_seeder.seed_professions -> src.teleon.seeds.profession_capability_seeder.derive_for

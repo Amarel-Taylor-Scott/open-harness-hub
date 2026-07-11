@@ -1,0 +1,18 @@
+{
+  "registry": "queueing_disciplines",
+  "serves_truth": false,
+  "description": "Queueing + scheduling disciplines — the ORDER and FAIRNESS rules for serving a work queue (tasks, requests, jobs, agent steps). A registry of discipline SPECS (the serving rule, the property it guarantees, when to use it), not implementations; pointers, never truth. Composes with prioritization_algorithms (what computes the priority), worker_failure_taxonomy / the fleet supervisor (the consumers), and decision_policy (admission/backpressure thresholds).",
+  "stage": "runtime",
+  "disciplines": [
+    {"id": "fifo", "name": "FIFO", "rule": "serve in arrival order", "guarantees": "fairness by arrival; no starvation", "when_to_use": "uniform tasks, order matters, no priority"},
+    {"id": "priority_queue", "name": "Priority queue", "rule": "serve the highest priority first", "guarantees": "important work first", "risk": "low-priority STARVATION", "when_to_use": "heterogeneous urgency; pair with aging to avoid starvation"},
+    {"id": "weighted_fair_queueing", "name": "Weighted fair queueing", "rule": "share capacity by weight across classes/tenants", "guarantees": "no class starves; bounded share", "when_to_use": "multi-tenant fairness with differentiated tiers"},
+    {"id": "round_robin", "name": "Round robin", "rule": "cycle one unit per queue/worker in turn", "guarantees": "equal share, simple", "when_to_use": "even load spread across workers/queues"},
+    {"id": "sjf", "name": "Shortest Job First", "rule": "serve the smallest job next", "guarantees": "minimizes mean wait", "risk": "large-job starvation", "when_to_use": "known/estimable job sizes, throughput-optimizing"},
+    {"id": "edf", "name": "Earliest Deadline First", "rule": "serve the nearest deadline next", "guarantees": "optimal for meeting deadlines (if feasible)", "when_to_use": "real-time / SLA-bound work"},
+    {"id": "aging", "name": "Priority aging", "rule": "raise a waiting item's priority over time", "guarantees": "bounds starvation under priority/SJF", "when_to_use": "anti-starvation layer on priority_queue or sjf"},
+    {"id": "backpressure", "name": "Backpressure", "rule": "signal upstream to slow when the queue grows past a bound", "guarantees": "bounded queue, no overload collapse", "when_to_use": "protect a downstream from overload; pair with a token bucket / circuit breaker"},
+    {"id": "token_bucket", "name": "Token bucket (rate limit)", "rule": "admit only while tokens remain; refill at a rate", "guarantees": "bounded rate with bursts", "when_to_use": "admission control / rate limiting at the queue edge"},
+    {"id": "dead_letter", "name": "Dead-letter queue", "rule": "route repeatedly-failing items to a side queue", "guarantees": "poison messages don't block the main queue", "when_to_use": "fault isolation; pair with the worker_failure_taxonomy"}
+  ]
+}

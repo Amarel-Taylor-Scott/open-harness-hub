@@ -1,0 +1,12 @@
+MODULE _repos/teleon/backend/src/teleon/digestion/model_compatibility.py
+## API signatures
+```python
+"""src.teleon.digestion.model_compatibility — for a digested skill, determine which model/provider it works with
+(and which it does NOT), and on what inputs/outputs. Composes the Inference Gateway numeric provider graph."""
+_SPEC = ...
+def _required_spec_codes(digest: dict) -> set[int]
+def run_model_compatibility(digest: dict, *, now: str, candidate_nodes: list[str] | None=None, available_secrets: set | None=None, provider_health: dict | None=None) -> dict[str, Any]
+    # Test the digested skill against candidate model nodes. Returns a per-node ModelCompatibilityReport list +
+```
+## intra-module call edges
+src.teleon.digestion.model_compatibility.run_model_compatibility -> src.teleon.digestion.model_compatibility._required_spec_codes

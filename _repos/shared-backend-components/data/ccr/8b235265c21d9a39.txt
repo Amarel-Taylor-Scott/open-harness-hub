@@ -1,0 +1,27 @@
+MODULE src/teleon/sources/source_registry.py
+## API signatures
+```python
+"""source_registry — query the OpenSourceHub source registry (architecture/source_registry.json). Find authoritative
+sources by industry / entity / field, and order them as a COST-ORDERED DESCENT (free public registries first → your own
+browser → paid search → grounded → stealth) so a freshness pipeline tries the cheapest authoritative source first. Every
+source is a CANDIDATE (discovery != trust); i"""
+_REGISTRY = ...
+def _registry() -> dict
+def _cost_rank(tier: str) -> int
+def sources() -> list
+def source(source_id: str) -> dict | None
+def _matches(rec: dict, industry, entity, field) -> bool
+def sources_for(*, industry: str | None=None, entity: str | None=None, field: str | None=None) -> list
+    # The source ids covering the given industry / entity / field (any subset). 'all'/'any' wildcards match.
+def descent(*, industry: str | None=None, entity: str | None=None, field: str | None=None) -> list
+    # The matching sources as a cost-ordered descent: free public registries first, then own browser, then paid search,
+```
+## intra-module call edges
+src.teleon.sources.source_registry._cost_rank -> src.teleon.sources.source_registry._registry
+src.teleon.sources.source_registry.descent -> src.teleon.sources.source_registry._cost_rank
+src.teleon.sources.source_registry.descent -> src.teleon.sources.source_registry._registry
+src.teleon.sources.source_registry.descent -> src.teleon.sources.source_registry.sources_for
+src.teleon.sources.source_registry.source -> src.teleon.sources.source_registry._registry
+src.teleon.sources.source_registry.sources -> src.teleon.sources.source_registry._registry
+src.teleon.sources.source_registry.sources_for -> src.teleon.sources.source_registry._matches
+src.teleon.sources.source_registry.sources_for -> src.teleon.sources.source_registry._registry

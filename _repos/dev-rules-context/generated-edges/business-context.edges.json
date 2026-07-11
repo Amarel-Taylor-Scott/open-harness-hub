@@ -1,0 +1,34 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "business-context",
+  "repo": "aidoneright-business-context",
+  "role": "CONTEXT repo \u2014 business notes, decisions (with warrants), activity log, analytics, MCP server configs, meeting/strategy notes. 'Context in a repo': the durable business memory every surface can reference, separate from product code.",
+  "exposes": [
+    "decisions-ledger",
+    "activity-log",
+    "analytics",
+    "mcp-configs",
+    "business-notes"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    }
+  ],
+  "consumed_by": [
+    "aidevobserver",
+    "aidoneright",
+    "baltor",
+    "teleon"
+  ],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

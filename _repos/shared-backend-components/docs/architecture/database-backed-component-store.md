@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/database-backed-component-store.md

@@ -1,0 +1,37 @@
+{
+  "record_type": "repo_edge_digest",
+  "surface": "fundraising",
+  "repo": "aidoneright-fundraising",
+  "role": "CONTEXT repo \u2014 go-to-market + fundraising strategy, investor outreach, round planning, market sizing. The money/market PLAN, separate from the deck itself and from product code.",
+  "exposes": [
+    "gtm-plan",
+    "fundraising-strategy",
+    "investor-outreach",
+    "market-sizing"
+  ],
+  "depends_on": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "exposes": [
+        "standards/*",
+        "contracts/surface-registry.json",
+        "tools/check_*.py",
+        "_shared/*"
+      ],
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the nami"
+    },
+    {
+      "surface": "aidoneright",
+      "repo": "aidoneright-parent",
+      "exposes": [
+        "portfolio-site",
+        "brand"
+      ],
+      "role": "the PARENT BRAND / portfolio umbrella (aidoneright.dev). References every surface's PUBLIC interface for the portfolio s"
+    }
+  ],
+  "consumed_by": [],
+  "forbidden_from_me": [],
+  "rule": "Consume a neighbor ONLY via its exposed interface listed here \u2014 never read/import its source."
+}

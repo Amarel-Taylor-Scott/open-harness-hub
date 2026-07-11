@@ -1,0 +1,327 @@
+{
+  "version": "1.0",
+  "updated": "2026-06-20",
+  "principle": "One canonical map of the fundamental primitives, organized by layer, each pointing to the REAL artifact that implements it. Assurance is first-class (the PMF wedge), not an afterthought. Non-destructive: this INDEXES the code; it does not move it.",
+  "layers": [
+    "data",
+    "standard",
+    "runtime",
+    "capability",
+    "assurance"
+  ],
+  "pmf_alignment": "DATA + STANDARD + RUNTIME are the substrate we share with every platform; ASSURANCE (verification/freshness/source-authority/receipts/governance) is where we differentiate \u2014 'they standardize where context lives; Baltor governs whether it's true'.",
+  "requested_family_coverage": {
+    "data storage": "data.storage",
+    "data transfer": "data.transfer",
+    "data computation": "data.computation",
+    "units": "data.unit",
+    "mediums": "data.medium",
+    "standards": "standard.interop",
+    "context standards": "standard.context",
+    "skill standards": "standard.skill",
+    "K8 primitives": "runtime.k8s",
+    "cloud function primitives": "runtime.cloud_function"
+  },
+  "serves_truth": false,
+  "primitive_families": [
+    {
+      "id": "data.unit",
+      "family_group": "data",
+      "layer": "data",
+      "definition": "The typed atomic unit of data that flows through the system, with governance attached.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/io/governed_record.py",
+        "_repos/teleon/backend/src/teleon/resources/resource_ref.py",
+        "schemas/io",
+        "schemas/shared"
+      ],
+      "standards": [
+        "JSON-Schema",
+        "JSON-LD @context"
+      ],
+      "pmf_role": "Every unit carries serves_truth + provenance \u2014 assurance rides on the unit, not bolted on."
+    },
+    {
+      "id": "data.medium",
+      "family_group": "data",
+      "layer": "data",
+      "definition": "The FORMAT/medium a unit travels in (native shape, envelope, open knowledge/entity format).",
+      "canonical_artifacts": [
+        "_repos/baltor/backend/src/baltor/native/native_format_preserver.py",
+        "_repos/baltor/backend/src/baltor/native/okf_adapter.py",
+        "_repos/baltor/backend/src/baltor/native/ftm_adapter.py",
+        "schemas/native",
+        "schemas/envelopes"
+      ],
+      "standards": [
+        "OKF",
+        "FollowTheMoney",
+        "native JSON/CSV/Markdown"
+      ],
+      "pmf_role": "Same-format-in/out + open-format interop = the on-ramp; we govern the contents above the medium."
+    },
+    {
+      "id": "data.storage",
+      "family_group": "data",
+      "layer": "data",
+      "definition": "Where units rest: state log, memory, vector store, object/staging store.",
+      "canonical_artifacts": [
+        "schemas/memory",
+        "schemas/runtime",
+        "db",
+        "data/capability-candidates"
+      ],
+      "standards": [
+        "pgvector",
+        "SQLite-WAL"
+      ],
+      "pmf_role": "Candidate\u2260promoted is enforced at the storage/promotion boundary."
+    },
+    {
+      "id": "data.transfer",
+      "family_group": "data",
+      "layer": "data",
+      "definition": "How units MOVE: event bus, work I/O, governed egress.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/io/event_io.py",
+        "_repos/teleon/backend/src/teleon/io/work_io.py",
+        "_repos/teleon/backend/src/teleon/egress",
+        "architecture/egress_route_policy_taxonomy.json",
+        "schemas/egress"
+      ],
+      "standards": [
+        "CDC events",
+        "CloudEvents-shaped"
+      ],
+      "pmf_role": "Egress is policy-bounded; transfer carries receipts, not raw trust."
+    },
+    {
+      "id": "data.computation",
+      "family_group": "data",
+      "layer": "data",
+      "definition": "How units are TRANSFORMED: execution providers, workers, inference lanes.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/runtime/execution_provider.py",
+        "_repos/teleon/backend/src/teleon/workers",
+        "_repos/teleon/backend/src/teleon/inference",
+        "_repos/teleon/backend/src/teleon/io/inference_io.py"
+      ],
+      "standards": [
+        "OpenAI-compatible inference"
+      ],
+      "pmf_role": "LLM output is never truth \u2014 computation proposes, the assurance rail disposes."
+    },
+    {
+      "id": "standard.interop",
+      "family_group": "standard",
+      "layer": "standard",
+      "definition": "Open standards we adopt at the edges (single source of what we ingest/emit).",
+      "canonical_artifacts": [
+        "architecture/standards_interop_manifest.json",
+        "_repos/baltor/backend/src/baltor/observability/projections/standards.py"
+      ],
+      "standards": [
+        "OKF",
+        "FollowTheMoney",
+        "PROV-JSON",
+        "OpenLineage",
+        "Web-Annotation",
+        "JSON-Patch",
+        "MCP"
+      ],
+      "pmf_role": "Format isn't the moat; we consume the open formats and add assurance."
+    },
+    {
+      "id": "standard.context",
+      "family_group": "standard",
+      "layer": "standard",
+      "definition": "Context-grounding standards: the governed context object + its grammar.",
+      "canonical_artifacts": [
+        "schemas/context",
+        "schemas/context-object.schema.json",
+        "schemas/contextops",
+        "taxonomy/SPEC.md"
+      ],
+      "standards": [
+        "OKF",
+        "JSON-LD",
+        "DCAT/SKOS"
+      ],
+      "pmf_role": "They standardize where context lives; we govern whether it's true."
+    },
+    {
+      "id": "standard.skill",
+      "family_group": "standard",
+      "layer": "standard",
+      "definition": "Skill/capability standards: CapabilityTask + digested skills + the seed framework.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/purpose_tasks/purpose_task.py",
+        "_repos/teleon/backend/src/teleon/digestion",
+        "_repos/teleon/backend/src/teleon/seeds",
+        "schemas/purpose_tasks"
+      ],
+      "standards": [
+        "SKILL.md",
+        "CapabilityTask spec (CTS)"
+      ],
+      "pmf_role": "SKILL.md won the format war \u2192 adopt it as candidate import/export; the moat is governed lift."
+    },
+    {
+      "id": "runtime.execution",
+      "family_group": "runtime",
+      "layer": "runtime",
+      "definition": "Compute backend selection by policy/telemetry (local/docker/k8s/cloud-fn behind one port).",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/runtime/execution_backend_selector.py",
+        "_repos/teleon/backend/src/teleon/runtime/execution_providers",
+        "architecture/execution_backend_policy_matrix.json"
+      ],
+      "standards": [
+        "ExecutionProviderPort"
+      ],
+      "pmf_role": "Backends interchangeable behind a port; the FleetLedger stays truth."
+    },
+    {
+      "id": "runtime.k8s",
+      "family_group": "runtime",
+      "layer": "runtime",
+      "definition": "Kubernetes primitives (Job/Deployment-worker) with a built local equivalent (defer gate).",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/workers/execution_providers/local_job_emulator.py",
+        "architecture/execution_backend_policy_matrix.json",
+        "scripts/check_real_execution_candidates_have_emulators.py"
+      ],
+      "standards": [
+        "K8s Job/Deployment"
+      ],
+      "pmf_role": "Cloud may be candidate; the local equivalent can never be missing."
+    },
+    {
+      "id": "runtime.cloud_function",
+      "family_group": "runtime",
+      "layer": "runtime",
+      "definition": "FaaS primitives (Cloud Run / Lambda / Azure Function) each with a local emulator.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/runtime/execution_providers/gcp_cloud_run_function_candidate.py",
+        "local_emulators/model_emulator.py",
+        "local_emulators/source_of_truth_emulator.py",
+        "scripts/check_local_function_emulator.py"
+      ],
+      "standards": [
+        "Cloud Run",
+        "AWS Lambda",
+        "Azure Function"
+      ],
+      "pmf_role": "Every live seam has a built local emulator \u2192 local_go_live_ready=True while cloud stays honest."
+    },
+    {
+      "id": "runtime.environment",
+      "family_group": "runtime",
+      "layer": "runtime",
+      "definition": "The execution-environment profile + provisioning (the medium compute runs IN).",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/environments",
+        "architecture/execution_environment_profiles.json",
+        "schemas/environments",
+        "schemas/runtime"
+      ],
+      "standards": [
+        "ExecutionEnvironmentProfile"
+      ],
+      "pmf_role": "Environment is a typed, policy-bounded profile, not ad-hoc."
+    },
+    {
+      "id": "capability.seven_primitives",
+      "family_group": "capability",
+      "layer": "capability",
+      "definition": "The seven-primitive grammar: Input \u00b7 Knowledge Corpus \u00b7 If Statement \u00b7 Action \u00b7 Loop \u00b7 Stop/End \u00b7 Output.",
+      "canonical_artifacts": [
+        "taxonomy/SPEC.md",
+        "taxonomy"
+      ],
+      "standards": [
+        "seven-primitive model"
+      ],
+      "pmf_role": "The shared vocabulary every component decomposes into \u2014 version lives in metadata, never names."
+    },
+    {
+      "id": "assurance.verification",
+      "family_group": "assurance",
+      "layer": "assurance",
+      "definition": "Measured lift + verification: does the component do what the model can't, provably?",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/lift",
+        "scripts/eval/reason_codes.py",
+        "scripts/eval/durable_gap_harness.py"
+      ],
+      "standards": [
+        "RuleArena",
+        "measured-lift"
+      ],
+      "pmf_role": "The internal selection bar: admit on lift AND structural durability."
+    },
+    {
+      "id": "assurance.freshness",
+      "family_group": "assurance",
+      "layer": "assurance",
+      "definition": "Freshness/CDC currency: stale facts are held out, never served, until re-synced.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/evolution/freshness_runtime.py",
+        "_repos/teleon/backend/src/teleon/self_healing",
+        "local_emulators/source_of_truth_emulator.py"
+      ],
+      "standards": [
+        "CDC 'changed' events"
+      ],
+      "pmf_role": "The wedge provers concede + gateways disclaim \u2014 answer currency."
+    },
+    {
+      "id": "assurance.source_authority",
+      "family_group": "assurance",
+      "layer": "assurance",
+      "definition": "Earned source-authority + multi-source corroboration (not a fixture).",
+      "canonical_artifacts": [
+        "architecture/source_authority_registry.json",
+        "scripts/artifact_graph/authority_corroboration.py"
+      ],
+      "standards": [
+        "provenance",
+        "independent corroboration"
+      ],
+      "pmf_role": "'Independent authorities AGREE' \u2014 earned from provenance, the #1 differentiator."
+    },
+    {
+      "id": "assurance.receipt",
+      "family_group": "assurance",
+      "layer": "assurance",
+      "definition": "Portable receipts: every governed action emits a verifiable, backend-portable record.",
+      "canonical_artifacts": [
+        "schemas/observability",
+        "_repos/baltor/backend/src/baltor/observability/projections/standards.py",
+        "scripts/check_live_ofac_receipt.py"
+      ],
+      "standards": [
+        "PROV-JSON",
+        "OpenLineage",
+        "ModelInvocationReceipt"
+      ],
+      "pmf_role": "Portable cross-vendor receipts \u2014 what data-gravity platforms don't emit."
+    },
+    {
+      "id": "assurance.governance",
+      "family_group": "assurance",
+      "layer": "assurance",
+      "definition": "Policy + promotion + org guardrails bounding what the AI may do/heal/promote.",
+      "canonical_artifacts": [
+        "_repos/teleon/backend/src/teleon/governance/org_policy.py",
+        "architecture/org_guardrail_policies.json",
+        "architecture/portfolio_dependency_law.json"
+      ],
+      "standards": [
+        "org guardrail policy",
+        "promotion boundary"
+      ],
+      "pmf_role": "The AI fixes only within the org's confines; candidate never auto-promotes."
+    }
+  ]
+}

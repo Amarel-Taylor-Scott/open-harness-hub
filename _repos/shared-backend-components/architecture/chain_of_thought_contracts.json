@@ -1,0 +1,88 @@
+{
+  "registry": "chain_of_thought_contracts",
+  "serves_truth": false,
+  "description": "Chain-of-thought contracts — enforceable specifications of HOW a model must think before an answer is accepted: the required reasoning STRUCTURE, the ENFORCEMENT mechanism (a deterministic schema/gate, a model/judge, and/or a fine-tuned LoRA/QLoRA adapter that biases the structure in), and the VERIFICATION that the structure was actually followed. A contract makes a 'way of thinking' a checkable obligation, not a hope. Composes with reasoning_strategies (the catalog of thinking MODES the contract can require), lora_adapters / qlora_adapters (the model-side enforcer), and the verification rail (the deterministic enforcer). The descent: prefer the cheapest enforcer that holds — schema gate first, adapter to raise the hit-rate, judge only for the hard cases. serves_truth=false: a contract governs the PROCESS; the governance/provenance rail still gates the truth of the OUTPUT.",
+  "stage": "cross_cutting",
+  "contracts": [
+    {
+      "id": "decompose_before_solve",
+      "name": "Decompose before solve",
+      "enforces": "restate the problem and break it into named sub-steps before producing an answer",
+      "required_structure": ["restate", "decompose", "solve_each", "compose", "answer"],
+      "enforcement": ["schema_gate", "qlora_adapter:qlora_reasoning_4bit", "model_judge"],
+      "verification": "deterministic gate rejects output with no decompose section; a judge scores decomposition quality on hard items",
+      "composes_with": ["reasoning_strategies:first_principles", "reasoning_strategies:systems_thinking"],
+      "failure_mode_caught": "jumping straight to an answer on a multi-part problem"
+    },
+    {
+      "id": "cite_before_claim",
+      "name": "Cite before claim",
+      "enforces": "every factual claim carries a source handle at the point it is asserted",
+      "required_structure": ["claim", "source_ref", "confidence"],
+      "enforcement": ["schema_gate", "deterministic"],
+      "verification": "reject any claim lacking a resolvable source_ref; ties directly into the governance/provenance rail",
+      "composes_with": ["reasoning_strategies:abduction"],
+      "failure_mode_caught": "confident unsourced assertions (the hallucination surface)"
+    },
+    {
+      "id": "verify_then_answer",
+      "name": "Verify, then answer",
+      "enforces": "check the draft answer against the question + constraints and revise before finalizing",
+      "required_structure": ["draft", "self_check_against_constraints", "revise", "final"],
+      "enforcement": ["model_judge", "qlora_adapter", "schema_gate"],
+      "verification": "the self_check section must reference each stated constraint; a judge confirms the final addresses the check",
+      "composes_with": ["reasoning_strategies:second_order_thinking"],
+      "failure_mode_caught": "answers that ignore a stated constraint"
+    },
+    {
+      "id": "consider_alternatives",
+      "name": "Consider alternatives before committing",
+      "enforces": "enumerate >=N candidate approaches with why-rejected before selecting one",
+      "required_structure": ["candidates", "evaluate_each", "select", "justify_choice"],
+      "enforcement": ["schema_gate", "model_judge"],
+      "verification": "gate requires >=N distinct candidates with a rejection reason each",
+      "composes_with": ["reasoning_strategies:inversion", "reasoning_strategies:reason_by_analogy"],
+      "failure_mode_caught": "first-idea fixation; the reinvention the observer flags"
+    },
+    {
+      "id": "first_principles_required",
+      "name": "First-principles required (novel problems)",
+      "enforces": "reason from base facts, not memorized patterns/analogy, when the problem is flagged novel",
+      "required_structure": ["base_facts", "derive", "conclusion"],
+      "enforcement": ["qlora_adapter:qlora_reasoning_4bit", "model_judge"],
+      "verification": "a judge checks the derivation chains from the stated base facts (not from an asserted pattern)",
+      "composes_with": ["reasoning_strategies:first_principles"],
+      "failure_mode_caught": "pattern-matching a wrong analogy onto a novel problem"
+    },
+    {
+      "id": "show_work_or_reject",
+      "name": "Show reproducible work or reject",
+      "enforces": "the working must be present and checkable; an answer without reproducible steps is rejected",
+      "required_structure": ["inputs", "steps", "result", "check"],
+      "enforcement": ["deterministic", "schema_gate"],
+      "verification": "re-execute/re-derive the steps deterministically where possible; mismatch -> reject",
+      "composes_with": ["reasoning_strategies:deduction"],
+      "failure_mode_caught": "unverifiable black-box answers"
+    },
+    {
+      "id": "bounded_uncertainty",
+      "name": "Bounded uncertainty",
+      "enforces": "state confidence and what would change the conclusion; flag overconfident claims",
+      "required_structure": ["answer", "confidence", "what_would_change_my_mind"],
+      "enforcement": ["schema_gate", "model_judge"],
+      "verification": "gate requires the confidence + falsifier fields; a judge flags confidence that outruns the evidence",
+      "composes_with": ["reasoning_strategies:second_order_thinking"],
+      "failure_mode_caught": "miscalibrated certainty"
+    },
+    {
+      "id": "stepwise_tool_use",
+      "name": "Stepwise, justified tool use",
+      "enforces": "each tool call is justified (why this tool, expected result) before invocation; the result is checked after",
+      "required_structure": ["goal", "tool_choice_rationale", "expected_result", "call", "post_check"],
+      "enforcement": ["schema_gate"],
+      "verification": "reject a tool call with no rationale/expected_result; the observer's footgun + waste checks watch the post_check",
+      "composes_with": ["reasoning_strategies:5w1h"],
+      "failure_mode_caught": "flailing tool calls; the agentic thrash the supervisor flags"
+    }
+  ]
+}

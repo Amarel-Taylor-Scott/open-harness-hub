@@ -1,0 +1,29 @@
+{
+  "serves_truth": false,
+  "purpose": "Contract for the north-star gap closure loop. The loop reads deterministic artifacts, classifies remaining gaps, writes resumable state/summary, and routes the next bounded workstream. It is candidate evidence, not proof of completion.",
+  "command": "scripts/north_star_gap_closure_loop.py",
+  "prompt": ".codex/prompts/north-star-gap-closure-goal.md",
+  "docs": "_repos/_shared/codex/north-star-gap-closure-loop-command.md",
+  "artifacts": [
+    ".agent/north-star-gap-closure/state.json",
+    ".agent/north-star-gap-closure/summary.md"
+  ],
+  "tracked_gaps": [
+    "repo_wide_unique_naming",
+    "blast_radius_graph",
+    "disagreement_management",
+    "primitive_derivation",
+    "registry_vectorization_search",
+    "promotion_gate"
+  ],
+  "loop_rules": [
+    "Refresh code inventory before classifying gaps when files changed.",
+    "Work one bounded next_gap at a time.",
+    "Keep proof gate green after each implementation cycle.",
+    "Do not run unsafe repo-wide rename sweeps.",
+    "Do not promote LLM output or placeholder/synthetic primitive rows as truth.",
+    "Mark unresolved dynamic refs instead of pretending they are resolved.",
+    "Preserve enterprise control paths: source export, package/private-service/API modes, BYOK, SBOM/provenance, rollback."
+  ],
+  "completion_law": "Complete only when every tracked gap is ready_or_green, line/code inventory and hybrid packets are refreshed, primitive registry builder and promotion gate exist, and scripts/run_proofs.py is green."
+}

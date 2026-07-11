@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "purpose": "NUMERIC edge-type vocabulary for the provider selection graph. An edge between two ProviderNodes carries a numeric `code` (control logic) + a `label` (display only). Numeric codes leave gaps for new edge kinds. Combined with numeric priority/cost/reliability/latency/safety WEIGHTS on each edge, this lets a new provider be inserted BETWEEN existing ones (e.g. priority 6500 between 5000 and 7000) without renumbering or code changes. See _repos/teleon/context/architecture/numeric-preference-graph.md.",
+  "control_rule": "Branch on numeric edge `code` + numeric weights, never on the edge label string or a provider display name.",
+  "codes": [
+    {"code": 100, "label": "IMPLEMENTS_SLOT", "note": "node provides this capability slot"},
+    {"code": 110, "label": "EMULATES", "note": "node is a local contract-compatible emulator of the target"},
+    {"code": 120, "label": "ALTERNATIVE_TO", "note": "interchangeable peer (within the tie band)"},
+    {"code": 130, "label": "SUPERSEDES", "note": "node replaces an older one (e.g. v2 supersedes v1)"},
+    {"code": 140, "label": "SHADOW_OF", "note": "runs in shadow alongside the target; results compared, not served"},
+    {"code": 150, "label": "CANARY_OF", "note": "receives a weighted slice of traffic vs the target"},
+    {"code": 160, "label": "FALLBACK_AFTER_FAILURE", "note": "selected when the higher-priority node is unavailable/unhealthy"},
+    {"code": 170, "label": "BLOCKED_BY_POLICY", "note": "edge disabled by tenant/residency/safety policy"},
+    {"code": 180, "label": "REQUIRES_APPROVAL", "note": "selectable only with explicit human/owner approval"}
+  ],
+  "weight_scale": {
+    "note": "Priority/score weights use a 0-10000 scale with deliberate gaps so new providers slot BETWEEN existing ones.",
+    "1000": "low priority", "5000": "normal", "6500": "insert-between example", "7000": "preferred candidate", "9000": "highly preferred"
+  }
+}

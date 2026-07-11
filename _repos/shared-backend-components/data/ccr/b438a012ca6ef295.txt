@@ -1,0 +1,41 @@
+MODULE src/baltor/native/native_projection_builder.py
+## API signatures
+```python
+"""src/baltor/native/native_projection_builder — build a SAME-SHAPE native output per output_mode."""
+def _hid(prefix: str, body: dict) -> str
+def _sha256(b: bytes) -> str
+class NativeDiff:
+    # The ledger of every value change applied to a same-shape projection. Empty == no change made.
+    def to_dict(self) -> dict
+class NativeProjection:
+    # The same-shape output bytes + the diff that produced them. ``output_bytes`` fits the customer's system.
+    def output_text(self) -> str
+    def to_dict(self) -> dict
+def _pointer_get(obj, pointer: str)
+def _pointer_set(obj, pointer: str, value) -> None
+class NativeProjectionBuilder:
+    # Render a same-shape native projection for a given output_mode. Applies only verified changes; emits diffs.
+    def build(self, contract: NativeShapeContract, *, output_mode: str, passthrough: bool, verified_changes=None, annotate: bool=False, sidecar_ref: str='', now: str='') -> NativeProjection
+        # verified_changes: list of {path, new_value, decision, receipt_id}. A change WITHOUT a receipt_id is
+    def _json(self, contract, output_mode, passthrough, changes, now) -> NativeProjection
+    def _csv(self, contract, output_mode, passthrough, changes, now) -> NativeProjection
+    def _markdown(self, contract, output_mode, passthrough, annotate, sidecar_ref, changes, now) -> NativeProjection
+    def _proj(self, contract, output_mode, out: bytes, diff: NativeDiff, now, *, byte_identical: bool, annotations: int=0) -> NativeProjection
+```
+## intra-module call edges
+src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder.NativeDiff
+src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj
+src.baltor.native.native_projection_builder._csv -> src.baltor.native.native_projection_builder._hid
+src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder.NativeDiff
+src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj
+src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._hid
+src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._pointer_get
+src.baltor.native.native_projection_builder._json -> src.baltor.native.native_projection_builder._pointer_set
+src.baltor.native.native_projection_builder._markdown -> src.baltor.native.native_projection_builder.NativeDiff
+src.baltor.native.native_projection_builder._markdown -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._proj
+src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder.NativeProjection
+src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder._hid
+src.baltor.native.native_projection_builder._proj -> src.baltor.native.native_projection_builder._sha256
+src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._csv
+src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._json
+src.baltor.native.native_projection_builder.build -> src.baltor.native.native_projection_builder.NativeProjectionBuilder._markdown

@@ -1,0 +1,685 @@
+schema_version: "0.1.0"
+evidence_snapshot_date: "2026-07-09"
+title: Enterprise operating-system primitive atlas
+scope:
+  statement: >-
+    Public-evidence-backed system, workflow, and primitive candidates for enterprise
+    operating systems. Public company examples are breadth signals only; every
+    primitive decomposition is an independent inference and candidate.
+  excluded_domains: [insurance]
+  excluded_actions:
+    - autonomous lethal targeting
+    - unreviewed clinical diagnosis or treatment
+    - unreviewed public-benefit eligibility decisions
+    - covert surveillance decisions
+  source_use_policy: public metadata and high-level capability descriptions only; never copy vendor code, UI, schemas, or proprietary implementation details
+  promotion_policy: source review plus independent implementation plus executed oracle plus measured marginal lift
+
+quality_floors:
+  min_system_families: 25
+  min_workflows_per_system: 4
+  min_primitive_templates: 60
+  min_required_bindings_per_workflow: 1
+  min_source_classes: 3
+  rationale: >-
+    Breadth must cover platform and industry surfaces, while every workflow must
+    decompose into a non-trivial reusable route. These are validation floors,
+    not claims of completeness or production readiness.
+
+adapter_contract:
+  - discover_schema
+  - read_object
+  - search_objects
+  - subscribe_to_changes
+  - map_to_canonical_object
+  - validate_permission
+  - stage_or_apply_writeback
+  - record_source_version
+  - health_check
+  - emit_execution_receipt
+
+default_error_semantics:
+  - explicit_failure_receipt
+  - no_silent_drop
+  - rejected_input_preserved
+
+workflow_operation_bindings:
+  allocate: [allocation-engine, constraint-feasibility-checker]
+  analyze: [root-cause-traversal, prioritization-ranker]
+  answer: [governed-retriever, citation-span-verifier, structured-output-validator]
+  approve: [approval-gate, separation-of-duties-gate, decision-receipt]
+  assess: [metric-calculator, prioritization-ranker, human-review-packet]
+  audit: [audit-event-emitter, decision-receipt]
+  authorize: [rbac-gate, attribute-policy-gate, purpose-limit-gate]
+  calculate: [metric-calculator]
+  classify: [prioritization-ranker, work-queue-router]
+  close: [case-state-machine, human-review-packet, decision-receipt]
+  compare: [reconciliation-engine, regression-gate]
+  coordinate: [work-queue-router, sla-deadline-monitor, notification-router]
+  correlate: [record-linker, root-cause-traversal]
+  deploy: [release-channel-resolver, canary-health-gate, rollback-controller]
+  detect: [anomaly-signal-builder, exception-escalator]
+  dispatch: [transactional-outbox, idempotency-gate]
+  escalate: [exception-escalator, human-review-packet]
+  evaluate: [eval-case-runner, regression-gate]
+  execute: [approval-gate, transactional-writeback, decision-receipt]
+  explain: [root-cause-traversal, human-review-packet]
+  extract: [schema-validator, field-mapper, lineage-propagator]
+  filter: [row-column-policy-filter, purpose-limit-gate]
+  forecast: [forecast-wrapper, eval-case-runner]
+  govern: [purpose-limit-gate, audit-event-emitter, retention-enforcer]
+  harmonize: [field-mapper, type-coercer, entity-identity-resolver]
+  import: [schema-validator, field-mapper, raw-landing-receipt]
+  integrate: [connector-probe, schema-snapshot, incremental-sync, field-mapper]
+  investigate: [case-state-machine, root-cause-traversal, human-review-packet]
+  maintain: [anomaly-signal-builder, prioritization-ranker, work-queue-router]
+  meter: [token-meter, cost-per-pass-calculator]
+  mine: [event-log-normalizer, process-graph-miner]
+  model: [object-mapper, link-type-validator]
+  monitor: [sla-deadline-monitor, anomaly-signal-builder, exception-escalator]
+  optimize: [optimizer-adapter, constraint-feasibility-checker]
+  place: [allocation-engine, constraint-feasibility-checker, approval-gate]
+  plan: [scenario-runner, optimizer-adapter, constraint-feasibility-checker]
+  prevent: [forecast-wrapper, anomaly-signal-builder, notification-router]
+  prioritize: [prioritization-ranker, work-queue-router]
+  reconcile: [reconciliation-engine, decision-receipt]
+  recover: [scenario-runner, work-queue-router, notification-router]
+  reduce: [digital-twin-state-reducer, object-change-event]
+  remediate: [work-queue-router, approval-gate, transactional-writeback]
+  resolve: [entity-identity-resolver, record-linker]
+  review: [governed-retriever, human-review-packet, approval-gate]
+  route: [route-cost-evaluator, constraint-feasibility-checker]
+  schedule: [schedule-feasibility, constraint-feasibility-checker]
+  select: [governed-retriever, purpose-limit-gate]
+  simulate: [scenario-runner, constraint-feasibility-checker]
+  snapshot: [digital-twin-snapshot, temporal-validity-resolver]
+  stage: [agent-action-policy, human-review-packet, approval-gate]
+  synchronize: [incremental-sync, cdc-watermark, event-deduplicator]
+  trace: [graph-reachability, lineage-propagator]
+  trigger: [object-change-event, transactional-outbox]
+  validate: [schema-validator, reference-integrity-checker]
+  verify: [conformance-checker, decision-receipt]
+  writeback: [approval-gate, idempotency-gate, transactional-writeback]
+
+sources:
+  - {id: sec-palantir-form-10k, title: Palantir 2025 Form 10-K, url: "https://www.sec.gov/Archives/edgar/data/1321655/000132165526000011/pltr-20251231.htm", source_class: A, authority: regulator_filing}
+  - {id: palantir-platform-architecture, title: AIP Foundry and Apollo architecture, url: "https://www.palantir.com/docs/foundry/architecture-center/platforms", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-ontology-system, title: Ontology system, url: "https://www.palantir.com/docs/foundry/architecture-center/ontology-system", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-data-integration, title: Data integration overview, url: "https://www.palantir.com/docs/foundry/data-integration/overview", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-action-types, title: Action types overview, url: "https://www.palantir.com/docs/foundry/action-types/overview", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-automate, title: Automate, url: "https://www.palantir.com/docs/foundry/automate", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-aip-logic, title: AIP Logic, url: "https://www.palantir.com/docs/foundry/logic", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-aip-retrieval, title: AIP retrieval context, url: "https://www.palantir.com/docs/foundry/chatbot-studio/retrieval-context", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-aip-evals, title: AIP Evals, url: "https://www.palantir.com/docs/foundry/aip-evals/overview", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-model-integration, title: Model integration, url: "https://www.palantir.com/docs/foundry/model-integration/overview/index.html", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-observability, title: Observability overview, url: "https://www.palantir.com/docs/foundry/observability/overview", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-apollo-environments, title: Apollo environments, url: "https://www.palantir.com/docs/apollo/core/environments", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-security, title: Security overview, url: "https://www.palantir.com/docs/foundry/security/overview", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-process-mining, title: Process mining and automation, url: "https://www.palantir.com/platforms/foundry/process-mining/", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-offerings, title: Public offerings index, url: "https://www.palantir.com/offerings/", source_class: C, authority: vendor_offering_page, background_only: true}
+  - {id: palantir-procurement, title: Procurement offering, url: "https://www.palantir.com/offerings/procurement/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-consumer-goods, title: Consumer goods offering, url: "https://www.palantir.com/offerings/consumer-goods", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-retail, title: Retail offering, url: "https://www.palantir.com/offerings/retail/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-food-beverage, title: Food and beverage offering, url: "https://www.palantir.com/offerings/food-and-beverage/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-manufacturing, title: Manufacturing offering, url: "https://www.palantir.com/explore/foundry-for-manufacturing/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-semiconductors, title: Semiconductor overview, url: "https://www.palantir.com/offerings/semiconductors/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-automotive, title: Automotive and mobility offering, url: "https://www.palantir.com/offerings/automotive-mobility/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-airbus, title: Airbus and Skywise impact page, url: "https://www.palantir.com/impact/airbus/", source_class: C, authority: vendor_customer_page}
+  - {id: palantir-rail, title: Rail offering, url: "https://www.palantir.com/offerings/palantir-for-rail/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-energy, title: Energy offering, url: "https://www.palantir.com/offerings/energy", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-telecommunications, title: Telecommunications offering, url: "https://www.palantir.com/offerings/telecommunications/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-hospitals, title: Hospitals offering, url: "https://www.palantir.com/offerings/palantir-for-hospitals/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-health, title: Health and life sciences offering, url: "https://www.palantir.com/offerings/health/", source_class: C, authority: vendor_offering_page}
+  - {id: nih-n3c, title: NIH N3C frequently asked questions, url: "https://ncats.nih.gov/research/research-activities/n3c/faqs", source_class: A, authority: government}
+  - {id: palantir-financial-services, title: Financial services offering, url: "https://www.palantir.com/offerings/financial-services/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-aml, title: Anti-money laundering offering, url: "https://www.palantir.com/offerings/anti-money-laundering/", source_class: C, authority: vendor_offering_page}
+  - {id: army-financial-management, title: Army financial-management use of Vantage, url: "https://www.army.mil/article/254210/", source_class: A, authority: government}
+  - {id: palantir-readiness, title: Readiness offering, url: "https://www.palantir.com/offerings/readiness/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-uk-government, title: United Kingdom government page, url: "https://www.palantir.com/uk/government/", source_class: C, authority: vendor_customer_page}
+  - {id: wfp-palantir, title: World Food Programme partnership, url: "https://www.wfp.org/news/palantir-and-wfp-partner-help-transform-global-humanitarian-delivery", source_class: A, authority: intergovernmental_organization}
+  - {id: palantir-construction, title: Construction offering, url: "https://www.palantir.com/offerings/construction/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-gotham, title: Gotham platform, url: "https://www.palantir.com/platforms/gotham/", source_class: B, authority: vendor_technical_docs}
+  - {id: palantir-defense-navy, title: Defense and Navy offering, url: "https://www.palantir.com/offerings/defense/navy/", source_class: C, authority: vendor_offering_page}
+  - {id: palantir-metaconstellation, title: MetaConstellation offering, url: "https://www.palantir.com/offerings/metaconstellation", source_class: C, authority: vendor_offering_page}
+
+tool_classes:
+  - {id: erp-accounting-epm, title: ERP accounting and enterprise planning, objects: [ledger-entry, account, invoice, payment, budget, forecast]}
+  - {id: crm-cpq-support, title: CRM CPQ sales and support, objects: [customer, contact, opportunity, quote, campaign, ticket]}
+  - {id: hris-workforce-lms, title: HRIS workforce and learning, objects: [worker, role, skill, shift, pay-item, course]}
+  - {id: procurement-srm-clm, title: Procurement supplier and contract systems, objects: [supplier, bid, purchase-order, contract, obligation, control]}
+  - {id: oms-wms-tms, title: Order warehouse and transport systems, objects: [order, sku, inventory-position, shipment, fulfillment]}
+  - {id: mes-scada-iot, title: Manufacturing execution and industrial telemetry, objects: [equipment, signal, production-order, batch, downtime-event]}
+  - {id: plm-qms-eam-cmms, title: Product quality and asset lifecycle systems, objects: [part, bom, revision, defect, asset, maintenance-order]}
+  - {id: ehr-lis-pacs, title: Provider health record and diagnostic systems, objects: [patient, encounter, order, result, image-study, medication]}
+  - {id: core-banking-payments, title: Core banking and payments, objects: [customer, account, transaction, authorization, settlement]}
+  - {id: trading-market-infrastructure, title: Trading and market infrastructure, objects: [instrument, order, execution, position, collateral]}
+  - {id: public-sector-case-system, title: Public-sector case and program systems, objects: [person, household, case, grant, permit, filing]}
+  - {id: warehouse-lakehouse-mdm, title: Warehouse lakehouse and master data, objects: [dataset, table, column, lineage-edge, master-entity]}
+  - {id: bi-semantic-gis, title: BI semantic and geospatial systems, objects: [metric, dimension, map-feature, territory, dashboard]}
+  - {id: source-control-cicd, title: Source control CI CD and artifact registry, objects: [repository, change, build, test, release, artifact]}
+  - {id: itsm-cmdb-observability, title: ITSM CMDB and observability, objects: [service, configuration-item, incident, alert, slo]}
+  - {id: iam-siem-soar, title: Identity and security operations, objects: [identity, entitlement, session, finding, incident, response]}
+  - {id: dms-ecm-collaboration, title: Document content and collaboration systems, objects: [document, record, message, thread, retention-policy]}
+  - {id: ml-ai-platform, title: Machine learning and AI platforms, objects: [dataset, feature, model, run, evaluation, deployment, agent-trace]}
+  - {id: rpa-browser-mcp-api, title: RPA browser MCP and API tool surfaces, objects: [tool, action, browser-state, request, approval, receipt]}
+  - {id: geospatial-sensor-network, title: Geospatial and sensor networks, objects: [sensor, observation, track, location, coverage-window]}
+  - {id: edge-disconnected-runtime, title: Edge and intermittently disconnected runtimes, objects: [environment, device, release, sync-batch, health-report]}
+
+primitive_templates:
+  - {id: connector-probe, layer: data, operation: probe, object: source-system, input: ConnectorConfig, output: ConnectorCapabilityReceipt, invariants: [read-only, no-secret-output], effects: read, determinism: deterministic, oracle: contract, primitive: action}
+  - {id: credential-scope-check, layer: data, operation: authorize, object: connector-credential, input: CredentialIntent, output: CredentialScopeDecision, invariants: [least-privilege, no-secret-output], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: schema-snapshot, layer: data, operation: snapshot, object: schema, input: SourceSchema, output: VersionedSchemaSnapshot, invariants: [stable-hash, source-version-recorded], effects: read, determinism: deterministic, oracle: contract, primitive: action}
+  - {id: cdc-watermark, layer: data, operation: checkpoint, object: change-stream, input: ChangeBatch, output: WatermarkReceipt, invariants: [monotonic-watermark, no-gap], effects: write, determinism: deterministic, oracle: stateful, primitive: action}
+  - {id: incremental-sync, layer: data, operation: synchronize, object: record-batch, input: SourceDelta, output: CanonicalDelta, invariants: [no-duplicate, replay-safe], effects: write, determinism: deterministic, oracle: integration, primitive: action}
+  - {id: event-deduplicator, layer: data, operation: deduplicate, object: event, input: EventBatch, output: UniqueEventBatch, invariants: [stable-order, preserve-first-seen], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: raw-landing-receipt, layer: data, operation: preserve, object: source-artifact, input: RawArtifact, output: RawArtifactReceipt, invariants: [content-hash, source-handle], effects: write, determinism: deterministic, oracle: receipt, primitive: action}
+  - {id: schema-drift-detector, layer: data, operation: compare, object: schema, input: SchemaPair, output: SchemaDriftReport, invariants: [field-level-diff, compatibility-class], effects: none, determinism: deterministic, oracle: mutation, primitive: action}
+  - {id: source-health-check, layer: data, operation: inspect, object: source-system, input: SourceEndpoint, output: SourceHealthReceipt, invariants: [bounded-timeout, no-write], effects: read, determinism: deterministic, oracle: integration, primitive: action}
+  - {id: schema-validator, layer: quality, operation: validate, object: record, input: RecordAndSchema, output: ValidationResult, invariants: [all-errors-preserved, no-silent-coercion], effects: none, determinism: deterministic, oracle: mutation, primitive: if_statement}
+  - {id: field-mapper, layer: quality, operation: map, object: record, input: SourceRecordAndMapping, output: CanonicalRecord, invariants: [unmapped-fields-reported, lineage-preserved], effects: none, determinism: deterministic, oracle: contract, primitive: action}
+  - {id: type-coercer, layer: quality, operation: coerce, object: value, input: TypedValueIntent, output: TypedValueOrError, invariants: [lossy-coercion-rejected, error-explicit], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: unit-normalizer, layer: quality, operation: normalize, object: measurement, input: Measurement, output: CanonicalMeasurement, invariants: [unit-recorded, round-trip-tolerance], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: reference-integrity-checker, layer: quality, operation: validate, object: reference, input: RecordGraph, output: IntegrityReport, invariants: [dangling-reference-reported], effects: none, determinism: deterministic, oracle: mutation, primitive: if_statement}
+  - {id: quarantine-router, layer: quality, operation: route, object: rejected-record, input: ValidationResult, output: AcceptedAndQuarantinedRows, invariants: [no-row-dropped, reason-attached], effects: write, determinism: deterministic, oracle: stateful, primitive: action}
+  - {id: entity-identity-resolver, layer: identity, operation: resolve, object: entity, input: EntityCandidates, output: IdentityResolution, invariants: [evidence-per-link, ambiguous-not-merged], effects: none, determinism: deterministic_or_scored, oracle: held-out, primitive: action}
+  - {id: record-linker, layer: identity, operation: link, object: record, input: CanonicalRecords, output: RecordLinks, invariants: [cardinality-enforced, evidence-per-link], effects: none, determinism: deterministic_or_scored, oracle: held-out, primitive: action}
+  - {id: lineage-propagator, layer: identity, operation: trace, object: lineage-edge, input: TransformReceiptSet, output: LineageGraph, invariants: [source-reachable, transform-recorded], effects: write, determinism: deterministic, oracle: graph, primitive: action}
+  - {id: temporal-validity-resolver, layer: identity, operation: resolve, object: effective-interval, input: DatedFacts, output: PointInTimeFacts, invariants: [no-overlap-unless-declared, timezone-explicit], effects: none, determinism: deterministic, oracle: boundary, primitive: action}
+  - {id: object-mapper, layer: ontology, operation: materialize, object: enterprise-object, input: CanonicalRecord, output: ObjectProjection, invariants: [stable-primary-key, source-link], effects: write, determinism: deterministic, oracle: contract, primitive: action}
+  - {id: link-type-validator, layer: ontology, operation: validate, object: object-link, input: TypedObjectGraph, output: LinkValidationReport, invariants: [endpoint-types-valid, cardinality-valid], effects: none, determinism: deterministic, oracle: graph, primitive: if_statement}
+  - {id: graph-reachability, layer: ontology, operation: traverse, object: graph, input: GraphAndTraversalPolicy, output: ReachableObjectSet, invariants: [cycle-safe, policy-filtered], effects: none, determinism: deterministic, oracle: graph, primitive: action}
+  - {id: digital-twin-state-reducer, layer: ontology, operation: reduce, object: state, input: OrderedEvents, output: ObjectState, invariants: [event-order-explicit, replay-identical], effects: none, determinism: deterministic, oracle: stateful, primitive: action}
+  - {id: digital-twin-snapshot, layer: ontology, operation: snapshot, object: operational-world, input: ObjectGraph, output: VersionedTwinSnapshot, invariants: [consistent-cut, content-hash], effects: write, determinism: deterministic, oracle: replay, primitive: action}
+  - {id: object-change-event, layer: ontology, operation: emit, object: object-change, input: ObjectStateDiff, output: ChangeEvent, invariants: [before-after-hash, actor-or-source], effects: write, determinism: deterministic, oracle: receipt, primitive: action}
+  - {id: metric-calculator, layer: analytics, operation: calculate, object: metric, input: TypedFactsAndMetricSpec, output: MetricValueReceipt, invariants: [formula-version, input-lineage], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: anomaly-signal-builder, layer: analytics, operation: detect, object: observation, input: ObservationsAndThresholdPolicy, output: AnomalySignals, invariants: [threshold-version, false-positive-fixtures], effects: none, determinism: deterministic_or_model_wrapped, oracle: held-out, primitive: action}
+  - {id: forecast-wrapper, layer: analytics, operation: forecast, object: time-series, input: FeaturesModelAndHorizon, output: ForecastWithIntervals, invariants: [model-hash, split-receipt, horizon-explicit], effects: none, determinism: model_wrapped, oracle: ml, primitive: action}
+  - {id: scenario-runner, layer: analytics, operation: simulate, object: scenario, input: BaselineAndScenarioInputs, output: ScenarioComparison, invariants: [fixed-seed-when-stochastic, baseline-preserved], effects: none, determinism: deterministic_or_seeded, oracle: replay, primitive: loop}
+  - {id: constraint-feasibility-checker, layer: analytics, operation: validate, object: plan, input: CandidatePlanAndConstraints, output: FeasibilityReport, invariants: [all-hard-constraints-checked], effects: none, determinism: deterministic, oracle: optimization, primitive: if_statement}
+  - {id: optimizer-adapter, layer: analytics, operation: optimize, object: plan, input: DecisionVariablesConstraintsObjective, output: CandidatePlan, invariants: [feasible-or-explicit-infeasible, objective-recorded], effects: none, determinism: deterministic_or_seeded, oracle: optimization, primitive: action}
+  - {id: root-cause-traversal, layer: analytics, operation: explain, object: causal-graph, input: SignalAndDependencyGraph, output: RankedCausePaths, invariants: [evidence-per-path, cycles-bounded], effects: none, determinism: deterministic_or_scored, oracle: graph, primitive: action}
+  - {id: prioritization-ranker, layer: analytics, operation: rank, object: work-item, input: WorkItemsAndPolicy, output: RankedWorkItems, invariants: [tie-breaker-stable, score-components-visible], effects: none, determinism: deterministic_or_model_wrapped, oracle: held-out, primitive: action}
+  - {id: reconciliation-engine, layer: analytics, operation: reconcile, object: transaction-or-state, input: LeftRightAndMatchPolicy, output: MatchedAndUnmatchedSets, invariants: [totals-conserved, unmatched-preserved], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: allocation-engine, layer: analytics, operation: allocate, object: resource, input: SupplyDemandAndConstraints, output: AllocationPlan, invariants: [no-negative-allocation, conservation], effects: none, determinism: deterministic_or_seeded, oracle: optimization, primitive: action}
+  - {id: schedule-feasibility, layer: analytics, operation: schedule, object: resource, input: ResourcesTasksAndConstraints, output: FeasibleScheduleOrConflict, invariants: [coverage-constraints, no-overlap], effects: none, determinism: deterministic_or_seeded, oracle: optimization, primitive: action}
+  - {id: route-cost-evaluator, layer: analytics, operation: route, object: network, input: NetworkDemandAndConstraints, output: RoutePlanAndCost, invariants: [network-valid, capacity-valid], effects: none, determinism: deterministic_or_seeded, oracle: optimization, primitive: action}
+  - {id: case-state-machine, layer: workflow, operation: transition, object: case, input: CaseStateEventAndPolicy, output: NewCaseStateReceipt, invariants: [forbidden-transition-rejected, history-append-only], effects: write, determinism: deterministic, oracle: stateful, primitive: action}
+  - {id: work-queue-router, layer: workflow, operation: route, object: work-item, input: WorkItemAndRoutingPolicy, output: QueueAssignmentReceipt, invariants: [owner-explicit, reason-explicit], effects: write, determinism: deterministic_or_scored, oracle: stateful, primitive: action}
+  - {id: sla-deadline-monitor, layer: workflow, operation: monitor, object: deadline, input: DatedWorkItemsAndClock, output: DeadlineSignals, invariants: [clock-explicit, calendar-version], effects: read, determinism: deterministic, oracle: boundary, primitive: loop}
+  - {id: approval-gate, layer: workflow, operation: approve, object: proposed-action, input: ActionIntentActorAndPolicy, output: ApprovalDecision, invariants: [policy-version, actor-recorded], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: separation-of-duties-gate, layer: workflow, operation: authorize, object: action-chain, input: ActorHistoryAndPolicy, output: AuthorizationDecision, invariants: [requester-not-sole-approver], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: transactional-writeback, layer: workflow, operation: write, object: enterprise-object, input: AuthorizedObjectChanges, output: TransactionReceipt, invariants: [atomic-or-rolled-back, version-checked], effects: external_write, determinism: deterministic, oracle: integration, primitive: action}
+  - {id: idempotency-gate, layer: workflow, operation: deduplicate, object: action-intent, input: ActionIntentAndKey, output: NewOrReplayDecision, invariants: [same-key-same-effect], effects: read_write, determinism: deterministic, oracle: stateful, primitive: if_statement}
+  - {id: transactional-outbox, layer: workflow, operation: dispatch, object: side-effect, input: CommittedChange, output: DeliveryIntentReceipt, invariants: [commit-before-delivery, replay-safe], effects: write, determinism: deterministic, oracle: fault-injection, primitive: action}
+  - {id: notification-router, layer: workflow, operation: notify, object: notification, input: EventRecipientsAndPolicy, output: NotificationIntent, invariants: [recipient-authorized, sensitive-data-redacted], effects: external_write, determinism: deterministic, oracle: integration, primitive: action}
+  - {id: exception-escalator, layer: workflow, operation: escalate, object: exception, input: FailureAndEscalationPolicy, output: EscalationReceipt, invariants: [failure-preserved, owner-and-deadline], effects: write, determinism: deterministic, oracle: stateful, primitive: action}
+  - {id: human-review-packet, layer: workflow, operation: assemble, object: review-case, input: EvidenceDecisionOptionsAndGaps, output: ReviewPacket, invariants: [sources-visible, uncertainty-visible], effects: none, determinism: deterministic, oracle: receipt, primitive: action}
+  - {id: decision-receipt, layer: workflow, operation: record, object: decision, input: DecisionActorEvidenceAndPolicy, output: ImmutableDecisionReceipt, invariants: [actor-recorded, evidence-linked, timestamped], effects: write, determinism: deterministic, oracle: receipt, primitive: output}
+  - {id: governed-retriever, layer: ai, operation: retrieve, object: evidence, input: QueryScopeAndPermissions, output: RankedEvidenceSet, invariants: [permission-filtered, source-ids-preserved], effects: read, determinism: deterministic_or_scored, oracle: held-out, primitive: action}
+  - {id: citation-span-verifier, layer: ai, operation: verify, object: citation, input: ClaimCitationAndSourceSpan, output: CitationVerdict, invariants: [span-resolves, support-class-explicit], effects: none, determinism: deterministic_or_model_wrapped, oracle: held-out, primitive: if_statement}
+  - {id: context-budgeter, layer: ai, operation: select, object: context, input: EvidenceSetAndBudget, output: BoundedContextPack, invariants: [source-ids-preserved, budget-not-exceeded], effects: none, determinism: deterministic_or_scored, oracle: property, primitive: action}
+  - {id: structured-output-validator, layer: ai, operation: validate, object: model-output, input: ModelOutputAndSchema, output: ValidatedOutputOrErrors, invariants: [no-silent-field-drop], effects: none, determinism: deterministic, oracle: mutation, primitive: if_statement}
+  - {id: agent-action-policy, layer: ai, operation: authorize, object: tool-call, input: ToolIntentActorScopeAndPolicy, output: ToolDecision, invariants: [least-privilege, side-effect-class-checked], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: model-route-policy, layer: ai, operation: route, object: model-call, input: TaskRiskCostAndCapability, output: ModelRouteDecision, invariants: [policy-version, no-unsafe-fallback], effects: none, determinism: deterministic, oracle: truth-table, primitive: if_statement}
+  - {id: eval-case-runner, layer: ai, operation: evaluate, object: candidate, input: CandidateAndHeldOutCases, output: EvalReceipt, invariants: [same-cases-per-arm, case-results-preserved], effects: read, determinism: deterministic_or_model_wrapped, oracle: mutation, primitive: action}
+  - {id: regression-gate, layer: ai, operation: gate, object: candidate-version, input: BaselineCandidateAndMetrics, output: PromotionOrHoldDecision, invariants: [ratchet-enforced, missing-metric-is-gap], effects: none, determinism: deterministic, oracle: mutation, primitive: if_statement}
+  - {id: evidence-gap-router, layer: ai, operation: route, object: unsupported-claim, input: ClaimAndEvidenceVerdict, output: RefusalReviewOrSearchAction, invariants: [unsupported-not-promoted], effects: none, determinism: deterministic, oracle: truth-table, primitive: if_statement}
+  - {id: feedback-capture, layer: ai, operation: capture, object: workflow-feedback, input: DecisionOutcomeAndCorrection, output: VersionedFeedbackReceipt, invariants: [original-preserved, actor-recorded], effects: write, determinism: deterministic, oracle: receipt, primitive: action}
+  - {id: rbac-gate, layer: governance, operation: authorize, object: resource-action, input: ActorRoleResourceAndAction, output: AccessDecision, invariants: [default-deny, reason-code], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: attribute-policy-gate, layer: governance, operation: authorize, object: resource-action, input: ActorResourceAttributesAndPolicy, output: AccessDecision, invariants: [default-deny, policy-version], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: purpose-limit-gate, layer: governance, operation: authorize, object: data-use, input: PurposeDataAndPolicy, output: PurposeDecision, invariants: [purpose-explicit, no-scope-widening], effects: none, determinism: deterministic, oracle: security, primitive: if_statement}
+  - {id: row-column-policy-filter, layer: governance, operation: filter, object: dataset, input: QueryActorAndPolicy, output: AuthorizedProjection, invariants: [noninterference, masked-fields-recorded], effects: read, determinism: deterministic, oracle: security, primitive: action}
+  - {id: sensitive-data-redactor, layer: governance, operation: redact, object: record, input: RecordAndPrivacyPolicy, output: RedactedRecordAndReceipt, invariants: [redactions-recorded, reversible-only-under-authority], effects: none, determinism: deterministic_or_model_wrapped, oracle: security, primitive: action}
+  - {id: audit-event-emitter, layer: governance, operation: record, object: governed-action, input: ActionTrace, output: AuditEvent, invariants: [append-only, actor-purpose-resource], effects: write, determinism: deterministic, oracle: receipt, primitive: output}
+  - {id: retention-enforcer, layer: governance, operation: retain-or-expire, object: record, input: RecordDatesAndPolicy, output: RetentionActionReceipt, invariants: [legal-hold-wins, deletion-authorized], effects: write, determinism: deterministic, oracle: boundary, primitive: action}
+  - {id: source-authority-gate, layer: governance, operation: verify, object: source, input: SourceIdentityScopeAndEvidence, output: AuthorityDecision, invariants: [scope-specific, evidence-linked], effects: none, determinism: deterministic, oracle: truth-table, primitive: if_statement}
+  - {id: freshness-gate, layer: governance, operation: verify, object: dated-fact, input: FactDatesAndFreshnessPolicy, output: FreshStaleOrReviewDecision, invariants: [as-of-explicit, stale-not-served], effects: none, determinism: deterministic, oracle: boundary, primitive: if_statement}
+  - {id: environment-selector, layer: runtime, operation: select, object: execution-environment, input: TaskPolicyAndAvailableBackends, output: EnvironmentDecision, invariants: [trust-boundary-locked, secret-policy-locked], effects: none, determinism: deterministic, oracle: truth-table, primitive: action}
+  - {id: desired-state-diff, layer: runtime, operation: compare, object: deployment, input: DesiredAndReportedState, output: DeploymentDiff, invariants: [ordered-diff, drift-explicit], effects: none, determinism: deterministic, oracle: mutation, primitive: action}
+  - {id: release-channel-resolver, layer: runtime, operation: route, object: release, input: ArtifactEnvironmentAndChannelPolicy, output: ReleaseDecision, invariants: [constraint-checked, provenance-preserved], effects: none, determinism: deterministic, oracle: truth-table, primitive: if_statement}
+  - {id: canary-health-gate, layer: runtime, operation: gate, object: release, input: CanaryMetricsAndPolicy, output: PromoteHoldOrRecall, invariants: [baseline-comparison, missing-metric-is-hold], effects: none, determinism: deterministic, oracle: fault-injection, primitive: if_statement}
+  - {id: rollback-controller, layer: runtime, operation: rollback, object: deployment, input: FailedReleaseAndPriorState, output: RollbackReceipt, invariants: [prior-state-preserved, active-pointer-only], effects: external_write, determinism: deterministic, oracle: integration, primitive: action}
+  - {id: disconnected-edge-sync, layer: runtime, operation: synchronize, object: edge-state, input: LocalRemoteStateAndConflictPolicy, output: ReconciledStateReceipt, invariants: [offline-queue-preserved, conflicts-explicit], effects: external_write, determinism: deterministic, oracle: fault-injection, primitive: action}
+  - {id: config-drift-detector, layer: runtime, operation: detect, object: runtime-config, input: ExpectedAndObservedConfig, output: ConfigDriftReport, invariants: [security-fields-never-autofixed], effects: read, determinism: deterministic, oracle: mutation, primitive: action}
+  - {id: trace-context-propagator, layer: runtime, operation: propagate, object: trace, input: ParentTraceAndOperation, output: ChildTraceContext, invariants: [causal-parent-preserved, tenant-scope-preserved], effects: none, determinism: deterministic, oracle: receipt, primitive: action}
+  - {id: token-meter, layer: runtime, operation: meter, object: model-call, input: ProviderUsageReceipt, output: NormalizedUsageReceipt, invariants: [provider-fields-preserved, unknown-not-estimated-as-real], effects: write, determinism: deterministic, oracle: receipt, primitive: action}
+  - {id: cost-per-pass-calculator, layer: runtime, operation: calculate, object: benchmark-run, input: UsageCostsAndOracleResults, output: CostPerPassReceipt, invariants: [failed-attempt-costs-included, zero-pass-explicit], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: event-log-normalizer, layer: process, operation: normalize, object: process-event, input: HeterogeneousEventLogs, output: CanonicalProcessEvents, invariants: [case-id-preserved, event-time-explicit], effects: none, determinism: deterministic, oracle: contract, primitive: action}
+  - {id: process-graph-miner, layer: process, operation: mine, object: process-graph, input: CanonicalProcessEvents, output: ProcessGraph, invariants: [event-count-conserved, variant-frequency-recorded], effects: none, determinism: deterministic, oracle: graph, primitive: action}
+  - {id: conformance-checker, layer: process, operation: compare, object: process-trace, input: ObservedAndExpectedProcess, output: ConformanceReport, invariants: [deviation-spans-preserved], effects: none, determinism: deterministic, oracle: mutation, primitive: action}
+  - {id: bottleneck-ranker, layer: process, operation: rank, object: process-step, input: ProcessGraphAndDurations, output: RankedBottlenecks, invariants: [duration-lineage, stable-ties], effects: none, determinism: deterministic, oracle: property, primitive: action}
+  - {id: process-simulator, layer: process, operation: simulate, object: process, input: ProcessGraphResourcesAndScenario, output: ProcessScenarioReceipt, invariants: [seed-recorded, baseline-preserved], effects: none, determinism: deterministic_or_seeded, oracle: replay, primitive: loop}
+
+bundles:
+  integration-core: [connector-probe, credential-scope-check, schema-snapshot, cdc-watermark, incremental-sync, event-deduplicator, raw-landing-receipt, schema-drift-detector, source-health-check]
+  quality-identity-core: [schema-validator, field-mapper, type-coercer, unit-normalizer, reference-integrity-checker, quarantine-router, entity-identity-resolver, record-linker, lineage-propagator, temporal-validity-resolver]
+  digital-twin-core: [object-mapper, link-type-validator, graph-reachability, digital-twin-state-reducer, digital-twin-snapshot, object-change-event]
+  analytics-core: [metric-calculator, anomaly-signal-builder, root-cause-traversal, prioritization-ranker]
+  planning-core: [forecast-wrapper, scenario-runner, constraint-feasibility-checker, optimizer-adapter, allocation-engine, schedule-feasibility, route-cost-evaluator]
+  reconciliation-core: [record-linker, temporal-validity-resolver, reconciliation-engine, metric-calculator, decision-receipt]
+  workflow-core: [case-state-machine, work-queue-router, sla-deadline-monitor, approval-gate, transactional-writeback, idempotency-gate, transactional-outbox, exception-escalator, decision-receipt]
+  review-core: [approval-gate, separation-of-duties-gate, human-review-packet, decision-receipt]
+  governed-ai-core: [governed-retriever, citation-span-verifier, context-budgeter, structured-output-validator, agent-action-policy, model-route-policy, evidence-gap-router]
+  eval-core: [eval-case-runner, regression-gate, feedback-capture, token-meter, cost-per-pass-calculator]
+  governance-core: [rbac-gate, attribute-policy-gate, purpose-limit-gate, row-column-policy-filter, sensitive-data-redactor, audit-event-emitter, retention-enforcer, source-authority-gate, freshness-gate]
+  deployment-core: [environment-selector, desired-state-diff, release-channel-resolver, canary-health-gate, rollback-controller, config-drift-detector]
+  observability-core: [trace-context-propagator, audit-event-emitter, token-meter, cost-per-pass-calculator]
+  edge-core: [environment-selector, disconnected-edge-sync, config-drift-detector, trace-context-propagator, audit-event-emitter]
+  process-mining-core: [event-log-normalizer, process-graph-miner, conformance-checker, bottleneck-ranker, process-simulator]
+  notification-core: [notification-router, transactional-outbox, exception-escalator, sensitive-data-redactor]
+  reliability-core: [idempotency-gate, transactional-outbox, source-health-check, config-drift-detector, rollback-controller]
+
+oracle_patterns:
+  contract: {strength: O5, execution: local-fixture, mutations: [missing-field, wrong-type, schema-drift]}
+  stateful: {strength: O6, execution: local-service, mutations: [duplicate-event, out-of-order-event, forbidden-transition, crash-replay]}
+  integration: {strength: O6, execution: local-emulator, mutations: [dependency-timeout, partial-write, duplicate-write, unauthorized-write]}
+  optimization: {strength: O6, execution: exact-small-instance, mutations: [infeasible-plan, capacity-breach, objective-regression]}
+  ml: {strength: O6, execution: local-train-eval, mutations: [data-leakage, nondeterministic-split, metric-regression, artifact-mismatch]}
+  security: {strength: O6, execution: actor-resource-action-matrix, mutations: [unauthorized-read, unauthorized-write, purpose-mismatch, tenant-leak]}
+  graph: {strength: O5, execution: hidden-graph-fixtures, mutations: [dangling-edge, wrong-cardinality, hidden-cycle, missing-path]}
+  receipt: {strength: O5, execution: receipt-readback, mutations: [missing-source, missing-actor, changed-payload, broken-hash]}
+  process: {strength: O6, execution: hidden-event-log, mutations: [missing-event, reordered-event, bypassed-approval, bottleneck-shift]}
+
+primitive_oracle_patterns:
+  boundary: {execution: boundary-fixtures, mutations: [lower-boundary, upper-boundary, timezone-edge, missing-date]}
+  contract: {execution: positive-negative-contract-fixtures, mutations: [missing-field, wrong-type, unknown-field, schema-drift]}
+  fault-injection: {execution: local-fault-harness, mutations: [timeout, crash, duplicate-delivery, partial-write]}
+  graph: {execution: hidden-graph-fixtures, mutations: [dangling-edge, wrong-cardinality, cycle, missing-path]}
+  held-out: {execution: held-out-labeled-fixtures, mutations: [near-duplicate, ambiguous-match, distribution-shift, tie-case]}
+  integration: {execution: local-emulator, mutations: [unauthorized-call, dependency-timeout, duplicate-write, rollback]}
+  ml: {execution: fixed-split-model-harness, mutations: [data-leakage, nondeterministic-split, artifact-mismatch, metric-regression]}
+  mutation: {execution: positive-negative-mutation-suite, mutations: [remove-check, invert-decision, drop-error, accept-invalid]}
+  optimization: {execution: exact-small-instance, mutations: [infeasible-plan, capacity-breach, objective-regression, unstable-tie]}
+  property: {execution: property-and-metamorphic-tests, mutations: [conservation-break, roundtrip-break, order-instability, precision-loss]}
+  receipt: {execution: receipt-readback, mutations: [missing-source, missing-actor, changed-payload, broken-hash]}
+  replay: {execution: byte-identical-replay, mutations: [changed-order, changed-seed, missing-event, duplicate-event]}
+  security: {execution: actor-resource-action-matrix, mutations: [unauthorized-read, unauthorized-write, purpose-mismatch, tenant-leak]}
+  stateful: {execution: state-machine-harness, mutations: [duplicate-event, out-of-order-event, forbidden-transition, crash-replay]}
+  truth-table: {execution: exhaustive-decision-table, mutations: [boundary-flip, missing-case, unsafe-default, policy-version-mismatch]}
+
+project_archetypes:
+  - enterprise-data-integration
+  - operational-control-tower
+  - case-management-work-queue
+  - asset-network-digital-twin
+  - planning-scheduling-optimization
+  - real-time-monitoring-alerting
+  - reconciliation-exception-management
+  - regulatory-evidence-audit
+  - document-standards-processing
+  - ml-train-evaluate-register-serve
+  - incident-response-recovery
+  - source-system-migration-parallel-run
+  - permissioned-agent-copilot
+  - edge-offline-eventual-sync
+  - process-mining-remediation
+
+system_families:
+  - id: platform-data-integration
+    title: Enterprise data integration platform
+    industries: [cross_industry, data_governance]
+    tool_classes: [warehouse-lakehouse-mdm, rpa-browser-mcp-api]
+    business_objects: [source-system, dataset, table, canonical-record, lineage-edge]
+    source_refs: [palantir-data-integration, palantir-platform-architecture, sec-palantir-form-10k]
+    default_bundles: [integration-core, quality-identity-core, governance-core, observability-core]
+    workflows:
+      - {id: multi-source-onboarding, title: Multi-source onboarding and schema mapping, object: source-system, operation: integrate, bundles: [], primitives: [], oracle: integration, project: enterprise-data-integration, risk: medium}
+      - {id: batch-stream-cdc-unification, title: Batch stream and CDC unification, object: change-stream, operation: synchronize, bundles: [reliability-core], primitives: [], oracle: stateful, project: enterprise-data-integration, risk: medium}
+      - {id: source-schema-drift-response, title: Source schema drift response, object: schema, operation: remediate, bundles: [workflow-core], primitives: [], oracle: contract, project: source-system-migration-parallel-run, risk: medium}
+      - {id: source-writeback-roundtrip, title: Governed source-system writeback round trip, object: enterprise-object, operation: writeback, bundles: [workflow-core, review-core], primitives: [], oracle: integration, project: source-system-migration-parallel-run, risk: high}
+  - id: platform-ontology-digital-twin
+    title: Ontology and digital-twin platform
+    industries: [cross_industry, data_governance]
+    tool_classes: [warehouse-lakehouse-mdm, bi-semantic-gis]
+    business_objects: [enterprise-object, object-link, action, state, digital-twin]
+    source_refs: [palantir-ontology-system, palantir-platform-architecture]
+    default_bundles: [quality-identity-core, digital-twin-core, governance-core, observability-core]
+    workflows:
+      - {id: canonical-object-modeling, title: Canonical object and relationship modeling, object: enterprise-object, operation: model, bundles: [], primitives: [], oracle: graph, project: asset-network-digital-twin, risk: medium}
+      - {id: event-to-twin-state, title: Event-to-digital-twin state reduction, object: digital-twin, operation: reduce, bundles: [integration-core], primitives: [], oracle: stateful, project: asset-network-digital-twin, risk: medium}
+      - {id: point-in-time-object-view, title: Point-in-time object and link view, object: object-graph, operation: snapshot, bundles: [], primitives: [temporal-validity-resolver], oracle: graph, project: asset-network-digital-twin, risk: medium}
+      - {id: ontology-action-writeback, title: Transactional ontology action and writeback, object: action, operation: execute, bundles: [workflow-core, review-core], primitives: [], oracle: integration, project: operational-control-tower, risk: high}
+  - id: platform-operational-workflows
+    title: Operational workflow and automation platform
+    industries: [cross_industry]
+    tool_classes: [rpa-browser-mcp-api, itsm-cmdb-observability]
+    business_objects: [case, work-item, action, approval, notification]
+    source_refs: [palantir-action-types, palantir-automate]
+    default_bundles: [workflow-core, review-core, notification-core, governance-core, observability-core]
+    workflows:
+      - {id: event-triggered-action, title: Event-triggered governed action, object: action, operation: dispatch, bundles: [reliability-core], primitives: [], oracle: stateful, project: case-management-work-queue, risk: high}
+      - {id: scheduled-threshold-automation, title: Scheduled and threshold automation, object: automation, operation: trigger, bundles: [], primitives: [metric-calculator], oracle: stateful, project: real-time-monitoring-alerting, risk: medium}
+      - {id: approval-notification-writeback, title: Approval notification and writeback chain, object: action-chain, operation: approve, bundles: [], primitives: [], oracle: integration, project: case-management-work-queue, risk: high}
+      - {id: exception-to-human-review, title: Exception-to-human-review routing, object: exception, operation: escalate, bundles: [], primitives: [], oracle: receipt, project: case-management-work-queue, risk: high}
+  - id: platform-ai-agents
+    title: Governed AI agent and retrieval platform
+    industries: [ai, cross_industry]
+    tool_classes: [ml-ai-platform, rpa-browser-mcp-api, dms-ecm-collaboration]
+    business_objects: [query, evidence, tool-call, model-output, agent-trace]
+    source_refs: [palantir-aip-logic, palantir-aip-retrieval, palantir-aip-evals]
+    default_bundles: [governed-ai-core, eval-core, governance-core, observability-core]
+    workflows:
+      - {id: permissioned-enterprise-rag, title: Permissioned enterprise RAG with citations, object: evidence, operation: answer, bundles: [], primitives: [], oracle: contract, project: permissioned-agent-copilot, risk: medium}
+      - {id: staged-agent-action, title: Agent action staged for human confirmation, object: tool-call, operation: stage, bundles: [review-core, workflow-core], primitives: [], oracle: security, project: permissioned-agent-copilot, risk: high}
+      - {id: model-and-tool-routing, title: Policy-based model and tool routing, object: route, operation: route, bundles: [], primitives: [], oracle: contract, project: permissioned-agent-copilot, risk: medium}
+      - {id: agent-regression-evaluation, title: Agent workflow regression evaluation, object: agent-version, operation: evaluate, bundles: [], primitives: [], oracle: ml, project: ml-train-evaluate-register-serve, risk: medium}
+  - id: platform-model-operations
+    title: Model integration and operations platform
+    industries: [ai, software]
+    tool_classes: [ml-ai-platform, source-control-cicd]
+    business_objects: [model, feature, run, evaluation, deployment]
+    source_refs: [palantir-model-integration, palantir-aip-evals]
+    default_bundles: [integration-core, eval-core, deployment-core, governance-core, observability-core]
+    workflows:
+      - {id: model-artifact-import-validation, title: Model artifact import and signature validation, object: model, operation: import, bundles: [], primitives: [schema-validator], oracle: ml, project: ml-train-evaluate-register-serve, risk: medium}
+      - {id: champion-challenger-evaluation, title: Champion challenger evaluation, object: model-version, operation: compare, bundles: [], primitives: [regression-gate], oracle: ml, project: ml-train-evaluate-register-serve, risk: high}
+      - {id: batch-live-model-deployment, title: Batch and live model deployment, object: model-deployment, operation: deploy, bundles: [], primitives: [], oracle: integration, project: ml-train-evaluate-register-serve, risk: high}
+      - {id: model-feedback-drift-loop, title: Model feedback and drift loop, object: model, operation: monitor, bundles: [workflow-core], primitives: [anomaly-signal-builder, feedback-capture], oracle: ml, project: ml-train-evaluate-register-serve, risk: high}
+  - id: platform-observability
+    title: Enterprise observability and execution evidence
+    industries: [it, sre, software, ai]
+    tool_classes: [itsm-cmdb-observability, ml-ai-platform]
+    business_objects: [trace, span, log, metric, alert, usage-receipt]
+    source_refs: [palantir-observability]
+    default_bundles: [observability-core, analytics-core, governance-core, workflow-core]
+    workflows:
+      - {id: distributed-trace-correlation, title: Distributed trace and log correlation, object: trace, operation: correlate, bundles: [], primitives: [record-linker], oracle: graph, project: real-time-monitoring-alerting, risk: medium}
+      - {id: token-cost-latency-accounting, title: Token cost and latency accounting, object: model-call, operation: meter, bundles: [], primitives: [], oracle: receipt, project: regulatory-evidence-audit, risk: medium}
+      - {id: execution-failure-classification, title: Execution failure classification and routing, object: failure, operation: classify, bundles: [], primitives: [prioritization-ranker], oracle: stateful, project: incident-response-recovery, risk: medium}
+      - {id: slo-alert-to-remediation, title: SLO alert to governed remediation, object: incident, operation: remediate, bundles: [reliability-core, review-core], primitives: [], oracle: integration, project: incident-response-recovery, risk: high}
+  - id: platform-deployment-runtime
+    title: Continuous delivery and runtime fleet platform
+    industries: [software, it, sre]
+    tool_classes: [source-control-cicd, edge-disconnected-runtime, itsm-cmdb-observability]
+    business_objects: [environment, artifact, release, deployment, health-report]
+    source_refs: [palantir-apollo-environments, palantir-platform-architecture]
+    default_bundles: [deployment-core, edge-core, governance-core, observability-core, reliability-core]
+    workflows:
+      - {id: environment-inventory-and-policy, title: Environment inventory and deployment policy, object: environment, operation: govern, bundles: [], primitives: [], oracle: contract, project: source-system-migration-parallel-run, risk: high}
+      - {id: canary-promote-or-recall, title: Canary promote hold or recall, object: release, operation: deploy, bundles: [], primitives: [], oracle: integration, project: incident-response-recovery, risk: high}
+      - {id: fleet-config-drift-remediation, title: Fleet configuration drift remediation, object: runtime-config, operation: remediate, bundles: [review-core], primitives: [], oracle: integration, project: incident-response-recovery, risk: high}
+      - {id: disconnected-edge-release-sync, title: Disconnected-edge release and state synchronization, object: edge-environment, operation: synchronize, bundles: [], primitives: [], oracle: integration, project: edge-offline-eventual-sync, risk: high}
+  - id: platform-security-governance
+    title: Security privacy and governance platform
+    industries: [security, privacy, compliance, ai_governance]
+    tool_classes: [iam-siem-soar, warehouse-lakehouse-mdm, ml-ai-platform]
+    business_objects: [identity, entitlement, marking, purpose, audit-event, retention-policy]
+    source_refs: [palantir-security, palantir-platform-architecture]
+    default_bundles: [governance-core, review-core, observability-core, workflow-core]
+    workflows:
+      - {id: purpose-and-attribute-access, title: Purpose and attribute access enforcement, object: access-intent, operation: authorize, bundles: [], primitives: [], oracle: security, project: regulatory-evidence-audit, risk: high}
+      - {id: row-column-marking-projection, title: Row column and marking-based projection, object: dataset, operation: filter, bundles: [], primitives: [], oracle: security, project: regulatory-evidence-audit, risk: high}
+      - {id: sensitive-data-retention-lifecycle, title: Sensitive-data redaction and retention lifecycle, object: record, operation: govern, bundles: [], primitives: [], oracle: security, project: regulatory-evidence-audit, risk: high}
+      - {id: governed-action-audit-trail, title: Governed action audit trail, object: action, operation: audit, bundles: [], primitives: [], oracle: receipt, project: regulatory-evidence-audit, risk: high}
+  - id: platform-process-mining
+    title: Process mining and remediation platform
+    industries: [cross_industry, data_governance]
+    tool_classes: [warehouse-lakehouse-mdm, rpa-browser-mcp-api]
+    business_objects: [process-event, case-id, process-graph, deviation, bottleneck]
+    source_refs: [palantir-process-mining]
+    default_bundles: [integration-core, process-mining-core, analytics-core, workflow-core, observability-core]
+    workflows:
+      - {id: event-history-to-process-model, title: Event history to process model, object: process, operation: mine, bundles: [], primitives: [], oracle: process, project: process-mining-remediation, risk: medium}
+      - {id: process-conformance-deviation, title: Process conformance and deviation detection, object: process-trace, operation: verify, bundles: [], primitives: [], oracle: process, project: process-mining-remediation, risk: medium}
+      - {id: process-bottleneck-analysis, title: Process bottleneck and root-cause analysis, object: process-step, operation: analyze, bundles: [], primitives: [root-cause-traversal], oracle: process, project: process-mining-remediation, risk: medium}
+      - {id: process-change-simulation-writeback, title: Process-change simulation and governed writeback, object: process, operation: optimize, bundles: [planning-core, review-core], primitives: [], oracle: integration, project: process-mining-remediation, risk: high}
+  - id: procurement-contract-operations
+    title: Procurement contract and supplier operations
+    industries: [procurement, supply_chain]
+    tool_classes: [procurement-srm-clm, erp-accounting-epm, dms-ecm-collaboration]
+    business_objects: [supplier, material, purchase-order, receipt, invoice, contract, obligation]
+    source_refs: [palantir-procurement]
+    default_bundles: [integration-core, quality-identity-core, workflow-core, governance-core, observability-core]
+    workflows:
+      - {id: material-reference-harmonization, title: Material and supplier reference harmonization, object: material, operation: harmonize, bundles: [], primitives: [entity-identity-resolver, record-linker], oracle: contract, project: enterprise-data-integration, risk: medium}
+      - {id: purchase-order-receipt-invoice-match, title: Purchase order receipt and invoice reconciliation, object: purchase-order, operation: reconcile, bundles: [reconciliation-core], primitives: [], oracle: stateful, project: reconciliation-exception-management, risk: high}
+      - {id: supplier-risk-and-crisis-route, title: Supplier risk and crisis routing, object: supplier, operation: monitor, bundles: [analytics-core, review-core, notification-core], primitives: [], oracle: stateful, project: operational-control-tower, risk: high}
+      - {id: contract-obligation-monitor, title: Contract clause obligation and SLA monitor, object: contract, operation: monitor, bundles: [governed-ai-core, review-core], primitives: [temporal-validity-resolver], oracle: contract, project: regulatory-evidence-audit, risk: high}
+  - id: supply-chain-logistics
+    title: Supply-chain logistics and fulfillment operations
+    industries: [supply_chain, logistics]
+    tool_classes: [oms-wms-tms, erp-accounting-epm, bi-semantic-gis]
+    business_objects: [sku, inventory-position, order, shipment, route, supplier]
+    source_refs: [palantir-consumer-goods, palantir-retail]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, analytics-core, workflow-core, governance-core]
+    workflows:
+      - {id: demand-supply-balance, title: Demand supply and capacity balancing, object: inventory-position, operation: allocate, bundles: [planning-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: shortage-disruption-response, title: Shortage and disruption response, object: shipment, operation: remediate, bundles: [planning-core, notification-core, review-core], primitives: [], oracle: integration, project: operational-control-tower, risk: high}
+      - {id: load-route-consolidation, title: Load consolidation and route optimization, object: shipment, operation: route, bundles: [planning-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: medium}
+      - {id: inventory-reconciliation-rebalance, title: Inventory reconciliation and network rebalance, object: inventory-position, operation: reconcile, bundles: [reconciliation-core, planning-core], primitives: [], oracle: stateful, project: reconciliation-exception-management, risk: high}
+  - id: retail-consumer-goods
+    title: Retail and consumer-goods operations
+    industries: [retail, manufacturing, supply_chain]
+    tool_classes: [oms-wms-tms, crm-cpq-support, erp-accounting-epm]
+    business_objects: [sku, assortment, promotion, price, customer, store, inventory-position]
+    source_refs: [palantir-retail, palantir-consumer-goods]
+    default_bundles: [integration-core, quality-identity-core, analytics-core, workflow-core, governance-core]
+    workflows:
+      - {id: out-of-stock-prevention, title: Out-of-stock prediction and intervention, object: sku-store, operation: prevent, bundles: [planning-core, notification-core, review-core], primitives: [], oracle: ml, project: operational-control-tower, risk: high}
+      - {id: pricing-promotion-simulation, title: Pricing and promotion scenario simulation, object: promotion, operation: simulate, bundles: [planning-core, review-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: assortment-allocation-optimization, title: Assortment and store allocation optimization, object: assortment, operation: allocate, bundles: [planning-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: product-recall-blast-radius, title: Product recall blast-radius and response, object: product-lot, operation: trace, bundles: [digital-twin-core, review-core, notification-core], primitives: [], oracle: graph, project: incident-response-recovery, risk: high}
+  - id: food-agriculture-operations
+    title: Food beverage and agricultural operations
+    industries: [food, agriculture, food_safety]
+    tool_classes: [oms-wms-tms, mes-scada-iot, plm-qms-eam-cmms]
+    business_objects: [lot, ingredient, recipe, batch, inventory-position, shipment, quality-event]
+    source_refs: [palantir-food-beverage, palantir-consumer-goods]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, workflow-core, governance-core]
+    workflows:
+      - {id: farm-to-product-lot-trace, title: Farm-to-product lot traceability, object: product-lot, operation: trace, bundles: [], primitives: [graph-reachability], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: cold-chain-excursion-response, title: Cold-chain excursion detection and response, object: shipment, operation: monitor, bundles: [analytics-core, review-core, notification-core], primitives: [], oracle: stateful, project: real-time-monitoring-alerting, risk: high}
+      - {id: production-yield-waste, title: Production yield and waste optimization, object: batch, operation: optimize, bundles: [planning-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: medium}
+      - {id: food-safety-investigation, title: Food-safety investigation and recall workflow, object: quality-event, operation: investigate, bundles: [review-core, notification-core], primitives: [root-cause-traversal], oracle: graph, project: incident-response-recovery, risk: high}
+  - id: manufacturing-operations
+    title: Manufacturing production quality and maintenance
+    industries: [manufacturing]
+    tool_classes: [mes-scada-iot, plm-qms-eam-cmms, erp-accounting-epm]
+    business_objects: [equipment, production-order, batch, part, bom, defect, maintenance-order]
+    source_refs: [palantir-manufacturing]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, analytics-core, workflow-core, governance-core]
+    workflows:
+      - {id: production-plan-execution-reconcile, title: Production plan-to-execution reconciliation, object: production-order, operation: reconcile, bundles: [reconciliation-core, planning-core], primitives: [], oracle: stateful, project: reconciliation-exception-management, risk: high}
+      - {id: equipment-predictive-maintenance, title: Equipment predictive maintenance and work-order routing, object: equipment, operation: maintain, bundles: [planning-core, review-core], primitives: [forecast-wrapper], oracle: ml, project: real-time-monitoring-alerting, risk: high}
+      - {id: quality-root-cause-disposition, title: Quality root cause and disposition workflow, object: defect, operation: investigate, bundles: [review-core], primitives: [root-cause-traversal], oracle: graph, project: case-management-work-queue, risk: high}
+      - {id: plant-capacity-bottleneck, title: Plant capacity and bottleneck optimization, object: production-line, operation: optimize, bundles: [planning-core, process-mining-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: medium}
+  - id: semiconductor-operations
+    title: Semiconductor manufacturing and experiment operations
+    industries: [semiconductors, manufacturing]
+    tool_classes: [mes-scada-iot, plm-qms-eam-cmms, ml-ai-platform]
+    business_objects: [lot, wafer, die, recipe, tool, process-step, defect, experiment]
+    source_refs: [palantir-semiconductors, palantir-manufacturing]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, analytics-core, eval-core, governance-core]
+    workflows:
+      - {id: lot-wafer-genealogy, title: Lot wafer and process genealogy, object: wafer-lot, operation: trace, bundles: [], primitives: [], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: process-excursion-detection, title: Process excursion detection and hold routing, object: process-step, operation: detect, bundles: [workflow-core, review-core], primitives: [anomaly-signal-builder], oracle: stateful, project: real-time-monitoring-alerting, risk: high}
+      - {id: yield-loss-attribution, title: Yield-loss attribution and root-cause traversal, object: yield-metric, operation: explain, bundles: [], primitives: [root-cause-traversal], oracle: graph, project: reconciliation-exception-management, risk: high}
+      - {id: experiment-planning, title: Next-experiment planning with hard constraints, object: experiment, operation: plan, bundles: [planning-core, review-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+  - id: automotive-mobility
+    title: Automotive manufacturing quality and fleet operations
+    industries: [automotive, manufacturing]
+    tool_classes: [plm-qms-eam-cmms, mes-scada-iot, oms-wms-tms]
+    business_objects: [vehicle, part, bom, build-order, defect, service-event, fleet]
+    source_refs: [palantir-automotive]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, analytics-core, workflow-core, governance-core]
+    workflows:
+      - {id: vehicle-part-genealogy, title: Vehicle configuration and serialized-part genealogy, object: vehicle, operation: trace, bundles: [], primitives: [], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: field-quality-investigation, title: Field-quality signal investigation, object: defect, operation: investigate, bundles: [review-core], primitives: [root-cause-traversal], oracle: graph, project: case-management-work-queue, risk: high}
+      - {id: launch-shortage-response, title: Vehicle-launch part shortage response, object: part, operation: allocate, bundles: [planning-core, review-core], primitives: [], oracle: optimization, project: operational-control-tower, risk: high}
+      - {id: fleet-maintenance-planning, title: Fleet maintenance planning and availability, object: fleet, operation: schedule, bundles: [planning-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: medium}
+  - id: aviation-operations
+    title: Aviation network maintenance and day-of operations
+    industries: [aviation, transportation]
+    tool_classes: [plm-qms-eam-cmms, oms-wms-tms, hris-workforce-lms]
+    business_objects: [aircraft, flight, crew, airport, part, defect, maintenance-order]
+    source_refs: [palantir-airbus]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, planning-core, workflow-core, governance-core]
+    workflows:
+      - {id: aircraft-maintenance-reliability, title: Aircraft maintenance and reliability workflow, object: aircraft, operation: maintain, bundles: [analytics-core, review-core], primitives: [], oracle: stateful, project: asset-network-digital-twin, risk: high}
+      - {id: day-of-flight-operations, title: Day-of-flight disruption and resource response, object: flight, operation: recover, bundles: [review-core, notification-core], primitives: [], oracle: optimization, project: operational-control-tower, risk: high}
+      - {id: crew-aircraft-schedule-feasibility, title: Crew and aircraft schedule feasibility, object: schedule, operation: schedule, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: supplier-delay-propagation, title: Supplier delay and maintenance-impact propagation, object: part, operation: simulate, bundles: [analytics-core], primitives: [graph-reachability], oracle: graph, project: operational-control-tower, risk: high}
+  - id: rail-transportation-operations
+    title: Rail network terminal and maintenance operations
+    industries: [transportation, transportation.rail]
+    tool_classes: [oms-wms-tms, plm-qms-eam-cmms, bi-semantic-gis]
+    business_objects: [train, locomotive, crew, terminal, track, turnout, alert, maintenance-order]
+    source_refs: [palantir-rail]
+    default_bundles: [integration-core, digital-twin-core, planning-core, analytics-core, workflow-core, governance-core]
+    workflows:
+      - {id: rail-disruption-propagation, title: Rail disruption propagation and recovery, object: network, operation: recover, bundles: [review-core, notification-core], primitives: [], oracle: optimization, project: operational-control-tower, risk: high}
+      - {id: locomotive-maintenance-priority, title: Locomotive maintenance prioritization, object: locomotive, operation: prioritize, bundles: [review-core], primitives: [], oracle: stateful, project: case-management-work-queue, risk: high}
+      - {id: terminal-container-allocation, title: Terminal container and resource allocation, object: terminal, operation: allocate, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: medium}
+      - {id: wayside-alert-root-cause, title: Wayside alert root-cause and work-order routing, object: alert, operation: investigate, bundles: [review-core], primitives: [root-cause-traversal], oracle: graph, project: incident-response-recovery, risk: high}
+  - id: energy-utility-operations
+    title: Energy utility grid and field operations
+    industries: [energy, energy.grid, climate]
+    tool_classes: [mes-scada-iot, plm-qms-eam-cmms, bi-semantic-gis]
+    business_objects: [asset, meter, circuit, outage, crew, weather-cell, work-order, emission]
+    source_refs: [palantir-energy]
+    default_bundles: [integration-core, digital-twin-core, analytics-core, planning-core, workflow-core, governance-core]
+    workflows:
+      - {id: grid-outage-impact-response, title: Grid outage impact and restoration response, object: outage, operation: recover, bundles: [review-core, notification-core], primitives: [], oracle: graph, project: operational-control-tower, risk: high}
+      - {id: wildfire-weather-risk-overlay, title: Wildfire and weather risk overlay for human review, object: circuit, operation: assess, bundles: [review-core], primitives: [anomaly-signal-builder, graph-reachability], oracle: security, project: real-time-monitoring-alerting, risk: high}
+      - {id: utility-asset-maintenance, title: Utility asset maintenance and crew scheduling, object: asset, operation: maintain, bundles: [review-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: emissions-accounting-pathway, title: Emissions accounting and pathway simulation, object: emission, operation: calculate, bundles: [reconciliation-core], primitives: [scenario-runner], oracle: receipt, project: regulatory-evidence-audit, risk: high}
+  - id: telecommunications-operations
+    title: Telecommunications network customer and field operations
+    industries: [telecommunications, telecom]
+    tool_classes: [mes-scada-iot, itsm-cmdb-observability, crm-cpq-support]
+    business_objects: [network-element, link, alarm, outage, customer, service, field-work]
+    source_refs: [palantir-telecommunications]
+    default_bundles: [integration-core, digital-twin-core, analytics-core, planning-core, workflow-core, governance-core]
+    workflows:
+      - {id: network-topology-reconciliation, title: Network topology and inventory reconciliation, object: network-element, operation: reconcile, bundles: [reconciliation-core], primitives: [], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: alarm-customer-impact-root-cause, title: Alarm correlation customer impact and root cause, object: outage, operation: investigate, bundles: [review-core, notification-core], primitives: [root-cause-traversal], oracle: graph, project: incident-response-recovery, risk: high}
+      - {id: field-engineering-allocation, title: Field-engineering work allocation, object: field-work, operation: allocate, bundles: [review-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: ran-energy-optimization, title: RAN energy optimization with quality guard, object: network-element, operation: optimize, bundles: [review-core], primitives: [constraint-feasibility-checker], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+  - id: hospital-operations
+    title: Hospital capacity staffing and patient-flow operations
+    industries: [healthcare]
+    tool_classes: [ehr-lis-pacs, hris-workforce-lms, oms-wms-tms]
+    business_objects: [patient, encounter, bed, unit, shift, operating-room, supply, discharge]
+    source_refs: [palantir-hospitals]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, planning-core, workflow-core, governance-core, review-core]
+    workflows:
+      - {id: patient-flow-bed-placement, title: Patient-flow and bed-placement decision support, object: encounter, operation: place, bundles: [], primitives: [], oracle: optimization, project: operational-control-tower, risk: high}
+      - {id: nurse-skill-shift-allocation, title: Nurse skill and shift allocation decision support, object: shift, operation: schedule, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: operating-room-utilization, title: Operating-room block utilization and conflict checks, object: operating-room, operation: schedule, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: discharge-readiness-coordination, title: Discharge readiness and coordination work queue, object: discharge, operation: coordinate, bundles: [], primitives: [], oracle: stateful, project: case-management-work-queue, risk: high}
+    safety: decision-support-only; no automated diagnosis treatment or final clinical disposition
+  - id: public-health-research
+    title: Public-health and biomedical research data operations
+    industries: [healthcare.public_health, scientific_research, data_governance]
+    tool_classes: [ehr-lis-pacs, warehouse-lakehouse-mdm, ml-ai-platform]
+    business_objects: [patient-record, observation, cohort, study, site, data-use-request]
+    source_refs: [palantir-health, nih-n3c]
+    default_bundles: [integration-core, quality-identity-core, governed-ai-core, eval-core, governance-core, review-core]
+    workflows:
+      - {id: health-data-standard-harmonization, title: Health-data standard harmonization, object: patient-record, operation: harmonize, bundles: [], primitives: [], oracle: contract, project: document-standards-processing, risk: high}
+      - {id: privacy-governed-cohort-builder, title: Privacy-governed cohort construction, object: cohort, operation: select, bundles: [], primitives: [], oracle: security, project: regulatory-evidence-audit, risk: high}
+      - {id: research-access-purpose-approval, title: Research access and purpose approval, object: data-use-request, operation: approve, bundles: [], primitives: [], oracle: security, project: regulatory-evidence-audit, risk: high}
+      - {id: public-health-signal-review, title: Public-health signal detection and expert review, object: observation, operation: detect, bundles: [analytics-core], primitives: [], oracle: ml, project: real-time-monitoring-alerting, risk: high}
+    safety: de-identified synthetic fixtures and authorized research use only
+  - id: life-sciences-operations
+    title: Life-sciences research trial and biomanufacturing operations
+    industries: [pharma, biotech, scientific_research]
+    tool_classes: [ehr-lis-pacs, mes-scada-iot, plm-qms-eam-cmms, ml-ai-platform]
+    business_objects: [sample, assay, protocol, trial-site, cohort, batch, deviation, release]
+    source_refs: [palantir-health]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, analytics-core, workflow-core, governance-core, review-core]
+    workflows:
+      - {id: trial-schema-cohort-harmonization, title: Trial schema and cohort harmonization, object: study, operation: harmonize, bundles: [], primitives: [], oracle: contract, project: enterprise-data-integration, risk: high}
+      - {id: trial-site-enrollment-planning, title: Trial-site and enrollment planning, object: trial-site, operation: plan, bundles: [planning-core], primitives: [], oracle: ml, project: planning-scheduling-optimization, risk: high}
+      - {id: batch-genealogy-deviation, title: Biomanufacturing batch genealogy and deviation, object: batch, operation: investigate, bundles: [], primitives: [root-cause-traversal], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: release-quality-evidence, title: Release-quality evidence and approval packet, object: release, operation: approve, bundles: [governed-ai-core], primitives: [], oracle: receipt, project: regulatory-evidence-audit, risk: high}
+  - id: financial-services-aml
+    title: Financial-services KYC AML and portfolio operations
+    industries: [finance, finance.aml, finance.kyc]
+    tool_classes: [core-banking-payments, trading-market-infrastructure, dms-ecm-collaboration]
+    business_objects: [customer, account, transaction, beneficial-owner, alert, case, exposure]
+    source_refs: [palantir-financial-services, palantir-aml]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, analytics-core, workflow-core, governance-core, review-core]
+    workflows:
+      - {id: customer-beneficial-owner-resolution, title: Customer and beneficial-owner resolution, object: customer, operation: resolve, bundles: [], primitives: [entity-identity-resolver, graph-reachability], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: kyc-edd-checklist, title: KYC and enhanced-diligence checklist workflow, object: customer, operation: review, bundles: [governed-ai-core], primitives: [], oracle: security, project: case-management-work-queue, risk: high}
+      - {id: aml-alert-case-assembly, title: AML alert deduplication and case assembly, object: alert, operation: investigate, bundles: [governed-ai-core], primitives: [], oracle: stateful, project: case-management-work-queue, risk: high}
+      - {id: portfolio-exposure-scenario, title: Portfolio exposure and scenario calculation, object: exposure, operation: simulate, bundles: [planning-core, reconciliation-core], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+    safety: analyst decision support with jurisdiction policy and human signoff
+  - id: government-financial-readiness
+    title: Government financial personnel and asset readiness
+    industries: [government, defense]
+    tool_classes: [erp-accounting-epm, hris-workforce-lms, plm-qms-eam-cmms]
+    business_objects: [contract, obligation, budget, person, qualification, asset, readiness-state]
+    source_refs: [army-financial-management, palantir-readiness]
+    default_bundles: [integration-core, quality-identity-core, digital-twin-core, reconciliation-core, analytics-core, workflow-core, governance-core, review-core]
+    workflows:
+      - {id: cross-system-contract-reconciliation, title: Cross-system contract and obligation reconciliation, object: contract, operation: reconcile, bundles: [], primitives: [], oracle: stateful, project: reconciliation-exception-management, risk: high}
+      - {id: budget-variance-reallocation-review, title: Budget variance and reallocation review, object: budget, operation: review, bundles: [planning-core], primitives: [], oracle: receipt, project: regulatory-evidence-audit, risk: high}
+      - {id: personnel-qualification-readiness, title: Personnel qualification and readiness rollup, object: person, operation: assess, bundles: [], primitives: [], oracle: contract, project: operational-control-tower, risk: high}
+      - {id: asset-availability-readiness, title: Asset availability and readiness forecast, object: asset, operation: forecast, bundles: [planning-core], primitives: [], oracle: ml, project: operational-control-tower, risk: high}
+    safety: logistics finance and readiness only; no autonomous targeting or lethal decisions
+  - id: public-sector-case-management
+    title: Public-sector case program and crisis operations
+    industries: [government, humanitarian]
+    tool_classes: [public-sector-case-system, dms-ecm-collaboration, oms-wms-tms]
+    business_objects: [person, household, case, document, site, allocation, shipment]
+    source_refs: [palantir-uk-government]
+    default_bundles: [integration-core, quality-identity-core, workflow-core, governed-ai-core, governance-core, review-core]
+    workflows:
+      - {id: person-household-case-dedup, title: Person household and case deduplication, object: case, operation: resolve, bundles: [], primitives: [], oracle: security, project: case-management-work-queue, risk: high}
+      - {id: case-document-completeness, title: Case document completeness and review queue, object: case, operation: review, bundles: [], primitives: [], oracle: contract, project: case-management-work-queue, risk: high}
+      - {id: site-readiness-allocation, title: Site-readiness and allocation decision support, object: site, operation: allocate, bundles: [planning-core], primitives: [], oracle: optimization, project: operational-control-tower, risk: high}
+      - {id: shipment-milestone-reporting, title: Shipment milestone and stakeholder reporting, object: shipment, operation: monitor, bundles: [notification-core], primitives: [], oracle: stateful, project: real-time-monitoring-alerting, risk: high}
+    safety: human authority required for eligibility safeguarding allocation and appeal decisions
+  - id: humanitarian-operations
+    title: Humanitarian supply allocation and delivery operations
+    industries: [humanitarian, nonprofit, logistics]
+    tool_classes: [oms-wms-tms, public-sector-case-system, bi-semantic-gis]
+    business_objects: [beneficiary-group, food-basket, supplier, warehouse, shipment, route, distribution]
+    source_refs: [wfp-palantir]
+    default_bundles: [integration-core, quality-identity-core, planning-core, workflow-core, governance-core, review-core]
+    workflows:
+      - {id: nutrition-basket-sourcing-optimization, title: Nutrition basket and sourcing optimization, object: food-basket, operation: optimize, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: multimodal-delivery-route, title: Multimodal delivery-time and cost tradeoff, object: route, operation: route, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: warehouse-last-mile-control-tower, title: Warehouse and last-mile control tower, object: shipment, operation: monitor, bundles: [digital-twin-core, analytics-core], primitives: [], oracle: stateful, project: operational-control-tower, risk: high}
+      - {id: aid-allocation-reconciliation, title: Aid allocation and distribution reconciliation, object: distribution, operation: reconcile, bundles: [reconciliation-core], primitives: [], oracle: stateful, project: reconciliation-exception-management, risk: high}
+    safety: privacy-safe synthetic beneficiary groups and human allocation authority
+  - id: construction-operations
+    title: Construction schedule cost safety and closeout operations
+    industries: [construction, real_estate]
+    tool_classes: [erp-accounting-epm, procurement-srm-clm, plm-qms-eam-cmms, dms-ecm-collaboration]
+    business_objects: [project, drawing, specification, bid, subcontract, task, resource, change-order, invoice]
+    source_refs: [palantir-construction]
+    default_bundles: [integration-core, quality-identity-core, planning-core, workflow-core, governed-ai-core, governance-core]
+    workflows:
+      - {id: specification-quantity-extraction, title: Specification and quantity extraction with evidence, object: specification, operation: extract, bundles: [], primitives: [], oracle: contract, project: document-standards-processing, risk: high}
+      - {id: schedule-critical-path-resources, title: Schedule critical path and resource allocation, object: project, operation: schedule, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: job-cost-change-order-reconcile, title: Job-cost and change-order reconciliation, object: change-order, operation: reconcile, bundles: [reconciliation-core], primitives: [], oracle: stateful, project: reconciliation-exception-management, risk: high}
+      - {id: closeout-evidence-binder, title: Closeout checklist and evidence binder, object: project, operation: close, bundles: [review-core], primitives: [], oracle: receipt, project: regulatory-evidence-audit, risk: high}
+  - id: defense-readiness-logistics
+    title: Defense readiness logistics and authorized common operations
+    industries: [defense]
+    tool_classes: [geospatial-sensor-network, plm-qms-eam-cmms, oms-wms-tms, edge-disconnected-runtime]
+    business_objects: [asset, unit, supply, maintenance-order, location, readiness-state, authorized-task]
+    source_refs: [palantir-gotham, palantir-defense-navy, palantir-readiness]
+    default_bundles: [integration-core, digital-twin-core, planning-core, workflow-core, governance-core, review-core, edge-core]
+    workflows:
+      - {id: unit-asset-readiness-picture, title: Unit and asset readiness common picture, object: readiness-state, operation: assess, bundles: [], primitives: [], oracle: graph, project: operational-control-tower, risk: high}
+      - {id: resilient-logistics-scenario, title: Resilient logistics and resupply scenario planning, object: supply, operation: plan, bundles: [], primitives: [], oracle: optimization, project: planning-scheduling-optimization, risk: high}
+      - {id: maintenance-supply-dependency, title: Maintenance and supply dependency analysis, object: asset, operation: analyze, bundles: [analytics-core], primitives: [root-cause-traversal], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: authorized-edge-operations-sync, title: Authorized edge operations and delayed synchronization, object: authorized-task, operation: synchronize, bundles: [], primitives: [], oracle: security, project: edge-offline-eventual-sync, risk: high}
+    safety: logistics readiness and defensive support only; explicit human authorization and audit; no autonomous targeting lethal action or covert surveillance decision
+  - id: space-edge-operations
+    title: Space sensor scheduling and disconnected-edge operations
+    industries: [space]
+    tool_classes: [geospatial-sensor-network, edge-disconnected-runtime, ml-ai-platform]
+    business_objects: [sensor, orbit, coverage-window, collection-request, model, edge-device, observation]
+    source_refs: [palantir-metaconstellation, palantir-apollo-environments]
+    default_bundles: [integration-core, digital-twin-core, planning-core, eval-core, governance-core, review-core, edge-core]
+    workflows:
+      - {id: sensor-capability-coverage-window, title: Sensor capability and coverage-window calculation, object: sensor, operation: calculate, bundles: [], primitives: [], oracle: graph, project: asset-network-digital-twin, risk: high}
+      - {id: human-approved-collection-schedule, title: Human-approved collection scheduling, object: collection-request, operation: schedule, bundles: [], primitives: [], oracle: security, project: planning-scheduling-optimization, risk: high}
+      - {id: edge-model-hardware-compatibility, title: Edge model and hardware compatibility, object: model, operation: validate, bundles: [deployment-core], primitives: [], oracle: contract, project: edge-offline-eventual-sync, risk: high}
+      - {id: bandwidth-aware-edge-sync, title: Bandwidth-aware edge result filtering and synchronization, object: observation, operation: synchronize, bundles: [], primitives: [], oracle: integration, project: edge-offline-eventual-sync, risk: high}
+    safety: authorized sensing and operations only; human approval for collection tasking and release

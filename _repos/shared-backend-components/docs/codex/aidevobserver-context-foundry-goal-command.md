@@ -1,0 +1,1 @@
+../../../aidevobserver/context/codex/aidevobserver-context-foundry-goal-command.md

@@ -1,0 +1,32 @@
+MODULE src/baltor/contextops/sandbox_gate.py
+## API signatures
+```python
+"""contextops/sandbox_gate — the SANDBOX + PROOF GATE for extractor snippets (Lane D)."""
+GATE_DECISIONS = ...
+_NETWORK_PATTERNS = ...
+_SECRET_PATTERNS = ...
+_ESCAPE_PATTERNS = ...
+class SandboxViolation:
+    # Raised when a snippet violates the sandbox (network/secret/escape) — it is BLOCKED, never run.
+class SandboxReport:
+    # What the sandbox observed about a snippet run (no secrets ever present in the sandbox).
+    def to_dict(self) -> dict
+class GateResult:
+    # The proof-gate outcome for one snippet, shaped like VerifierProofResult.
+    def to_dict(self) -> dict
+def _snippet_id(code: str) -> str
+def static_scan(code: str) -> tuple[bool, bool, bool, list[str]]
+    # Statically scan snippet source for network / secret / escape attempts (the primary sandbox defense).
+def run_in_sandbox(code: str, unit_test, *, allow_network: bool=False) -> SandboxReport
+    # Run a snippet's proof in an isolated temp dir after a static safety scan.
+def gate_snippet(code: str, unit_test, *, high_risk: bool=False, allow_network: bool=False, has_human_approval: bool=False, gated_at: int=0, snippet_id: str | None=None) -> GateResult
+    # The full proof gate: static sandbox scan + unit-test proof → a gate decision.
+```
+## intra-module call edges
+src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.GateResult
+src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.SandboxReport
+src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate._snippet_id
+src.baltor.contextops.sandbox_gate.gate_snippet -> src.baltor.contextops.sandbox_gate.run_in_sandbox
+src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.SandboxReport
+src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.SandboxViolation
+src.baltor.contextops.sandbox_gate.run_in_sandbox -> src.baltor.contextops.sandbox_gate.static_scan

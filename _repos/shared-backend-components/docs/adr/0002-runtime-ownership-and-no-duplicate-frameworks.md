@@ -1,0 +1,1 @@
+../../../_shared/adr/0002-runtime-ownership-and-no-duplicate-frameworks.md

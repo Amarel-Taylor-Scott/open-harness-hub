@@ -1,0 +1,12 @@
+MODULE src/teleon/components/lowering.py
+## API signatures
+```python
+"""lowering — seam 2: lower an abstract compiled DAG spec ({nodes, edges}) to the EXECUTABLE pipeline_dag, so it RUNS
+on real ports via the uniform Component wrapper (not just a synthetic dry-run)."""
+def py_function_src_teleon_components_lowering__lower_to_dag(py_arg_src_teleon_components_lowering__py_function_src_teleon_components_lowering__lower_to_dag__nodes: list, py_arg_src_teleon_components_lowering__py_function_src_teleon_components_lowering__lower_to_dag__edges: list) -> DAG
+    # nodes: [{"step", "component"|None, "plane"}]; edges: [[step_a, step_b]]. -> a runnable pipeline_dag.DAG.
+def py_function_src_teleon_components_lowering__run_compiled(py_arg_src_teleon_components_lowering__py_function_src_teleon_components_lowering__run_compiled__nodes: list, py_arg_src_teleon_components_lowering__py_function_src_teleon_components_lowering__run_compiled__edges: list, py_arg_src_teleon_components_lowering__py_function_src_teleon_components_lowering__run_compiled__graph_inputs: dict) -> dict
+    # Lower + RUN the composed DAG on real ports. graph_inputs: {type: value} available at the graph boundary.
+```
+## intra-module call edges
+src.teleon.components.lowering.py_function_src_teleon_components_lowering__run_compiled -> src.teleon.components.lowering.py_function_src_teleon_components_lowering__lower_to_dag

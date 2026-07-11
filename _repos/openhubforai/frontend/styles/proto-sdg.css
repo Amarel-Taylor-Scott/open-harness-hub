@@ -1,0 +1,42 @@
+/* ============================================================
+   OpenHubForAI — SDG Solutions (17 prebuilt pipelines)
+   ============================================================ */
+.pt-sdg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(208px, 1fr)); gap: 12px; }
+.pt-sdg-card { border-radius: var(--r-lg); padding: 15px; color: var(--fg); cursor: pointer; min-height: 138px;
+               display: flex; flex-direction: column; gap: 7px; position: relative; overflow: hidden;
+               background: color-mix(in srgb, var(--sdg) 7%, var(--panel)); border: 1px solid var(--line); border-top: 3px solid var(--sdg);
+               text-align: left; font-family: inherit; transition: transform .12s, box-shadow .12s, border-color .12s; }
+.pt-sdg-card:hover { transform: translateY(-2px); box-shadow: var(--e2); border-color: color-mix(in srgb, var(--sdg) 45%, var(--line)); }
+.pt-sdg-card .num { font-family: var(--font-display); font-size: 30px; font-weight: 800; line-height: .9; color: var(--sdg); }
+.pt-sdg-card .ttl { font-size: 13.5px; font-weight: 700; line-height: 1.18; color: var(--fg); }
+.pt-sdg-card .task { font-size: 11px; line-height: 1.35; color: var(--fg-muted); margin-top: auto; }
+.pt-sdg-card .meta { display: flex; gap: 9px; font-size: 10px; font-family: var(--font-mono); color: var(--fg-muted);
+                     border-top: 1px solid var(--line); padding-top: 7px; margin-top: 7px; }
+.pt-sdg-card .wheel { position: absolute; right: -16px; top: -16px; font-size: 70px; opacity: .08; line-height: 1; color: var(--sdg); }
+
+.pt-sdg-band { border-radius: var(--r-lg); padding: 22px 24px; color: var(--fg); display: flex; align-items: center; gap: 18px; margin-bottom: 20px;
+               background: color-mix(in srgb, var(--sdg) 10%, var(--panel)); border: 1px solid color-mix(in srgb, var(--sdg) 28%, var(--line)); border-left: 4px solid var(--sdg); }
+.pt-sdg-band .bignum { font-family: var(--font-display); font-size: 54px; font-weight: 800; line-height: 1; color: var(--sdg); }
+.pt-sdg-band .bt { font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1.1; color: var(--fg); }
+.pt-sdg-band .bd { font-size: 13.5px; color: var(--fg-muted); margin-top: 5px; max-width: 560px; }
+.pt-sdg-band .bgwheel { margin-left: auto; font-size: 84px; opacity: .14; color: var(--sdg); }
+.pt-sdg-flowwrap { background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-md); padding: 18px; margin-bottom: 16px; }
+.pt-sdg-pay { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: var(--r-md); margin-top: 16px;
+              background: color-mix(in srgb, var(--verified) 8%, var(--panel)); border: 1px solid color-mix(in srgb, var(--verified) 30%, var(--line)); font-size: 12.5px; line-height: 1.5; }
+.pt-sdg-pay .gl { color: var(--verified); font-size: 16px; flex: 0 0 auto; }
+.pt-sdg-pay b { color: var(--verified); }
+
+/* readable goal numbers (muted by default; vibrant via tweak) + pipeline cards */
+.pt-sdg-card .num { color: color-mix(in srgb, var(--sdg) 58%, var(--fg)); }
+.pt-sdg-card .go { font-size: 11px; font-weight: 600; margin-top: 8px; color: color-mix(in srgb, var(--sdg) 58%, var(--fg)); }
+.pt-sdg-band .bignum { color: color-mix(in srgb, var(--sdg) 58%, var(--fg)); }
+.int-vibrant .pt-sdg-card .num, .int-vibrant .pt-sdg-card .go, .int-vibrant .pt-sdg-band .bignum { color: var(--sdg); }
+.pt-pipe { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--sdg); border-radius: var(--r-md);
+           padding: 13px 15px; cursor: pointer; transition: border-color .12s, box-shadow .12s; }
+.pt-pipe:hover { box-shadow: var(--e1); border-color: color-mix(in srgb, var(--sdg) 45%, var(--line)); }
+.pt-pipe .pn { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+.pt-pipe .pio { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin: 8px 0; }
+.pt-pipe .pio .in, .pt-pipe .pio .out { font-family: var(--font-mono); font-size: 10.5px; color: var(--fg-muted);
+           background: var(--bg-subtle); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 3px 7px; }
+.pt-pipe .pio .ar { color: var(--fg-faint); }
+.pt-pipe .pf .go { font-size: 11px; font-weight: 600; color: color-mix(in srgb, var(--sdg) 58%, var(--fg)); }

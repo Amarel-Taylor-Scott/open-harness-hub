@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/specialized-model-card-scan-jobs.md

@@ -1,0 +1,28 @@
+MODULE src/teleon/runtime/trust_tiers.py
+## API signatures
+```python
+"""trust_tiers — the trust-agnostic seam: a component's trust tier gates its EXECUTION environment (which sandbox) and
+WHAT DATA may flow to it (data class). Deny-by-default: an unknown/missing tier is treated as the most restrictive. This
+is the operational form of `discovery ≠ trust` — a discovered component may be in the registry but may only run in a hard
+sandbox on synthetic inputs until it earn"""
+def py_function_src_teleon_runtime_trust_tiers___policy() -> dict
+def py_function_src_teleon_runtime_trust_tiers___tiers() -> dict
+def py_function_src_teleon_runtime_trust_tiers___sensitivity(py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__sensitivity__data_class: str) -> int
+def py_function_src_teleon_runtime_trust_tiers__tier_of(py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__tier_of__component: dict) -> str
+    # A component's trust tier, defaulting to the most restrictive ('experimental') when unset — deny-by-default.
+def py_function_src_teleon_runtime_trust_tiers__required_sandbox(py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__required_sandbox__tier: str) -> str
+    # The sandbox level this tier MUST run in ('hard' for an unknown tier).
+def py_function_src_teleon_runtime_trust_tiers__can_execute(py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__can_execute__tier: str, py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__can_execute__data_class: str) -> dict
+    # May a component of `tier` execute on data of `data_class`? Allowed only if the data is no more sensitive than the
+def py_function_src_teleon_runtime_trust_tiers__gate_component(py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__gate_component__component: dict, py_arg_src_teleon_runtime_trust_tiers__py_function_src_teleon_runtime_trust_tiers__gate_component__data_class: str) -> dict
+    # Convenience: resolve a component's tier and decide if it may run on this data class.
+```
+## intra-module call edges
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___sensitivity -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___policy
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___tiers -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___policy
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__can_execute -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___sensitivity
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__can_execute -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___tiers
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__gate_component -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__can_execute
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__gate_component -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__tier_of
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__required_sandbox -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___tiers
+src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers__tier_of -> src.teleon.runtime.trust_tiers.py_function_src_teleon_runtime_trust_tiers___tiers

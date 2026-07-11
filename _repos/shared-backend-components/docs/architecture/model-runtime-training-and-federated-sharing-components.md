@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/model-runtime-training-and-federated-sharing-components.md

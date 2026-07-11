@@ -1,0 +1,43 @@
+{
+  "schema_version": "portfolio-connection-map",
+  "purpose": "Memorialize how EVERYTHING connects: the spine is to help people use AI better by moving each unit of work unbounded+inefficient -> most-bounded+most-efficient, on context kept true/current/provable, defined by capability, getting smarter over time. The CORE products (Baltor, Teleon) CONSUME content from the Open*Hub surfaces (context packs, harnesses, model info, methods, receipts...). Names are cross-checked against the authoritative family source (dist/sites/aidoneright-design/shared/products.js) so this map can never silently omit a surface.",
+  "amazon_strategy": {
+    "principle": "Each Open*Hub is built as INTERNAL infrastructure that Baltor/Teleon consume first, with the ability to spin it out as a PUBLIC, independently-monetizable Open*Hub.io registry later — the AWS pattern (internal infra -> public revenue stream).",
+    "open_trigger": "a credible competitor launches in the hub's lane OR a planned public-release milestone — whichever first — AND owner domain/trademark clearance (per architecture/candidate_open_hubs.json).",
+    "stages": {
+      "live": "dual-use: already a live open registry AND internal infra the core consumes",
+      "private_bench": "internal-first: private infra now; a public-revenue candidate when its trigger fires"
+    }
+  },
+  "dependency_law": "Baltor -> Teleon -> OpenHubForAI, NEVER reverse (enforced by check_portfolio_dependency_law). Content flows hub -> core (the core CONSUMES from hubs); a hub never depends on the core.",
+  "core": [
+    {"name": "Baltor", "role": "core_product", "kind": "Governed context (applied)", "consumes_from_hubs": true},
+    {"name": "Teleon", "role": "core_product", "kind": "Purpose-driven runtime", "consumes_from_hubs": true}
+  ],
+  "parent": {"name": "AI Done Right", "role": "parent", "kind": "AI platform company (holding)"},
+  "open_ecosystem": {"name": "OpenHubForAI", "role": "open_ecosystem", "kind": "open evals/harnesses + the CapabilityTask spec"},
+  "hubs": [
+    {"name": "OpenContextHub",        "tier": "live",          "provides": "context packs",                       "consumed_by": "baltor"},
+    {"name": "OpenSkillsHub",         "tier": "live",          "provides": "composable evaluated agent skills",    "consumed_by": "teleon"},
+    {"name": "OpenToolsHub",          "tier": "live",          "provides": "governed callable tools",              "consumed_by": "teleon"},
+    {"name": "OpenSkillToTool",       "tier": "live",          "provides": "skill->tool conversions",              "consumed_by": "teleon"},
+    {"name": "OpenHubForAI",        "tier": "live", "role": "ecosystem", "provides": "harnesses / templates / eval packs",   "consumed_by": "teleon"},
+    {"name": "OpenMCPHub",            "tier": "live",          "provides": "MCP server intelligence (discovery!=trust)", "consumed_by": "teleon"},
+    {"name": "OpenCompressionHub",    "tier": "live",          "provides": "compression + token-budget intelligence", "consumed_by": "baltor"},
+    {"name": "OpenBenchmarkHub",      "tier": "live",          "provides": "benchmark evidence (not authority)",   "consumed_by": "both"},
+    {"name": "OpenReviewHub",         "tier": "live",          "provides": "capability/reproducibility review",    "consumed_by": "both"},
+    {"name": "OpenTemplatesHub",      "tier": "private_bench", "provides": "schema/runtime/resource/API-UI/inference/PurposeTask template families", "consumed_by": "teleon"},
+    {"name": "OpenEndpointHub",       "tier": "private_bench", "provides": "LLM endpoint + gateway due-diligence (model info, data-class/jurisdiction)", "consumed_by": "teleon"},
+    {"name": "OpenEnvironmentHub",            "tier": "private_bench", "provides": "verifiable eval environments + reward specs", "consumed_by": "teleon"},
+    {"name": "OpenSandboxHub",        "tier": "private_bench", "provides": "sandbox registry + risk/conformance",  "consumed_by": "teleon"},
+    {"name": "OpenAgentHub",          "tier": "private_bench", "provides": "agent-runtime adapters + run receipts", "consumed_by": "teleon"},
+    {"name": "OpenReceiptHub",        "tier": "private_bench", "provides": "portable signed receipts (the attestation face)", "consumed_by": "both"},
+    {"name": "OpenStateHub",          "tier": "private_bench", "provides": "durable governed agent working state", "consumed_by": "teleon"},
+    {"name": "OpenRoutingHub",        "tier": "private_bench", "provides": "model-routing POLICY (preference cards, lane policy, model info)", "consumed_by": "teleon"},
+    {"name": "OpenReconciliationHub", "tier": "private_bench", "provides": "reconciliation methods (cluster align, dedupe, contradictions)", "consumed_by": "baltor"},
+    {"name": "OpenHardeningHub",      "tier": "private_bench", "provides": "object-hardening methods (brittle text -> refreshing objects)", "consumed_by": "baltor"},
+    {"name": "OpenEnrichmentHub",     "tier": "private_bench", "provides": "context enrichment methods (metadata, relationships, graphs)", "consumed_by": "baltor"},
+    {"name": "OpenOptimizationHub",   "tier": "private_bench", "provides": "pack-shaping methods (summarize/distill, unstructured->structured, fit budget = the descent)", "consumed_by": "baltor"},
+    {"name": "OpenVerificationHub",   "tier": "private_bench", "provides": "verification methods (bind claim->source, prove by hash, hold out the unprovable)", "consumed_by": "both"}
+  ]
+}

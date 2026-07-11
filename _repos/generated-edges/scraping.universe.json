@@ -1,0 +1,295 @@
+{
+  "record_type": "repo_universe",
+  "surface": "scraping",
+  "repo": "aidoneright-scraping",
+  "kind": "dev_tool",
+  "layer": "library",
+  "role": "DEV TOOL \u2014 reusable scraping / browser-automation / stealth-fetch toolkit (the descent ladder: API -> browser -> stealth -> vision). Feeds intake/discovery. Consented + governed only.",
+  "interface": {
+    "mode": "port",
+    "how": "Consume as a capability behind a stable port (a library/adapter) \u2014 no HTTP seam; you invoke the port, never its host.",
+    "seam": null,
+    "seam_env": null
+  },
+  "exposes": [
+    {
+      "id": "fetch-ladder",
+      "summary": "The escalating fetch descent (API to browser to stealth to vision) that climbs only as far as a source needs."
+    },
+    {
+      "id": "browser-automation",
+      "summary": "Headless browser automation for JS-rendered sources."
+    },
+    {
+      "id": "extract-cascade",
+      "summary": "The cost-ordered extraction cascade (deterministic-first, model-last)."
+    },
+    {
+      "id": "rate-governance",
+      "summary": "Rate limiting and politeness governance across sources."
+    },
+    {
+      "id": "robots/consent-gate",
+      "summary": "The robots.txt + consent gate (gate #0) enforced before any fetch."
+    }
+  ],
+  "consume": [
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "kind": "rules_and_context",
+      "role": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the naming law, multi-path methodology, verification laws, the surface registry, and the portable checkers.",
+      "interface": {
+        "mode": "inherit",
+        "how": "Inherited standards + shared context \u2014 present in every repo, read as law; not a running service.",
+        "seam": null,
+        "seam_env": null
+      },
+      "exposes": [
+        {
+          "id": "standards/*",
+          "summary": "The eight inherited org laws (multi-path, globally-unique naming, candidate/truth boundary, change-verification, verify-the-verifier, no-magic-values, lossless-distillation, archival)."
+        },
+        {
+          "id": "contracts/surface-registry.json",
+          "summary": "The single source of truth for every surface: its exposes, allowed may_depend_on edges, and forbidden edges."
+        },
+        {
+          "id": "tools/check_*.py",
+          "summary": "Portable enforcement gates every repo runs (cross-repo dependency law, interface-manifest consistency)."
+        },
+        {
+          "id": "_shared/*",
+          "summary": "Common truth every repo references: the glossary, architecture map, single-source config constants, and the id-minting authority."
+        }
+      ]
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "kind": "substrate",
+      "role": "the SUBSTRATE every product consumes \u2014 the primitive/component registry + factory + catalog, codegraph, naming planes, eval, storage tiers, pipelines, credential plane. Reusable infrastructure, product-neutral.",
+      "interface": {
+        "mode": "seam",
+        "how": "Call the substrate registry seam same-origin at `/registry/` (cloud base `OH_SEAM_REGISTRY_BASE`, a local port in dev).",
+        "seam": "/registry/",
+        "seam_env": "OH_SEAM_SHARED_BACKEND_COMPONENTS_BASE"
+      },
+      "exposes": [
+        {
+          "id": "registry",
+          "summary": "The federated component/primitive registry behind one Registry<T> port (uniform list/lookup/search/explain)."
+        },
+        {
+          "id": "primitives",
+          "summary": "The seven canonical primitives (Input, Knowledge Corpus, If Statement, Action, Loop, Stop/End, Output) and their composition edges."
+        },
+        {
+          "id": "codegraph",
+          "summary": "The tree-sitter AST symbol/edge graph over the codebase (callers, callees, impact, change-audit)."
+        },
+        {
+          "id": "eval-harness",
+          "summary": "The two-axis lift+durability gap harness that admits a component only if it lifts over the bare model AND the lift is structural."
+        },
+        {
+          "id": "storage-tiers",
+          "summary": "The tiered record store: config JSON, operational Postgres+pgvector, and history warehouse."
+        },
+        {
+          "id": "credential-plane",
+          "summary": "The single-source credential registry \u2014 env-var names only, deny-by-default reachability."
+        }
+      ]
+    },
+    {
+      "surface": "api-endpoint-wrappers",
+      "repo": "aidoneright-api-endpoint-wrappers",
+      "kind": "dev_tool",
+      "role": "DEV TOOL \u2014 reusable adapters that wrap third-party / local / cloud API endpoints behind stable PORTS (agnostic-adapter pattern), so every product calls a capability, never a hardcoded host. Cost-ordered, deterministic-first.",
+      "interface": {
+        "mode": "port",
+        "how": "Consume as a capability behind a stable port (a library/adapter) \u2014 no HTTP seam; you invoke the port, never its host.",
+        "seam": null,
+        "seam_env": null
+      },
+      "exposes": [
+        {
+          "id": "port-adapters",
+          "summary": "Reusable adapters that wrap third-party/local/cloud API endpoints behind a stable port."
+        },
+        {
+          "id": "provider-registry",
+          "summary": "The catalog of wrapped providers and their capabilities."
+        },
+        {
+          "id": "cost-gates",
+          "summary": "Pre-call cost/budget gates on outbound provider calls."
+        },
+        {
+          "id": "retry/backoff",
+          "summary": "Shared retry and backoff policy for provider reachability."
+        },
+        {
+          "id": "credential-port",
+          "summary": "The port that resolves provider credentials from the credential-plane (env names only)."
+        }
+      ]
+    }
+  ],
+  "consumed_by": [
+    {
+      "surface": "aidevobserver",
+      "repo": "aidoneright-aidevobserver"
+    },
+    {
+      "surface": "baltor",
+      "repo": "aidoneright-baltor"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components"
+    }
+  ],
+  "forbidden_from_me": [],
+  "universe": [
+    {
+      "surface": "aidevobserver",
+      "repo": "aidoneright-aidevobserver",
+      "kind": "product_usage_layer",
+      "layer": "product",
+      "interface_mode": "seam",
+      "seam": "/api/observer/",
+      "role_short": "the AI-USAGE layer \u2014 session/AI-usage coaching (not code review); MCP + CLI + extension + app + local service."
+    },
+    {
+      "surface": "aidoneright",
+      "repo": "aidoneright-parent",
+      "kind": "parent_brand",
+      "layer": "product",
+      "interface_mode": "site",
+      "seam": null,
+      "role_short": "the PARENT BRAND / portfolio umbrella (aidoneright.dev). References every surface's PUBLIC interface for the portfolio\u2026"
+    },
+    {
+      "surface": "api-endpoint-wrappers",
+      "repo": "aidoneright-api-endpoint-wrappers",
+      "kind": "dev_tool",
+      "layer": "library",
+      "interface_mode": "port",
+      "seam": null,
+      "role_short": "DEV TOOL \u2014 reusable adapters that wrap third-party / local / cloud API endpoints behind stable PORTS (agnostic-adapter\u2026"
+    },
+    {
+      "surface": "baltor",
+      "repo": "aidoneright-baltor",
+      "kind": "product_applied",
+      "layer": "product",
+      "interface_mode": "seam",
+      "seam": "/api/baltor/",
+      "role_short": "the applied, customer-facing CONTEXT product, powered by Teleon (a TENANT). Governance / provenance / signed facts /\u2026"
+    },
+    {
+      "surface": "business-context",
+      "repo": "aidoneright-business-context",
+      "kind": "context",
+      "layer": "business",
+      "interface_mode": "read",
+      "seam": null,
+      "role_short": "CONTEXT repo \u2014 business notes, decisions (with warrants), activity log, analytics, MCP server configs, meeting/strategy\u2026"
+    },
+    {
+      "surface": "context-injection",
+      "repo": "aidoneright-context-injection",
+      "kind": "dev_tool",
+      "layer": "library",
+      "interface_mode": "port",
+      "seam": null,
+      "role_short": "DEV TOOL \u2014 reusable context assembly / packing / memory / prompt-composition tooling (context packs, headroom\u2026"
+    },
+    {
+      "surface": "dev-rules-context",
+      "repo": "aidoneright-dev-rules-context",
+      "kind": "rules_and_context",
+      "layer": "devkit",
+      "interface_mode": "inherit",
+      "seam": null,
+      "role_short": "the standards + gates + shared-context TEMPLATE repo (this template-repo). Inherited by every other repo; holds the\u2026"
+    },
+    {
+      "surface": "edge-graph-generator",
+      "repo": "aidoneright-edge-graph-generator",
+      "kind": "meta_tool",
+      "layer": "library",
+      "interface_mode": "generate",
+      "seam": null,
+      "role_short": "META DEV TOOL \u2014 reads the surface-registry + every repo's published interface.json and GENERATES the repo-to-repo edge\u2026"
+    },
+    {
+      "surface": "fundraising",
+      "repo": "aidoneright-fundraising",
+      "kind": "context",
+      "layer": "business",
+      "interface_mode": "read",
+      "seam": null,
+      "role_short": "CONTEXT repo \u2014 go-to-market + fundraising strategy, investor outreach, round planning, market sizing. The money/market\u2026"
+    },
+    {
+      "surface": "openhubforai",
+      "repo": "aidoneright-openhubforai",
+      "kind": "open_spec",
+      "layer": "product",
+      "interface_mode": "spec",
+      "seam": null,
+      "role_short": "the OPEN ecosystem + the open CapabilityTask spec (CTS). The neutral home of the standard; stays product-neutral."
+    },
+    {
+      "surface": "pitch-decks",
+      "repo": "aidoneright-pitch-decks",
+      "kind": "context",
+      "layer": "business",
+      "interface_mode": "read",
+      "seam": null,
+      "role_short": "CONTEXT repo \u2014 investor pitch decks, investment narrative, one-pagers, traction/metrics evidence. The outward-facing\u2026"
+    },
+    {
+      "surface": "scraping",
+      "repo": "aidoneright-scraping",
+      "kind": "dev_tool",
+      "layer": "library",
+      "interface_mode": "port",
+      "seam": null,
+      "role_short": "DEV TOOL \u2014 reusable scraping / browser-automation / stealth-fetch toolkit (the descent ladder: API -> browser ->\u2026"
+    },
+    {
+      "surface": "shared-backend-components",
+      "repo": "aidoneright-shared-backend-components",
+      "kind": "substrate",
+      "layer": "substrate",
+      "interface_mode": "seam",
+      "seam": "/registry/",
+      "role_short": "the SUBSTRATE every product consumes \u2014 the primitive/component registry + factory + catalog, codegraph, naming planes\u2026"
+    },
+    {
+      "surface": "teleon",
+      "repo": "aidoneright-teleon",
+      "kind": "product_runtime",
+      "layer": "product",
+      "interface_mode": "seam",
+      "seam": "/api/teleon/",
+      "role_short": "the purpose-driven, eval-gated, self-adaptive compute RUNTIME SaaS. Owns PurposeTask/CapabilityTask, runtime selection\u2026"
+    },
+    {
+      "surface": "yc-applications",
+      "repo": "aidoneright-yc-applications",
+      "kind": "context",
+      "layer": "business",
+      "interface_mode": "read",
+      "seam": null,
+      "role_short": "CONTEXT repo \u2014 Y Combinator (and other accelerator) application drafts, answers, founder/video scripts, readiness\u2026"
+    }
+  ],
+  "law": "Dependency direction is preserved across repos: Baltor -> Teleon -> OpenHubForAI, never the reverse. Every product surface may consume SharedBackendComponents (the substrate) and the OpenHubForAI open spec. A surface consumes another ONLY via its published interface.json (a versioned contract), never its internals. dev-rules-context is inherited by every repo (standards + gates) and depends on nothing.",
+  "consumption_rule": "surface A may reference surface B's capabilities ONLY through B's interface.json (name + version + exposes). Importing B's source from A is a forbidden cross-repo edge, caught by the checker.",
+  "rule": "Consume a neighbor ONLY via its published interface listed here \u2014 never read/import its source."
+}

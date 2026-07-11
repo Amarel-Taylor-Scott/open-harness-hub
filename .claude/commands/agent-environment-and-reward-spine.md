@@ -22,10 +22,10 @@ equivalent + candidate metadata + record blocker + continue. Watchdog: restart O
 ONLY on `.agent/STOP_REQUESTED`.
 
 ## VERIFIED REALITY (re-verify each cycle)
-- Agent-runtime layer BUILT + redteamed: `src/teleon/agents/agent_runtime_provider.py` + `check_agent_runtime_layer`
-  + `check_agent_runtime_layer_redteam` (the thing this spine measures). Sandbox: `src/teleon/sandbox` (SandboxProviderPort).
-  LLM plane: `src/teleon/inference` (route model calls through it; never raw provider calls). flywheel ~386+.
-- Repo2RLEnv research recorded: `docs/research/repo2rlenv-and-rl-env-synthesis.md` + memory `rl-env-synthesis-tools`.
+- Agent-runtime layer BUILT + redteamed: `_repos/teleon/backend/src/teleon/agents/agent_runtime_provider.py` + `check_agent_runtime_layer`
+  + `check_agent_runtime_layer_redteam` (the thing this spine measures). Sandbox: `_repos/teleon/backend/src/teleon/sandbox` (SandboxProviderPort).
+  LLM plane: `_repos/teleon/backend/src/teleon/inference` (route model calls through it; never raw provider calls). flywheel ~386+.
+- Repo2RLEnv research recorded: `_repos/shared-backend-components/context/research/repo2rlenv-and-rl-env-synthesis.md` + memory `rl-env-synthesis-tools`.
 
 ## TARGET LADDER (first incomplete; mark VERIFIED_DONE + advance, never stop)
 - **P1 (start here): research registry** — `architecture/agent_environment_research_registry.json` (entries:
@@ -38,7 +38,7 @@ ONLY on `.agent/STOP_REQUESTED`.
 - **P0 contracts:** schemas/environments/{AgentEnvironmentArtifact,EnvironmentProviderNode,EnvironmentRunRequest,
   EnvironmentRunResult,EnvironmentRunReceipt,RewardSpec,RewardResult,RewardProviderNode,EnvironmentCompatibilityReport}.v1
   + register in contract_registry + check_agent_environment_contracts.
-- **P2 local provider:** src/teleon/environments/{local_environment_provider,reward_runner}.py + src/teleon/ports/
+- **P2 local provider:** _repos/teleon/backend/src/teleon/environments/{local_environment_provider,reward_runner}.py + _repos/teleon/backend/src/teleon/ports/
   {environment_provider,reward_provider}.py — offline, no Docker, no key, writes EnvironmentRunReceipt, deterministic
   reward, output-contract validation + check_local_environment_provider.
 - **P3 Baltor context env (the killer internal demo):** environment.baltor.cfpb_context_governance.local@v1 —
@@ -46,7 +46,7 @@ ONLY on `.agent/STOP_REQUESTED`.
   allegation served + no LLM-output-as-truth + check_baltor_context_environment. (Reuse the existing CFPB seed.)
 - **P4 Teleon env:** environment.teleon.capabilitytask_runtime_selection.local@v1 — reward = candidate-not-active-
   before-promotion + scorecard + rollback + runtime-decision-receipt + boundary-approval + check_teleon_capability_environment.
-- **P5 candidate adapters (stubs only):** src/teleon/environments/providers/{repo2rlenv,harbor,openenv,ors,repolaunch}_candidate.py
+- **P5 candidate adapters (stubs only):** _repos/teleon/backend/src/teleon/environments/providers/{repo2rlenv,harbor,openenv,ors,repolaunch}_candidate.py
   — no import-at-load if dep missing; ProviderUnavailableResult; Docker/LLM-required stay candidate; no raw keys; no push.
 - **P6 redteam:** check_agent_environment_redteam — attacks: benchmark promotes candidate / agent output→Baltor truth /
   Repo2RLEnv runs Docker unauthorized / Harbor uses raw key / OpenEnv network without policy / reward LLM-judge without

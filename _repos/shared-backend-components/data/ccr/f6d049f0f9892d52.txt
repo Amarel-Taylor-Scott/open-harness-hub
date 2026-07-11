@@ -1,0 +1,66 @@
+MODULE src/teleon/tuning/tuner.py
+## API signatures
+```python
+"""src.teleon.tuning.tuner — the self-tuning TUNER that learns from the action ledger CONTRASTIVELY."""
+_REPO = ...
+DEFAULT_DIMENSION = ...
+DEFAULT_MIN_SUPPORT = ...
+DEFAULT_MIN_PASSRATE_GAP = ...
+DEFAULT_PASSRATE_EPSILON = ...
+DEFAULT_MIN_COST_GAIN = ...
+_CONFIDENCE_SMOOTHING = ...
+SERVES_TRUTH = ...
+POLICY_DELTA_KIND = ...
+WIN_RELIABILITY = ...
+WIN_COST = ...
+class TunerRefused:
+    # Raised when a destructive/un-approved apply is attempted — the tuner proposes, it never auto-applies.
+class PolicyDelta:
+    # A proposed, governed selection-policy adjustment: in ``context`` (for ``task``), prefer ``prefer`` over
+    def rationale(self) -> str
+    def delta_id(self) -> str
+    def to_record(self) -> dict[str, Any]
+def _context_key(task: str, context: dict, keys) -> str
+    # The SIMILARITY bucket key: the task plus the selected context features (canonical, order-independent).
+def _choice_value(choice: dict, dimension: str)
+    # The value being contrasted: ``choice[dimension]`` when present, else the whole canonical choice (so records
+def _stats(observations: list[dict]) -> dict
+    # Contrast stats for one choice within one context: n, passes/fails, pass-rate, mean cost/latency/tokens.
+class ContrastiveTuner:
+    # Reads an action ledger and PROPOSES selection-policy deltas by contrasting successful vs failed choices in
+    def __init__(self, ledger: ActionLedger, *, dimension: str=DEFAULT_DIMENSION, context_keys=None, min_support: int=DEFAULT_MIN_SUPPORT, min_passrate_gap: float=DEFAULT_MIN_PASSRATE_GAP, passrate_epsilon: float=DEFAULT_PASSRATE_EPSILON, min_cost_gain: float=DEFAULT_MIN_COST_GAIN) -> None
+    def _buckets(self) -> dict[str, dict]
+        # Group ledger actions into {context_key: {"task","context", "choices": {value: [records]}}}.
+    def _confidence(self, strength: float, support: int) -> float
+        # Fold the win MARGIN (strength ∈ [0,1]) with the SUPPORT via Laplace smoothing — small samples are
+    def _compare(self, task, context, a, b) -> PolicyDelta | None
+        # Contrast choice A against choice B in one context. Returns a delta only if A DOMINATES B by the
+    def proposals(self) -> list[PolicyDelta]
+        # The contrastive policy deltas across all contexts — proposals ONLY (never applied). Within each context,
+    def best_choice_for(self, task: str, context: dict)
+        # The empirically best choice value for a context (the recommendation): the most-reliable / then-cheapest
+    def summary(self) -> dict
+        # A computed readout: #contexts examined, #proposals, and the proposals as records.
+    def apply_delta(self, delta: PolicyDelta, base_policy: dict | None=None, *, approved: bool=False) -> dict
+        # GOVERNED apply. The tuner PROPOSES; applying a policy change is a human decision. This REFUSES unless
+def self_test() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.tuning.tuner._buckets -> src.teleon.tuning.tuner._choice_value
+src.teleon.tuning.tuner._buckets -> src.teleon.tuning.tuner._context_key
+src.teleon.tuning.tuner._compare -> src.teleon.tuning.tuner.ContrastiveTuner._confidence
+src.teleon.tuning.tuner._compare -> src.teleon.tuning.tuner.PolicyDelta
+src.teleon.tuning.tuner.apply_delta -> src.teleon.tuning.tuner.TunerRefused
+src.teleon.tuning.tuner.best_choice_for -> src.teleon.tuning.tuner.ContrastiveTuner._buckets
+src.teleon.tuning.tuner.best_choice_for -> src.teleon.tuning.tuner._context_key
+src.teleon.tuning.tuner.best_choice_for -> src.teleon.tuning.tuner._stats
+src.teleon.tuning.tuner.main -> src.teleon.tuning.tuner.self_test
+src.teleon.tuning.tuner.proposals -> src.teleon.tuning.tuner.ContrastiveTuner._buckets
+src.teleon.tuning.tuner.proposals -> src.teleon.tuning.tuner.ContrastiveTuner._compare
+src.teleon.tuning.tuner.proposals -> src.teleon.tuning.tuner._stats
+src.teleon.tuning.tuner.self_test -> src.teleon.tuning.tuner.ContrastiveTuner
+src.teleon.tuning.tuner.summary -> src.teleon.tuning.tuner.ContrastiveTuner._buckets
+src.teleon.tuning.tuner.summary -> src.teleon.tuning.tuner.ContrastiveTuner.proposals
+src.teleon.tuning.tuner.to_record -> src.teleon.tuning.tuner.PolicyDelta.delta_id
+src.teleon.tuning.tuner.to_record -> src.teleon.tuning.tuner.PolicyDelta.rationale

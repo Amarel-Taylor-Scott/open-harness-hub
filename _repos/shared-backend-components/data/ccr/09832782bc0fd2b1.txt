@@ -1,0 +1,26 @@
+MODULE src/teleon/ingest/bulk_registry.py
+## API signatures
+```python
+"""src.teleon.ingest.bulk_registry — bulk-ingest machine-readable capability REGISTRY DUMPS into candidate rows
+WITHOUT an LLM. The path from thousands to hundreds of thousands."""
+REGISTRY_FORMATS = ...
+_FORMAT_SOURCE_KIND = ...
+_KIND_DETERMINISM = ...
+_CATEGORY_KEYWORDS = ...
+def _infer_category(text: str) -> str
+def _slug(name: str) -> str
+def _common_entry(raw: dict, fmt: str) -> dict
+    # Pull a common (name, description, url, kind, license) from a format-specific dump entry — deterministic.
+def map_entry(raw: dict, fmt: str) -> dict | None
+    # Map ONE registry entry to a CapabilityCandidate-shaped row (no LLM). None if it has no usable name.
+def ingest_dump(dump, *, registry_format: str) -> list[dict]
+    # Map a whole registry dump (a list of entries, or a dict with an entries/connectors/servers/data list) into
+def ingest_to_feed(dump_path: str | Path, *, registry_format: str, out_path: str | Path) -> dict
+    # Read a registry dump file, map it, and write a discovered-feed JSON the runner ingests. Returns a summary.
+```
+## intra-module call edges
+src.teleon.ingest.bulk_registry.ingest_dump -> src.teleon.ingest.bulk_registry.map_entry
+src.teleon.ingest.bulk_registry.ingest_to_feed -> src.teleon.ingest.bulk_registry.ingest_dump
+src.teleon.ingest.bulk_registry.map_entry -> src.teleon.ingest.bulk_registry._common_entry
+src.teleon.ingest.bulk_registry.map_entry -> src.teleon.ingest.bulk_registry._infer_category
+src.teleon.ingest.bulk_registry.map_entry -> src.teleon.ingest.bulk_registry._slug

@@ -1,0 +1,907 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "adapter_status": "executed",
+    "llm_raw_preview": "```json\n{\n  \"llm_summaries\": [\n    {\n      \"faithfulness_risk\": \"low\",\n      \"freshness_warning\": \"volatile_fact\",\n      \"summary_type\": \"claim_set\",\n      \"supported_claim_ids\": [\n        \"claim-001-532d2b53\",\n        \"claim-002-693b3c68\",\n        \"claim-003-82a2cbf5\",\n        \"claim-009-6617d8be\"\n      ],\n      \"text\": \"Information regarding Acme Bank's headquarters (100 Market Street), its website (https://example.com/acme), and personnel details (Jane Doe joining as CCO in 2021) is present in the source chunk-001-fd3d4976.\"\n    },\n    {\n      \"faithfulness_risk\": \"low\",\n      \"freshness_warning\": \"volatile_fact\",\n      \"summary_type\": \"claim_set\",\n      \"supported_claim_ids\": [\n        \"claim-005-505fe164\"\n      ],\n      \"text\": \"The status of John Smith as Chief Compliance Officer as of 2025-10-15 is noted in the source chunk-001-fd3d4976, but this fact is volatile.\"\n    },\n    {\n      \"faithfulness_risk\": \"low\",\n      \"freshness_warning\": \"volatile_fact\",\n      \"summary_type\": \"c",
+    "llm_summaries": [
+      {
+        "faithfulness_risk": "low",
+        "freshness_warning": "volatile_fact",
+        "summary_type": "claim_set",
+        "supported_claim_ids": [
+          "claim-001-532d2b53",
+          "claim-002-693b3c68",
+          "claim-003-82a2cbf5",
+          "claim-009-6617d8be"
+        ],
+        "text": "Information regarding Acme Bank's headquarters (100 Market Street), its website (https://example.com/acme), and personnel details (Jane Doe joining as CCO in 2021) is present in the source chunk-001-fd3d4976."
+      },
+      {
+        "faithfulness_risk": "low",
+        "freshness_warning": "volatile_fact",
+        "summary_type": "claim_set",
+        "supported_claim_ids": [
+          "claim-005-505fe164"
+        ],
+        "text": "The status of John Smith as Chief Compliance Officer as of 2025-10-15 is noted in the source chunk-001-fd3d4976, but this fact is volatile."
+      },
+      {
+        "faithfulness_risk": "low",
+        "freshness_warning": "volatile_fact",
+        "summary_type": "claim_set",
+        "supported_claim_ids": [
+          "claim-007-0bce170c",
+          "claim-008-4e445184"
+        ],
+        "text": "The escalation threshold information shows a change: it was $10,000 in 2023 (claim-008-4e445184) and is currently $25,000 as of 2026-05-31 (claim-007-0bce170c), indicating volatility."
+      },
+      {
+        "faithfulness_risk": "low",
+        "freshness_warning": "serve_with_freshness_warning",
+        "summary_type": "claim_set",
+        "supported_claim_ids": [
+          "claim-006-f8a2b3b4"
+        ],
+        "text": "Contractor SharePoint access must be reviewed every 90 days (claim-006-f8a2b3b4)."
+      }
+    ],
+    "model": "batiai/gemma4-e2b:q4",
+    "model_route": {
+      "candidate_adapters": [
+        "ollama-gemma4-e2b-local",
+        "ollama-gemma4-e2b-mid",
+        "ollama-gemma4-e2b-large-placeholder"
+      ],
+      "cost_estimate": {
+        "estimated_cost_usd": 0.0
+      },
+      "fallbacks": [
+        {
+          "accepted": false,
+          "adapter": "ollama-gemma4-e2b-local",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        },
+        {
+          "accepted": true,
+          "adapter": "ollama-gemma4-e2b-mid",
+          "reason_codes": []
+        },
+        {
+          "accepted": false,
+          "adapter": "ollama-gemma4-e2b-large-placeholder",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        }
+      ],
+      "latency_budget_ms": null,
+      "modality": [
+        "text"
+      ],
+      "model_route_id": "mr-2ca65a9a5365f230",
+      "policy": {
+        "allow_cloud": false,
+        "allow_frontier": false,
+        "capability": "structured_review",
+        "max_cost_usd": null,
+        "preferred_lane": "open_weight_medium",
+        "privacy_scope": "tenant",
+        "require_zero_data_retention": false,
+        "tenant_allowed_providers": []
+      },
+      "quality_tier": "mid_open_weight_cpu",
+      "route_reason": "selected_first_compliant_policy_route",
+      "selected_adapter": "ollama-gemma4-e2b-mid",
+      "selected_model": "batiai/gemma4-e2b:q4",
+      "selected_route": {
+        "adapter": "ollama-gemma4-e2b-mid",
+        "api_key_env": null,
+        "backend": "http-openai",
+        "base_url": "http://ollama:11434/v1",
+        "capabilities": [
+          "*"
+        ],
+        "data_retention": "local",
+        "enabled": true,
+        "estimated_cost_usd": 0.0,
+        "free_credit": false,
+        "lane": "open_weight_medium",
+        "latency_ms": null,
+        "modalities": [
+          "text"
+        ],
+        "model": "batiai/gemma4-e2b:q4",
+        "provider": "ollama",
+        "quality_tier": "mid_open_weight_cpu",
+        "trust_boundary": "local"
+      },
+      "task_type": "llm.context.summarize",
+      "trust_boundary": "local"
+    },
+    "training_examples": [
+      {
+        "accepted": null,
+        "cascade": {
+          "escalation_reasons": [
+            "fragile_facts",
+            "ambiguous_context"
+          ],
+          "max_tier": 4,
+          "policy_version": "model-cascade-policy.v1",
+          "risk_signals": {
+            "ambiguous_count": 1,
+            "claim_count": 9,
+            "conflict_count": 0,
+            "fragile_count": 7,
+            "high_stakes": false,
+            "low_confidence": false,
+            "model_disagreement": false,
+            "user_facing": false
+          },
+          "selected_tiers": [
+            {
+              "examples": [
+                "Gemma 4 efficient",
+                "small Qwen",
+                "small Llama/Mistral"
+              ],
+              "fine_tune_targets": [
+                "classification",
+                "claim extraction",
+                "fragility tagging",
+                "ambiguity detection"
+              ],
+              "id": "small_open_weight",
+              "lane": "local_efficient",
+              "model_policy": {
+                "capability": "structured_json",
+                "lane": "local_efficient"
+              },
+              "tier": 1,
+              "trainable": true
+            },
+            {
+              "examples": [
+                "Gemma 4 larger",
+                "Qwen 3.6 mid",
+                "medium open-weight reviewer"
+              ],
+              "fine_tune_targets": [
+                "edge extraction",
+                "evidence review",
+                "summary verification",
+                "contradiction candidates"
+              ],
+              "id": "mid_open_weight",
+              "lane": "open_weight_medium",
+              "model_policy": {
+                "capability": "structured_review",
+                "lane": "open_weight_medium"
+              },
+              "tier": 2,
+              "trainable": true
+            }
+          ],
+          "start_tier": 1,
+          "target_tier": 2,
+          "task_name": "llm.context.summarize",
+          "training_task": "safe_summary"
+        },
+        "do_not_train_changing_facts_into_weights": true,
+        "input": {
+          "claims": [
+            {
+              "claim": "Acme Bank is headquartered at 100 Market Street.",
+              "claim_id": "claim-001-532d2b53",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [],
+                "state": "allow_with_citation"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Acme Bank is headquartered at 100 Market Street.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "Acme Bank",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "The website is https://example.com/acme.",
+              "claim_id": "claim-002-693b3c68",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "website"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "The website is https://example.com/acme.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "the website https example com",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "Jane Doe joined Acme Bank as Chief Compliance Officer in 2021.",
+              "claim_id": "claim-003-82a2cbf5",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "officer"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Jane Doe joined Acme Bank as Chief Compliance Officer in 2021.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "Chief Compliance Officer",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "# ZIP member: company/leadership/current-officers.md",
+              "claim_id": "claim-004-e9eca135",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "current"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "# ZIP member: company/leadership/current-officers.md",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "ZIP",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "John Smith is currently listed as Chief Compliance Officer as of 2025-10-15.",
+              "claim_id": "claim-005-505fe164",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "ambiguous_language",
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "review_before_serving"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "as of",
+                  "currently",
+                  "officer"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "John Smith is currently listed as Chief Compliance Officer as of 2025-10-15.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "Chief Compliance Officer",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "Contractor SharePoint access must be reviewed every 90 days.",
+              "claim_id": "claim-006-f8a2b3b4",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "positive",
+              "provenance": {
+                "evidence_span": "Contractor SharePoint access must be reviewed every 90 days.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "contractor sharepoint access must reviewed",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "The current escalation threshold is $25,000 as of 2026-05-31.",
+              "claim_id": "claim-007-0bce170c",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "as of",
+                  "current",
+                  "threshold"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "The current escalation threshold is $25,000 as of 2026-05-31.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "the current escalation threshold",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "The escalation threshold was $10,000 in 2023.",
+              "claim_id": "claim-008-4e445184",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "threshold"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "The escalation threshold was $10,000 in 2023.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "the escalation threshold was",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "The public website for Acme Bank is https://example.com/acme.",
+              "claim_id": "claim-009-6617d8be",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "website"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "The public website for Acme Bank is https://example.com/acme.",
+                "run_id": "adm-7d7d20594e",
+                "source_chunk": "chunk-001-fd3d4976"
+              },
+              "source_chunk": "chunk-001-fd3d4976",
+              "subject": "Acme Bank",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            }
+          ],
+          "conflict_candidates": [],
+          "context_concerns": [
+            {
+              "claim_id": "claim-005-505fe164",
+              "concern_id": "ambiguity-001-7587a60a",
+              "evidence": "John Smith is currently listed as Chief Compliance Officer as of 2025-10-15.",
+              "recommended_action": "llm_claim_review",
+              "severity": "medium",
+              "signals": [
+                "currently"
+              ],
+              "source_chunk": "chunk-001-fd3d4976",
+              "type": "ambiguous_language"
+            }
+          ],
+          "edges": [
+            {
+              "from": "entity-002-3a6b6219",
+              "to": "chunk-001-fd3d4976",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-005-6c6bb2c8",
+              "to": "chunk-001-fd3d4976",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-006-cac7bbb6",
+              "to": "chunk-001-fd3d4976",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-007-43ab9806",
+              "to": "chunk-001-fd3d4976",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-008-d9d220ab",
+              "to": "chunk-001-fd3d4976",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "claim-001-532d2b53",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-001-532d2b53",
+              "to": "entity-005-6c6bb2c8",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-002-693b3c68",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-003-82a2cbf5",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-003-82a2cbf5",
+              "to": "entity-002-3a6b6219",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-004-e9eca135",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-004-e9eca135",
+              "to": "entity-008-d9d220ab",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-005-505fe164",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-005-505fe164",
+              "to": "entity-002-3a6b6219",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-006-f8a2b3b4",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-007-0bce170c",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-008-4e445184",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-009-6617d8be",
+              "to": "chunk-001-fd3d4976",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-009-6617d8be",
+              "to": "entity-005-6c6bb2c8",
+              "type": "mentions"
+            }
+          ],
+          "nodes": [
+            {
+              "id": "entity-001-f4f17262",
+              "label": "Access Control Contractor",
+              "type": "entity"
+            },
+            {
+              "id": "entity-002-3a6b6219",
+              "label": "Chief Compliance Officer",
+              "type": "entity"
+            },
+            {
+              "id": "entity-003-cbf4e343",
+              "label": "Officers John Smith",
+              "type": "entity"
+            },
+            {
+              "id": "entity-004-a4ac79fc",
+              "label": "Old Policy The",
+              "type": "entity"
+            },
+            {
+              "id": "entity-005-6c6bb2c8",
+              "label": "Acme Bank",
+              "type": "entity"
+            },
+            {
+              "id": "entity-006-cac7bbb6",
+              "label": "Jane Doe",
+              "type": "entity"
+            },
+            {
+              "id": "entity-007-43ab9806",
+              "label": "Market Street",
+              "type": "entity"
+            },
+            {
+              "id": "entity-008-d9d220ab",
+              "label": "ZIP",
+              "type": "entity"
+            },
+            {
+              "id": "chunk-001-fd3d4976",
+              "label": "chunk-001-fd3d4976",
+              "type": "chunk",
+              "weight": 804
+            },
+            {
+              "id": "claim-001-532d2b53",
+              "label": "Acme Bank",
+              "type": "claim"
+            },
+            {
+              "id": "claim-002-693b3c68",
+              "label": "the website https example com",
+              "type": "claim"
+            },
+            {
+              "id": "claim-003-82a2cbf5",
+              "label": "Chief Compliance Officer",
+              "type": "claim"
+            },
+            {
+              "id": "claim-004-e9eca135",
+              "label": "ZIP",
+              "type": "claim"
+            },
+            {
+              "id": "claim-005-505fe164",
+              "label": "Chief Compliance Officer",
+              "type": "claim"
+            },
+            {
+              "id": "claim-006-f8a2b3b4",
+              "label": "contractor sharepoint access must reviewed",
+              "type": "claim"
+            },
+            {
+              "id": "claim-007-0bce170c",
+              "label": "the current escalation threshold",
+              "type": "claim"
+            },
+            {
+              "id": "claim-008-4e445184",
+              "label": "the escalation threshold was",
+              "type": "claim"
+            },
+            {
+              "id": "claim-009-6617d8be",
+              "label": "Acme Bank",
+              "type": "claim"
+            }
+          ]
+        },
+        "label_source": "pending_review",
+        "model_output": {
+          "adapter_status": "executed",
+          "llm_raw_preview": "```json\n{\n  \"llm_summaries\": [\n    {\n      \"faithfulness_risk\": \"low\",\n      \"freshness_warning\": \"volatile_fact\",\n      \"summary_type\": \"claim_set\",\n      \"supported_claim_ids\": [\n        \"claim-001-532d2b53\",\n        \"claim-002-693b3c68\",\n        \"claim-003-82a2cbf5\",\n        \"claim-009-6617d8be\"\n      ],\n      \"text\": \"Information regarding Acme Bank's headquarters (100 Market Street), its website (https://example.com/acme), and personnel details (Jane Doe joining as CCO in 2021) is present in the source chunk-001-fd3d4976.\"\n    },\n    {\n      \"faithfulness_risk\": \"low\",\n      \"freshness_warning\": \"volatile_fact\",\n      \"summary_type\": \"claim_set\",\n      \"supported_claim_ids\": [\n        \"claim-005-505fe164\"\n      ],\n      \"text\": \"The status of John Smith as Chief Compliance Officer as of 2025-10-15 is noted in the source chunk-001-fd3d4976, but this fact is volatile.\"\n    },\n    {\n      \"faithfulness_risk\": \"low\",\n      \"freshness_warning\": \"volatile_fact\",\n      \"summary_type\": \"c",
+          "llm_summaries": [
+            {
+              "faithfulness_risk": "low",
+              "freshness_warning": "volatile_fact",
+              "summary_type": "claim_set",
+              "supported_claim_ids": [
+                "claim-001-532d2b53",
+                "claim-002-693b3c68",
+                "claim-003-82a2cbf5",
+                "claim-009-6617d8be"
+              ],
+              "text": "Information regarding Acme Bank's headquarters (100 Market Street), its website (https://example.com/acme), and personnel details (Jane Doe joining as CCO in 2021) is present in the source chunk-001-fd3d4976."
+            },
+            {
+              "faithfulness_risk": "low",
+              "freshness_warning": "volatile_fact",
+              "summary_type": "claim_set",
+              "supported_claim_ids": [
+                "claim-005-505fe164"
+              ],
+              "text": "The status of John Smith as Chief Compliance Officer as of 2025-10-15 is noted in the source chunk-001-fd3d4976, but this fact is volatile."
+            },
+            {
+              "faithfulness_risk": "low",
+              "freshness_warning": "volatile_fact",
+              "summary_type": "claim_set",
+              "supported_claim_ids": [
+                "claim-007-0bce170c",
+                "claim-008-4e445184"
+              ],
+              "text": "The escalation threshold information shows a change: it was $10,000 in 2023 (claim-008-4e445184) and is currently $25,000 as of 2026-05-31 (claim-007-0bce170c), indicating volatility."
+            },
+            {
+              "faithfulness_risk": "low",
+              "freshness_warning": "serve_with_freshness_warning",
+              "summary_type": "claim_set",
+              "supported_claim_ids": [
+                "claim-006-f8a2b3b4"
+              ],
+              "text": "Contractor SharePoint access must be reviewed every 90 days (claim-006-f8a2b3b4)."
+            }
+          ],
+          "model": "batiai/gemma4-e2b:q4",
+          "model_route": {
+            "candidate_adapters": [
+              "ollama-gemma4-e2b-local",
+              "ollama-gemma4-e2b-mid",
+              "ollama-gemma4-e2b-large-placeholder"
+            ],
+            "cost_estimate": {
+              "estimated_cost_usd": 0.0
+            },
+            "fallbacks": [
+              {
+                "accepted": false,
+                "adapter": "ollama-gemma4-e2b-local",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              },
+              {
+                "accepted": true,
+                "adapter": "ollama-gemma4-e2b-mid",
+                "reason_codes": []
+              },
+              {
+                "accepted": false,
+                "adapter": "ollama-gemma4-e2b-large-placeholder",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              }
+            ],
+            "latency_budget_ms": null,
+            "modality": [
+              "text"
+            ],
+            "model_route_id": "mr-2ca65a9a5365f230",
+            "policy": {
+              "allow_cloud": false,
+              "allow_frontier": false,
+              "capability": "structured_review",
+              "max_cost_usd": null,
+              "preferred_lane": "open_weight_medium",
+              "privacy_scope": "tenant",
+              "require_zero_data_retention": false,
+              "tenant_allowed_providers": []
+            },
+            "quality_tier": "mid_open_weight_cpu",
+            "route_reason": "selected_first_compliant_policy_route",
+            "selected_adapter": "ollama-gemma4-e2b-mid",
+            "selected_model": "batiai/gemma4-e2b:q4",
+            "selected_route": {
+              "adapter": "ollama-gemma4-e2b-mid",
+              "api_key_env": null,
+              "backend": "http-openai",
+              "base_url": "http://ollama:11434/v1",
+              "capabilities": [
+                "*"
+              ],
+              "data_retention": "local",
+              "enabled": true,
+              "estimated_cost_usd": 0.0,
+              "free_credit": false,
+              "lane": "open_weight_medium",
+              "latency_ms": null,
+              "modalities": [
+                "text"
+              ],
+              "model": "batiai/gemma4-e2b:q4",
+              "provider": "ollama",
+              "quality_tier": "mid_open_weight_cpu",
+              "trust_boundary": "local"
+            },
+            "task_type": "llm.context.summarize",
+            "trust_boundary": "local"
+          }
+        },
+        "model_route": {
+          "candidate_adapters": [
+            "ollama-gemma4-e2b-local",
+            "ollama-gemma4-e2b-mid",
+            "ollama-gemma4-e2b-large-placeholder"
+          ],
+          "cost_estimate": {
+            "estimated_cost_usd": 0.0
+          },
+          "fallbacks": [
+            {
+              "accepted": false,
+              "adapter": "ollama-gemma4-e2b-local",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            },
+            {
+              "accepted": true,
+              "adapter": "ollama-gemma4-e2b-mid",
+              "reason_codes": []
+            },
+            {
+              "accepted": false,
+              "adapter": "ollama-gemma4-e2b-large-placeholder",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            }
+          ],
+          "latency_budget_ms": null,
+          "modality": [
+            "text"
+          ],
+          "model_route_id": "mr-2ca65a9a5365f230",
+          "policy": {
+            "allow_cloud": false,
+            "allow_frontier": false,
+            "capability": "structured_review",
+            "max_cost_usd": null,
+            "preferred_lane": "open_weight_medium",
+            "privacy_scope": "tenant",
+            "require_zero_data_retention": false,
+            "tenant_allowed_providers": []
+          },
+          "quality_tier": "mid_open_weight_cpu",
+          "route_reason": "selected_first_compliant_policy_route",
+          "selected_adapter": "ollama-gemma4-e2b-mid",
+          "selected_model": "batiai/gemma4-e2b:q4",
+          "selected_route": {
+            "adapter": "ollama-gemma4-e2b-mid",
+            "api_key_env": null,
+            "backend": "http-openai",
+            "base_url": "http://ollama:11434/v1",
+            "capabilities": [
+              "*"
+            ],
+            "data_retention": "local",
+            "enabled": true,
+            "estimated_cost_usd": 0.0,
+            "free_credit": false,
+            "lane": "open_weight_medium",
+            "latency_ms": null,
+            "modalities": [
+              "text"
+            ],
+            "model": "batiai/gemma4-e2b:q4",
+            "provider": "ollama",
+            "quality_tier": "mid_open_weight_cpu",
+            "trust_boundary": "local"
+          },
+          "task_type": "llm.context.summarize",
+          "trust_boundary": "local"
+        },
+        "reviewed_output": null,
+        "run_id": "adm-7d7d20594e",
+        "task": "llm.context.summarize",
+        "training_example_id": "training-example-001-6c2abd74",
+        "training_task": "safe_summary"
+      }
+    ]
+  }
+}

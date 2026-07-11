@@ -1,0 +1,20 @@
+MODULE _repos/teleon/backend/src/teleon/economics/provider_arbitrage.py
+## API signatures
+```python
+"""provider_arbitrage — cross-provider price arbitrage for the SAME model (backs registry #63)."""
+_REPO = ...
+_MODEL_INDEX = ...
+_PCT = ...
+def _load_entries() -> list[dict]
+def _blended_cost(entry: dict) -> float | None
+    # Blended $/Mtok = input + output (a 1:1 simplification; a workload-specific blend would weight by that
+def arbitrage_for_model(model_id: str, entries: list[dict] | None=None) -> dict
+    # Price spread across providers serving `model_id`. available=False when unpriced/absent.
+def all_arbitrage(entries: list[dict] | None=None) -> list[dict]
+    # Every model served by >1 provider, biggest price spread first (where the savings are).
+```
+## intra-module call edges
+src.teleon.economics.provider_arbitrage.all_arbitrage -> src.teleon.economics.provider_arbitrage._load_entries
+src.teleon.economics.provider_arbitrage.all_arbitrage -> src.teleon.economics.provider_arbitrage.arbitrage_for_model
+src.teleon.economics.provider_arbitrage.arbitrage_for_model -> src.teleon.economics.provider_arbitrage._blended_cost
+src.teleon.economics.provider_arbitrage.arbitrage_for_model -> src.teleon.economics.provider_arbitrage._load_entries

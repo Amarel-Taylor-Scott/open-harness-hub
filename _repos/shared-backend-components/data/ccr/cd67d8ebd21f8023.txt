@@ -1,0 +1,24 @@
+MODULE src/teleon/seeds/openapi_deconstructor.py
+## API signatures
+```python
+"""src.teleon.seeds.openapi_deconstructor — deconstruct an API endpoint SPEC (OpenAPI — how RapidAPI and every API
+hub describes its endpoints) into a Teleon capability SEED candidate."""
+_HTTP_METHODS = ...
+def _slug(text: str) -> str
+def _base_url(doc: dict) -> str
+def _auth_required(doc: dict, op: dict) -> bool
+def _params(op: dict) -> list[str]
+def deconstruct_operation(method: str, path: str, op: dict, *, api_name: str, base_url: str, doc: dict, hub: str='rapidapi') -> dict
+    # One OpenAPI operation → a governed capability-seed candidate (with input/output contract + the endpoint).
+def deconstruct_api(doc: dict, *, api_name: str | None=None, hub: str='rapidapi') -> list[dict]
+    # Deconstruct a whole OpenAPI document → one capability-seed candidate per operation. Deterministic + offline.
+def deconstruct_hub(specs: dict, *, hub: str='rapidapi') -> list[dict]
+    # Deconstruct a hub's worth of OpenAPI docs ({api_name: openapi_doc}) → all capability-seed candidates.
+```
+## intra-module call edges
+src.teleon.seeds.openapi_deconstructor.deconstruct_api -> src.teleon.seeds.openapi_deconstructor._base_url
+src.teleon.seeds.openapi_deconstructor.deconstruct_api -> src.teleon.seeds.openapi_deconstructor.deconstruct_operation
+src.teleon.seeds.openapi_deconstructor.deconstruct_hub -> src.teleon.seeds.openapi_deconstructor.deconstruct_api
+src.teleon.seeds.openapi_deconstructor.deconstruct_operation -> src.teleon.seeds.openapi_deconstructor._auth_required
+src.teleon.seeds.openapi_deconstructor.deconstruct_operation -> src.teleon.seeds.openapi_deconstructor._params
+src.teleon.seeds.openapi_deconstructor.deconstruct_operation -> src.teleon.seeds.openapi_deconstructor._slug

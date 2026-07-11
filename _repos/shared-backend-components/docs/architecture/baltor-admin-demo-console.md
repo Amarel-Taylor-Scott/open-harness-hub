@@ -1,0 +1,1 @@
+../../../baltor/context/architecture/baltor-admin-demo-console.md

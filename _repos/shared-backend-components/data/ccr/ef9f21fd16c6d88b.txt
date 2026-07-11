@@ -1,0 +1,23 @@
+MODULE src/teleon/lift/pipeline.py
+## API signatures
+```python
+"""src.teleon.lift.pipeline — the end-to-end Teleon Lift orchestrator."""
+_RUNTIME_PROFILE_SCHEMA = ...
+class LiftResult:
+    # The full lift output for one workload (all components are JSON-serializable dicts).
+    def as_dict(self) -> dict[str, Any]
+def build_runtime_profile(workload: dict, observations: dict | None) -> dict[str, Any]
+    # A RuntimeProfile from SUPPLIED telemetry observations. No observations → an explicit `unavailable` profile
+def build_trigger_graph(workload: dict) -> dict[str, Any]
+def build_dependency_graph(workload: dict) -> dict[str, Any]
+def lift_workload(native: dict, *, imported_at: str, observations: dict | None=None) -> LiftResult
+    # Run the full lift on ONE provider-native workload. Discover/model only — no production change.
+def lift_inventory(connectors, *, imported_at: str, observations_by_name: dict | None=None) -> list[LiftResult]
+    # Scan each connector (read-only) and lift every discovered workload. `observations_by_name` maps a workload's
+```
+## intra-module call edges
+src.teleon.lift.pipeline.lift_inventory -> src.teleon.lift.pipeline.lift_workload
+src.teleon.lift.pipeline.lift_workload -> src.teleon.lift.pipeline.LiftResult
+src.teleon.lift.pipeline.lift_workload -> src.teleon.lift.pipeline.build_dependency_graph
+src.teleon.lift.pipeline.lift_workload -> src.teleon.lift.pipeline.build_runtime_profile
+src.teleon.lift.pipeline.lift_workload -> src.teleon.lift.pipeline.build_trigger_graph

@@ -1,0 +1,105 @@
+{
+  "contract_id": "aidevobserver.launch_readiness.v0",
+  "status": "candidate",
+  "serves_truth": false,
+  "doc": "_repos/aidevobserver/context/codex/aidevobserver-launch-readiness-and-alpha-plan.md",
+  "checker": "scripts/check_aidevobserver_launch_readiness.py",
+  "positioning": {
+    "lead": "AIDevObserver is the reuse and token-savings layer for AI coding sessions.",
+    "not_lead": "Do not lead with risky-command detection.",
+    "truth_boundary": "Findings are candidate advice until proof and promotion."
+  },
+  "launch_phases": [
+    {
+      "id": "demo_ready",
+      "label": "Friend / public-demo-ready",
+      "current_state": "mostly_ready",
+      "required_gates": [
+        "review_page_loads",
+        "manual_paste_upload_path_documented",
+        "replay_examples_available",
+        "observer_review_self_test_passes",
+        "example_sessions_self_test_passes",
+        "public_tunnel_or_stable_url_available"
+      ]
+    },
+    {
+      "id": "private_alpha",
+      "label": "Private alpha with technical users",
+      "current_state": "not_ready",
+      "required_gates": [
+        "one_installer_path_packaged_end_to_end",
+        "mcp_or_cli_setup_doc_proven",
+        "triage_outcome_persistence",
+        "registry_connector_minimum_viable",
+        "source_backed_primitive_candidates",
+        "privacy_and_redaction_policy_documented",
+        "session_review_benchmark_smoke_passes"
+      ]
+    },
+    {
+      "id": "public_launch",
+      "label": "Public / commercial launch",
+      "current_state": "not_ready",
+      "required_gates": [
+        "stable_deployment_domain",
+        "backend_health_and_rollback",
+        "auth_workspace_billing_real",
+        "extension_marketplace_or_signed_distribution",
+        "benchmark_metrics_published",
+        "legal_privacy_terms_reviewed",
+        "registry_precision_targets_met",
+        "support_and_onboarding_docs"
+      ]
+    }
+  ],
+  "current_proof_commands": [
+    "python3 scripts/check_observer_review.py --self-test",
+    "python3 scripts/check_aidevobserver_example_sessions.py --self-test",
+    "python3 scripts/aidevobserver_project_scaffold.py --self-test",
+    "python3 scripts/check_aidevobserver_mcp.py --self-test",
+    "python3 scripts/check_aidevobserver_vscode_ext.py --self-test",
+    "python3 scripts/check_observer_capture_store.py --self-test",
+    "python3 scripts/check_observer_local_service.py --self-test",
+    "python3 scripts/check_aidevobserver_local_registry_connector.py --self-test",
+    "python3 scripts/aidevobserver_hook.py --self-test",
+    "python3 scripts/check_aidevobserver_session_benchmark.py --self-test",
+    "python3 scripts/aidevobserver_context_foundry_loop.py --self-test"
+  ],
+  "minimum_alpha_surfaces": [
+    "manual_upload",
+    "replay_examples",
+    "cli_review",
+    "claude_project_scaffold",
+    "claude_code_mcp",
+    "live_pretooluse_hook",
+    "vscode_extension_scaffold",
+    "local_session_discovery"
+  ],
+  "required_metric_groups": [
+    "finding_precision",
+    "top_source_ref_accuracy",
+    "top1_source_ref_accuracy",
+    "top3_source_ref_accuracy",
+    "accepted_reuse_rate",
+    "outcome_memory_ranking_effect",
+    "tokens_avoided_estimate_basis",
+    "false_positive_rate",
+    "privacy_redaction_success",
+    "runtime_review_latency"
+  ],
+  "privacy_rules": [
+    "No raw private transcript text in public examples.",
+    "No raw local filesystem paths in public examples.",
+    "No secrets or PII in fixtures.",
+    "Public demo mode hides local session paths.",
+    "Local discovery is opt-in and candidate-only."
+  ],
+  "non_launch_blockers_to_track": [
+    "Trycloudflare URLs are temporary and acceptable only for demos.",
+    "Reports, billing, and team views remain illustrative until persistence and metering are wired.",
+    "The primitive registry connector must prove source-ref precision before paid launch.",
+    "Synthetic-only primitive ideas must remain primitive_opportunity records until source evidence, proof, and promotion exist.",
+    "Accepted and dismissed findings must feed reuse and negative memory before team rollout."
+  ]
+}

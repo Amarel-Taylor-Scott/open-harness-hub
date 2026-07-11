@@ -1,0 +1,37 @@
+MODULE src/teleon/retrieval/learned_vectors.py
+## API signatures
+```python
+"""src.teleon.retrieval.learned_vectors — LEARNED semantic-vector port (real model when available; else HONEST lexical floor)."""
+def py_function_src_teleon_retrieval_learned_vectors___st_available() -> bool
+    # Network-free probe: is the sentence-transformers dependency importable? (Does NOT load/download a model.)
+class py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder:
+    # LEARNED semantic embedder via sentence-transformers (config-driven model + dim). Lazy load; honest-raises if the
+    def __init__(self, model_id: str=DEFAULT_SENTENCE_TRANSFORMERS_EMBEDDING_MODEL)
+    def available(self) -> bool
+    def _load(self)
+    def embed(self, py_arg_src_teleon_retrieval_learned_vectors__py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder_embed__text: str) -> list[float]
+    def embed_batch(self, py_arg_src_teleon_retrieval_learned_vectors__py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder_embed_batch__texts: list[str]) -> list[list[float]]
+def py_function_src_teleon_retrieval_learned_vectors__resolve_learned_embedder(*, allow_model: bool=True, probe_st=None, probe_nomic=None)
+    # Resolve the best AVAILABLE embedder, learned-first, with an HONEST deterministic-lexical fallback:
+class py_class_src_teleon_retrieval_learned_vectors__LearnedVectorPort:
+    # Uniform LEARNED-vector port: resolves a real semantic model when available, else the repo's lexical floor.
+    def __init__(self, *, allow_model: bool=True, probe_st=None, probe_nomic=None, backend=None)
+    def embed(self, py_arg_src_teleon_retrieval_learned_vectors__py_class_src_teleon_retrieval_learned_vectors__LearnedVectorPort_embed__text: str) -> list[float]
+    def embed_batch(self, py_arg_src_teleon_retrieval_learned_vectors__py_class_src_teleon_retrieval_learned_vectors__LearnedVectorPort_embed_batch__texts) -> list[list[float]]
+    def info(self) -> dict
+def py_function_src_teleon_retrieval_learned_vectors__register_learned_embedder(py_arg_src_teleon_retrieval_learned_vectors__py_function_src_teleon_retrieval_learned_vectors__register_learned_embedder__name: str='learned_vector') -> None
+    # Opt-in: wire this learned port behind embedding_port.select_embedder(<name>) WITHOUT any import side effect
+def py_function_src_teleon_retrieval_learned_vectors__self_test() -> int
+def main(py_arg_src_teleon_retrieval_learned_vectors__main__argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.retrieval.learned_vectors.__init__ -> src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__resolve_learned_embedder
+src.teleon.retrieval.learned_vectors.available -> src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors___st_available
+src.teleon.retrieval.learned_vectors.embed -> src.teleon.retrieval.learned_vectors.py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder._load
+src.teleon.retrieval.learned_vectors.embed_batch -> src.teleon.retrieval.learned_vectors.py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder._load
+src.teleon.retrieval.learned_vectors.main -> src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__self_test
+src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__resolve_learned_embedder -> src.teleon.retrieval.learned_vectors.py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder
+src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__self_test -> src.teleon.retrieval.learned_vectors.py_class_src_teleon_retrieval_learned_vectors__LearnedVectorPort
+src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__self_test -> src.teleon.retrieval.learned_vectors.py_class_src_teleon_retrieval_learned_vectors__SentenceTransformersEmbedder
+src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__self_test -> src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors___st_available
+src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__self_test -> src.teleon.retrieval.learned_vectors.py_function_src_teleon_retrieval_learned_vectors__resolve_learned_embedder

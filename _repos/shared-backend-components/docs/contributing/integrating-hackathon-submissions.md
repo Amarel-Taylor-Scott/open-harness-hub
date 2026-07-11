@@ -1,0 +1,1 @@
+../../../openhubforai/context/contributing/integrating-hackathon-submissions.md

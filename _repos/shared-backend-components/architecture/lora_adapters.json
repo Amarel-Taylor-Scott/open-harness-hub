@@ -1,0 +1,74 @@
+{
+  "registry": "lora_adapters",
+  "serves_truth": false,
+  "description": "LoRA (Low-Rank Adaptation) adapters — small trainable rank-decomposition matrices that specialize a frozen base model for a task without full fine-tuning. A registry of adapter SPECS (shape + intent + when-to-use), not weights; pointers, never truth. Composes with ml_model_registry (the base models), models_as_memory (adapters used as a memory store), and chain_of_thought_contracts (adapters that enforce a reasoning structure). Records are synthetic/public metadata only.",
+  "stage": "model",
+  "adapters": [
+    {
+      "id": "lora_code_completion",
+      "name": "Code-completion adapter",
+      "base_model_family": "code LLM (7B-class)",
+      "task": "fill-in-the-middle + next-token code completion in a target stack",
+      "rank": 16, "alpha": 32, "target_modules": ["q_proj", "v_proj"],
+      "trainable_param_pct": 0.12,
+      "when_to_use": "narrow per-repo or per-stack completion where a frozen base under-performs on house idioms",
+      "merge_strategy": "hot-swap at inference; never merged into the base (keeps the base reusable)",
+      "license": "adapter-author-defined; base license governs use"
+    },
+    {
+      "id": "lora_sql_generation",
+      "name": "Text-to-SQL adapter",
+      "base_model_family": "instruction LLM (7-13B)",
+      "task": "natural-language to dialect-correct SQL over a known schema",
+      "rank": 32, "alpha": 64, "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj"],
+      "trainable_param_pct": 0.34,
+      "when_to_use": "deterministic-leaning structured-output task; pairs with a SQL validator gate downstream",
+      "merge_strategy": "hot-swap; routed by the inference gateway per request",
+      "license": "adapter-author-defined"
+    },
+    {
+      "id": "lora_function_calling",
+      "name": "Tool / function-calling adapter",
+      "base_model_family": "instruction LLM",
+      "task": "emit well-formed tool-call JSON against a tool schema",
+      "rank": 16, "alpha": 32, "target_modules": ["q_proj", "v_proj"],
+      "trainable_param_pct": 0.12,
+      "when_to_use": "a base that drifts on strict tool schemas; cheaper than a larger base for the same reliability",
+      "merge_strategy": "hot-swap",
+      "license": "adapter-author-defined"
+    },
+    {
+      "id": "lora_domain_legal",
+      "name": "Domain adapter (governed vertical)",
+      "base_model_family": "instruction LLM",
+      "task": "domain register + terminology for a governed vertical (public corpora only)",
+      "rank": 64, "alpha": 128, "target_modules": ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj"],
+      "trainable_param_pct": 0.7,
+      "when_to_use": "domain language gap; output still passes the governance/verification rail (adapter never asserts truth)",
+      "merge_strategy": "hot-swap; per-tenant adapter never becomes a global default",
+      "license": "adapter-author-defined; corpus license governs"
+    },
+    {
+      "id": "lora_reasoning_math",
+      "name": "Stepwise-reasoning adapter",
+      "base_model_family": "instruction LLM",
+      "task": "show-the-work math / multi-step reasoning with explicit intermediate steps",
+      "rank": 32, "alpha": 64, "target_modules": ["q_proj", "v_proj", "gate_proj", "up_proj"],
+      "trainable_param_pct": 0.4,
+      "when_to_use": "enforce a visible chain of thought; pairs with chain_of_thought_contracts as the model-side enforcer",
+      "merge_strategy": "hot-swap",
+      "license": "adapter-author-defined"
+    },
+    {
+      "id": "lora_style_persona",
+      "name": "Style / persona adapter",
+      "base_model_family": "instruction LLM",
+      "task": "consistent voice/format for a brand or persona",
+      "rank": 8, "alpha": 16, "target_modules": ["q_proj", "v_proj"],
+      "trainable_param_pct": 0.06,
+      "when_to_use": "cheap surface-style control without touching task competence",
+      "merge_strategy": "hot-swap",
+      "license": "adapter-author-defined"
+    }
+  ]
+}

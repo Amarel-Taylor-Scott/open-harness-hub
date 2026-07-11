@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:,">
+<title>Baltor · Guided Demos — data examples</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../shared/oh-tokens.css" />
+<link rel="stylesheet" href="../shared/oh-components.css" />
+<link rel="stylesheet" href="../shared/oh-site.css" />
+<link rel="stylesheet" href="guided-demo.css" />
+</head>
+<body class="oh dir-d theme-dark oh-site cd" data-page="guided_demos_index">
+<div class="cd-top"><div class="cd-wrap" style="display:flex;align-items:center;gap:14px;padding-top:0;padding-bottom:0;width:100%;box-sizing:border-box;">
+  <a class="cd-logo" href="Context Enrichment.html"><span class="cd-mark">◳</span><span>Baltor<small>guided demos · data examples</small></span></a>
+  <span class="sp"></span>
+  <span class="cd-tag">Each example: a real contradiction, governed</span>
+</div></div>
+
+<div class="cd-wrap">
+  <section class="cd-hero">
+    <div class="cd-eyebrow">Governed context · data examples</div>
+    <h1>Pick a dataset. Watch Baltor govern the answer.</h1>
+    <p>Each example takes a real source conflict, runs the same seven-stage pipeline, and serves the verified answer with receipts — holding the contradiction out where you can still see it. Same governance, different data. The model never decides the truth.</p>
+  </section>
+
+  <div id="grid"></div>
+
+  <div style="margin-top:22px;padding:15px 18px;border:1px solid color-mix(in srgb, var(--accent) 26%, var(--line));border-radius:var(--r-md);background:var(--accent-weak);display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <span style="font-size:13px;color:var(--fg);"><b>Want the whole picture?</b> These are worked instances — Baltor governs against the entire Federal Register &amp; eCFR.</span>
+    <a class="oh-btn oh-btn--primary oh-btn--sm" style="margin-left:auto;" href="Baltor Engine.html" data-track="engine_cta" data-tp-from="demos_index">The engine · 5 stages →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor Federal Register Coverage.html">Federal Register coverage →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor International Coverage.html">International &amp; cross-jurisdiction →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor Context Governance Report.html">What an audit produces →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor Optimization Showcase.html">Optimization &amp; efficiency →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor Receipts Explorer.html">Receipts &amp; provenance →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor Reconciliation Deep-Dive.html">Reconciliation →</a>
+    <a class="oh-btn oh-btn--ghost oh-btn--sm" href="Baltor Anti-Fragility Deep-Dive.html">Hardening →</a>
+  </div>
+
+  <div class="cd-foot"><b>Why several examples.</b> Governed context isn’t a one-off trick — the same pipeline resolves a regulation citation, a sanctions screen, a regulatory-date change, and an internal-policy conflict. Each links to its own runnable page. <b>It does not</b> show a raw model answer; the contradiction is always held out, never served.</div>
+</div>
+
+<script src="guided-demo.js"></script>
+<script>
+  const META = [
+    { key:'cfpb',      href:'Baltor CFPB Guided Demo.html',          q:'“What’s the error-resolution deadline under Regulation E?”', cat:'finance' },
+    { key:'sanctions', href:'Baltor Sanctions Guided Demo.html',     q:'“Is counterparty Northwind Trading LLC sanctioned?”', cat:'finance' },
+    { key:'gaap',      href:'Baltor Accounting-Standard Guided Demo.html', q:'“When does the new accounting standard take effect for us?”', cat:'finance' },
+    { key:'fda',       href:'Baltor FDA Guided Demo.html',             q:'“What’s the max acetaminophen per dosage unit in a prescription combination?”', cat:'health' },
+    { key:'icd',       href:'Baltor ICD Coding Guided Demo.html',      q:'“Which diagnostic code applies under the current classification?”', cat:'health' },
+    { key:'osha',      href:'Baltor OSHA Guided Demo.html',            q:'“What’s the permissible exposure limit for respirable crystalline silica?”', cat:'health' },
+    { key:'tariff',    href:'Baltor Tariff Guided Demo.html',         q:'“What’s the HS code & duty basis for lithium-ion battery packs?”', cat:'trade' },
+    { key:'dgr',       href:'Baltor Dangerous-Goods Guided Demo.html', q:'“Can we ship these lithium-ion batteries by air, and at what state of charge?”', cat:'trade' },
+    { key:'transit',   href:'Baltor Transit-SLA Guided Demo.html',     q:'“What’s the committed transit time, EU→US East Coast ocean freight?”', cat:'trade' },
+    { key:'bunker',    href:'Baltor Marine-Fuel Guided Demo.html',      q:'“What’s the max sulphur content for the marine fuel we deliver?”', cat:'trade' },
+    { key:'export',    href:'Baltor Export-Controls Guided Demo.html', q:'“Can we export this item to that destination without a license?”', cat:'trade' },
+    { key:'faa',       href:'Baltor Airworthiness Guided Demo.html',   q:'“Is this engine component subject to an active airworthiness directive?”', cat:'trade' },
+    { key:'eudr',      href:'Baltor EUDR Guided Demo.html',          q:'“When does the EU Deforestation Regulation apply for large operators?”', cat:'esg' },
+    { key:'water',     href:'Baltor Water-Safety Guided Demo.html',     q:'“What’s the lead limit for our drinking-water system?”', cat:'esg' },
+    { key:'reserves',  href:'Baltor Oil-Reserves Guided Demo.html',     q:'“Can we book these barrels as proved reserves at today’s price?”', cat:'esg' },
+    { key:'freight',   href:'Baltor Freight-Hours Guided Demo.html',    q:'“What’s the max daily driving time for our US delivery drivers?”', cat:'ops' },
+    { key:'minwage',   href:'Baltor Minimum-Wage Guided Demo.html',    q:'“What’s the minimum wage we must pay our Seattle staff?”', cat:'ops' },
+    { key:'refund',    href:'Baltor Refund-Policy Guided Demo.html', q:'“What’s our refund window?”', cat:'ops' },
+  ];
+  const CATS = [
+    ['finance', 'Consumer finance & sanctions', 'credit, payments, KYC — regulated, action-triggering answers'],
+    ['health',  'Health & life sciences', 'FDA limits, clinical coding, workplace safety — compliance-fragile'],
+    ['trade',   'Trade, customs & logistics', 'tariffs, dangerous goods, shipping — wrong answer = holds, penalties'],
+    ['esg',     'Environment, energy & ESG', 'regulatory deadlines, reserves, environmental limits'],
+    ['ops',     'Operations & internal policy', 'delivery rules, refund/billing — conflicting internal sources'],
+  ];
+  const S = window.GuidedDemo.SCENARIOS;
+  function card(m) {
+    const sc = S[m.key];
+    return `<a class="oh-card cd-idx-card" href="${m.href}" data-track="demo_open" data-tp-scenario="${m.key}" data-tp-cat="${m.cat}">
+      <span class="cd-idx-dom">${sc.domain}</span>
+      <div class="cd-idx-title">${sc.runLabel}</div>
+      <div class="cd-idx-q">${m.q}</div>
+      <div class="cd-idx-ans">
+        <span class="served">✓ serves <b>${sc.answer}</b></span>
+        <span class="held">⚠ holds out <b>${sc.held.v.replace(/^[^“"]*/, '').replace(/[:].*/, '') || sc.held.v}</b></span>
+      </div>
+      <span class="cd-idx-go">Open example</span>
+    </a>`;
+  }
+  document.getElementById('grid').innerHTML = CATS.map(([id, nm, desc]) => {
+    const items = META.filter(m => m.cat === id);
+    if (!items.length) return '';
+    return `<section class="cd-cat">
+      <div class="cd-cat-h"><h2>${nm}</h2><span class="d">${desc}</span><span class="n">${items.length}</span></div>
+      <div class="cd-idx-grid">${items.map(card).join('')}</div>
+    </section>`;
+  }).join('');
+</script>
+<script src="../shared/oh-experiments.js"></script>
+<script src="track.js"></script>
+</body>
+</html>

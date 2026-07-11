@@ -1,0 +1,110 @@
+{
+  "version": "0.1.0",
+  "note": "Catalog of Teleon DESCENT demos — each is the same shape: an expensive default DAG descended to the cheapest viable path over the shared step library (architecture/pipeline_step_catalog.json) that still meets the requirement floor. 'live' demos compute their savings from real modules; 'ideated' demos carry a designed estimate (clearly labeled) + the DAG to build. serves_truth=false (a demo output is a candidate the verification rail dispositions). Savings %s for live demos are COMPUTED by scripts/demo_dashboard.py, never hand-typed.",
+  "demos": [
+    {
+      "id": "doc_schema_extraction",
+      "title": "Document → defined-schema extraction",
+      "status": "live",
+      "expensive_default": "send the whole PDF/scan/photo to a frontier vision/LLM model",
+      "descended_dag": ["acquire(text|ocr|vision)", "clean_normalize", "chunk", "relevance_filter", "prune/compress", "extract(regex|nlp|cheap_llm|frontier_llm)", "merge_fields", "schema_validate", "emit_schema"],
+      "axes": ["cost", "determinism", "tokens_in"],
+      "module": "_repos/teleon/backend/src/teleon/extraction/document_extraction_cascade.py",
+      "dag": "_repos/teleon/backend/src/teleon/dag/example_pipelines.py:build_extraction_dag",
+      "check": "scripts/check_teleon_example_descents.py",
+      "governance": "honest MISSING (never fabricated); serves_truth=false"
+    },
+    {
+      "id": "search_enrichment",
+      "title": "Enrich via search + LLM",
+      "status": "live",
+      "expensive_default": "Gemini Grounded Search (search + synthesis in one premium call)",
+      "descended_dag": ["search(cheap|premium)", "dedupe", "rerank", "synthesize(cheap|grounded)", "source_attribution", "emit_answer"],
+      "axes": ["cost", "freshness", "verifiability"],
+      "module": "_repos/teleon/backend/src/teleon/enrichment/search_enrich.py",
+      "dag": "_repos/teleon/backend/src/teleon/dag/example_pipelines.py:build_enrichment_dag",
+      "check": "scripts/check_teleon_example_descents.py",
+      "governance": "GROUNDING LAW: ungrounded answer HELD OUT; serves_truth=false"
+    },
+    {
+      "id": "classification_routing",
+      "title": "Text classification / intent routing",
+      "status": "ideated",
+      "expensive_default": "ask a frontier model to classify every item",
+      "descended_dag": ["clean_normalize", "embed(nomic-embed local)", "nearest_centroid|rules", "confidence_gate → cheap_llm only on low-confidence", "emit_label"],
+      "axes": ["cost", "specialization", "tokens_in"],
+      "expected_pct_saved": 90,
+      "governance": "low-confidence -> review_ticket; serves_truth=false"
+    },
+    {
+      "id": "summarization_compression",
+      "title": "Summarization / context compression",
+      "status": "ideated",
+      "expensive_default": "send the full document to a frontier model for a summary",
+      "descended_dag": ["chunk", "extractive_select (top sentences)", "compress_context", "cheap_llm summarize", "emit_answer"],
+      "axes": ["tokens_in", "tokens_out", "cost"],
+      "expected_pct_saved": 80,
+      "governance": "extractive grounding preserved; serves_truth=false"
+    },
+    {
+      "id": "pii_redaction",
+      "title": "PII detection + redaction",
+      "status": "ideated",
+      "expensive_default": "ask an LLM to find and redact PII",
+      "descended_dag": ["deterministic_ner+regex", "confidence_gate → cheap_llm only on ambiguous spans", "schema_validate", "emit"],
+      "axes": ["privacy", "determinism", "cost"],
+      "expected_pct_saved": 95,
+      "governance": "deterministic redaction before any egress; serves_truth=true for exact-match spans"
+    },
+    {
+      "id": "table_extraction",
+      "title": "Table / form extraction from documents",
+      "status": "ideated",
+      "expensive_default": "vision-LLM over the whole page image",
+      "descended_dag": ["acquire", "layout_chunk (detect tables)", "deterministic table parse", "cheap_llm only for messy cells", "schema_validate", "emit_schema"],
+      "axes": ["cost", "determinism"],
+      "expected_pct_saved": 75,
+      "governance": "cell provenance + honest MISSING; serves_truth=false"
+    },
+    {
+      "id": "rerank_retrieval",
+      "title": "Retrieval reranking",
+      "status": "ideated",
+      "expensive_default": "LLM reranker scoring every candidate",
+      "descended_dag": ["embed (local)", "retrieve_topk", "cross-encoder rerank (cheap)", "cheap_llm rerank only the top-N", "emit"],
+      "axes": ["cost", "latency"],
+      "expected_pct_saved": 85,
+      "governance": "serves_truth=false (a ranking is a routing decision)"
+    },
+    {
+      "id": "sql_generation",
+      "title": "Natural language → SQL",
+      "status": "ideated",
+      "expensive_default": "frontier text-to-SQL on the full schema",
+      "descended_dag": ["schema retrieve (relevant tables)", "cheap_llm generate", "deterministic SQL validate + dry-run", "frontier only on validation failure", "emit"],
+      "axes": ["cost", "determinism", "reliability"],
+      "expected_pct_saved": 80,
+      "governance": "validated/dry-run before serve; serves_truth=false"
+    },
+    {
+      "id": "translation",
+      "title": "Document translation",
+      "status": "ideated",
+      "expensive_default": "frontier multilingual model",
+      "descended_dag": ["detect_language", "chunk", "specialized cheap MT model", "cheap_llm post-edit only flagged segments", "emit"],
+      "axes": ["cost", "specialization"],
+      "expected_pct_saved": 80,
+      "governance": "serves_truth=false (candidate translation)"
+    },
+    {
+      "id": "factcheck_verification",
+      "title": "Claim verification / fact-check",
+      "status": "ideated",
+      "expensive_default": "LLM judge decides if a claim is true",
+      "descended_dag": ["search(cheap)", "deterministic match against source", "cheap_llm only for nuanced claims", "source_attribution", "emit"],
+      "axes": ["verifiability", "determinism", "cost"],
+      "expected_pct_saved": 70,
+      "governance": "deterministic source match = serves_truth=true; LLM judgment = candidate"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+MODULE src/teleon/synthesis/component_search.py
+## API signatures
+```python
+"""src.teleon.synthesis.component_search — label every component with text+keywords+vector + SEARCH/COMPOSE over them."""
+def py_function_src_teleon_synthesis_component_search__embed(py_arg_src_teleon_synthesis_component_search__embed__text: str) -> list[float]
+    # Deterministic, offline LEXICAL embedding: char-trigrams + tokens hashed into a fixed dim, L2-normalized.
+def py_function_src_teleon_synthesis_component_search__index_entry(py_arg_src_teleon_synthesis_component_search__index_entry__id: str, py_arg_src_teleon_synthesis_component_search__index_entry__kind: str, py_arg_src_teleon_synthesis_component_search__index_entry__text: str, py_arg_src_teleon_synthesis_component_search__index_entry__keywords: list[str]) -> dict
+def py_function_src_teleon_synthesis_component_search___cos(py_arg_src_teleon_synthesis_component_search__cos__a: list[float], py_arg_src_teleon_synthesis_component_search__cos__b: list[float]) -> float
+def py_function_src_teleon_synthesis_component_search__load_index() -> tuple
+def py_function_src_teleon_synthesis_component_search__search(py_arg_src_teleon_synthesis_component_search__search__query: str, *, k: int=10, index=None, kind: str | None=None) -> list[dict]
+    # Rank components by lexical-vector cosine + a keyword-overlap boost. Returns top-k {id, kind, score, keywords}.
+def py_function_src_teleon_synthesis_component_search__compose(py_arg_src_teleon_synthesis_component_search__compose__capability: str, *, k: int=5, index=None) -> dict
+    # COMPOSE: for a capability's ladder rungs, search the index for candidate components per rung (by the rung's plane +
+```
+## intra-module call edges
+src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__compose -> src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__load_index
+src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__compose -> src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__search
+src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__index_entry -> src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__embed
+src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__search -> src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search___cos
+src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__search -> src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__embed
+src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__search -> src.teleon.synthesis.component_search.py_function_src_teleon_synthesis_component_search__load_index

@@ -1,0 +1,93 @@
+{
+  "serves_truth": false,
+  "purpose": "Adversarial benchmark contract for comparing Teleon pipeline-template authoring variants on a local business workflow before formalizing the recommended usage.",
+  "checker": "scripts/check_teleon_pipeline_template_adversarial_benchmark.py",
+  "business_problem": {
+    "id": "vendor_invoice_review",
+    "summary": "Normalize an invoice-like vendor task, validate required fields, score risk, and emit a candidate review packet.",
+    "reason": "The workflow is business-shaped, local, deterministic, side-effect-free, and representative of acquire-normalize-validate-score-emit pipelines."
+  },
+  "variants_under_test": [
+    "verbose_json_steps",
+    "compact_json_ids",
+    "callable_list",
+    "primitive_handle_list",
+    "object_graph_matrix",
+    "opt_in_object_graph"
+  ],
+  "usage_lanes": [
+    {
+      "id": "llm_boundary_min_tokens",
+      "current_incumbent": "compact_json_ids",
+      "why": "LLM emits only primitive ids or small slot bindings; deterministic compiler expands them."
+    },
+    {
+      "id": "python_linear_readability",
+      "current_incumbent": "callable_list",
+      "why": "Local Python authors can write one callable per line without step labels or primitive strings."
+    },
+    {
+      "id": "python_explicit_control",
+      "current_incumbent": "primitive_handle_list",
+      "why": "Authors can attach or override metadata explicitly when inference is not enough."
+    },
+    {
+      "id": "python_grouped_composition",
+      "current_incumbent": "object_graph_matrix",
+      "why": "Lists, dicts, and matrices preserve grouping while still compiling to linear step specs."
+    },
+    {
+      "id": "domain_bundle_authoring",
+      "current_incumbent": "opt_in_object_graph",
+      "why": "A domain object can expose to_teleon_primitives without letting the compiler crawl arbitrary internals."
+    },
+    {
+      "id": "lockfile_debug_audit",
+      "current_incumbent": "verbose_json_steps",
+      "why": "Verbose step specs are easiest to inspect after compilation, even if they are not the cheapest LLM output."
+    }
+  ],
+  "adversarial_cases": [
+    "unknown_primitive_rejected",
+    "invalid_state_path_rejected",
+    "arbitrary_object_crawl_rejected",
+    "json_import_surface_rejected",
+    "structure_paths_preserved"
+  ],
+  "metrics": [
+    "planner_payload_token_proxy",
+    "authoring_surface_token_proxy",
+    "compiled_step_token_proxy",
+    "deterministic_digest_count",
+    "semantic_output_digest",
+    "runtime_ns",
+    "flexibility_score"
+  ],
+  "default_recommendation": {
+    "law": "There is no single universal winner. Recommendations are per usage lane and can change when a new variant beats the incumbent under the benchmark.",
+    "llm_boundary_min_tokens": "compact_json_ids",
+    "python_linear_readability": "callable_list",
+    "python_explicit_control": "primitive_handle_list",
+    "python_grouped_composition": "object_graph_matrix",
+    "domain_bundle_authoring": "opt_in_object_graph",
+    "runtime_execution": "compiled_step_specs",
+    "lockfile_debug": "verbose_json_steps",
+    "reason": "Every allowed authoring surface compiles into the same deterministic serializable step specs. The contract chooses incumbents by lane rather than pretending one surface is best for all use cases."
+  },
+  "acceptance_laws": [
+    "All allowed variants compile and execute successfully.",
+    "All allowed variants produce the same semantic business output.",
+    "Each allowed variant is deterministic across repeated runs.",
+    "compact_json_ids uses fewer planner payload tokens than verbose_json_steps.",
+    "At least six authoring variants are evaluated; the benchmark may not hard-code a binary choice.",
+    "Every usage-lane incumbent appears in the evaluated variant set.",
+    "The highest-flexibility variant is an explicit Python object-graph form, not a raw JSON surface.",
+    "Unsupported primitive ids, invalid state roots, arbitrary object crawling, and JSON import/code surfaces are rejected.",
+    "All benchmark reports and compiled outputs remain serves_truth=false."
+  ],
+  "contract_evolution": {
+    "status": "candidate",
+    "rule": "A future authoring variant can become recommended only if this checker is extended with a named variant, the variant beats or ties the current recommendation on token proxy, determinism, and flexibility for at least one declared usage lane, and the full proof gate remains green.",
+    "versioning": "Changes to variant semantics require a new contract version and must preserve old lockfile execution semantics or provide an explicit migration."
+  }
+}

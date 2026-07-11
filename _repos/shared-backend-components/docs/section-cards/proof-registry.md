@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/section-cards/proof-registry.md

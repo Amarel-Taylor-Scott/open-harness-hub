@@ -1,0 +1,25 @@
+MODULE src/teleon/registry/variations.py
+## API signatures
+```python
+"""registry.variations — generate FORKS / VARIATIONS of any registry record (the owner's fork-generation discipline
+applied to DATA, not just architecture)."""
+def py_function_src_teleon_registry_variations___base_id(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__base_id__record: dict) -> str
+def py_function_src_teleon_registry_variations__fork_questions(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__fork_questions__record: dict) -> list[str]
+    # The variation questions to ASK for this record (the discipline, made explicit + per-record).
+def py_function_src_teleon_registry_variations__variations_of(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__variations_of__record: dict, py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__variations_of__axis: str, py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__variations_of__values: list[str] | None=None) -> list[dict]
+    # Generate candidate variations of `record` along `axis` (e.g. industry). Each is a governed candidate fork.
+def py_function_src_teleon_registry_variations__expand_record(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__expand_record__record: dict, py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__expand_record__axes: list[str] | None=None) -> dict[str, list[dict]]
+    # Generate the full fork set: variations across MULTIPLE axes for one record.
+def py_function_src_teleon_registry_variations__mutation_space(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__mutation_space__axes: list[str]) -> int
+    # Variations PER record across the cartesian product of `axes` = product of axis sizes (computed, not typed).
+def py_function_src_teleon_registry_variations__mutate_stream(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__mutate_stream__records, py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__mutate_stream__axes: list[str])
+    # LAZILY yield governed candidate variations across the cartesian product of `axes` for each record — so 1M+
+def py_function_src_teleon_registry_variations__reachable_count(py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__reachable_count__n_records: int, py_arg_src_teleon_registry_variations__py_function_src_teleon_registry_variations__reachable_count__axes: list[str]) -> int
+    # How many candidate variations `n_records` reach across `axes` (n_records x mutation_space).
+```
+## intra-module call edges
+src.teleon.registry.variations.py_function_src_teleon_registry_variations__expand_record -> src.teleon.registry.variations.py_function_src_teleon_registry_variations__variations_of
+src.teleon.registry.variations.py_function_src_teleon_registry_variations__fork_questions -> src.teleon.registry.variations.py_function_src_teleon_registry_variations___base_id
+src.teleon.registry.variations.py_function_src_teleon_registry_variations__mutate_stream -> src.teleon.registry.variations.py_function_src_teleon_registry_variations___base_id
+src.teleon.registry.variations.py_function_src_teleon_registry_variations__reachable_count -> src.teleon.registry.variations.py_function_src_teleon_registry_variations__mutation_space
+src.teleon.registry.variations.py_function_src_teleon_registry_variations__variations_of -> src.teleon.registry.variations.py_function_src_teleon_registry_variations___base_id

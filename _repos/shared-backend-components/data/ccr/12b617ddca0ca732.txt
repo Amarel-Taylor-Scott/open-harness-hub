@@ -1,0 +1,17 @@
+MODULE src/teleon/synthesis/dag_contract.py
+## API signatures
+```python
+"""dag_contract — verify a COMPOSED DAG is a *verified working build*, not just an acyclic spec."""
+def py_function_src_teleon_synthesis_dag_contract__component_types(py_arg_src_teleon_synthesis_dag_contract__component_types__plane) -> tuple
+    # (consumes, produces) types for a plane, or ([],[]) if the plane is not (yet) typed.
+def py_function_src_teleon_synthesis_dag_contract___acyclic_order(py_arg_src_teleon_synthesis_dag_contract__acyclic_order__steps: set, py_arg_src_teleon_synthesis_dag_contract__acyclic_order__edges: list) -> list
+def py_function_src_teleon_synthesis_dag_contract___synthetic_dag(py_arg_src_teleon_synthesis_dag_contract__synthetic_dag__nodes: list, py_arg_src_teleon_synthesis_dag_contract__synthetic_dag__edges: list) -> DAG
+    # Lower the abstract spec to a real pipeline_dag.DAG whose fns emit a synthetic typed placeholder — so DAG.run
+def py_function_src_teleon_synthesis_dag_contract__verify_buildable_dag(py_arg_src_teleon_synthesis_dag_contract__verify_buildable_dag__nodes: list, py_arg_src_teleon_synthesis_dag_contract__verify_buildable_dag__edges: list, *, graph_inputs: tuple=py_const_src_teleon_synthesis_dag_contract__DEFAULT_GRAPH_INPUTS, py_arg_src_teleon_synthesis_dag_contract__verify_buildable_dag__dry_run: bool=True) -> dict
+    # nodes: [{"step": str, "plane": str, ...}]; edges: [[step_a, step_b]]. Returns the verdict (see module docstring).
+```
+## intra-module call edges
+src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract___synthetic_dag -> src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract__component_types
+src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract__verify_buildable_dag -> src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract___acyclic_order
+src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract__verify_buildable_dag -> src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract___synthetic_dag
+src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract__verify_buildable_dag -> src.teleon.synthesis.dag_contract.py_function_src_teleon_synthesis_dag_contract__component_types

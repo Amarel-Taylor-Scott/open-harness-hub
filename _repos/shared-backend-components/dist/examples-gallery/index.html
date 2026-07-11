@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%235b6cff'/%3E%3C/svg%3E">
+<title>AI Done Right — Governed Examples Gallery</title>
+<style>
+:root{--bg:#0d1117;--panel:#161b22;--ink:#e6edf3;--muted:#9aa7b4;--line:#283039;--accent:#5b6cff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(180deg,#0b0e14,#0d1117 40%);color:var(--ink);
+ font-family:"Hanken Grotesk","Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--line);padding:18px 0;position:sticky;top:0;backdrop-filter:blur(8px);
+ background:rgba(13,17,23,.72);z-index:5}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.2px}
+.dot{width:14px;height:14px;border-radius:4px;background:var(--accent);box-shadow:0 0 18px var(--accent)}
+.kind{color:var(--muted);font-weight:500;font-size:13px;margin-left:auto}
+.hero{padding:72px 0 36px}
+.hero h1{font-size:clamp(30px,5vw,52px);line-height:1.08;margin:0 0 16px;letter-spacing:-.5px}
+.hero p.lead{font-size:clamp(17px,2.4vw,22px);color:var(--ink);max-width:760px;margin:0 0 28px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--muted);
+ font-size:13px;margin-bottom:22px}
+.cta{display:inline-flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-block;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px}
+.btn.primary{background:var(--accent);color:#06121f}
+.btn.secondary{border:1px solid var(--line);color:var(--ink)}
+section{padding:30px 0;border-top:1px solid var(--line)}
+h2{font-size:22px;margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin:0 0 10px;font-size:16px}
+ul.clean{list-style:none;padding:0;margin:0}ul.clean li{padding:7px 0 7px 22px;position:relative;color:var(--ink)}
+ul.clean li::before{content:"";position:absolute;left:0;top:14px;width:8px;height:8px;border-radius:2px;background:var(--accent)}
+ul.no li::before{background:#6b7480}
+.diagram{background:#0a0d13;border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted);
+ font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;overflow-x:auto}
+.rel{color:var(--muted)}
+.portfolio{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:720px){.portfolio{grid-template-columns:1fr 1fr}}
+.portfolio a{display:block;border:1px solid var(--line);border-radius:12px;padding:14px;text-decoration:none;color:var(--ink)}
+.portfolio a:hover{border-color:var(--accent)}
+.portfolio small{color:var(--muted)}
+.disclaimer{color:var(--muted);font-size:13px;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#0a0d13}
+.preview{color:var(--muted);font-size:13px;margin-top:10px}
+footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--muted);font-size:14px}
+footer a{color:var(--ink)}
+
+.exwrap{max-width:1100px;margin:0 auto;padding:0 22px 80px}
+.ex{margin:0 0 26px}
+.exhead{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.exhead h3{font-size:19px;margin:0 0 4px}
+.meta{color:var(--muted);font-size:13px}.dur{color:var(--accent)}
+.chip{border:1px solid var(--c);color:var(--c);border-radius:999px;padding:7px 14px;font-size:13px;
+ font-weight:600;white-space:nowrap;flex:0 0 auto}
+.contrast{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+.contrast>div{border:1px solid var(--line);border-radius:10px;padding:14px}
+.bad{background:#1a1113}.good{background:#0f1a12}
+.clabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.contrast p{margin:0;font-size:14px}
+table.kv{width:100%;border-collapse:collapse;margin:6px 0 4px}
+table.kv td{padding:7px 10px;border-top:1px solid var(--line);vertical-align:top;font-size:13.5px}
+td.k{color:var(--muted);width:38%}td.v{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.trace,.report{margin-top:14px}
+.tlabel{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.trace ol{margin:0;padding-left:20px}.trace li{margin:5px 0;font-size:13px}
+.tstep{font-weight:600}.tdetail{color:var(--muted);font-family:"IBM Plex Mono",ui-monospace,monospace;
+ font-size:12px;margin-left:8px;word-break:break-word}
+.report pre{background:#0a0d13;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;
+ font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink);white-space:pre-wrap}
+</style></head>
+<body>
+<div class="wrap">
+  <header class="top"><div class="brand"><span>AI Done Right</span></div>
+    <span class="kind">Governed Examples Gallery</span></header>
+  <section class="hero">
+    <span class="pill">14 runnable pipelines · real output · the model is the only simulated seam</span>
+    <h1>The capability lift, shown — not claimed.</h1>
+    <p class="lead">Every card below is the actual output of a pipeline that composes the real governed
+    processors end-to-end. Each targets a place a frontier model fails <em>structurally</em>
+    (Aggregation, Coded, Efficiency, Freshness, Grounding, Low-resource, Precedence, Safety, Source-authority …) — where being fluent isn’t the same as being right.</p>
+  </section>
+</div>
+<div class="exwrap">
+    <article class="ex card" id="ex-sanctions_aml_screening">
+      <header class="exhead">
+        <div>
+          <h3>Sanctions / AML — the OFAC 50% Rule</h3>
+          <div class="meta">Financial crime · compliance · <span class="dur">durability: Aggregation</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">BLOCKED — aggregate listed ownership 54% ≥ 50% rule</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model can’t traverse an ownership graph or know today’s delta-list additions, so it clears the unlisted name. The 50% Rule is arithmetic over a governed graph.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Screen “Acme Trading” — NOT on the SDN list itself, but owned through a chain (Volkov 30% directly + 60% of MidCo, which owns 40%).</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Aggregate listed ownership</td><td class="v">54%</td></tr><tr><td class="k">Escalated to SAR review</td><td class="v">sar-0001</td></tr><tr><td class="k">Serves truth</td><td class="v">False</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">fuzzy_trigram_retrieve</span><span class="tdetail">{&quot;direct_hit&quot;: false, &quot;name_variants&quot;: []}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;reached&quot;: [&quot;Acme Trading&quot;, &quot;CleanCo&quot;, &quot;MidCo&quot;, &quot;Volkov, Dmitri&quot;], &quot;seeds&quot;: [&quot;Acme Trading&quot;]}</span></li><li><span class="tstep">fifty_percent_rule</span><span class="tdetail">{&quot;entity&quot;: &quot;Acme Trading&quot;, &quot;aggregate_listed_ownership&quot;: 0.54, &quot;blocked&quot;: true, &quot;threshold&quot;: 0.5}</span></li><li><span class="tstep">source_precedence_select</span><span class="tdetail">{&quot;governing&quot;: &quot;ofac-sdn@2026-06-12&quot;}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># Sanctions screening — Acme Trading
+
+## Answer
+BLOCKED
+
+## Details
+- **aggregate_listed_ownership**: 0.54
+- **direct_hit**: False
+- **fifty_percent_blocked**: True
+
+## Citations
+- ofac-sdn@2026-06-12
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-related_party_network">
+      <header class="exhead">
+        <div>
+          <h3>Related-party / shell-network discovery</h3>
+          <div class="meta">Financial crime · KYB · entity resolution · <span class="dur">durability: Aggregation</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">1 shell network(s) flagged</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model takes each entity at face value (different names, different rows) and says “independent.” It can’t normalize identifiers or compute connected components.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Screen a registry of staffing agencies for hidden networks — cluster over shared addresses, phones, officers, and M&amp;A events.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Clusters found</td><td class="v">3</td></tr><tr><td class="k">Apex Staffing LLC · Summit Labor Partners · Premier Workforce Inc</td><td class="v">HIGH — shares address, officer, phone</td></tr><tr><td class="k">BigCo Staffing · Regional Temps</td><td class="v">NORMAL — shares ; M&amp;A e4→e5</td></tr><tr><td class="k">Escalated</td><td class="v">rel-0001</td></tr><tr><td class="k">Serves truth</td><td class="v">False</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">identifier_graph_components</span><span class="tdetail">{&quot;clusters&quot;: 3, &quot;sizes&quot;: [3, 2, 1]}</span></li><li><span class="tstep">fuzzy_name_softlink</span><span class="tdetail">{&quot;near_duplicate_name_pairs&quot;: 0}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;focus&quot;: &quot;e1&quot;, &quot;reached&quot;: [&quot;e1&quot;, &quot;e2&quot;, &quot;e3&quot;]}</span></li><li><span class="tstep">risk_score</span><span class="tdetail">{&quot;high_risk_clusters&quot;: 1, &quot;levels&quot;: [&quot;high&quot;, &quot;none&quot;, &quot;normal&quot;]}</span></li><li><span class="tstep">source_precedence_select</span><span class="tdetail">{&quot;governing&quot;: &quot;corp-registry@2026-06-12&quot;}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># Related-party network discovery
+
+## Answer
+1 likely shell network(s) flagged
+
+## Details
+- **clusters**: 3
+- **high_risk**: [{&#x27;members&#x27;: [&#x27;Apex Staffing LLC&#x27;, &#x27;Summit Labor Partners&#x27;, &#x27;Premier Workforce Inc&#x27;], &#x27;shared&#x27;: [&#x27;address&#x27;, &#x27;officer&#x27;, &#x27;phone&#x27;]}]
+
+## Citations
+- corp-registry@2026-06-12
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-cve_dependency_triage">
+      <header class="exhead">
+        <div>
+          <h3>CVE / dependency vulnerability triage</h3>
+          <div class="meta">Software supply chain · security · <span class="dur">durability: Freshness + exactness</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">AFFECTED — KEV (exploited in the wild)</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model hallucinates CVE ids, misses post-cutoff advisories, and can’t map an advisory to your exact installed versions. Triage is exact range arithmetic.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Is CVE-2024-3094 affecting us? Match the advisory’s version range against the exact installed versions in the lockfile.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Affected package</td><td class="v">liblzma 5.6.1</td></tr><tr><td class="k">Known-exploited (KEV)</td><td class="v">True</td></tr><tr><td class="k">Escalated</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">exact_id_lookup</span><span class="tdetail">{&quot;cve&quot;: &quot;CVE-2024-3094&quot;, &quot;found&quot;: true}</span></li><li><span class="tstep">version_range_check</span><span class="tdetail">{&quot;affected&quot;: [{&quot;name&quot;: &quot;liblzma&quot;, &quot;installed&quot;: &quot;5.6.1&quot;, &quot;fixed_in&quot;: &quot;5.6.2&quot;}], &quot;range&quot;: &quot;&gt;=5.6.0, &lt;5.6.2&quot;}</span></li><li><span class="tstep">source_precedence_select</span><span class="tdetail">{&quot;governing&quot;: &quot;nvd@2026-06-12&quot;}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># CVE triage — CVE-2024-3094
+
+## Answer
+AFFECTED (KEV — exploited in the wild)
+
+## Details
+- **affected**: [{&#x27;name&#x27;: &#x27;liblzma&#x27;, &#x27;installed&#x27;: &#x27;5.6.1&#x27;, &#x27;fixed_in&#x27;: &#x27;5.6.2&#x27;}]
+- **kev**: True
+- **package**: liblzma
+
+## Citations
+- nvd@2026-06-12
+- CVE-2024-3094
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-common_control_resolver">
+      <header class="exhead">
+        <div>
+          <h3>Common control from M&amp;A news</h3>
+          <div class="meta">Financial crime · audit · M&amp;A · <span class="dur">durability: Aggregation + freshness</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">RELATED-PARTY — both controlled by ParentCo</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model doesn’t know post-cutoff deals, can’t chain acquirer-of-acquirer ownership, and misses that today’s “arm’s-length” vendor was bought by the customer’s parent.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Chain M&amp;A deals by date to each company’s ultimate parent, then check if a vendor↔customer transaction is actually self-dealing under common control.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Buyer control chain</td><td class="v">BetaCustomer → ParentCo</td></tr><tr><td class="k">Seller control chain</td><td class="v">AlphaVendor → ParentCo</td></tr><tr><td class="k">Ultimate parent</td><td class="v">ParentCo</td></tr><tr><td class="k">As of</td><td class="v">2025-09-01</td></tr><tr><td class="k">Escalated</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">ultimate_parent_asof</span><span class="tdetail">{&quot;as_of&quot;: &quot;2025-09-01&quot;, &quot;buyer_root&quot;: &quot;ParentCo&quot;, &quot;seller_root&quot;: &quot;ParentCo&quot;, &quot;buyer_chain&quot;: [&quot;BetaCustomer&quot;, &quot;ParentCo&quot;], &quot;seller_chain&quot;: [&quot;AlphaVendor&quot;, &quot;ParentCo&quot;]}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;reached&quot;: [&quot;AlphaVendor&quot;, &quot;BetaCustomer&quot;, &quot;ParentCo&quot;]}</span></li><li><span class="tstep">source_precedence_select</span><span class="tdetail">{&quot;governing&quot;: &quot;corp-registry@2026-06-12&quot;}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># Common-control / related-party transaction review
+
+## Answer
+RELATED-PARTY TRANSACTION — both sides controlled by ParentCo
+
+## Details
+- **as_of**: 2025-09-01
+- **buyer**: BetaCustomer
+- **buyer_chain**: BetaCustomer → ParentCo
+- **seller**: AlphaVendor
+- **seller_chain**: AlphaVendor → ParentCo
+
+## Citations
+- corp-registry@2026-06-12
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-beneficial_ownership_resolver">
+      <header class="exhead">
+        <div>
+          <h3>Beneficial ownership + OFAC 50% rule</h3>
+          <div class="meta">Sanctions · KYC · M&amp;A roll-ups · <span class="dur">durability: Aggregation + freshness + source-authority</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">2 BLOCKED BY INHERITANCE (OFAC 50% rule): Apex Staffing, Meridian Staffing Holdings</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model doesn’t know post-cutoff deals, can’t tell an SEC filing from a blog, and can’t propagate a sanctions block down a ≥50% ownership chain.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Resolve each agency’s authoritative parent from conflicting ownership claims (an SEC filing governs over a press rumor), then apply OFAC’s 50% rule — an entity ≥50%-owned through the chain by an SDN-listed person is itself blocked, even if unlisted.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Blocked by inheritance</td><td class="v">Apex Staffing, Meridian Staffing Holdings</td></tr><tr><td class="k">Proof chain</td><td class="v">Volkov Holdings → Meridian Staffing Holdings → Apex Staffing</td></tr><tr><td class="k">Held-out (lower-authority) claims</td><td class="v">1</td></tr><tr><td class="k">As of</td><td class="v">2025-06-01</td></tr><tr><td class="k">Escalated</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">source_authority.classify + resolve_owners</span><span class="tdetail">{&quot;as_of&quot;: &quot;2025-06-01&quot;, &quot;resolved&quot;: {&quot;Apex Staffing&quot;: {&quot;parent&quot;: &quot;Meridian Staffing Holdings&quot;, &quot;pct&quot;: 60.0, &quot;tier&quot;: &quot;official_agency&quot;}, &quot;Meridian Staffing Holdings&quot;: {&quot;parent&quot;: &quot;Volkov Holdings&quot;, &quot;pct&quot;: 70.0, &quot;tier&quot;: &quot;official_agency&quot;}, &quot;Beacon Staffing&quot;: {&quot;parent&quot;: &quot;Meridian Staffing Holdings&quot;, &quot;pct&quot;: 40.0, &quot;tier&quot;: &quot;official_agency&quot;}}, &quot;held_out&quot;: [{&quot;subject&quot;: &quot;Apex Staffing&quot;, &quot;claimed_parent&quot;: &quot;RivalGroup&quot;, &quot;date&quot;: &quot;2025-05-01&quot;, &quot;reason_held_out&quot;: &quot;lower authority \u2014 &#x27;staffingdealrumors.example.com&#x27; is not a listed authoritative publisher \u2192 unverified (rank 10)&quot;}]}</span></li><li><span class="tstep">ultimate_parent</span><span class="tdetail">{&quot;chains&quot;: {&quot;Apex Staffing&quot;: &quot;Apex Staffing \u2192 Meridian Staffing Holdings \u2192 Volkov Holdings&quot;, &quot;Meridian Staffing Holdings&quot;: &quot;Meridian Staffing Holdings \u2192 Volkov Holdings&quot;, &quot;Beacon Staffing&quot;: &quot;Beacon Staffing \u2192 Meridian Staffing Holdings \u2192 Volkov Holdings&quot;}}</span></li><li><span class="tstep">ofac_50_percent_rule</span><span class="tdetail">{&quot;directly_blocked&quot;: [&quot;Volkov Holdings&quot;], &quot;blocked_by_inheritance&quot;: {&quot;Meridian Staffing Holdings&quot;: {&quot;via&quot;: &quot;Volkov Holdings&quot;, &quot;chain&quot;: &quot;Volkov Holdings \u2192 Meridian Staffing Holdings&quot;, &quot;pct_path&quot;: [70.0]}, &quot;Apex Staffing&quot;: {&quot;via&quot;: &quot;Volkov Holdings&quot;, &quot;chain&quot;: &quot;Volkov Holdings \u2192 Meridian Staffing Holdings \u2192 Apex Staffing&quot;, &quot;pct_path&quot;: [70.0, 60.0]}}}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;reached&quot;: []}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># Beneficial-ownership resolution + OFAC 50% rule
+
+## Answer
+2 entity(ies) BLOCKED BY INHERITANCE (≥50% owned by an SDN-listed person): Apex Staffing, Meridian Staffing Holdings
+
+## Details
+- **as_of**: 2025-06-01
+- **blocked_by_inheritance**: {&#x27;Meridian Staffing Holdings&#x27;: &#x27;Volkov Holdings → Meridian Staffing Holdings&#x27;, &#x27;Apex Staffing&#x27;: &#x27;Volkov Holdings → Meridian Staffing Holdings → Apex Staffing&#x27;}
+- **held_out_claims**: [&quot;Apex Staffing ⟵ RivalGroup (lower authority — &#x27;staffingdealrumors.example.com&#x27; is not a listed authoritative publisher → unverified (rank 10))&quot;]
+- **resolved_owners**: {&#x27;Apex Staffing&#x27;: &#x27;Meridian Staffing Holdings (60%, official_agency)&#x27;, &#x27;Meridian Staffing Holdings&#x27;: &#x27;Volkov Holdings (70%, official_agency)&#x27;, &#x27;Beacon Staffing&#x27;: &#x27;Meridian Staffing Holdings (40%, official_agency)&#x27;}
+
+## Citations
+- U.S. Securities and Exchange Commission matched &#x27;sec.gov&#x27; → official_agency (rank 90); provenance verified
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-fda_labeling_claim_review">
+      <header class="exhead">
+        <div>
+          <h3>FDA labeling: off-label overclaims</h3>
+          <div class="meta">Pharma · regulatory · promo review · <span class="dur">durability: Source-authority + freshness</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">2 promotional claim(s) HELD OUT (off-label / contradicts the FDA label)</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model can’t tell an FDA-approved label from a glossy brochure and repeats the overclaim as fact.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Substantiate each promotional claim against the FDA-approved label; a claim that contradicts the label or asserts an unapproved indication is held out as off-label risk (FDCA 502).</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Substantiated (FDA label)</td><td class="v">indicated for hypertension in adults; lowers systolic BP by ~12 mmHg vs placebo; reduces heart-attack risk by 40%</td></tr><tr><td class="k">Held-out overclaims</td><td class="v">2</td></tr><tr><td class="k">Violation kinds</td><td class="v">contradicts_approved_label, off_label_unsupported_topic</td></tr><tr><td class="k">Escalated</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">source_authority.classify + review_claims</span><span class="tdetail">{&quot;governing&quot;: {&quot;indication&quot;: {&quot;tier&quot;: &quot;official_agency&quot;}, &quot;efficacy_bp&quot;: {&quot;tier&quot;: &quot;official_agency&quot;}, &quot;cardiac_risk&quot;: {&quot;tier&quot;: &quot;unverified&quot;}}, &quot;held_out&quot;: [{&quot;topic&quot;: &quot;efficacy_bp&quot;, &quot;claim&quot;: &quot;lowers systolic BP by 25 mmHg \u2014 best in class&quot;, &quot;kind&quot;: &quot;contradicts_approved_label&quot;, &quot;reason_held_out&quot;: &quot;lower authority \u2014 &#x27;brandrx-promo.example.com&#x27; is not a listed authoritative publisher \u2192 unverified (rank 10)&quot;}, {&quot;topic&quot;: &quot;cardiac_risk&quot;, &quot;claim&quot;: &quot;reduces heart-attack risk by 40%&quot;, &quot;kind&quot;: &quot;off_label_unsupported_topic&quot;, &quot;reason_held_out&quot;: &quot;no FDA-approved label claim for this topic \u2014 &#x27;brandrx-promo.example.com&#x27; is not a listed authoritative publisher \u2192 unverified (rank 10)&quot;}]}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;reached&quot;: []}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># FDA drug-labeling claim review
+
+## Answer
+2 promotional claim(s) HELD OUT (off-label / contradicts the FDA-approved label): lowers systolic BP by 25 mmHg — best in class; reduces heart-attack risk by 40%
+
+## Details
+- **held_out_overclaims**: [&quot;[contradicts_approved_label] lowers systolic BP by 25 mmHg — best in class (lower authority — &#x27;brandrx-promo.example.com&#x27; is not a listed authoritative publisher → unverified (rank 10))&quot;, &quot;[off_label_unsupported_topic] reduces heart-attack risk by 40% (no FDA-approved label claim for this topic — &#x27;brandrx-promo.example.com&#x27; is not a listed authoritative publisher → unverified (rank 10))&quot;]
+- **substantiated**: {&#x27;indication&#x27;: &#x27;indicated for hypertension in adults&#x27;, &#x27;efficacy_bp&#x27;: &#x27;lowers systolic BP by ~12 mmHg vs placebo&#x27;, &#x27;cardiac_risk&#x27;: &#x27;reduces heart-attack risk by 40%&#x27;}
+
+## Citations
+- &#x27;brandrx-promo.example.com&#x27; is not a listed authoritative publisher → unverified (rank 10)
+- U.S. Food and Drug Administration matched &#x27;fda.gov&#x27; → official_agency (rank 90); provenance verified
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-export_control_screening">
+      <header class="exhead">
+        <div>
+          <h3>BIS export-control screening</h3>
+          <div class="meta">Trade compliance · sanctions · EAR · <span class="dur">durability: Source-authority + freshness</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">1 export(s) REQUIRE A LICENSE (end-user on the BIS Entity List)</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model doesn’t know post-cutoff Entity-List additions and clears an export it shouldn’t.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Screen each export’s end-user against the authoritative BIS Entity List; a stale vendor-DB “clear” is held out when the Entity List shows the end-user listed → a license is required.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">License required</td><td class="v">EXP-001</td></tr><tr><td class="k">Governing source tier</td><td class="v">official_agency</td></tr><tr><td class="k">Held-out stale “clear”s</td><td class="v">1</td></tr><tr><td class="k">Escalated</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">source_authority.classify + screen</span><span class="tdetail">{&quot;governing&quot;: {&quot;Sinotech Microelectronics&quot;: {&quot;determination&quot;: &quot;listed&quot;, &quot;tier&quot;: &quot;official_agency&quot;}, &quot;Helvetia Instruments AG&quot;: {&quot;determination&quot;: &quot;clear&quot;, &quot;tier&quot;: &quot;official_agency&quot;}}, &quot;held_out&quot;: [{&quot;end_user&quot;: &quot;Sinotech Microelectronics&quot;, &quot;determination&quot;: &quot;clear&quot;, &quot;reason_held_out&quot;: &quot;contradicts the higher-authority screen \u2014 &#x27;screenfast-db.example.com&#x27; is not a listed authoritative publisher \u2192 unverified (rank 10)&quot;}]}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;reached&quot;: []}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># BIS export-control screening
+
+## Answer
+1 export(s) require a LICENSE (end-user on the authoritative Entity List): EXP-001
+
+## Details
+- **decisions**: {&#x27;EXP-001&#x27;: &#x27;LICENSE REQUIRED — Sinotech Microelectronics&#x27;, &#x27;EXP-002&#x27;: &#x27;ok — Helvetia Instruments AG&#x27;}
+- **held_out_stale_clears**: [&quot;Sinotech Microelectronics: clear (contradicts the higher-authority screen — &#x27;screenfast-db.example.com&#x27; is not a listed authoritative publisher → unverified (rank 10))&quot;]
+
+## Citations
+- Bureau of Industry and Security (Commerce) matched &#x27;bis.doc.gov&#x27; → official_agency (rank 90); provenance verified
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-icd10_coding">
+      <header class="exhead">
+        <div>
+          <h3>ICD-10 coding — abstain over fabricate</h3>
+          <div class="meta">Clinical · medical coding · <span class="dur">durability: Coded vocabulary</span></div>
+        </div>
+        <span class="chip" style="--c:#d29922">2 coded · 1 abstained → proposed to a coder</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>The output is a CODE where fluency gives zero signal — a plausible-but-wrong code is a compliance liability. A bare model invents plausible-looking ICD-10 codes.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Code the diagnoses in an encounter note against a governed terminology. The note documents two codeable conditions plus one not in the terminology.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">essential hypertension</td><td class="v">DEMO-I10  (demo-icd:i10@v1)</td></tr><tr><td class="k">type 2 diabetes</td><td class="v">DEMO-E11.9  (demo-icd:e119@v1)</td></tr><tr><td class="k">ABSTAINED — fibromyalgia</td><td class="v">no exact terminology match — left uncoded rather than guessed</td></tr><tr><td class="k">Disposition</td><td class="v">proposed</td></tr><tr><td class="k">Serves truth</td><td class="v">False</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">soap_note_structurer</span><span class="tdetail">{&quot;assessment_items&quot;: 2, &quot;diagnoses&quot;: [&quot;essential hypertension&quot;, &quot;type 2 diabetes&quot;, &quot;fibromyalgia&quot;]}</span></li><li><span class="tstep">icd10_code_grounder</span><span class="tdetail">{&quot;coded&quot;: [&quot;DEMO-I10&quot;, &quot;DEMO-E11.9&quot;], &quot;abstained&quot;: [&quot;fibromyalgia&quot;]}</span></li><li><span class="tstep">clinical_abstention_gate</span><span class="tdetail">{&quot;sufficient&quot;: true}</span></li></ol></div>
+      
+    </article>
+    <article class="ex card" id="ex-procurement_collusion_ring">
+      <header class="exhead">
+        <div>
+          <h3>Procurement bid-rigging ring</h3>
+          <div class="meta">Public procurement · fraud · <span class="dur">durability: Aggregation</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">BID-RIGGING RING — 3 vendors, 100% cover-bid tenders</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model scores each tender in isolation and calls it competitive. The ring is a property of the WHOLE bid history — who co-bids, whether wins rotate, cover-bid bands.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Screen a tender ledger for a bid-rigging ring — vendors who rotate wins and submit cover bids (deliberately high losing bids) to fake competition.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Ring members</td><td class="v">BidCo · CovCo · RingCo</td></tr><tr><td class="k">Wins rotate among them</td><td class="v">True</td></tr><tr><td class="k">Rotating winners</td><td class="v">BidCo · CovCo · RingCo</td></tr><tr><td class="k">Cover-bid tenders</td><td class="v">100%</td></tr><tr><td class="k">Escalated</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">cobid_graph</span><span class="tdetail">{&quot;frequent_pairs&quot;: 3, &quot;candidate_group&quot;: [&quot;BidCo&quot;, &quot;CovCo&quot;, &quot;RingCo&quot;]}</span></li><li><span class="tstep">ring_signals</span><span class="tdetail">{&quot;group_tenders&quot;: 4, &quot;wins_rotate&quot;: true, &quot;cover_bid_tenders&quot;: 4, &quot;cover_bid_share&quot;: 1.0, &quot;winners&quot;: [&quot;BidCo&quot;, &quot;CovCo&quot;, &quot;RingCo&quot;], &quot;is_ring&quot;: true}</span></li><li><span class="tstep">graphrag_retrieve</span><span class="tdetail">{&quot;reached&quot;: [&quot;BidCo&quot;, &quot;CovCo&quot;, &quot;RingCo&quot;]}</span></li><li><span class="tstep">source_precedence_select</span><span class="tdetail">{&quot;governing&quot;: &quot;award-notice@2026-06-12&quot;}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># Procurement collusion / bid-rigging review
+
+## Answer
+BID-RIGGING RING — 3 vendors, rotating winners, 100% cover-bid tenders
+
+## Details
+- **cover_bid_share**: 1.0
+- **ring**: [&#x27;BidCo&#x27;, &#x27;CovCo&#x27;, &#x27;RingCo&#x27;]
+- **rotating_winners**: [&#x27;BidCo&#x27;, &#x27;CovCo&#x27;, &#x27;RingCo&#x27;]
+- **wins_rotate**: True
+
+## Citations
+- award-notice@2026-06-12
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-regulated_fact_qa">
+      <header class="exhead">
+        <div>
+          <h3>Regulated-fact QA — state interest-rate caps</h3>
+          <div class="meta">Consumer finance · regulated facts · <span class="dur">durability: Precedence + freshness</span></div>
+        </div>
+        <span class="chip" style="--c:#3fb950">SERVED — cites the source of law</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model averages a stale 21% blog post with the real statute, or states a cap with no citation. The governed path picks the source of law and quotes it.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>“What is the consumer loan interest rate cap in Ohio?” — answer only from the current source of law, never an expired blog figure.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Answer</td><td class="v">Ohio Revised Code 1321.13: a consumer loan under the Short-Term Loan Act is capped at an annual interest rate of 28%.</td></tr><tr><td class="k">Citations</td><td class="v">orc-1321.13 (source_of_law)</td></tr><tr><td class="k">Conflicting sources resolved</td><td class="v">3</td></tr><tr><td class="k">Serves truth</td><td class="v">False</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">prompt_injection_screen</span><span class="tdetail">{&quot;safe&quot;: true}</span></li><li><span class="tstep">hybrid_retrieve_fuse</span><span class="tdetail">{&quot;n&quot;: 5, &quot;dense_placeholder&quot;: true}</span></li><li><span class="tstep">cross_encoder_reranker</span><span class="tdetail">{&quot;n&quot;: 5, &quot;scorer&quot;: &quot;lexical-overlap-proxy (NOT a cross-encoder \u2014 inject one via scorer=)&quot;}</span></li><li><span class="tstep">simhash_dedupe</span><span class="tdetail">{&quot;kept&quot;: 5, &quot;removed&quot;: 0}</span></li><li><span class="tstep">source_precedence_select</span><span class="tdetail">{&quot;ordered&quot;: [&quot;ca-civ-1916&quot;, &quot;orc-1321.13&quot;, &quot;orc-1321.13-restate&quot;, &quot;unrelated&quot;, &quot;blog-old&quot;], &quot;conflicts&quot;: [{&quot;ids&quot;: [&quot;orc-1321.13&quot;, &quot;orc-1321.13-restate&quot;], &quot;values&quot;: [[&quot;1321.13&quot;, &quot;28%&quot;], [&quot;28%&quot;]], &quot;precedence_prefers&quot;: &quot;orc-1321.13&quot;, &quot;resolution&quot;: &quot;flagged_not_averaged&quot;}, {&quot;ids&quot;: [&quot;orc-1321.13&quot;, &quot;blog-old&quot;], &quot;values&quot;: [[&quot;1321.13&quot;, &quot;28%&quot;], [&quot;21%&quot;]], &quot;precedence_prefers&quot;: &quot;orc-1321.13&quot;, &quot;resolution&quot;: &quot;flagged_not_averaged&quot;}, {&quot;ids&quot;: [&quot;orc-1321.13-restate&quot;, &quot;blog-old&quot;], &quot;values&quot;: [[&quot;28%&quot;], [&quot;21%&quot;]], &quot;precedence_prefers&quot;: &quot;orc-1321.13-restate&quot;, &quot;resolution&quot;: &quot;flagged_not_averaged&quot;}]}</span></li><li><span class="tstep">extractive_span_selector</span><span class="tdetail">{&quot;spans&quot;: 3, &quot;compression&quot;: 0.631068}</span></li><li><span class="tstep">context_placer_edge+system_prompt_builder</span><span class="tdetail">{&quot;placement&quot;: [&quot;orc-1321.13&quot;, &quot;orc-1321.13-restate&quot;, &quot;blog-old&quot;], &quot;cite_or_abstain&quot;: true}</span></li><li><span class="tstep">governed_verification</span><span class="tdetail">{&quot;served&quot;: true, &quot;eligible_spans&quot;: 1, &quot;rejected_ineligible&quot;: [&quot;orc-1321.13-restate&quot;, &quot;blog-old&quot;]}</span></li></ol></div>
+      <div class="report"><div class="tlabel">governed report (real output)</div><pre># Regulated answer — what is the consumer loan interest rate cap in Ohio?
+
+## Answer
+Ohio Revised Code 1321.13: a consumer loan under the Short-Term Loan Act is capped at an annual interest rate of 28%.
+
+## Details
+- **abstained**: False
+- **jurisdiction_durability**: the cap is jurisdiction+amendment bound
+
+## Citations
+- orc-1321.13 (source_of_law)
+</pre></div>
+    </article>
+    <article class="ex card" id="ex-clinical_support">
+      <header class="exhead">
+        <div>
+          <h3>Clinical decision support — propose, never act</h3>
+          <div class="meta">Clinical · patient safety · <span class="dur">durability: Safety + abstention</span></div>
+        </div>
+        <span class="chip" style="--c:#ff6b6b">3 safety findings → ESCALATED (not autonomous)</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model answers confidently and autonomously. The governed path checks interactions / dosing / labs deterministically and ESCALATES to a clinician.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>A renally-impaired patient on warfarin with a new high-potassium lab and an interacting order. Surface the safety findings.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">interaction</td><td class="v">fluconazole + warfarin — CYP2C9 inhibition raises INR</td></tr><tr><td class="k">contraindication</td><td class="v">Amoxicillin — allergy beta-lactam cross-reactivity</td></tr><tr><td class="k">critical_lab</td><td class="v">critical value: Potassium</td></tr><tr><td class="k">Disposition</td><td class="v">proposed</td></tr><tr><td class="k">Serves truth</td><td class="v">False</td></tr></table>
+      
+      
+    </article>
+    <article class="ex card" id="ex-low_resource_alert">
+      <header class="exhead">
+        <div>
+          <h3>Disaster alert in a low-resource language</h3>
+          <div class="meta">Public safety · low-resource NLP · <span class="dur">durability: Low-resource + faithfulness</span></div>
+        </div>
+        <span class="chip" style="--c:#d29922">3 fields extracted → AWAITING HUMAN SIGN-OFF (nothing auto-broadcasts)</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A bare model is unreliable in low-resource languages and will silently mistranslate a life-safety number. The governed path extracts faithfully and a human signs off.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>Turn a Filipino PAGASA typhoon bulletin into a Waray TTS-ready radio script — pivoting through English, locking the output language.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Pivot hops</td><td class="v">filipino-&gt;english → english-&gt;waray</td></tr><tr><td class="k">Language locked</td><td class="v">True</td></tr><tr><td class="k">Auto-broadcast</td><td class="v">False</td></tr><tr><td class="k">Awaiting sign-off ticket</td><td class="v">bcast-0001</td></tr></table>
+      
+      
+    </article>
+    <article class="ex card" id="ex-governed_rag">
+      <header class="exhead">
+        <div>
+          <h3>Governed hybrid RAG — the general default</h3>
+          <div class="meta">General · grounded answering · <span class="dur">durability: Grounding</span></div>
+        </div>
+        <span class="chip" style="--c:#3fb950">GROUNDED ANSWER READY</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>Ungoverned RAG answers from whatever ranked highest, including an injected instruction. The governed path screens, fuses, reranks, and grounds in real spans.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>“How does the deploy preflight gate work?” over a governed corpus, with prompt-injection screening on the way in.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Grounded in real spans</td><td class="v">True</td></tr><tr><td class="k">Context compression ratio</td><td class="v">45%</td></tr><tr><td class="k">Prompt enforces cite-or-abstain</td><td class="v">True</td></tr></table>
+      <div class="trace"><div class="tlabel">composition trace (real)</div><ol><li><span class="tstep">prompt_injection_screen</span><span class="tdetail"></span></li><li><span class="tstep">hybrid_retrieve_fuse</span><span class="tdetail"></span></li><li><span class="tstep">cross_encoder_reranker</span><span class="tdetail"></span></li><li><span class="tstep">mmr_diversity_select</span><span class="tdetail"></span></li><li><span class="tstep">extractive_span_selector</span><span class="tdetail"></span></li><li><span class="tstep">context_placer_edge</span><span class="tdetail"></span></li><li><span class="tstep">system_prompt_builder</span><span class="tdetail"></span></li></ol></div>
+      
+    </article>
+    <article class="ex card" id="ex-context_efficiency_loop">
+      <header class="exhead">
+        <div>
+          <h3>Usage-gated context efficiency</h3>
+          <div class="meta">Runtime · cost efficiency · <span class="dur">durability: Efficiency (consumer behaviour)</span></div>
+        </div>
+        <span class="chip" style="--c:#5b6cff">cohort “power_user_large_substrate” · predicted re-read savings 67%</span>
+      </header>
+      <div class="contrast">
+        <div class="bad"><div class="clabel">Bare model</div><p>A naive loop re-reads the whole working set every turn. The governed loop pages out the stable substrate by cohort and rehydrates on a miss — measured savings.</p></div>
+        <div class="good"><div class="clabel">Governed pipeline</div><p>A multi-turn session: classify the tenant’s usage shape, pick a cohort compression curve, and serve only what’s needed across turns.</p></div>
+      </div>
+      <table class="kv"><tr><td class="k">Cohort</td><td class="v">power_user_large_substrate</td></tr><tr><td class="k">Budget fraction</td><td class="v">35%</td></tr><tr><td class="k">Tokens kept vs naive re-read</td><td class="v">433 vs 1297</td></tr><tr><td class="k">Rehydrated on miss</td><td class="v">substrate-4.py (re-promoted)</td></tr></table>
+      
+      
+    </article></div>
+<div class="wrap"><footer class="foot" style="border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:13px">
+  Generated from the real pipelines by <code>scripts/build_examples_gallery.py</code>. Deterministic —
+  the embedded output is byte-identical to a live run. None of these serve truth autonomously; each
+  proposes, and a gate or a human disposes.
+</footer></div>
+</body></html>

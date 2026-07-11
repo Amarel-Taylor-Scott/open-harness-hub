@@ -1,0 +1,688 @@
+{
+  "kind": "context_worker.output.v1",
+  "output": {
+    "adapter_status": "invalid_model_json",
+    "llm_error": "Expecting ',' delimiter: line 1 column 1400 (char 1399)",
+    "llm_graph_enrichment": [],
+    "llm_proposed_edges": [],
+    "llm_proposed_nodes": [],
+    "llm_raw_preview": "```json\n{\n  \"llm_graph_enrichment\": [\n    {\n      \"proposed_edges\": [\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-001-ca0bcc55\",\n            \"chunk-001-b1cef137\"\n          ],\n          \"source\": \"chunk-001-b1cef137\",\n          \"target\": \"entity-002-3f08cc0b\",\n          \"type\": \"governs\"\n        },\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-002-201e042c\",\n            \"chunk-001-b1cef137\"\n          ],\n          \"source\": \"chunk-001-b1cef137\",\n          \"target\": \"entity-003-77c7b490\",\n          \"type\": \"describes\"\n        },\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-003-26c8bedb\",\n            \"chunk-001-b1cef137\"\n          ],\n          \"source\": \"chunk-001-b1cef137\",\n          \"target\": \"entity-005-da433cd4\",\n          \"type\": \"refers_to\"\n        },\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-004-e3cb1341\",\n            ",
+    "model_route": {
+      "candidate_adapters": [
+        "ollama-gemma4-e2b-local",
+        "ollama-gemma4-e2b-mid",
+        "ollama-gemma4-e2b-large-placeholder"
+      ],
+      "cost_estimate": {
+        "estimated_cost_usd": 0.0
+      },
+      "fallbacks": [
+        {
+          "accepted": false,
+          "adapter": "ollama-gemma4-e2b-local",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        },
+        {
+          "accepted": true,
+          "adapter": "ollama-gemma4-e2b-mid",
+          "reason_codes": []
+        },
+        {
+          "accepted": false,
+          "adapter": "ollama-gemma4-e2b-large-placeholder",
+          "reason_codes": [
+            "preferred_lane_mismatch"
+          ]
+        }
+      ],
+      "latency_budget_ms": null,
+      "modality": [
+        "text"
+      ],
+      "model_route_id": "mr-fbd5be263a6fd196",
+      "policy": {
+        "allow_cloud": false,
+        "allow_frontier": false,
+        "capability": "structured_review",
+        "max_cost_usd": null,
+        "preferred_lane": "open_weight_medium",
+        "privacy_scope": "tenant",
+        "require_zero_data_retention": false,
+        "tenant_allowed_providers": []
+      },
+      "quality_tier": "mid_open_weight_cpu",
+      "route_reason": "selected_first_compliant_policy_route",
+      "selected_adapter": "ollama-gemma4-e2b-mid",
+      "selected_model": "batiai/gemma4-e2b:q4",
+      "selected_route": {
+        "adapter": "ollama-gemma4-e2b-mid",
+        "api_key_env": null,
+        "backend": "http-openai",
+        "base_url": "http://ollama:11434/v1",
+        "capabilities": [
+          "*"
+        ],
+        "data_retention": "local",
+        "enabled": true,
+        "estimated_cost_usd": 0.0,
+        "free_credit": false,
+        "lane": "open_weight_medium",
+        "latency_ms": null,
+        "modalities": [
+          "text"
+        ],
+        "model": "batiai/gemma4-e2b:q4",
+        "provider": "ollama",
+        "quality_tier": "mid_open_weight_cpu",
+        "trust_boundary": "local"
+      },
+      "task_type": "llm.graph.enrich",
+      "trust_boundary": "local"
+    },
+    "training_examples": [
+      {
+        "accepted": null,
+        "cascade": {
+          "escalation_reasons": [
+            "fragile_facts"
+          ],
+          "max_tier": 4,
+          "policy_version": "model-cascade-policy.v1",
+          "risk_signals": {
+            "ambiguous_count": 0,
+            "claim_count": 7,
+            "conflict_count": 0,
+            "fragile_count": 3,
+            "high_stakes": false,
+            "low_confidence": false,
+            "model_disagreement": false,
+            "user_facing": false
+          },
+          "selected_tiers": [
+            {
+              "examples": [
+                "Gemma 4 larger",
+                "Qwen 3.6 mid",
+                "medium open-weight reviewer"
+              ],
+              "fine_tune_targets": [
+                "edge extraction",
+                "evidence review",
+                "summary verification",
+                "contradiction candidates"
+              ],
+              "id": "mid_open_weight",
+              "lane": "open_weight_medium",
+              "model_policy": {
+                "capability": "structured_review",
+                "lane": "open_weight_medium"
+              },
+              "tier": 2,
+              "trainable": true
+            }
+          ],
+          "start_tier": 2,
+          "target_tier": 2,
+          "task_name": "llm.graph.enrich",
+          "training_task": "graph_enrichment"
+        },
+        "do_not_train_changing_facts_into_weights": true,
+        "input": {
+          "claims": [
+            {
+              "claim": "Raw source access is a fallback and requires an exact source handle, identity, ACL filtering, and audit logging.",
+              "claim_id": "claim-001-ca0bcc55",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [],
+                "state": "allow_with_citation"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Raw source access is a fallback and requires an exact source handle, identity, ACL filtering, and audit logging.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "ACL",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "Allowed operations are metadata probe, indexed sync, and exact-object live fetch.",
+              "claim_id": "claim-002-201e042c",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [],
+                "state": "allow_with_citation"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "positive",
+              "provenance": {
+                "evidence_span": "Allowed operations are metadata probe, indexed sync, and exact-object live fetch.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "Allowed",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "Unrestricted raw search, bulk comment dumps, and write actions are blocked by default.",
+              "claim_id": "claim-003-26c8bedb",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [],
+                "state": "allow_with_citation"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Unrestricted raw search, bulk comment dumps, and write actions are blocked by default.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "Raw",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "Baltor vendor policy requires supplier reviews every 90 days.",
+              "claim_id": "claim-004-e3cb1341",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "policy"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "Baltor vendor policy requires supplier reviews every 90 days.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "Baltor",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "SharePoint access must be reviewed before contractor onboarding.",
+              "claim_id": "claim-005-f3bfd7bd",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [],
+                "state": "allow_with_citation"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [],
+                "valid_until": null,
+                "volatile": false
+              },
+              "polarity": "positive",
+              "provenance": {
+                "evidence_span": "SharePoint access must be reviewed before contractor onboarding.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "sharepoint access must reviewed before",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "The current escalation threshold is $25,000 as of 2026-05-31.",
+              "claim_id": "claim-006-0bce170c",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "refreshable via search/tool worker",
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "as of",
+                  "current",
+                  "threshold"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "The current escalation threshold is $25,000 as of 2026-05-31.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "the current escalation threshold",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            },
+            {
+              "claim": "According to https://example.com/source, the policy owner is Security Operations.",
+              "claim_id": "claim-007-e9781cf8",
+              "context_serving": {
+                "requires_citation": true,
+                "risk_reasons": [
+                  "volatile_fact"
+                ],
+                "state": "serve_with_freshness_warning"
+              },
+              "freshness": {
+                "retrieved_at": null,
+                "signals": [
+                  "owner",
+                  "policy"
+                ],
+                "valid_until": null,
+                "volatile": true
+              },
+              "polarity": "neutral",
+              "provenance": {
+                "evidence_span": "According to https://example.com/source, the policy owner is Security Operations.",
+                "run_id": "adm-285412fb1f",
+                "source_chunk": "chunk-001-b1cef137"
+              },
+              "source_chunk": "chunk-001-b1cef137",
+              "subject": "Security Operations",
+              "verification": {
+                "authoritative_source_count": 0,
+                "conflict_status": "unknown",
+                "independent_source_count": 1,
+                "state": "detected"
+              }
+            }
+          ],
+          "conflict_candidates": [],
+          "context_concerns": [],
+          "edges": [
+            {
+              "from": "entity-001-1b5f3ffd",
+              "to": "chunk-001-b1cef137",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-002-3f08cc0b",
+              "to": "chunk-001-b1cef137",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-003-77c7b490",
+              "to": "chunk-001-b1cef137",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-004-dacaf791",
+              "to": "chunk-001-b1cef137",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-005-da433cd4",
+              "to": "chunk-001-b1cef137",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "entity-006-5c30ad5f",
+              "to": "chunk-001-b1cef137",
+              "type": "mentioned_in"
+            },
+            {
+              "from": "claim-001-ca0bcc55",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-001-ca0bcc55",
+              "to": "entity-002-3f08cc0b",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-002-201e042c",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-002-201e042c",
+              "to": "entity-003-77c7b490",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-003-26c8bedb",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-003-26c8bedb",
+              "to": "entity-005-da433cd4",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-004-e3cb1341",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-004-e3cb1341",
+              "to": "entity-004-dacaf791",
+              "type": "mentions"
+            },
+            {
+              "from": "claim-005-f3bfd7bd",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-006-0bce170c",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-007-e9781cf8",
+              "to": "chunk-001-b1cef137",
+              "type": "supported_by"
+            },
+            {
+              "from": "claim-007-e9781cf8",
+              "to": "entity-001-1b5f3ffd",
+              "type": "mentions"
+            }
+          ],
+          "nodes": [
+            {
+              "id": "entity-001-1b5f3ffd",
+              "label": "Security Operations",
+              "type": "entity"
+            },
+            {
+              "id": "entity-002-3f08cc0b",
+              "label": "ACL",
+              "type": "entity"
+            },
+            {
+              "id": "entity-003-77c7b490",
+              "label": "Allowed",
+              "type": "entity"
+            },
+            {
+              "id": "entity-004-dacaf791",
+              "label": "Baltor",
+              "type": "entity"
+            },
+            {
+              "id": "entity-005-da433cd4",
+              "label": "Raw",
+              "type": "entity"
+            },
+            {
+              "id": "entity-006-5c30ad5f",
+              "label": "Unrestricted",
+              "type": "entity"
+            },
+            {
+              "id": "chunk-001-b1cef137",
+              "label": "chunk-001-b1cef137",
+              "type": "chunk",
+              "weight": 728
+            },
+            {
+              "id": "claim-001-ca0bcc55",
+              "label": "ACL",
+              "type": "claim"
+            },
+            {
+              "id": "claim-002-201e042c",
+              "label": "Allowed",
+              "type": "claim"
+            },
+            {
+              "id": "claim-003-26c8bedb",
+              "label": "Raw",
+              "type": "claim"
+            },
+            {
+              "id": "claim-004-e3cb1341",
+              "label": "Baltor",
+              "type": "claim"
+            },
+            {
+              "id": "claim-005-f3bfd7bd",
+              "label": "sharepoint access must reviewed before",
+              "type": "claim"
+            },
+            {
+              "id": "claim-006-0bce170c",
+              "label": "the current escalation threshold",
+              "type": "claim"
+            },
+            {
+              "id": "claim-007-e9781cf8",
+              "label": "Security Operations",
+              "type": "claim"
+            }
+          ]
+        },
+        "label_source": "pending_review",
+        "model_output": {
+          "adapter_status": "invalid_model_json",
+          "llm_error": "Expecting ',' delimiter: line 1 column 1400 (char 1399)",
+          "llm_graph_enrichment": [],
+          "llm_proposed_edges": [],
+          "llm_proposed_nodes": [],
+          "llm_raw_preview": "```json\n{\n  \"llm_graph_enrichment\": [\n    {\n      \"proposed_edges\": [\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-001-ca0bcc55\",\n            \"chunk-001-b1cef137\"\n          ],\n          \"source\": \"chunk-001-b1cef137\",\n          \"target\": \"entity-002-3f08cc0b\",\n          \"type\": \"governs\"\n        },\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-002-201e042c\",\n            \"chunk-001-b1cef137\"\n          ],\n          \"source\": \"chunk-001-b1cef137\",\n          \"target\": \"entity-003-77c7b490\",\n          \"type\": \"describes\"\n        },\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-003-26c8bedb\",\n            \"chunk-001-b1cef137\"\n          ],\n          \"source\": \"chunk-001-b1cef137\",\n          \"target\": \"entity-005-da433cd4\",\n          \"type\": \"refers_to\"\n        },\n        {\n          \"confidence\": 1.0,\n          \"evidence_ids\": [\n            \"claim-004-e3cb1341\",\n            ",
+          "model_route": {
+            "candidate_adapters": [
+              "ollama-gemma4-e2b-local",
+              "ollama-gemma4-e2b-mid",
+              "ollama-gemma4-e2b-large-placeholder"
+            ],
+            "cost_estimate": {
+              "estimated_cost_usd": 0.0
+            },
+            "fallbacks": [
+              {
+                "accepted": false,
+                "adapter": "ollama-gemma4-e2b-local",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              },
+              {
+                "accepted": true,
+                "adapter": "ollama-gemma4-e2b-mid",
+                "reason_codes": []
+              },
+              {
+                "accepted": false,
+                "adapter": "ollama-gemma4-e2b-large-placeholder",
+                "reason_codes": [
+                  "preferred_lane_mismatch"
+                ]
+              }
+            ],
+            "latency_budget_ms": null,
+            "modality": [
+              "text"
+            ],
+            "model_route_id": "mr-fbd5be263a6fd196",
+            "policy": {
+              "allow_cloud": false,
+              "allow_frontier": false,
+              "capability": "structured_review",
+              "max_cost_usd": null,
+              "preferred_lane": "open_weight_medium",
+              "privacy_scope": "tenant",
+              "require_zero_data_retention": false,
+              "tenant_allowed_providers": []
+            },
+            "quality_tier": "mid_open_weight_cpu",
+            "route_reason": "selected_first_compliant_policy_route",
+            "selected_adapter": "ollama-gemma4-e2b-mid",
+            "selected_model": "batiai/gemma4-e2b:q4",
+            "selected_route": {
+              "adapter": "ollama-gemma4-e2b-mid",
+              "api_key_env": null,
+              "backend": "http-openai",
+              "base_url": "http://ollama:11434/v1",
+              "capabilities": [
+                "*"
+              ],
+              "data_retention": "local",
+              "enabled": true,
+              "estimated_cost_usd": 0.0,
+              "free_credit": false,
+              "lane": "open_weight_medium",
+              "latency_ms": null,
+              "modalities": [
+                "text"
+              ],
+              "model": "batiai/gemma4-e2b:q4",
+              "provider": "ollama",
+              "quality_tier": "mid_open_weight_cpu",
+              "trust_boundary": "local"
+            },
+            "task_type": "llm.graph.enrich",
+            "trust_boundary": "local"
+          }
+        },
+        "model_route": {
+          "candidate_adapters": [
+            "ollama-gemma4-e2b-local",
+            "ollama-gemma4-e2b-mid",
+            "ollama-gemma4-e2b-large-placeholder"
+          ],
+          "cost_estimate": {
+            "estimated_cost_usd": 0.0
+          },
+          "fallbacks": [
+            {
+              "accepted": false,
+              "adapter": "ollama-gemma4-e2b-local",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            },
+            {
+              "accepted": true,
+              "adapter": "ollama-gemma4-e2b-mid",
+              "reason_codes": []
+            },
+            {
+              "accepted": false,
+              "adapter": "ollama-gemma4-e2b-large-placeholder",
+              "reason_codes": [
+                "preferred_lane_mismatch"
+              ]
+            }
+          ],
+          "latency_budget_ms": null,
+          "modality": [
+            "text"
+          ],
+          "model_route_id": "mr-fbd5be263a6fd196",
+          "policy": {
+            "allow_cloud": false,
+            "allow_frontier": false,
+            "capability": "structured_review",
+            "max_cost_usd": null,
+            "preferred_lane": "open_weight_medium",
+            "privacy_scope": "tenant",
+            "require_zero_data_retention": false,
+            "tenant_allowed_providers": []
+          },
+          "quality_tier": "mid_open_weight_cpu",
+          "route_reason": "selected_first_compliant_policy_route",
+          "selected_adapter": "ollama-gemma4-e2b-mid",
+          "selected_model": "batiai/gemma4-e2b:q4",
+          "selected_route": {
+            "adapter": "ollama-gemma4-e2b-mid",
+            "api_key_env": null,
+            "backend": "http-openai",
+            "base_url": "http://ollama:11434/v1",
+            "capabilities": [
+              "*"
+            ],
+            "data_retention": "local",
+            "enabled": true,
+            "estimated_cost_usd": 0.0,
+            "free_credit": false,
+            "lane": "open_weight_medium",
+            "latency_ms": null,
+            "modalities": [
+              "text"
+            ],
+            "model": "batiai/gemma4-e2b:q4",
+            "provider": "ollama",
+            "quality_tier": "mid_open_weight_cpu",
+            "trust_boundary": "local"
+          },
+          "task_type": "llm.graph.enrich",
+          "trust_boundary": "local"
+        },
+        "reviewed_output": null,
+        "run_id": "adm-285412fb1f",
+        "task": "llm.graph.enrich",
+        "training_example_id": "training-example-001-01298b27",
+        "training_task": "graph_enrichment"
+      }
+    ]
+  }
+}

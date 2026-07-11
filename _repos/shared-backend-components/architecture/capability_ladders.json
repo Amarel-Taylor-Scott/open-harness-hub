@@ -1,0 +1,127 @@
+{
+  "version": "0.1.0",
+  "updated": "2026-06-22",
+  "principle": "EVERY capability is a descent LADDER: cost-ordered rungs from the cheapest DETERMINISTIC method up to the most capable/expensive, including EXTERNAL-API rungs (often more deterministic than a model) and a governed top rung. The supervisor climbs the cheapest rung that meets the bar and NEVER gives up at rung 0 — it escalates, and on exhaustion reports honestly which rung is next (cataloged/not-wired). The browser ladder (architecture/browser_escalation_ladder.json) is the canonical worked instance; this generalizes it to every capability + subcomponent. Rungs reference real tools (tool_registry / ocr_provider_registry / web_browsing_stack_registry), external_apis (external_api_registry), and planes (tool_planes). serves_truth=false; ToS-sensitive rungs are GOVERNED.",
+  "serves_truth": false,
+  "exhaust_policy": "try the cheapest rung that can meet the bar; escalate on miss/low-confidence; only report unavailable after exhausting WIRED rungs, then name the next cataloged rung.",
+  "ladders": [
+    {"capability": "web_browsing", "plane": "browser", "canonical": "architecture/browser_escalation_ladder.json", "rungs": [
+      {"rung": 0, "tier": "http_fetch", "method": "raw HTTP, no JS", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["beautifulsoup", "trafilatura"], "planes": ["search"]},
+      {"rung": 1, "tier": "headless", "method": "headless render (real UA + networkidle + stealth-lite)", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["playwright"], "planes": ["browser"]},
+      {"rung": 2, "tier": "headed", "method": "headed browser", "deterministic": true, "cost_rank": 4, "status": "wired", "tools": ["playwright", "selenium"], "planes": ["browser"]},
+      {"rung": 3, "tier": "undetected", "method": "stealth/undetected driver", "deterministic": true, "cost_rank": 5, "status": "cataloged", "tools": ["undetected_chromedriver", "nodriver", "patchright"], "planes": ["browser"], "governance": "evasion_restricted"},
+      {"rung": 4, "tier": "managed_unlocker", "method": "external managed scraping proxy", "deterministic": true, "cost_rank": 6, "status": "candidate", "external_apis": ["web_unlocker"], "planes": ["browser"], "governance": "evasion_restricted_byo"},
+      {"rung": 5, "tier": "vision_coordinate", "method": "screenshot + grounding model + coordinate click", "deterministic": false, "cost_rank": 7, "status": "cataloged", "tools": ["screenshot_capture", "uground"], "planes": ["vision"]}
+    ]},
+    {"capability": "document_extraction", "plane": "data_extraction", "router": "_repos/teleon/backend/src/teleon/extraction/pdf_profiler.py:shortcut_plan", "rungs": [
+      {"rung": 0, "tier": "profile_route", "method": "cheap PDF profile (metadata/text-layer/scan/form/table signals) -> classify layout -> SHORTCUT to only the applicable rungs (e.g. skip OCR for born-digital text)", "deterministic": true, "cost_rank": 0, "status": "wired", "planes": ["data_extraction"]},
+      {"rung": 1, "tier": "text_layer", "method": "PDF text layer", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["pdfplumber", "pymupdf"], "planes": ["data_extraction"]},
+      {"rung": 1, "tier": "tables", "method": "table detect -> dataframe", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["camelot", "tabula", "polars"], "planes": ["data_extraction"]},
+      {"rung": 2, "tier": "ocr", "method": "local OCR for scans", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["tesseract", "paddleocr"], "planes": ["ocr"]},
+      {"rung": 3, "tier": "field_parse", "method": "deterministic typed-field parsers", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["dateparser", "commonregex", "price_parser"], "planes": ["field_parsing"]},
+      {"rung": 4, "tier": "hosted_api", "method": "external hosted extraction", "deterministic": true, "cost_rank": 4, "status": "candidate", "external_apis": ["pdf_extract_api", "table_extract_api"], "planes": ["data_extraction"]},
+      {"rung": 5, "tier": "cheap_llm", "method": "cheapest-capable LLM for residual fields", "deterministic": false, "cost_rank": 5, "status": "wired", "planes": ["llm"]},
+      {"rung": 6, "tier": "frontier_llm", "method": "frontier LLM on flagged only", "deterministic": false, "cost_rank": 6, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "document_classification", "plane": "classical_ml", "rungs": [
+      {"rung": 0, "tier": "rules", "method": "regex/keyword routing", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["commonregex", "spacy"], "planes": ["ner"]},
+      {"rung": 1, "tier": "classical_ml", "method": "trained classifier (no LLM)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["scikit_learn", "fasttext", "setfit"], "planes": ["classical_ml"]},
+      {"rung": 2, "tier": "hosted_api", "method": "external classification API", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["doc_classify_api"], "planes": ["classical_ml"]},
+      {"rung": 3, "tier": "cheap_llm", "method": "small LLM for ambiguous residual", "deterministic": false, "cost_rank": 3, "status": "wired", "planes": ["llm"]},
+      {"rung": 4, "tier": "frontier_llm", "method": "frontier LLM on flagged", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "entity_enrichment", "plane": "entity_enrichment", "rungs": [
+      {"rung": 0, "tier": "cache", "method": "cached prior enrichment within TTL", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["diskcache"], "planes": ["caching"]},
+      {"rung": 1, "tier": "field_parse", "method": "deterministic parse/normalize (phone/email/address)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["phonenumbers", "libpostal", "email_validator"], "planes": ["field_parsing"]},
+      {"rung": 2, "tier": "public_registry", "method": "public registry lookup (WHOIS/DNS)", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["domain_whois"], "planes": ["entity_enrichment"]},
+      {"rung": 3, "tier": "enrichment_api", "method": "external firmographic/geo enrichment API", "deterministic": true, "cost_rank": 3, "status": "candidate", "external_apis": ["company_enrichment", "maps_geocode"], "planes": ["entity_enrichment"], "governance": "public data + provenance"},
+      {"rung": 4, "tier": "browser", "method": "browse the authoritative source (web_browsing ladder)", "deterministic": true, "cost_rank": 4, "status": "wired", "tools": ["playwright"], "planes": ["browser"]},
+      {"rung": 5, "tier": "llm_supervise", "method": "LLM only to disambiguate/confirm", "deterministic": false, "cost_rank": 5, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "social_media_scraping", "plane": "social_scrape", "governance": "ToS_sensitive: public metadata only, no PII; cataloged rungs require explicit enable + research_guardrail_policy", "rungs": [
+      {"rung": 0, "tier": "official_api", "method": "the platform's official/public API where one exists", "deterministic": true, "cost_rank": 1, "status": "candidate", "planes": ["social_scrape"], "governance": "preferred — within ToS"},
+      {"rung": 1, "tier": "marketplace_api", "method": "external marketplace scraper API (more deterministic than a browser)", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["fb_page_scrape", "x_posts_public", "instagram_profile_public"], "planes": ["social_scrape"], "governance": "ToS_sensitive_public_only"},
+      {"rung": 2, "tier": "browser", "method": "the web_browsing ladder (headless->headed->undetected)", "deterministic": true, "cost_rank": 4, "status": "wired", "tools": ["playwright"], "planes": ["browser"], "governance": "evasion_restricted"},
+      {"rung": 3, "tier": "honest_stop", "method": "if all rungs blocked/ToS-refused -> honest unavailable", "deterministic": true, "cost_rank": 8, "status": "wired", "planes": ["social_scrape"], "governance": "never violate ToS to get data"}
+    ]},
+    {"capability": "search_research", "plane": "search", "rungs": [
+      {"rung": 0, "tier": "keyless_search", "method": "keyless search + fetch + extract", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["searxng", "beautifulsoup", "trafilatura"], "planes": ["search"]},
+      {"rung": 1, "tier": "search_api", "method": "search API (free-tier)", "deterministic": true, "cost_rank": 1, "status": "candidate", "tools": ["tavily", "brave_search"], "planes": ["search"]},
+      {"rung": 2, "tier": "serp_marketplace", "method": "external SERP API", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["serp_search_api"], "planes": ["search"]},
+      {"rung": 3, "tier": "browser", "method": "the web_browsing ladder", "deterministic": true, "cost_rank": 4, "status": "wired", "tools": ["playwright"], "planes": ["browser"]},
+      {"rung": 4, "tier": "llm_synthesize", "method": "LLM synthesis + cite (bounded)", "deterministic": false, "cost_rank": 5, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "ocr", "plane": "ocr", "rungs": [
+      {"rung": 0, "tier": "text_layer", "method": "embedded text layer (no OCR)", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["pdfplumber"], "planes": ["data_extraction"]},
+      {"rung": 1, "tier": "local_ocr", "method": "local OCR engine", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["tesseract", "paddleocr"], "planes": ["ocr"]},
+      {"rung": 2, "tier": "enhanced_ocr", "method": "preprocess + stronger local OCR", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["easyocr"], "planes": ["ocr"]},
+      {"rung": 3, "tier": "cloud_ocr", "method": "cloud document AI", "deterministic": true, "cost_rank": 3, "status": "candidate", "tools": ["aws_textract", "gcv"], "planes": ["ocr"], "governance": "byo cloud key"},
+      {"rung": 4, "tier": "vision_llm", "method": "vision-LLM read on flagged only", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "retrieval", "plane": "vector_store", "rungs": [
+      {"rung": 0, "tier": "bm25", "method": "keyword/BM25", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["rank_bm25", "tantivy"], "planes": ["reranker"]},
+      {"rung": 1, "tier": "vector", "method": "embed + ANN", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["faiss", "qdrant", "sentence_transformers"], "planes": ["vector_store", "embedding"]},
+      {"rung": 2, "tier": "rerank", "method": "cross-encoder rerank top-k", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["bge_reranker", "flashrank"], "planes": ["reranker"]},
+      {"rung": 3, "tier": "llm_rerank", "method": "LLM rerank/synthesize on residual", "deterministic": false, "cost_rank": 3, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "transcription_asr", "plane": "asr", "rungs": [
+      {"rung": 0, "tier": "local_asr", "method": "local Whisper", "deterministic": false, "cost_rank": 0, "status": "wired", "tools": ["whisper_cpp", "faster_whisper"], "planes": ["asr"]},
+      {"rung": 1, "tier": "vad_local", "method": "VAD segment + local ASR", "deterministic": false, "cost_rank": 1, "status": "wired", "tools": ["silero_vad", "faster_whisper"], "planes": ["asr"]},
+      {"rung": 2, "tier": "cloud_asr", "method": "cloud ASR on flagged", "deterministic": false, "cost_rank": 2, "status": "candidate", "tools": ["deepgram"], "planes": ["asr"], "governance": "byo key"}
+    ]},
+    {"capability": "translation", "plane": "mt", "rungs": [
+      {"rung": 0, "tier": "local_nmt", "method": "local NMT", "deterministic": false, "cost_rank": 0, "status": "wired", "tools": ["argos_translate", "marian_nmt"], "planes": ["mt"]},
+      {"rung": 1, "tier": "fast_inference", "method": "CTranslate2 fast local", "deterministic": false, "cost_rank": 1, "status": "wired", "tools": ["ctranslate2"], "planes": ["mt"]},
+      {"rung": 2, "tier": "cloud_mt", "method": "cloud MT (free tier)", "deterministic": false, "cost_rank": 2, "status": "candidate", "tools": ["deepl"], "planes": ["mt"]},
+      {"rung": 3, "tier": "llm", "method": "LLM translate on hard segments", "deterministic": false, "cost_rank": 3, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "entity_resolution", "plane": "fuzzy_matching", "rungs": [
+      {"rung": 0, "tier": "exact_normalize", "method": "normalize + exact key match", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["libpostal", "phonenumbers"], "planes": ["field_parsing"]},
+      {"rung": 1, "tier": "fuzzy", "method": "fuzzy/phonetic match", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["rapidfuzz", "jellyfish"], "planes": ["fuzzy_matching"]},
+      {"rung": 2, "tier": "record_linkage", "method": "probabilistic record linkage", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["splink", "dedupe"], "planes": ["fuzzy_matching"]},
+      {"rung": 3, "tier": "embedding", "method": "embedding similarity", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["sentence_transformers"], "planes": ["embedding"]},
+      {"rung": 4, "tier": "llm_adjudicate", "method": "LLM adjudicate ambiguous pairs", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "contact_lookup", "plane": "entity_enrichment", "rungs": [
+      {"rung": 0, "tier": "cache", "method": "cached verified record within TTL", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["diskcache"], "planes": ["caching"]},
+      {"rung": 1, "tier": "authoritative_fetch", "method": "official site fetch + deterministic parse", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["trafilatura", "phonenumbers", "usaddress"], "planes": ["field_parsing", "search"]},
+      {"rung": 2, "tier": "enrichment_api", "method": "external contact/firmographic API", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["company_enrichment"], "planes": ["entity_enrichment"]},
+      {"rung": 3, "tier": "search_browser", "method": "search + web_browsing ladder", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["searxng", "playwright"], "planes": ["search", "browser"]},
+      {"rung": 4, "tier": "llm_supervise", "method": "LLM disambiguate + confirm freshness", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "public_statement_tracking", "plane": "stance_nli", "governance": "BALTOR truth-domain. PUBLIC statements only; every statement carries provenance (source URL + date + speaker); a position change is a CDC event on a timeline; a flagged contradiction is a CANDIDATE (verify the quote is real + correctly attributed + in-context BEFORE asserting — discovery≠trust); neutral SOURCED documentation only (quotes + citations, never editorializing/defamation); no private PII; honor source ToS; honest-MISSING when not found.", "rungs": [
+      {"rung": 0, "tier": "gather", "method": "find public statements (search + news + governed social) via the search/social ladders", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["searxng", "trafilatura"], "external_apis": ["serp_search_api", "x_posts_public", "fb_page_scrape"], "planes": ["search", "social_scrape"]},
+      {"rung": 1, "tier": "extract_statements", "method": "extract statement units: speaker + quote + date + claim (deterministic quote/attribution + dates)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["spacy", "dateparser", "commonregex"], "planes": ["ner", "field_parsing"]},
+      {"rung": 2, "tier": "cluster_claims", "method": "group statements by the same underlying claim/topic", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["sentence_transformers", "rapidfuzz"], "planes": ["embedding", "fuzzy_matching"]},
+      {"rung": 3, "tier": "detect_contradiction", "method": "deterministic numeric/temporal/negation flip (diff) + NLI entailment-contradiction-neutral between statements", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["deepdiff", "roberta_mnli", "deberta_mnli"], "planes": ["diff_compare", "stance_nli"]},
+      {"rung": 4, "tier": "llm_adjudicate", "method": "LLM ONLY for nuanced/context-dependent pairs the NLI flags — proposes a CANDIDATE conflict, never asserts; Baltor verify gate confirms before publish", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "meeting_notes_to_actions", "plane": "ner", "rungs": [
+      {"rung": 0, "tier": "segment_extract", "method": "split notes; extract candidate action items (imperatives) via regex/dependency", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["spacy", "commonregex"], "planes": ["ner"]},
+      {"rung": 1, "tier": "owner_due", "method": "parse owner + due date deterministically", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["dateparser", "spacy"], "planes": ["field_parsing", "ner"]},
+      {"rung": 2, "tier": "dedupe", "method": "merge duplicate actions", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["rapidfuzz"], "planes": ["fuzzy_matching"]},
+      {"rung": 3, "tier": "llm_polish", "method": "LLM only to phrase/disambiguate unclear items", "deterministic": false, "cost_rank": 3, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "contract_clause_extraction", "plane": "data_extraction", "rungs": [
+      {"rung": 0, "tier": "text_layer", "method": "PDF text / OCR for scans", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["pdfplumber", "tesseract"], "planes": ["data_extraction", "ocr"]},
+      {"rung": 1, "tier": "clause_segment", "method": "segment into clauses (headings/numbering rules)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["spacy", "commonregex"], "planes": ["ner"]},
+      {"rung": 2, "tier": "clause_classify", "method": "classify clause type (trained classifier, no LLM)", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["setfit", "fasttext"], "planes": ["classical_ml"]},
+      {"rung": 3, "tier": "field_parse", "method": "parse dates/amounts/parties deterministically", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["dateparser", "price_parser"], "planes": ["field_parsing"]},
+      {"rung": 4, "tier": "llm_ambiguous", "method": "LLM only for ambiguous/novel clauses", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "brand_monitoring", "plane": "social_scrape", "governance": "PUBLIC mentions only, provenance per mention, no private PII, honor ToS", "rungs": [
+      {"rung": 0, "tier": "gather_mentions", "method": "search + governed public social for brand mentions", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["searxng", "trafilatura"], "external_apis": ["serp_search_api", "x_posts_public"], "planes": ["search", "social_scrape"]},
+      {"rung": 1, "tier": "extract", "method": "extract mention + source + date", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["spacy", "dateparser"], "planes": ["ner", "field_parsing"]},
+      {"rung": 2, "tier": "sentiment_stance", "method": "deterministic sentiment/stance classifier", "deterministic": true, "cost_rank": 2, "status": "wired", "tools": ["setfit", "roberta_mnli"], "planes": ["classical_ml", "stance_nli"]},
+      {"rung": 3, "tier": "cluster", "method": "cluster into topics/themes", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["sentence_transformers", "rapidfuzz"], "planes": ["embedding", "fuzzy_matching"]},
+      {"rung": 4, "tier": "llm_summarize", "method": "LLM only to summarize flagged themes", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]},
+    {"capability": "lead_research", "plane": "entity_enrichment", "governance": "public data + provenance; no private PII", "rungs": [
+      {"rung": 0, "tier": "cache", "method": "cached prior lead record within TTL", "deterministic": true, "cost_rank": 0, "status": "wired", "tools": ["diskcache"], "planes": ["caching"]},
+      {"rung": 1, "tier": "normalize", "method": "deterministic normalize (domain/email/phone)", "deterministic": true, "cost_rank": 1, "status": "wired", "tools": ["libpostal", "email_validator", "phonenumbers"], "planes": ["field_parsing"]},
+      {"rung": 2, "tier": "enrichment_api", "method": "external firmographic/WHOIS enrichment", "deterministic": true, "cost_rank": 2, "status": "candidate", "external_apis": ["company_enrichment", "domain_whois"], "planes": ["entity_enrichment"]},
+      {"rung": 3, "tier": "search_browser", "method": "search + web_browsing ladder for gaps", "deterministic": true, "cost_rank": 3, "status": "wired", "tools": ["searxng", "playwright"], "planes": ["search", "browser"]},
+      {"rung": 4, "tier": "llm_qualify", "method": "LLM only to qualify/score the lead", "deterministic": false, "cost_rank": 4, "status": "wired", "planes": ["llm"]}
+    ]}
+  ]
+}

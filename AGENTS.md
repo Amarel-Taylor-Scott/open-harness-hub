@@ -10,53 +10,30 @@ the modular pieces of an AI-assisted system are described. The hub is
 host-agnostic (GitHub Pages, Hugging Face Spaces, Vercel, Netlify,
 Cloudflare Pages) and industry-agnostic.
 
-Read [`README.md`](README.md) first, then [`taxonomy/SPEC.md`](taxonomy/SPEC.md).
+Read [`README.md`](README.md) first, then [`_repos/_shared/taxonomy/SPEC.md`](_repos/_shared/taxonomy/SPEC.md).
 For Baltor-specific work, also keep
-[`docs/codex/baltor-always-in-memory-context.md`](docs/codex/baltor-always-in-memory-context.md)
+[`_repos/shared-backend-components/docs/codex/baltor-always-in-memory-context.md`](_repos/shared-backend-components/docs/codex/baltor-always-in-memory-context.md)
 loaded as the compact product and architecture anchor.
 
-## Layout
+## Layout — everything lives under `_repos/`
 
-```
-.
-├── taxonomy/SPEC.md          # canonical specification (read first)
-├── schemas/*.schema.json     # JSON Schemas for every component type
-├── vocabularies/*.yaml       # controlled vocabularies (industries, capabilities, …)
-├── catalog/                  # the actual content
-│   ├── harnesses/<slug>.yaml
-│   ├── pipelines/<kind>/<slug>.yaml
-│   ├── rule-packs/<family>/<slug>.yaml
-│   ├── knowledge-packs/<slug>.yaml
-│   ├── tools/<slug>.yaml
-│   ├── personas/<slug>.yaml
-│   ├── adapters/<slug>.yaml
-│   ├── rubrics/<slug>.yaml
-│   └── _inbox/               # draft component definitions pending curator review
-├── db/
-│   ├── postgres/schema.sql   # canonical relational schema
-│   ├── mongodb/collections.md
-│   ├── redis/keys.md
-│   └── vector/spec.md
-├── scripts/
-│   ├── validate.py           # JSON Schema + ref + vocab validation
-│   ├── build_catalog_pages.py# render component definitions into docs/catalog/*.md
-│   ├── run_pipeline.py       # minimal pipeline runner with --simulate
-│   ├── new.py                # scaffold a new component definition
-│   └── mine_kaggle_harnesses.py
-├── hf-space/
-│   ├── app.py                # Gradio playground
-│   ├── Dockerfile
-│   └── README.md             # HF Space frontmatter
-├── docs/                     # MkDocs source (rendered to site/)
-├── .github/workflows/
-│   ├── pages.yml             # GitHub Pages deploy
-│   └── validate.yml          # PR validation
-├── mkdocs.yml
-├── vercel.json
-├── netlify.toml
-├── _headers / _redirects
-└── _reference/               # local reference repos; NOT republished
-```
+The tree was reorganized: the repo **root** now holds only `_repos/`, the essential meta files
+(`README.md`, `LICENSE`, `AGENTS.md`, `CLAUDE.md`, `conftest.py`, `.gitignore`, `.env`, `.aidoneright-root`),
+and tooling-hidden dirs tools read from root (`.venv`, `.claude`, `.codex`, `.github`). Every former
+top-level dir moved into `_repos/<owner>/`. Authoritative maps: **[`_repos/INDEX.md`](_repos/INDEX.md)**
+(surface → landmark files), **[`_repos/MIGRATION-STATUS.md`](_repos/MIGRATION-STATUS.md)** (what moved where),
+and **[`_repos/_moved_dirs.json`](_repos/_moved_dirs.json)** (old-name → new `_repos/…` path).
+
+| `_repos/<owner>/` | Holds |
+|---|---|
+| **`shared-backend-components`** | the substrate + all tooling: `scripts/` (suite runner + every `check_*.py`/`build_*.py`), `architecture/*.json`, `schemas/*.schema.json`, `vocabularies/*.yaml`, `catalog/`, `db/`, `docs/`, `hf-space/`, `rubrics/`, `data/`, `deploy/`, `dist/`, … |
+| **`teleon` · `baltor` · `openhubforai` · `aidevobserver` · `aidoneright`** | each product/surface: `backend/src/<x>/`, `frontend/`, `context/`, `EDGES.md`, `interface.json`, `CLAUDE.md`, `README.md` (+ `e2e/` in `baltor`) |
+| **`dev-rules-context`** | the devkit: `standards/` `prompts/` `hooks/` `mcp/` `commands/` `skills/` `code-templates/` `templates/` `workflows/` `tests/` |
+| **`_shared`** | cross-cutting: `strategy/` `codex/` `concepts/` `research/` `taxonomy/` `_reference/` (local ref repos, NOT republished) `archive/` (lineage) |
+
+**Path convention in the docs below:** a bare `scripts/x.py`, `docs/…`, `architecture/…`, `catalog/…` names the
+file under `_repos/shared-backend-components/…`; product code written `src/<x>/…` lives physically at
+`_repos/<x>/backend/src/<x>/…` (the `src/<x>/…` form is the canonical, location-stable name used by ids/graph).
 
 ## Conventions
 
@@ -107,7 +84,7 @@ python scripts/build_catalog_pages.py
   (embedding dimension, model IDs, thresholds, paths, type/row-family
   lists) get one definition and are imported/read everywhere else;
   strings are built from the owning constant, never copied as parallel
-  literals. See [`docs/codex/no-magic-values.md`](docs/codex/no-magic-values.md).
+  literals. See [`docs/codex/no-magic-values.md`](_repos/shared-backend-components/docs/codex/no-magic-values.md).
 
 ## Do not
 

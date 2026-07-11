@@ -1,0 +1,25 @@
+MODULE src/teleon/evolution/catalog_descent.py
+## API signatures
+```python
+"""src.teleon.evolution.catalog_descent — run the unbounded->bounded DESCENT over the real capability catalog and
+record EVERY attempt into the descent brain."""
+_REPO = ...
+_CATALOG = ...
+_MODEL_STAGE_COST = ...
+_DET_STAGE_COST = ...
+def load_catalog() -> list[dict]
+def _before(cap: dict) -> dict
+    # Before-state on the canonical descent axes: llm_usage = # model-core stages; freshness = deterministic fraction.
+def descend(cap: dict, *, downgrade: dict | None=None) -> tuple[dict, str, str, tuple]
+    # Return (after_axes, strategy, outcome, losers) — the cheapest bounded version the catalog says is achievable.
+def convert_catalog(store: DescentAttemptStore, caps: list[dict] | None=None) -> dict
+    # Run the descent over every catalog capability and record each attempt into the brain. Returns a summary.
+def demonstrate(store_path: str | Path) -> dict
+    # Run the conversion against the canonical brain store and return the summary + the meta-learner readout.
+```
+## intra-module call edges
+src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.catalog_descent._before
+src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.catalog_descent.descend
+src.teleon.evolution.catalog_descent.convert_catalog -> src.teleon.evolution.catalog_descent.load_catalog
+src.teleon.evolution.catalog_descent.demonstrate -> src.teleon.evolution.catalog_descent.convert_catalog
+src.teleon.evolution.catalog_descent.descend -> src.teleon.evolution.catalog_descent._before

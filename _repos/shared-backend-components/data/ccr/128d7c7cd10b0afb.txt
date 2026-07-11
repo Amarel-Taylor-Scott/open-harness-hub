@@ -1,0 +1,35 @@
+MODULE src/baltor/ports/memory_provider.py
+## API signatures
+```python
+"""src.baltor.ports.memory_provider — the memory/context-provider capability interfaces."""
+FORBIDDEN_CLAIM_STATUSES = ...
+MEMORY_ARTIFACT_REQUIRED_FIELDS = ...
+MEMORY_ARTIFACT_TYPE = ...
+MEMORY_PROVIDER_SLOT = ...
+MCP_TOOL_PROVIDER_SLOT = ...
+class MemoryProviderPort:
+    # One governed memory/recall provider. ``write``/``search`` return ``MemoryArtifact`` records that are
+    def write(self, request: dict[str, Any]) -> dict[str, Any]
+        # Remember one item. ``request`` is a MemoryWriteRequest: {tenant_id, project, content, now,
+    def search(self, request: dict[str, Any]) -> dict[str, Any]
+        # Recall items. ``request`` is a MemorySearchRequest: {tenant_id, project, query, now, limit?,
+    def status(self) -> dict[str, Any]
+        # Report provider liveness WITHOUT raising. Returns a MemoryProviderStatus:
+class MemoryProfileProviderPort:
+    # A provider that can project a governed PROFILE for a scope (static long-term + dynamic recent), modeled
+    def profile(self, scope: dict[str, Any]) -> dict[str, Any]
+        # Project a MemoryProfile for ``scope`` ({tenant_id, project, now, limit?}). Returns
+class MemoryMCPProviderPort:
+    # An MCP-tool surface for governed memory (the ``memory`` / ``recall`` / ``context`` tools). Each tool
+    def tools(self) -> list[str]
+        # List the MCP tool names this provider exposes (a subset/superset of {'memory','recall','context'}).
+    def memory(self, request: dict[str, Any]) -> dict[str, Any]
+        # MCP ``memory`` tool — remember. Same contract as MemoryProviderPort.write: returns ONE
+    def recall(self, request: dict[str, Any]) -> dict[str, Any]
+        # MCP ``recall`` tool — search. Same contract as MemoryProviderPort.search: returns a
+    def context(self, scope: dict[str, Any]) -> dict[str, Any]
+        # MCP ``context`` tool — project a MemoryProfile (static + dynamic), all candidate MemoryArtifacts.
+class UnavailableProvider:
+    # A memory provider's upstream backend / credential is not present. Carries the missing ``credential_ref``
+    def __init__(self, provider_id: str, credential_ref: str, detail: str='') -> None
+```

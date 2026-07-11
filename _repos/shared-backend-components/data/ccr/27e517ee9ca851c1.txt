@@ -1,0 +1,117 @@
+MODULE src/teleon/observer/local_registry_connector.py
+## API signatures
+```python
+"""Local registry connector for AIDevObserver."""
+LOCAL_REGISTRY_ID = ...
+CONNECTOR_VERSION = ...
+LOCAL_PRIMITIVE_CANDIDATE_SCHEMA = ...
+MAX_INDEXED_FILES = ...
+MAX_DOC_CHARS = ...
+MAX_SNIPPET_CHARS = ...
+MAX_SEARCH_RESULTS = ...
+MAX_PRIMITIVE_CANDIDATES = ...
+MIN_SEARCH_SCORE = ...
+PYTHON_SUFFIX = ...
+DOC_SUFFIXES = ...
+DOC_NAME_PREFIXES = ...
+CLAUDE_ROOT_DOC_KINDS = ...
+CLAUDE_DOC_DIR_KINDS = ...
+CLAUDE_PROJECT_KINDS = ...
+SCRIPT_FILENAMES = ...
+PRIMITIVE_SKIP_DIRS = ...
+KIND_PRIORITY = ...
+SKIP_DIRS = ...
+TOKEN_RE = ...
+PYPROJECT_SCRIPT_SECTION_RE = ...
+SAFE_REL_PATH_RE = ...
+STOPWORDS = ...
+QUERY_SYNONYMS = ...
+SELF_PARAM_NAMES = ...
+MUTATION_SCALAR_TO_SEQUENCE = ...
+MUTATION_OUTPUT_FIELD_WRAPPER = ...
+MUTATION_FIELD_RENAME_ADAPTER = ...
+MUTATION_RETRY_CACHE_RATE_LIMIT_ADAPTER = ...
+FIT_EXACT_MATCH = ...
+FIT_DETERMINISTIC_EDIT_MATCH = ...
+FIT_INCOMPATIBLE = ...
+_INDEX_CACHE_LOCK = ...
+def clear_local_repo_index_cache() -> None
+    # Clear the in-process local repo index cache.
+class LocalRegistryRecord:
+    # Candidate source-ref row from an explicit local repo root.
+    def to_dict(self) -> dict[str, Any]
+def _repo_root(path: str | Path) -> Path
+def _is_skipped(path: Path) -> bool
+def _is_doc_file(path: Path) -> bool
+def _file_index_priority(rel: Path) -> int | None
+def _project_doc_kind(rel: Path) -> str | None
+    # Return a structured kind for Claude-style project docs.
+def _project_doc_name(rel: Path, kind: str) -> str
+def _iter_files(root: Path) -> Iterable[Path]
+def _safe_rel(root: Path, path: Path) -> str
+def _tokens(text: str) -> set[str]
+def _record_id(kind: str, path: str, name: str) -> str
+def _first_line(text: str | None) -> str
+def _sha(text: str, *, n: int=LOCAL_REGISTRY_SETTINGS.hash_digest_chars) -> str
+def _canonical_json(obj: Any) -> str
+def _annotation_name(node: ast.AST | None) -> str
+def _ast_digest(node: ast.AST) -> str
+def _signature(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str
+def _signature_with_annotations(node: ast.FunctionDef | ast.AsyncFunctionDef) -> str
+def _function_contract(node: ast.FunctionDef | ast.AsyncFunctionDef, *, is_method: bool) -> dict[str, str]
+def _make_record(*, kind: str, name: str, path: str, summary: str, line: int | None=None, metadata: dict[str, Any] | None=None, search_terms: Iterable[str]=()) -> LocalRegistryRecord
+def _index_python_file(root: Path, path: Path) -> list[LocalRegistryRecord]
+def _index_doc_file(root: Path, path: Path) -> list[LocalRegistryRecord]
+def _index_package_scripts(root: Path, path: Path) -> list[LocalRegistryRecord]
+def _index_pyproject_scripts(root: Path, path: Path) -> list[LocalRegistryRecord]
+def index_local_repo(root: str | Path) -> list[dict[str, Any]]
+    # Index repo-local symbols/docs/scripts into candidate source-ref rows.
+def cached_index_local_repo(root: str | Path, *, ttl_seconds: int | None=None) -> list[dict[str, Any]]
+    # Return local repo index rows using a bounded in-process cache.
+def _record_text(record: dict[str, Any]) -> str
+def search_local_records(query: str, records: list[dict[str, Any]], *, limit: int=MAX_SEARCH_RESULTS, requested_input: str | dict | None=None, requested_output: str | dict | None=None) -> list[dict[str, Any]]
+    # Rank candidate local records for a query using deterministic lexical overlap.
+def search_local_repo(query: str, root: str | Path, *, limit: int=MAX_SEARCH_RESULTS, requested_input: str | dict | None=None, requested_output: str | dict | None=None) -> list[dict[str, Any]]
+    # Index and search an explicit repo root in one call.
+def _primitive_slug(record: dict[str, Any]) -> str
+def _contract_for_local_record(record: dict[str, Any]) -> dict[str, str]
+def _contract_tokens(text: str) -> set[str]
+def _contract_fields(text: str) -> list[str]
+def _contract_shape(text: str) -> str
+def _edge_descriptor(edge_kind: str, contract_text: str) -> dict[str, Any]
+    # Small black-box edge descriptor for LLMs and deterministic matching.
+def _mutation_option(mutation_id: str, *, from_edge: str, to_edge: str, proof_obligations: list[str], preconditions: list[str] | None=None, deterministic: bool=True) -> dict[str, Any]
+def _edge_mutation_options(input_edge: dict[str, Any], output_edge: dict[str, Any], effects: list[str]) -> list[dict[str, Any]]
+def _requested_edge(value: str | dict | None, edge_kind: str) -> dict[str, Any] | None
+def _edge_direct_compatible(candidate: dict[str, Any], requested: dict[str, Any] | None) -> bool
+def _edge_fit(record: dict[str, Any], *, requested_input: str | dict | None=None, requested_output: str | dict | None=None, query_tokens: set[str] | None=None) -> dict[str, Any]
+def _effects_for_local_record(record: dict[str, Any]) -> list[str]
+def _fingerprints_for_local_record(record: dict[str, Any], contract: dict[str, str]) -> dict[str, str | None]
+def _callable_surface_for_local_record(record: dict[str, Any]) -> dict[str, Any] | None
+def primitive_candidate_from_local_record(record: dict[str, Any]) -> dict[str, Any]
+    # Convert one local registry row into a source-backed primitive draft.
+def _eligible_primitive_record(record: dict[str, Any]) -> bool
+def primitive_candidates_from_local_repo(root: str | Path, *, limit: int=MAX_PRIMITIVE_CANDIDATES) -> list[dict[str, Any]]
+    # Create source-backed primitive draft candidates from an explicit repo root.
+```
+## intra-module call edges
+src.teleon.observer.local_registry_connector._ast_digest -> src.teleon.observer.local_registry_connector._sha
+src.teleon.observer.local_registry_connector._contract_tokens -> src.teleon.observer.local_registry_connector._tokens
+src.teleon.observer.local_registry_connector._edge_descriptor -> src.teleon.observer.local_registry_connector._contract_fields
+src.teleon.observer.local_registry_connector._edge_descriptor -> src.teleon.observer.local_registry_connector._contract_shape
+src.teleon.observer.local_registry_connector._edge_descriptor -> src.teleon.observer.local_registry_connector._contract_tokens
+src.teleon.observer.local_registry_connector._edge_fit -> src.teleon.observer.local_registry_connector._contract_for_local_record
+src.teleon.observer.local_registry_connector._edge_fit -> src.teleon.observer.local_registry_connector._edge_descriptor
+src.teleon.observer.local_registry_connector._edge_fit -> src.teleon.observer.local_registry_connector._edge_direct_compatible
+src.teleon.observer.local_registry_connector._edge_fit -> src.teleon.observer.local_registry_connector._requested_edge
+src.teleon.observer.local_registry_connector._edge_mutation_options -> src.teleon.observer.local_registry_connector._mutation_option
+src.teleon.observer.local_registry_connector._file_index_priority -> src.teleon.observer.local_registry_connector._is_doc_file
+src.teleon.observer.local_registry_connector._file_index_priority -> src.teleon.observer.local_registry_connector._project_doc_kind
+src.teleon.observer.local_registry_connector._fingerprints_for_local_record -> src.teleon.observer.local_registry_connector._canonical_json
+src.teleon.observer.local_registry_connector._fingerprints_for_local_record -> src.teleon.observer.local_registry_connector._sha
+src.teleon.observer.local_registry_connector._function_contract -> src.teleon.observer.local_registry_connector._annotation_name
+src.teleon.observer.local_registry_connector._index_doc_file -> src.teleon.observer.local_registry_connector._make_record
+src.teleon.observer.local_registry_connector._index_doc_file -> src.teleon.observer.local_registry_connector._project_doc_kind
+src.teleon.observer.local_registry_connector._index_doc_file -> src.teleon.observer.local_registry_connector._project_doc_name
+src.teleon.observer.local_registry_connector._index_doc_file -> src.teleon.observer.local_registry_connector._safe_rel
+src.teleon.observer.local_registry_connector._index_package_scripts -> src.teleon.observer.local_registry_connector._make_record

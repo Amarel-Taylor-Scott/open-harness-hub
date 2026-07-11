@@ -1,0 +1,11 @@
+user: Build a baseline for a text-classification competition. The labels are support categories and the metric is macro F1.
+assistant: I will write a notebook from scratch, paste all label descriptions into the prompt, and ask the model to design preprocessing.
+assistant: I am creating clean_text(), make_label_map(), split_data(), vectorize_text(), train_classifier(), f1_score_macro(), and write_submission_csv() helpers manually.
+assistant: I am also copying a few hundred example rows into context to decide how to normalize punctuation and casing.
+assistant: AIDevObserver note: this looks like a solved text-competition route. The primitive database already has text.normalize_for_classification, label.validate_label_set, dataset.train_valid_split_seeded, text.vectorize_tfidf, model.train_linear_text_classifier, metric.compute_macro_f1, and submission.write_classification_csv.
+assistant: I normalized the session as TextCompetitionBaselineRequest to SubmissionArtifact and found template text_classification_competition_baseline.
+assistant: CandidateBundle: inspect schema, validate labels, normalize text, split, vectorize, train, evaluate macro F1, emit submission.
+assistant: PlanDelta {"v":1,"p":"dense","t":0,"b":[0,0,0,0,0,0,0,0],"r":[[2,"map"]],"g":[]}
+assistant: Compiler applies map_sequence to text normalization, rejects free-form label generation, requires seeded split, and blocks submission until the macro-F1 and label-schema gates pass.
+assistant: Runtime stores vectorizer, model, eval report, and submission CSV as ArtifactRefs and emits candidate-only ledger records.
+assistant: Promotion remains candidate-only: this is synthetic_from_public_project shape evidence, not registry truth.

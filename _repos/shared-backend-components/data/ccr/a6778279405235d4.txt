@@ -1,0 +1,18 @@
+MODULE src/teleon/registry/compose.py
+## API signatures
+```python
+"""registry.compose — compile a vertical PLAYBOOK (or a universal intent) into a DAG plan FROM the registries."""
+def py_function_src_teleon_registry_compose___playbooks() -> dict
+def py_function_src_teleon_registry_compose___label(py_arg_src_teleon_registry_compose__py_function_src_teleon_registry_compose__label__rec: dict) -> str
+def py_function_src_teleon_registry_compose___resolve(py_arg_src_teleon_registry_compose__py_function_src_teleon_registry_compose__resolve__registry_id: str, py_arg_src_teleon_registry_compose__py_function_src_teleon_registry_compose__resolve__query: str | None=None) -> dict
+    # Resolve a composing registry to ingredients via the menu (honest when it isn't a queryable catalog).
+def py_function_src_teleon_registry_compose__compile_playbook(py_arg_src_teleon_registry_compose__py_function_src_teleon_registry_compose__compile_playbook__playbook_id: str) -> dict
+    # A vertical playbook -> a DAG plan: the loop stages + the composing registries resolved to candidate ingredients.
+def py_function_src_teleon_registry_compose__compile_universal(py_arg_src_teleon_registry_compose__py_function_src_teleon_registry_compose__compile_universal__intent: str, py_arg_src_teleon_registry_compose__py_function_src_teleon_registry_compose__compile_universal__registries: list[str] | None=None) -> dict
+    # A MIXED/universal tool: an intent -> picks across chosen registries (default: a public-fact + knowledge + risk lookup).
+```
+## intra-module call edges
+src.teleon.registry.compose.py_function_src_teleon_registry_compose___resolve -> src.teleon.registry.compose.py_function_src_teleon_registry_compose___label
+src.teleon.registry.compose.py_function_src_teleon_registry_compose__compile_playbook -> src.teleon.registry.compose.py_function_src_teleon_registry_compose___playbooks
+src.teleon.registry.compose.py_function_src_teleon_registry_compose__compile_playbook -> src.teleon.registry.compose.py_function_src_teleon_registry_compose___resolve
+src.teleon.registry.compose.py_function_src_teleon_registry_compose__compile_universal -> src.teleon.registry.compose.py_function_src_teleon_registry_compose___resolve

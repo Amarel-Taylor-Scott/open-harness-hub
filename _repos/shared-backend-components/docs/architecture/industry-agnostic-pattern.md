@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/industry-agnostic-pattern.md

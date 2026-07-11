@@ -1,10 +1,121 @@
 # CLAUDE.md - AI Done Right Agent Instructions
 
-> **READ `docs/BIBLE.md` FIRST** — the single north-star reference (vision · the 5 pillars · the ~35 OpenHubForAI surfaces
-> + 103 registries · assumptions · guardrails · laws · contracts · hooks · tools). This file (CLAUDE.md) is the agent
-> operating layer; the BIBLE is the canonical *what + why*. If they ever disagree, the BIBLE wins.
+> **READ `_repos/shared-backend-components/docs/BIBLE.md` FIRST** — the single north-star reference (vision · the 5
+> pillars · the ~35 OpenHubForAI surfaces + 103 registries · assumptions · guardrails · laws · contracts · hooks ·
+> tools). This file (CLAUDE.md) is the agent operating layer; the BIBLE is the canonical *what + why*. If they ever
+> disagree, the BIBLE wins.
 
 This file is for Claude Code, Claude desktop/browser agents, and any Claude 4.x/4.8/4.7-style workflow that opens this repository. Follow `AGENTS.md` first; this file adds speed and organization rules for scaling OpenHubForAI.
+
+## Active Handoff → GPT-5.6 (2026-07-09) — READ THIS FIRST
+
+**Start with `_repos/shared-backend-components/docs/HANDOFF-GPT-5.6.md`** (what this session built + the reconciled
+state) and **`docs/RESEARCH_PATHS_AND_IDEATION.md`** (56 ranked paths to test). Reconciled, EXECUTED savings picture
+— do not overwrite it with older framing:
+- Single-shot OUTPUT-token savings on common code are **marginal**.
+- Prompt-injecting "use this verified primitive" is strongly **PROMPT- and MODEL-dependent**: showing the FULL tested
+  source + "use as-is, do not re-implement" can work (pass≈0.5–1.0 @ ~68 out-tok); showing only signatures/edges
+  often makes models **re-implement and FAIL**. Not universal — a 7-model grid (`scripts/reuse_experiment_grid.py`,
+  resumable, MIN_N=8, aggregates-only) is still running; **do not conclude from small cells.**
+- The only robust **0-token** win is **deterministic composition** (a manager emits thin wiring from declared config
+  and mounts the verified module verbatim → passes hidden oracles, model-independent).
+- Realistic senior-dev sessions are **INPUT-token-dominated** (conversation + re-read files re-sent every turn) —
+  the biggest, least-explored savings lever (`scripts/realistic_session_harness.py`).
+- **Do NOT re-assert "47.5%", "4.7–5.9×", "486×", or "1.17M primitives" as proven token savings** — those are
+  projection / context-byte-reduction / raw-count. Honest ledger: `docs/REAL_SAVINGS_NUMBERS.md`,
+  `docs/strategy/primitive-system-end-to-end-briefing.md` §4, `docs/PMF_AND_MARKET_STRATEGY.md`.
+- Gemma-4-coding is reachable via browser-context CDP (`scripts/openwebui_cdp_bridge.py`), session-dependent.
+- **For cleanup work (Claude Fable): read `_repos/shared-backend-components/docs/CLEANUP-BACKLOG.md`** (P0 = untrack
+  the 68 GB of generated data from git — 55,606 tracked files, `.git`=2.6 GB; then JSONL→Postgres migration, doc
+  reconciliation, grid completion). System-agnostic router for ANY agent: `docs/AGENT-ONBOARDING.md`. Whole-system
+  reference: `docs/SYSTEM-OVERVIEW.md`.
+
+## Active Handoff For Claude Fable — 2026-07-07 (SUPERSEDED 2026-07-09 — see the GPT-5.6 handoff above; the foundry-loop commands below remain valid infrastructure)
+
+The active workstream is the **real-world primitive foundry loop**: use real developer sessions, repo files,
+websites, apps, Kaggle-style notebooks, LeetCode/competitive-programming problems, papers, and discussions to
+decompose systems into components, ask how each could be rebuilt from primitives, generate candidate primitives
+and variations, and benchmark token/context savings. This is candidate-only infrastructure: generated rows keep
+`candidate=true` and `serves_truth=false` until promotion gates prove source, license, correctness, and utility.
+
+Use `/loop` in Claude Code. The command lives at `.claude/commands/loop.md` and is mirrored at
+`_repos/dev-rules-context/commands/loop.md`. Its runnable backend is:
+
+```bash
+python3 _repos/shared-backend-components/scripts/source_to_primitive_foundry.py --self-test
+python3 _repos/shared-backend-components/scripts/real_world_primitive_loop.py --self-test
+python3 _repos/shared-backend-components/scripts/continuous_primitive_scrape_loop.py --self-test
+python3 _repos/shared-backend-components/scripts/primitive_deconstruction_plane_pipeline.py --self-test
+python3 _repos/shared-backend-components/scripts/real_world_primitive_loop.py --once --repo-root . --file-limit 0 --external-seed-count 1000 --max-components 5 --max-sources-per-partition 50
+python3 _repos/shared-backend-components/scripts/continuous_primitive_scrape_loop.py --once --source-limit 100 --question-count 240 --max-components 5 --max-sources-per-partition 25
+python3 _repos/shared-backend-components/scripts/primitive_deconstruction_plane_pipeline.py --run --question-count 360 --max-atlas-rows 250 --overlays-per-primitive 4
+```
+
+For deterministic tool-call style operation, prefer the JSON hook instead of
+free-form shell fragments. It allowlists actions, clamps budgets, writes
+request/response receipts, and keeps generated rows candidate-only:
+
+```bash
+python3 _repos/shared-backend-components/scripts/primitive_loop_json_hook.py --request-json '{"action":"actions.list"}'
+python3 _repos/shared-backend-components/scripts/primitive_loop_json_hook.py --request-json '{"action":"session_benchmarks.run","args":{"sessions":16,"turns_per_session":0,"k":8,"components_per_turn":4,"scenario_mode":"mixed","include_supervised":true,"compare_base":true,"context_window":262144}}'
+python3 _repos/shared-backend-components/scripts/primitive_loop_json_hook.py --request-json '{"action":"session_benchmarks.run","args":{"sessions":8,"turns_per_session":0,"k":8,"components_per_turn":4,"scenario_mode":"ml_lifecycle","include_supervised":true,"compare_base":true,"context_window":262144}}'
+python3 _repos/shared-backend-components/scripts/primitive_loop_json_hook.py --request-json '{"action":"session_benchmarks.run","args":{"sessions":6,"turns_per_session":0,"k":8,"components_per_turn":4,"scenario_mode":"large_org","include_supervised":true,"compare_base":true,"context_window":262144}}'
+python3 _repos/shared-backend-components/scripts/primitive_loop_json_hook.py --request-json '{"action":"twenty_million_cycle.run","args":{"seed_rows":100000,"rows_per_shard":10000,"compile_shards":2,"start_shard":-1,"benchmark_n":300,"benchmark_k":5,"paraphrase":true}}'
+```
+
+Current benchmark lanes:
+
+- `run_realistic_session_benchmarks.py` measures full multi-prompt sessions for app, warehouse, agent, regulated,
+  platform, ML lifecycle, and Google-scale large-organization buildouts. Latest lifecycle and large-org runs write
+  receipts under `_repos/shared-backend-components/data/dev-intel/realistic_session_benchmarks/`.
+- The ML lifecycle pack generated from the production-ML role matrix lives at
+  `_repos/shared-backend-components/data/dev-intel/primitive_factory/specialized_packs/ml_lifecycle_primitive_cards.jsonl`
+  with a manifest beside it; it is candidate-only and loaded into the expanded benchmark corpus.
+- The large-organization pack generated from the Google-scale operating-model matrix lives at
+  `_repos/shared-backend-components/data/dev-intel/primitive_factory/specialized_packs/large_org_primitive_cards.jsonl`
+  with a manifest beside it; it is candidate-only and loaded into the expanded benchmark corpus.
+- `run_twenty_million_supervised_cycle.py` now uses `--start-shard -1` as "auto next unused shard window" so repeated
+  cycles do not silently recompile the same shard slice.
+
+The loop writes receipts under
+`_repos/shared-backend-components/data/dev-intel/source_to_primitive_foundry/real_world_loop/`:
+`source_objects.jsonl`, `component_breakdowns.jsonl`, `rebuild_plans.jsonl`,
+`primitive_candidates.jsonl`, `primitive_variations.jsonl`, `gap_queue.jsonl`, and `latest_status.json`.
+The gap queue is fed by the latest primitive-consumption benchmark so hard misses such as algorithm,
+competitive-programming, Kaggle/ML, SWE, and agentic workflow gaps become source-acquisition targets.
+
+The continuous source-policy/LLM loop writes receipts under
+`_repos/shared-backend-components/data/dev-intel/continuous_primitive_scrape_loop/`. It covers news, apps,
+systems, Kaggle notebooks, Medium/blog articles, system-design writeups, textbooks/course material, Google
+Scholar/citation clusters, paper publication pages, repos, discussions, and websites. Offline mode is the default:
+it builds governed source snapshots, asks a 200+ question bank per source, emits decomposition rows, primitive
+graphs, language/design/architecture examples, and `primitive_database_feed.jsonl` rows. Live scraping and LLM
+calls are explicit flags (`--live`, `--use-llm`) and must keep raw source bodies out of persisted rows.
+
+The deconstruction-plane pipeline writes the persistent question/deconstruction database under
+`_repos/shared-backend-components/catalog/knowledge-packs/data/primitive-deconstruction-plane-database/` and receipts
+under `_repos/shared-backend-components/data/dev-intel/primitive_deconstruction_plane_pipeline/`. It defines
+deconstruction planes, analysis layers, dimensions, question rows, question edges, and a completeness rubric, then
+materializes fully-defined primitive candidate rows with visible edges, contracts, examples, graph refs, proof
+requirements, benchmark hooks, promotion blockers, and `serves_truth=false`. The latest bounded run created 18
+planes, 14 layers, 343 dimensions, 955 questions, and 175 fully-defined primitive candidate feed rows from the latest
+continuous-loop receipt. Optional model refinement can use Ollama/OpenRouter/direct OpenWebUI or OpenWebUI CDP, e.g.
+`--use-llm --provider openwebui --mode cdp --llm-refine-limit 25`; keep outputs candidate-only.
+
+When continuing this work, do not stop at one favorable benchmark. Keep running large receipts, compare against
+Claude Code session logs where possible, improve composition/remix standards, and turn every miss into a source
+target plus proof requirement. Raw source bodies should not be stored in primitive rows; store handles, digests,
+components, and receipts.
+
+> **Repository layout (post-`_repos/` migration) — read before following any path below.** The repo **root** now holds
+> only `_repos/` + meta files (`README.md`, `LICENSE`, `AGENTS.md`, `CLAUDE.md`, `conftest.py`) + tooling-hidden dirs
+> (`.venv`, `.claude`, `.codex`, `.github`). Every former top-level dir moved under `_repos/<owner>/`. Maps:
+> `_repos/INDEX.md`, `_repos/MIGRATION-STATUS.md`, `_repos/_moved_dirs.json`. **Path convention throughout this file:**
+> a bare `scripts/…`, `docs/…`, `architecture/…`, `catalog/…`, `schemas/…`, `vocabularies/…`, `rubrics/…` resolves under
+> **`_repos/shared-backend-components/…`**; the devkit (`standards/`, `prompts/`, `hooks/`, `commands/`, `skills/`) is
+> under `_repos/dev-rules-context/…`; strategy/codex/concepts/taxonomy prose is under `_repos/_shared/…`; and product
+> code written **`src/<x>/…`** lives physically at `_repos/<x>/backend/src/<x>/…` while `src/<x>/…` stays the canonical,
+> location-stable name used by ids and the code graph (do NOT rewrite `src/<x>/` to the physical path in ids/graph).
 
 ## Portfolio (owner-decided 2026-06-06; updated 2026-06-09 — read FIRST)
 
@@ -15,10 +126,11 @@ high-fidelity Claude Code Max handoff lives in
 `dist/sites/aidoneright-design/`: start with `START-HERE-CLAUDE-CODE.md`, then
 `README.md`, `CLAUDE-CODE.md`, and `HANDOFF.md`.
 
-Current design-family snapshot: parent + **Baltor** + **Teleon** + **22
-OpenHubForAI registries** (9 live open registries + 13 private-bench registries; the count is
-computed by the family check, never hand-counted — don't trust this prose over
-`scripts/check_ai_done_right_surface_family.py`). The private bench includes the
+Current design-family snapshot: parent + **Baltor** + **Teleon** + the
+**OpenHubForAI registries** (live open registries + private-bench registries; the exact
+count and live/preview split are **computed** by the family check, never hand-counted —
+run `python3 scripts/check_ai_done_right_surface_family.py` for the current numbers rather
+than trusting any literal in this prose). The private bench includes the
 complete Baltor method spine (OpenReconciliationHub, OpenHardeningHub,
 OpenEnrichmentHub, OpenOptimizationHub, OpenVerificationHub) and
 OpenRoutingHub (model-routing policy; owner-proposed 2026-06-09). The owner-directed Codex loop for
@@ -38,7 +150,7 @@ cross-service consumption. For local testing without paid cloud, read
 `python3 scripts/check_local_dev_tunnel_auth_runtime.py --self-test`.
 
 Canonical portfolio architecture remains:
-`docs/strategy/teleon-baltor-openharnesshub-portfolio.md`.
+`docs/strategy/teleon-baltor-openhubforai-portfolio.md`.
 
 ## Surfaces: serve the BUILT-OUT apps, never a basic replacement (read before touching any web surface)
 
@@ -61,6 +173,22 @@ Full contract: `docs/codex/surface-and-development-contract.md`.
 - **Reuse-first:** before building any surface/server/engine, check it already exists (the showcase, the service-plane,
   the shared kit). "This already exists, don't rebuild it" is the highest-ROI decision.
 
+## AIDevObserver Compatibility
+
+Before building a new helper, workflow, parser, scraper, API adapter, data pipeline, UI quality gate, model/eval
+harness, or agent integration, ask whether AIDevObserver or the primitive registry already knows the route.
+
+Use the companion project pack when working in Claude Code or another agentic dev framework:
+
+- `commands/find-reuse.md` before implementing a new utility or workflow;
+- `commands/review-session.md` at the end of a substantial AI coding session;
+- `commands/refresh-primitives.md` when local source-backed primitive candidates should be regenerated;
+- `mcp/aidevobserver.md` for the Claude Code MCP connection;
+- `hooks/pretooluse-aidevobserver.md` for non-blocking live reuse hints.
+
+Steering rule: do not reinvent code or workflows the primitive database already knows. AIDevObserver findings remain
+candidate advice (`serves_truth=false`) until proof and promotion.
+
 A holding company owns three product layers. **Teleon** (`teleon.dev`, domain owned) = the purpose-driven,
 eval-gated, self-adaptive compute **runtime SaaS** — it owns PurposeTask/CapabilityTask, runtime selection,
 evidence ledger, promotion/policy gates, boundary approvals, adapters, the assurance dashboard. **Baltor**
@@ -68,9 +196,9 @@ evidence ledger, promotion/policy gates, boundary approvals, adapters, the assur
 = the open ecosystem (evals/harnesses/templates/skills) + the **open CapabilityTask spec (CTS)**.
 
 - **Architectural law (enforced by `scripts/check_portfolio_dependency_law.py` over
-  `architecture/portfolio_dependency_law.json`):** Baltor → Teleon → OpenHarnessHub, **never the reverse**.
-  Teleon must never import Baltor; OpenHarnessHub imports neither. PurposeTask is **Teleon**, not a Baltor
-  subsystem — generic runtime code is being extracted `src/baltor/` → `src/teleon/` incrementally (lossless;
+  `architecture/portfolio_dependency_law.json`):** Baltor → Teleon → OpenHubForAI, **never the reverse**.
+  Teleon must never import Baltor; OpenHubForAI imports neither. PurposeTask is **Teleon**, not a Baltor
+  subsystem — generic runtime code is being extracted `_repos/baltor/backend/src/baltor/` → `_repos/teleon/backend/src/teleon/` incrementally (lossless;
   see the law file's `migration_status`).
 - **Naming:** product = **Teleon**; staff dashboard = **Teleon Control Tower**; customer dashboard =
   **Capability Assurance Portal**; object = **PurposeTask** (formal/spec synonym **CapabilityTask**). Brand
@@ -215,6 +343,32 @@ Use canonical hashes for:
 - replay and CDC events.
 
 Formatting changes should not create false versions. Source content changes should be detectable even when the wrapper stays the same.
+
+## Deterministic Global Object Naming (AI-first — owner law 2026-06-27; hardened 2026-07-01)
+
+Code here is read by AI first; future review is LLM review. Every defined thing gets a **globally unique,
+location-derived, meaning-bearing name** — long names are GOOD (a name is context the model uses); no name is
+ever reused; uniqueness lives IN the name (no opaque keys in code-object names). Unique names make
+**grep-as-graph exact**: the code graph, primitive edges, and cross-codebase search resolve by NAME with zero
+ambiguity (`codegraph.py` drops ~6k ambiguous call edges today — every collision removed increases graph recall).
+Two planes, one law:
+
+- **CODE objects (Python)** — the pyprefix scheme `py_<kind>__<file>__<scope>__<name>`
+  (kind ∈ class·function·method·const·instance·var·arg·local; dunders exempt). Engine: `scripts/pyprefix.py`;
+  law: `docs/codex/ai-first-naming-and-graph-spec.md`; migration manifest:
+  `architecture/pyprefix_migration.json` (leaf-first, package-by-package, full gate green after each — a
+  migrated path never diverges; gates: `check_pyprefix_conformance.py` + `check_pyprefix_methodology.py`).
+  New/generated code follows the scheme from the first draft (`architecture/teleon_codegen_contracts.json`).
+- **DATA objects (generated ids/records)** — minted ONLY by `src.teleon.experiments.ids`
+  (`canonical_id` = `"{prefix}-{sha256[:16]}"` over `canonical_bytes`; Baltor imports the
+  `_repos/baltor/backend/src/baltor/experiments/ids.py` shim). Version lives in `schema_version` METADATA — never in a name or id
+  (no `.vN`, no `@N` suffixes; external briefs using `@1` ids must be adapted on intake). Direct
+  `import hashlib` in `src/**` is the drift signal — 71 legacy sites are recorded in
+  `architecture/canonical_id_migration.json` and ratchet DOWN, enforced by
+  `scripts/check_canonical_id_single_source.py` (a NEW site fails; a migrated file leaves the baseline
+  same-change).
+- **User-facing names** — full words, no abbreviations, no jargon codenames; primitive records name their
+  edges (`input_edge`/`output_edge` contracts) so agents compose by reading names + edges, not bodies.
 
 ## No Magic Values (Single Source Of Truth)
 

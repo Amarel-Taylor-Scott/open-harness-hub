@@ -1,0 +1,123 @@
+"""src.teleon.runtime.execution_backend_selector — choose an EXECUTION BACKEND for a CapabilityTask by
+POLICY + PRICEBOOK + provider health + available credentials. Pure + deterministic (all inputs injected).
+Canonical TELEON home (runtime selection is a Teleon concern); imports only the stdlib (never Baltor). Baltor
+consumes this through a re-export shim at _repos/baltor/backend/src/baltor/workers/execution_backend_selector.py (Baltor → Teleon).
+
+The point: the SAME task can run on the local emulator today, a Kubernetes worker tomorrow, or a cloud
+function the day after — by changing policy/pricebook, NOT code. Kubernetes and cloud functions are
+interchangeable backends that can run side by side. Hard guards keep browser/GPU/open-ended/control-plane
+work off generic cloud functions unless a policy explicitly allows it WITH PROOF. Missing credentials or
+unhealthy providers fall back to the local/emulator correctness invariant — never crash.
+"""
+from __future__ import annotations
+from scripts._repo_paths import resource as _resource
+
+import json
+from pathlib import Path
+
+py_var_src_teleon_runtime_execution_backend_selector___A = _resource("architecture")
+#: CLOUD-AGNOSTIC default: the serverless-function FAMILY. AWS Lambda is just ONE peer here, never canonical.
+#: This is only a fallback — the authoritative set is read from the policy matrix's `generic_cloud_functions`
+#: (config, not code), so a new serverless provider is added by editing data, not this literal.
+py_const_src_teleon_runtime_execution_backend_selector__GENERIC_FUNCTIONS = {"aws_lambda@candidate", "gcp_cloud_run_function@candidate", "gcp_cloud_function@candidate",
+                     "azure_function@candidate", "cloudflare_workers@candidate", "openfaas_knative@candidate"}
+py_var_src_teleon_runtime_execution_backend_selector___FALLBACK_ORDER = ("local_function_emulator@v1", "local_subprocess@v1")
+
+
+def py_function_src_teleon_runtime_execution_backend_selector__generic_functions(py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__generic_functions__policy_matrix: dict | None = None) -> set:
+    """The serverless-function family, sourced from CONFIG (`generic_cloud_functions` in the policy matrix) so
+    it is cloud-agnostic and extensible without code changes. Falls back to GENERIC_FUNCTIONS if absent."""
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__generic_functions__pm = py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__generic_functions__policy_matrix if py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__generic_functions__policy_matrix is not None else py_function_src_teleon_runtime_execution_backend_selector___load("execution_backend_policy_matrix.json")
+    return set(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__generic_functions__pm.get("generic_cloud_functions") or py_const_src_teleon_runtime_execution_backend_selector__GENERIC_FUNCTIONS)
+
+
+#: any serverless-function backend uses the SAME action (provider-agnostic) — resolved by suffix so a new
+#: cloud function provider needs no entry here either.
+py_const_src_teleon_runtime_execution_backend_selector__ACTIONS = {
+    "local_function_emulator@v1": "use_local_function_emulator", "local_subprocess@v1": "use_local_subprocess",
+    "k8s_deployment_worker@candidate": "use_k8s_deployment_worker", "k8s_job@candidate": "use_k8s_job",
+    "cloud_run_job@candidate": "use_cloud_run_job", "browser_pool@candidate": "use_browser_pool",
+    "gpu_pool@candidate": "use_gpu_pool", "sandbox_worker@candidate": "use_sandbox_worker",
+}
+
+
+def py_function_src_teleon_runtime_execution_backend_selector___action_for(py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__action_for__backend: str) -> str:
+    """Provider-agnostic action: any serverless-function backend → 'use_cloud_function' (no per-vendor literal)."""
+    if py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__action_for__backend in py_const_src_teleon_runtime_execution_backend_selector__ACTIONS:
+        return py_const_src_teleon_runtime_execution_backend_selector__ACTIONS[py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__action_for__backend]
+    if py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__action_for__backend in py_const_src_teleon_runtime_execution_backend_selector__GENERIC_FUNCTIONS or "function" in py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__action_for__backend or py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__action_for__backend.startswith(("aws_", "gcp_", "azure_", "cloudflare_", "openfaas_")):
+        return "use_cloud_function"
+    return "use_backend"
+
+
+def py_function_src_teleon_runtime_execution_backend_selector___load(py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__load__name: str) -> dict:
+    return json.loads((py_var_src_teleon_runtime_execution_backend_selector___A / py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__load__name).read_text())
+
+
+def py_function_src_teleon_runtime_execution_backend_selector___est_cost(py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__backend: str, py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__pricebook: dict, py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__runtime_ms: int) -> float:
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__pb = py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__pricebook.get("backends", {}).get(py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__backend, {})
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__secs = max(0.0, py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__runtime_ms / 1000.0)
+    return py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__pb.get("request_cost", 0.0) + py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__pb.get("duration_cost_per_s", 0.0) * py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__secs + py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__pb.get("idle_cost_per_s", 0.0) * py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__est_cost__secs
+
+
+def py_function_src_teleon_runtime_execution_backend_selector___decision(py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__action: str, py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__backend: str, py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__reason: str, **py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__extra) -> dict:
+    return {"schema_version": "ExecutionProviderDecision", "action": py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__action, "backend": py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__backend,
+            "reason": py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__reason, **py_arg_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__decision__extra}
+
+
+def py_function_src_teleon_runtime_execution_backend_selector__select_backend(task: dict, *, policy_matrix: dict | None = None, pricebook: dict | None = None,
+                   provider_health: dict | None = None, available_creds: set | None = None,
+                   policy_override: dict | None = None) -> dict:
+    """Decide the execution backend for `task`. `task`: {capability_id, worker_bucket, estimated_runtime_ms,
+    requires_browser, requires_gpu, tenant_private, payload_bytes}. `provider_health`: backend→bool.
+    `available_creds`: set of configured backend ids (local/emulator always available). `policy_override`:
+    optional {preferred_backends:[...], excluded_backends:[...]} to force a switch (with proof)."""
+    policy_matrix = policy_matrix or py_function_src_teleon_runtime_execution_backend_selector___load("execution_backend_policy_matrix.json")
+    pricebook = pricebook or py_function_src_teleon_runtime_execution_backend_selector___load("execution_backend_pricebook.json")
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__health = provider_health or {}
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__creds = set(available_creds or set()) | {"local_function_emulator@v1", "local_subprocess@v1"}
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bucket = task.get("worker_bucket", "utility")
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bp = policy_matrix["buckets"].get(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bucket, {})
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runtime = int(task.get("estimated_runtime_ms", 500))
+    # offline fallback is single-sourced from the matrix (config: offline_default_backend), with the stdlib
+    # _FALLBACK_ORDER as the last-resort default so this stdlib-only module never hard-fails if the key is absent.
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__offline_default = policy_matrix.get("offline_default_backend", py_var_src_teleon_runtime_execution_backend_selector___FALLBACK_ORDER[0])
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fallback_order = (py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__offline_default, *(b for b in py_var_src_teleon_runtime_execution_backend_selector___FALLBACK_ORDER if b != py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__offline_default))
+
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible = list((policy_override or {}).get("eligible") or py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bp.get("eligible", py_var_src_teleon_runtime_execution_backend_selector___FALLBACK_ORDER))
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__excluded = set(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bp.get("excluded_by_default", [])) | set((policy_override or {}).get("excluded_backends", []))
+
+    # HARD GUARDS — browser/gpu/open-ended/control-plane never go to a generic cloud function by default,
+    # unless a policy_override explicitly allows it (caller asserts a proof exists).
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__allow_generic = bool((policy_override or {}).get("allow_generic_functions"))
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__generic = py_function_src_teleon_runtime_execution_backend_selector__generic_functions(policy_matrix)   # cloud-agnostic serverless family, from CONFIG not a literal
+    if not py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__allow_generic and (task.get("requires_browser") or task.get("requires_gpu")
+                              or py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bucket in ("browser", "model_inference", "cpu_gpu_compute", "open_ended_agent", "control_plane")):
+        py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__excluded |= py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__generic
+
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible = [b for b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible if b not in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__excluded]
+    if not py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible:
+        py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible = list(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fallback_order)
+
+    # available + healthy candidates (a backend with no creds, or health False, is not runnable now)
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runnable = [b for b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible if (b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__creds) and py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__health.get(b, True)]
+    if not py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runnable:
+        py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fb = next((b for b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fallback_order if b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible), py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fallback_order[0])
+        return py_function_src_teleon_runtime_execution_backend_selector___decision("fallback_due_to_provider_health", py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fb,
+                         f"no eligible backend is available+healthy (creds/health) → fall back to {py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__fb}",
+                         eligible=py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible, considered=py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible)
+
+    # ranking: an explicit policy preference order wins (a deliberate switch); else cheapest by pricebook
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__pref = (policy_override or {}).get("preferred_backends") or py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bp.get("preferred_backends") or []
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__chosen = next((b for b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__pref if b in py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runnable), None)
+    py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__basis = "policy preferred_backends"
+    if py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__chosen is None:
+        py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__chosen = min(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runnable, key=lambda b: (py_function_src_teleon_runtime_execution_backend_selector___est_cost(b, pricebook, py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runtime), b))   # cheapest, then stable
+        py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__basis = "lowest pricebook cost (telemetry/pricing-driven)"
+
+    return py_function_src_teleon_runtime_execution_backend_selector___decision(py_function_src_teleon_runtime_execution_backend_selector___action_for(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__chosen), py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__chosen,
+                     f"selected by {py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__basis} for bucket {py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__bucket!r}", eligible=py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__eligible,
+                     est_cost=round(py_function_src_teleon_runtime_execution_backend_selector___est_cost(py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__chosen, pricebook, py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__runtime), 4), basis=py_local_src_teleon_runtime_execution_backend_selector__py_function_src_teleon_runtime_execution_backend_selector__select_backend__basis)
+
+
+__all__ = ["py_function_src_teleon_runtime_execution_backend_selector__select_backend", "py_const_src_teleon_runtime_execution_backend_selector__GENERIC_FUNCTIONS", "py_function_src_teleon_runtime_execution_backend_selector__generic_functions", "py_const_src_teleon_runtime_execution_backend_selector__ACTIONS"]

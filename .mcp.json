@@ -3,13 +3,38 @@
     "baltor-context-gateway": {
       "command": "python3",
       "args": [
-        "scripts/baltor_context_gateway_mcp.py",
+        "_repos/shared-backend-components/scripts/baltor_context_gateway_mcp.py",
         "--base-url",
         "http://127.0.0.1:9304"
       ],
       "env": {
         "BALTOR_CONTEXT_GATEWAY_URL": "http://127.0.0.1:9304"
       }
+    },
+    "teleon-capability-gateway": {
+      "command": "python3",
+      "args": [
+        "_repos/shared-backend-components/scripts/teleon_capability_gateway_mcp.py"
+      ]
+    },
+    "capability-retrieval": {
+      "command": "python3",
+      "args": [
+        "_repos/shared-backend-components/scripts/capability_retrieval_mcp_server.py"
+      ]
+    },
+    "aidevobserver": {
+      "command": "python3",
+      "args": [
+        "_repos/shared-backend-components/scripts/aidevobserver_mcp_server.py"
+      ]
+    },
+    "cloud-provisioning": {
+      "command": "python3",
+      "args": [
+        "_repos/shared-backend-components/scripts/cloud_provisioning.py",
+        "--mcp"
+      ]
     }
   }
 }

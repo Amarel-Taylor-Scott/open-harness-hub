@@ -1,0 +1,17 @@
+MODULE src/teleon/registry/plane.py
+## API signatures
+```python
+"""registry.plane — policy-driven selection over a PLANE of interchangeable adapters (the flexible alternative to
+hardcoded best_X() wrappers)."""
+class py_class_src_teleon_registry_plane__Candidate:
+    # One adapter in a plane + the metadata a policy ranks on.
+def py_function_src_teleon_registry_plane___local(py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__local__c: py_class_src_teleon_registry_plane__Candidate) -> int
+def py_function_src_teleon_registry_plane__register_policy(py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__register_policy__name: str, py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__register_policy__key: Callable[[py_class_src_teleon_registry_plane__Candidate], tuple]) -> None
+    # Add a selection preference; select() never changes.
+def py_function_src_teleon_registry_plane__ranked(py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__ranked__candidates: list[py_class_src_teleon_registry_plane__Candidate], py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__ranked__policy: str=py_const_src_teleon_registry_plane__DEFAULT_POLICY, *, require_keyless: bool=False) -> list[py_class_src_teleon_registry_plane__Candidate]
+    # The candidates ranked by `policy` (filtered to keyless when required) — for selection + introspection.
+def py_function_src_teleon_registry_plane__select(py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__select__candidates: list[py_class_src_teleon_registry_plane__Candidate], py_arg_src_teleon_registry_plane__py_function_src_teleon_registry_plane__select__policy: str=py_const_src_teleon_registry_plane__DEFAULT_POLICY, *, require_keyless: bool=False)
+    # Rank by policy, then DESCEND to the first AVAILABLE candidate (the fallback chain). Honest: None if none
+```
+## intra-module call edges
+src.teleon.registry.plane.py_function_src_teleon_registry_plane__select -> src.teleon.registry.plane.py_function_src_teleon_registry_plane__ranked

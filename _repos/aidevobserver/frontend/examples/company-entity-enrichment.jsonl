@@ -1,0 +1,7 @@
+{"role":"user","content":"Build an enrichment system for company names. I want domain, website, industry, headquarters, LinkedIn, confidence score, and evidence."}
+{"role":"assistant","content":"I normalized this as list[RawCompanyName] to list[ProvenancedCompanyProfile] and found template entity_enrichment."}
+{"role":"assistant","content":"CandidateBundle: normalize, resolve, enrich, crosscheck, score, emit. The resolver and enrichment primitives are scalar but publish map_sequence and cache_ttl."}
+{"role":"assistant","content":"A normal agent might write fuzzy matching, search, dedupe, and company enrichment from scratch, but registry primitives already cover normalize_company_name, resolve_company_candidates, enrich_company_profile, and crosscheck_company_sources."}
+{"role":"assistant","content":"PlanDelta {\"v\":1,\"p\":\"dense\",\"t\":0,\"b\":[0,0,0,0,0,0],\"r\":[[1,\"map\"],[1,\"cache\"],[2,\"map\"],[2,\"cache\"],[4,\"map\"]],\"g\":[]}"}
+{"role":"assistant","content":"Compiler rejects lower-trust free search, applies map/cache remixes, creates VariationRecords, and checks source evidence before emit."}
+{"role":"assistant","content":"Runtime emits structured ledger events with cache hit/miss, input/output hashes, and serves_truth=false until proof and promotion."}

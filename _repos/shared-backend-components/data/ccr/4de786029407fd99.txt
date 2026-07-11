@@ -1,0 +1,14 @@
+MODULE _repos/teleon/backend/src/teleon/evolution/impl_finder.py
+## API signatures
+```python
+"""src.teleon.evolution.impl_finder — when a capability is entered, find a MORE-DETERMINISTIC / more-efficient
+implementation of it, searching internally (the corpus) and externally (a governed seam)."""
+_EPS = ...
+_DEFAULT_MIN_OVERLAP = ...
+_MAXIMAL_DETERMINISM = ...
+class ExternalImplSearchPort:
+    # The seam for external search (web/registries). A real impl returns candidate implementations for a
+    def search(self, capability: dict) -> list[dict]
+def find_implementations(capability: dict, corpus: list[dict], *, allow_external: bool=False, external_search: ExternalImplSearchPort | None=None, min_overlap: float=_DEFAULT_MIN_OVERLAP) -> dict
+    # Find more-deterministic / more-efficient implementations of ``capability``. Searches the corpus by intent
+```

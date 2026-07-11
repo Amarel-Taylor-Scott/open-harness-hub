@@ -1,0 +1,42 @@
+MODULE src/teleon/training/policy.py
+## API signatures
+```python
+"""src.teleon.training.policy — the DISTILLATION POLICY: learn the most efficient non-deterministic -> deterministic
+path for a capability, and the harness that trains + evaluates it."""
+_MIN_CLASS_OBS = ...
+def _class_of(features: dict) -> str
+def _prior_strategy(features: dict) -> str
+class PriorPolicy:
+    # Cold-start baseline: the strategy implied by the determinism band, no learning.
+    def predict(self, features: dict) -> dict
+class FittedPolicy:
+    # Trained from a dataset: per class, the highest-mean-efficiency strategy; backs off class -> band -> prior.
+    def __init__(self, by_class_best: dict, by_band_best: dict) -> None
+    def predict(self, features: dict) -> dict
+class TrainedArtifactPolicy:
+    # The SEAM for a real trained model / LoRA. ``artifact`` is a handle produced by an external sandboxed
+    def __init__(self, artifact=None) -> None
+    def available(self) -> bool
+    def predict(self, features: dict) -> dict
+def _best_by(group: dict) -> dict
+    # For {key: [examples]} pick, per key, the strategy with the highest mean efficiency (ties -> lowest name).
+def train(train_examples: list) -> FittedPolicy
+    # Fit a FittedPolicy from labeled examples: the best (highest-efficiency) strategy per class and per band.
+def evaluate(policy, holdout: list, *, baseline=None) -> dict
+    # Score a policy on held-out examples: accuracy = fraction whose predicted strategy matches the example's
+def model_artifact_spec(dataset, fitted: FittedPolicy) -> dict
+    # The descriptor a real training backend consumes to produce a model/LoRA — the 'trained system' as a governed
+def run_training(candidates: list[dict], records: list[dict], *, holdout_fraction: float=0.25) -> dict
+    # The training HARNESS: build the skills-DB dataset, split, train the FittedPolicy, evaluate held-out vs the
+```
+## intra-module call edges
+src.teleon.training.policy.evaluate -> src.teleon.training.policy.PriorPolicy
+src.teleon.training.policy.predict -> src.teleon.training.policy.TrainedArtifactPolicy.available
+src.teleon.training.policy.predict -> src.teleon.training.policy._class_of
+src.teleon.training.policy.predict -> src.teleon.training.policy._prior_strategy
+src.teleon.training.policy.run_training -> src.teleon.training.policy.evaluate
+src.teleon.training.policy.run_training -> src.teleon.training.policy.model_artifact_spec
+src.teleon.training.policy.run_training -> src.teleon.training.policy.train
+src.teleon.training.policy.train -> src.teleon.training.policy.FittedPolicy
+src.teleon.training.policy.train -> src.teleon.training.policy._best_by
+src.teleon.training.policy.train -> src.teleon.training.policy._class_of

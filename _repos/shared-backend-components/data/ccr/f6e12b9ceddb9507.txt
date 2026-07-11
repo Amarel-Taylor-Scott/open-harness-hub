@@ -1,0 +1,36 @@
+MODULE src/teleon/agent_gateway/mcp_projection.py
+## API signatures
+```python
+"""src.teleon.agent_gateway.mcp_projection — a LOCAL MCP PROJECTION of the Teleon Agent Capability Gateway."""
+def py_function_src_teleon_agent_gateway_mcp_projection___is_forbidden_key(py_arg_src_teleon_agent_gateway_mcp_projection__py_function_src_teleon_agent_gateway_mcp_projection__is_forbidden_key__key: str) -> bool
+    # True if ``key`` looks like it could carry a secret / backend internal. A belt-and-braces guard: the
+def py_function_src_teleon_agent_gateway_mcp_projection___scrub(py_arg_src_teleon_agent_gateway_mcp_projection__py_function_src_teleon_agent_gateway_mcp_projection__scrub__value: Any) -> Any
+    # Recursively drop any dict key whose name looks secret/backend-internal. The gateway's public dicts do
+def py_function_src_teleon_agent_gateway_mcp_projection___project(py_arg_src_teleon_agent_gateway_mcp_projection__py_function_src_teleon_agent_gateway_mcp_projection__project__source: dict, py_arg_src_teleon_agent_gateway_mcp_projection__py_function_src_teleon_agent_gateway_mcp_projection__project__fields: tuple[str, ...]) -> dict
+    # Return a COMPACT projection of ``source`` containing only ``fields`` that are present, each scrubbed of
+class py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection:
+    # A LOCAL MCP projection over an :class:`AgentCapabilityGateway`.
+    def __init__(self, gateway: py_class_src_teleon_agent_gateway_gateway__AgentCapabilityGateway | None=None) -> None
+    def tool_descriptors(self) -> list[dict]
+        # Return the FIVE MCP-style tool descriptors (``{name, description, input_schema}``), in stable order.
+    def call_tool(self, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection_call_tool__name: str, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection_call_tool__input: dict | None=None, *, now: str) -> dict
+        # Dispatch ONE of the five tools by ``name`` and return its dict. ``now`` is injected (determinism).
+    def _tool_list_capabilities(self, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_list_capabilities__input: dict, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_list_capabilities__now: str) -> dict
+        # ``teleon_list_capabilities`` — COMPACT cards, optionally filtered. Delegates to
+    def _tool_describe_capability(self, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_describe_capability__input: dict, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_describe_capability__now: str) -> dict
+        # ``teleon_describe_capability`` — one COMPACT card. Delegates to ``gateway.describe(capability_id)``;
+    def _tool_run_capability(self, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_run_capability__input: dict, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_run_capability__now: str) -> dict
+        # ``teleon_run_capability`` — run a capability end-to-end and return a COMPACT result + ``receipt_id``.
+    def _tool_get_receipt(self, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_get_receipt__input: dict, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_get_receipt__now: str) -> dict
+        # ``teleon_get_receipt`` — fetch a stored receipt by id. Delegates to ``gateway.get_receipt(...)`` and
+    def _tool_request_boundary_expansion(self, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_request_boundary_expansion__input: dict, py_arg_src_teleon_agent_gateway_mcp_projection__py_class_src_teleon_agent_gateway_mcp_projection__TeleonMcpProjection__tool_request_boundary_expansion__now: str) -> dict
+        # ``teleon_request_boundary_expansion`` — queue a boundary-expansion REQUEST (never grant it).
+```
+## intra-module call edges
+src.teleon.agent_gateway.mcp_projection._tool_describe_capability -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___project
+src.teleon.agent_gateway.mcp_projection._tool_get_receipt -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___scrub
+src.teleon.agent_gateway.mcp_projection._tool_list_capabilities -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___project
+src.teleon.agent_gateway.mcp_projection._tool_request_boundary_expansion -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___scrub
+src.teleon.agent_gateway.mcp_projection._tool_run_capability -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___project
+src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___project -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___scrub
+src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___scrub -> src.teleon.agent_gateway.mcp_projection.py_function_src_teleon_agent_gateway_mcp_projection___is_forbidden_key

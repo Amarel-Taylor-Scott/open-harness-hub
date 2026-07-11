@@ -1,0 +1,24 @@
+MODULE src/baltor/workers/worker_router.py
+## API signatures
+```python
+"""src.baltor.workers.worker_router — classify + policy-gate a CommandEnvelope by its command_type prefix."""
+_REPO = ...
+_REGISTRY = ...
+TRUTH_BUCKETS = ...
+class WorkerPolicyError:
+    # A command type maps to no bucket, or a bucket attempted a forbidden output.
+def load_buckets() -> list[dict]
+def route(command_type: str, *, buckets: list[dict] | None=None) -> dict
+    # Return the bucket whose queue_prefix is the longest prefix of command_type. Raise if none.
+def validate_output(bucket: dict, output_type: str) -> bool
+    # True iff the bucket may emit output_type (i.e. it is not in forbidden_outputs).
+def can_publish_truth(bucket: dict) -> bool
+def check_command(command_type: str, output_type: str | None=None, *, buckets: list[dict] | None=None) -> dict
+    # Route + policy-check a command. Returns an allow record, or an ErrorEnvelope-shaped dict on violation.
+```
+## intra-module call edges
+src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.can_publish_truth
+src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.route
+src.baltor.workers.worker_router.check_command -> src.baltor.workers.worker_router.validate_output
+src.baltor.workers.worker_router.route -> src.baltor.workers.worker_router.WorkerPolicyError
+src.baltor.workers.worker_router.route -> src.baltor.workers.worker_router.load_buckets

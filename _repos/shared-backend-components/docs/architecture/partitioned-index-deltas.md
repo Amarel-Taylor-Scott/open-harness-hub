@@ -1,0 +1,1 @@
+../../../shared-backend-components/context/architecture/partitioned-index-deltas.md

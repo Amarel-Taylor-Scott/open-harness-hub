@@ -13,7 +13,7 @@ WITHOUT leaking secrets, bypassing governance, or creating a duplicate LLM wrapp
 ## VERIFIED REALITY (2026-06-08 — re-verify each cycle; do NOT rebuild these)
 - **LLM plane EXISTS under the `inference` naming** (NOT `llm`): `schemas/inference/{InferencePreference,
   InferenceRequest,ResolvedInferencePreference,ModelRouteDecision,ModelInvocationReceipt,FreeLimitedEndpoint,
-  GatewayRepoAssessment,EndpointDueDiligenceReport}.v1`; `src/teleon/inference/{oips,adapters,free_endpoint_intel,
+  GatewayRepoAssessment,EndpointDueDiligenceReport}.v1`; `_repos/teleon/backend/src/teleon/inference/{oips,adapters,free_endpoint_intel,
   api_projection}.py`; routes `/api/inference/{providers,receipts,model-graph,resolve-preference,
   preferences,structured-local,free-endpoints,health}` (`scripts/api_inference_handler.py`). Proven:
   check_inference_* , check_free_limited_endpoint_intel. The shared LLM plane (Inference Gateway + OIPS) is
@@ -23,7 +23,7 @@ WITHOUT leaking secrets, bypassing governance, or creating a duplicate LLM wrapp
   Cloudflare Workers AI/OpenRouter:free/HuggingFace/NVIDIA NIM + Ollama; Together = paid (class 300); class
   codes already encode shared-key/bypass→quarantine(900), discovery→metadata(600), browser-runtime≠endpoint.
   ClawLess lives in `architecture/sandbox_provider_catalog.json` (runtime/sandbox), NOT the endpoint registry.
-- **Agent plane: agent-runtime layer BUILT this session** — `src/teleon/agents/agent_runtime_provider.py`
+- **Agent plane: agent-runtime layer BUILT this session** — `_repos/teleon/backend/src/teleon/agents/agent_runtime_provider.py`
   (AgentRuntimeProviderPort + LocalEmulator active + ClawLess/OpenClaw + Hermes CANDIDATE adapters returning
   AgentRuntimeUnavailable; `dispatch_agent_request` delegates to execution_backend_selector, hard-guards
   open-ended agents off generic cloud functions) + `architecture/agent_runtime_catalog.json` +
@@ -78,7 +78,7 @@ runtime_ownership,company_product_boundaries}.json`.
   AgentBoundaryApprovalRequest}.v1`** + register in `architecture/contract_registry.json` + check_agentic_bot_contracts.
 - **P1D: local agent stubs** (agent.local_echo@v1 / local_structured@v1 / local_skill_loader@v1) writing
   AgentRunReceipt — deterministic/offline/stdlib; the active golden path + fallback when OpenClaw/Hermes absent.
-- **P1B/P1C: OpenClaw + Hermes candidate ADAPTERS** (`src/teleon/agents/providers/{openclaw,hermes}_candidate.py`):
+- **P1B/P1C: OpenClaw + Hermes candidate ADAPTERS** (`_repos/teleon/backend/src/teleon/agents/providers/{openclaw,hermes}_candidate.py`):
   validate request/tool/skill/sandbox/memory policy; AgentProviderUnavailableResult when not installed; no install,
   no live run unless authorized, no raw keys, no host exec by default. OpenClaw: skills=instruction files (not
   authority), tools need allowlist, sandbox required for tool exec, env/key = secret_ref, tool output = evidence.

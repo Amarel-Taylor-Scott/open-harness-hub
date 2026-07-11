@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-06-10T16:04:50.100Z",
+  "gate": "governance_lifecycle",
+  "surface": "http://127.0.0.1:9210/opencontexthub/OpenContextHub%20Prototype.html",
+  "realm": "opencontexthub",
+  "reviewer": "acct_4980bb917b5f0ba931ce",
+  "ok": true,
+  "steps": [
+    {
+      "n": 1,
+      "label": "publisher-submits-two",
+      "ok": true,
+      "detail": "submitted two candidates — both in review, neither in Browse"
+    },
+    {
+      "n": 2,
+      "label": "operator-grants-reviewer",
+      "ok": true,
+      "detail": "granted reviewer acct_4980bb917b5f0ba931ce on realm 'opencontexthub' (recorded to /home/username/ai_harness_and_knowledge_facts_and_logic_website_sharing/dist/registry/reviewers.jsonl)"
+    },
+    {
+      "n": 3,
+      "label": "reviewer-approves-A",
+      "ok": true,
+      "detail": "approved \"Approve Me 1781107473833\" → now live in Browse"
+    },
+    {
+      "n": 4,
+      "label": "reviewer-rejects-B",
+      "ok": true,
+      "detail": "rejected \"Reject Me 1781107473833\" → never public-active, left the queue (candidate preserved)"
+    },
+    {
+      "n": 5,
+      "label": "reviewer-revokes-A",
+      "ok": true,
+      "detail": "revoked \"Approve Me 1781107473833\" → rolled back out of Browse (lossless — decision recorded)"
+    }
+  ],
+  "page_errors": [],
+  "video": "videos/governance-lifecycle.mp4",
+  "note": "The full reviewer lifecycle: approve (→ live), reject (→ never live), revoke (→ rolled back), all through the UI, all recorded losslessly."
+}
