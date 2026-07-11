@@ -66,6 +66,13 @@ SOURCE_CARD_SPECS: tuple[tuple[Path, str], ...] = (
     (_STAGED_DIR / "template_minted_producer_cards.jsonl", "staged_stub"),
     (_STAGED_DIR / "template_minted_producer_cards_v2.jsonl", "staged_stub"),
     (_STAGED_DIR / "model_backed_factory_cards.jsonl", "staged_model_fill"),
+    # EXECUTABLE KERNEL PACKS (2026-07-11): oracle-verified families with 3-register descriptions + typed
+    # edges + signed conformance evidence — the exec-verified top of the quality ladder; first-class rank.
+    (_resource("data") / "dev-intel" / "reasoning_control_proof_primitives" / "reasoning_control_proof_candidate_cards.jsonl", "kernel_verified"),
+    (_resource("data") / "dev-intel" / "brain_inspired_primitives" / "brain_inspired_candidate_cards.jsonl", "kernel_verified"),
+    (_resource("data") / "dev-intel" / "physics_tracking_primitives" / "physics_tracking_candidate_cards.jsonl", "kernel_verified"),
+    (_resource("data") / "dev-intel" / "math_foundations_primitives" / "math_foundations_candidate_cards.jsonl", "kernel_verified"),
+    (_resource("data") / "dev-intel" / "associative_memory_primitives" / "associative_memory_candidate_cards.jsonl", "kernel_verified"),
 )
 SOURCE_CARD_FILES: tuple[Path, ...] = tuple(path for path, _stage in SOURCE_CARD_SPECS)
 

@@ -48,6 +48,17 @@ except Exception as exc:  # pragma: no cover
 BOUNDARY: dict[str, Any] = {"candidate": True, "serves_truth": False}
 PRIMITIVE_ID_PREFIX = "prim:bio"
 CITATION = "inspired by Dragon Hatchling (BDH), Kosowski et al., arXiv:2509.26507"
+OUT_DIR = Path(__file__).resolve().parent.parent / "data" / "dev-intel" / "brain_inspired_primitives"
+CARDS_PATH = OUT_DIR / "brain_inspired_candidate_cards.jsonl"
+
+
+def build(write: bool = False) -> dict[str, Any]:
+    cards = emit_cards()
+    if write:
+        OUT_DIR.mkdir(parents=True, exist_ok=True)
+        CARDS_PATH.write_text("".join(json.dumps(c, sort_keys=True) + "\n" for c in cards))
+    return {"cards": len(cards), "path": str(CARDS_PATH) if write else None,
+            "ids": [c["primitive_id"] for c in cards], **BOUNDARY}
 
 
 # ═══════════════ 1. HEBBIAN LEARNING — the synapse is the memory (continuous, no retrain) ══════════════
@@ -305,7 +316,7 @@ def _main() -> int:
         print(json.dumps(demo(), indent=2))
         return 0
     if args.emit:
-        print(json.dumps({"cards": emit_cards()}, indent=2))
+        print(json.dumps(build(write=True), indent=2))
         return 0
     return _self_test()
 

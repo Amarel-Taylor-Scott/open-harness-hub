@@ -46,7 +46,8 @@ GITHUB_PLAIN_FILE_LIMIT_BYTES = 90_000_000
 _COMPRESSIBLE_DATA_ROOTS = ("repo/_repos/shared-backend-components/catalog",
                             "repo/_repos/shared-backend-components/data")
 FLY_REGION_DEFAULT = "iad"
-FLY_VM_MEMORY = "4gb"                            # 557K-doc index peaks ~2.3GB RSS on first search (measured)
+FLY_VM_MEMORY = "8gb"                            # measured 2026-07-11: serving + full-corpus admin reindex on 4gb
+                                                 # starved the box (critical health, 27s responses); 8gb holds both
 INTERNAL_PORT = 8080
 BUNDLE_DIR = _SBC / "dist" / "capability-saas-deploy"
 
@@ -63,6 +64,12 @@ BUNDLE_SOURCES: list[str] = [
     "_repos/shared-backend-components/data/dev-intel/aidevobserver_edge_foundry/verified_factory_primitive_cards.jsonl",
     "_repos/shared-backend-components/data/dev-intel/aidevobserver_edge_foundry/primitive_edge_cards.jsonl",
     "_repos/shared-backend-components/data/dev-intel/primitive_synthesis/working_primitives.jsonl",
+    # executable kernel packs (2026-07-11) — oracle-verified families baked into the served corpus
+    "_repos/shared-backend-components/data/dev-intel/reasoning_control_proof_primitives/reasoning_control_proof_candidate_cards.jsonl",
+    "_repos/shared-backend-components/data/dev-intel/brain_inspired_primitives/brain_inspired_candidate_cards.jsonl",
+    "_repos/shared-backend-components/data/dev-intel/physics_tracking_primitives/physics_tracking_candidate_cards.jsonl",
+    "_repos/shared-backend-components/data/dev-intel/math_foundations_primitives/math_foundations_candidate_cards.jsonl",
+    "_repos/shared-backend-components/data/dev-intel/associative_memory_primitives/associative_memory_candidate_cards.jsonl",
     "_repos/openhubforai/backend/src/openhubforai",
     "_repos/teleon/backend/src/teleon",
 ]
