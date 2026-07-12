@@ -1,0 +1,12 @@
+MODULE _repos/teleon/backend/src/teleon/evolution/token_reduction.py
+## API signatures
+```python
+"""src.teleon.evolution.token_reduction — token-reduce a SKILL/prompt, losslessly. The descent at the PROMPT layer."""
+_OPTIONAL_MARK = ...
+def estimate_tokens(text: str) -> int
+    # A standard ~4-chars-per-token estimate for INPUT-token accounting (no tokenizer dependency).
+def compress_skill(skill_slot: str, skill_text: str, *, must_keep: tuple=()) -> dict
+    # Deterministically token-reduce a skill's prompt: collapse internal/edge whitespace, drop duplicate
+```
+## intra-module call edges
+src.teleon.evolution.token_reduction.compress_skill -> src.teleon.evolution.token_reduction.estimate_tokens

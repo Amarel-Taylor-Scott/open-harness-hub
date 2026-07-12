@@ -1,0 +1,56 @@
+MODULE _repos/teleon/backend/src/teleon/examples/product_pipelines.py
+## API signatures
+```python
+"""examples.product_pipelines — example use-cases as runnable, functional PIPELINES, one+ per product surface."""
+REPO = ...
+class Step:
+    # One pipeline step: ``fn(state) -> dict`` returns the artifacts it adds to the shared state. ``calls`` records
+class Pipeline:
+    # An example use-case: a named, ordered sequence of real-function Steps belonging to one product. ``run`` threads
+    def step_names(self) -> list[str]
+    def run(self, inputs: dict | None=None) -> dict
+        # Execute the steps in order over a shared state (offline + deterministic, or honest-unavailable). Returns a
+def teleon_extract_pipeline() -> Pipeline
+    # Teleon use-case: turn a born-digital document into a defined schema for the cheapest viable cost. With no model
+def teleon_enrich_pipeline() -> Pipeline
+    # Teleon use-case: answer-by-enrichment (search -> dedupe -> rerank -> synthesize -> attribute) as a DAG descent.
+def baltor_provider_directory_pipeline() -> Pipeline
+    # Baltor use-case: keep a provider directory FRESH cheaply + safely. Deterministic rungs resolve the bulk at ~$0
+def baltor_verified_source_answer_pipeline() -> Pipeline
+    # Baltor use-case (HONEST-UNAVAILABLE): answer ONLY from a verified source (cite it, or say MISSING). This genuinely
+def openhubs_compose_pipeline() -> Pipeline
+    # OpenHubForAI use-case: turn an intent into a candidate tool. Federated-search EVERY open registry for the intent,
+def openhubs_populate_enrich_pipeline() -> Pipeline
+    # OpenHubForAI use-case: grow the registry. Turn a discovered repo slug into a governed candidate component RECORD,
+def observer_session_review_pipeline() -> Pipeline
+    # AIDevObserver use-case: review a finished AI coding session. Run the full typed-module taxonomy over the
+def all_pipelines() -> list
+    # Every example pipeline (1-2 per product). The single source of the example set.
+def pipelines_for(product: str) -> list
+    # The example pipelines belonging to one product surface.
+def run_all() -> dict
+    # Run every example pipeline -> {pipeline_name: receipt}. Deterministic + offline.
+def self_test() -> int
+def main(argv: list[str]) -> int
+```
+## intra-module call edges
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.baltor_provider_directory_pipeline
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.baltor_verified_source_answer_pipeline
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.observer_session_review_pipeline
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.openhubs_compose_pipeline
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.openhubs_populate_enrich_pipeline
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.teleon_enrich_pipeline
+src.teleon.examples.product_pipelines.all_pipelines -> src.teleon.examples.product_pipelines.teleon_extract_pipeline
+src.teleon.examples.product_pipelines.baltor_provider_directory_pipeline -> src.teleon.examples.product_pipelines.Pipeline
+src.teleon.examples.product_pipelines.baltor_provider_directory_pipeline -> src.teleon.examples.product_pipelines.Step
+src.teleon.examples.product_pipelines.baltor_verified_source_answer_pipeline -> src.teleon.examples.product_pipelines.Pipeline
+src.teleon.examples.product_pipelines.baltor_verified_source_answer_pipeline -> src.teleon.examples.product_pipelines.Step
+src.teleon.examples.product_pipelines.main -> src.teleon.examples.product_pipelines.all_pipelines
+src.teleon.examples.product_pipelines.main -> src.teleon.examples.product_pipelines.self_test
+src.teleon.examples.product_pipelines.observer_session_review_pipeline -> src.teleon.examples.product_pipelines.Pipeline
+src.teleon.examples.product_pipelines.observer_session_review_pipeline -> src.teleon.examples.product_pipelines.Step
+src.teleon.examples.product_pipelines.openhubs_compose_pipeline -> src.teleon.examples.product_pipelines.Pipeline
+src.teleon.examples.product_pipelines.openhubs_compose_pipeline -> src.teleon.examples.product_pipelines.Step
+src.teleon.examples.product_pipelines.openhubs_populate_enrich_pipeline -> src.teleon.examples.product_pipelines.Pipeline
+src.teleon.examples.product_pipelines.openhubs_populate_enrich_pipeline -> src.teleon.examples.product_pipelines.Step
+src.teleon.examples.product_pipelines.pipelines_for -> src.teleon.examples.product_pipelines.all_pipelines

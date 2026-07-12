@@ -1,0 +1,15 @@
+MODULE _repos/teleon/backend/src/teleon/experiments/ids.py
+## API signatures
+```python
+"""src/teleon/experiments/ids — canonical, deterministic id + hash helpers for the parallel-path engine."""
+ID_HASH_SUFFIX_LEN = ...
+def canonical_bytes(value: Any) -> bytes
+    # The canonical JSON bytes of ``value`` — sorted keys, compact separators, UTF-8.
+def sha256_hex(value: Any) -> str
+    # Full sha256 hex digest of ``value``'s canonical bytes (e.g. input_snapshot_hash).
+def canonical_id(prefix: str, *parts: str) -> str
+    # A stable id ``"{prefix}-{hash16}"`` where the hash is over the canonical bytes of ``parts``.
+```
+## intra-module call edges
+src.teleon.experiments.ids.canonical_id -> src.teleon.experiments.ids.canonical_bytes
+src.teleon.experiments.ids.sha256_hex -> src.teleon.experiments.ids.canonical_bytes
