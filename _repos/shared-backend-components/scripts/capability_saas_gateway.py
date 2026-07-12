@@ -192,6 +192,8 @@ class CapabilitySaasGateway:
         self.data_dir = Path(data_dir or _environment_setting(DATA_DIR_ENVIRONMENT_VARIABLE,
                                                               LEGACY_DATA_DIR_ENVIRONMENT_VARIABLE)
                              or _DEFAULT_DATA_DIR)
+        if data_dir:  # one truth for call-time consumers (email outbox): an explicit --data-dir wins the env too
+            os.environ[DATA_DIR_ENVIRONMENT_VARIABLE] = str(self.data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.realm = _environment_setting(REALM_ENVIRONMENT_VARIABLE, LEGACY_REALM_ENVIRONMENT_VARIABLE,
                                           _DEFAULT_REALM)

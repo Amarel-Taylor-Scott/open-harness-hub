@@ -31,8 +31,23 @@ from typing import Any, Callable
 REPO_ROOT = next((_ar for _ar in Path(__file__).resolve().parents if (_ar / ".aidoneright-root").exists()), Path(__file__).resolve().parents[1])
 from scripts._repo_paths import resource as _resource
 REALM_REGISTRY = _resource("architecture") / "identity_realm_registry.json"
-OUTBOX = _resource("dist") / "email-outbox"
-AUDIT = OUTBOX / "email-audit.jsonl"
+_LEGACY_OUTBOX = _resource("dist") / "email-outbox"   # bare dev-tool runs with no data dir configured
+
+
+def email_outbox_dir() -> Path:
+    """Runtime-state law (VERIFY-INDEPENDENCE check 7): when a data dir is configured
+    (TAEDRI_DATA_DIR, legacy OH_SAAS_DATA_DIR), the outbox lives THERE — the repo tree stays clean.
+    Resolved at CALL time so hosts that set the env after this module imports (gateway --data-dir,
+    self-test sandboxes) are honored."""
+    for variable in ("TAEDRI_DATA_DIR", "OH_SAAS_DATA_DIR"):
+        value = os.environ.get(variable)
+        if value:
+            return Path(value) / "email-outbox"
+    return _LEGACY_OUTBOX
+
+
+def email_audit_path() -> Path:
+    return email_outbox_dir() / "email-audit.jsonl"
 _SECRET_RE = re.compile(r"sk-[A-Za-z0-9]{8,}|api[_-]?key|RESEND_API_KEY|POSTMARK_API_KEY", re.I)
 
 
@@ -88,10 +103,11 @@ class ConsoleAdapter:
     name = "console"
 
     def deliver(self, msg: dict[str, Any]) -> dict[str, Any]:
-        OUTBOX.mkdir(parents=True, exist_ok=True)
+        outbox = email_outbox_dir()
+        outbox.mkdir(parents=True, exist_ok=True)
         ts = int(time.time())
         fname = f"{ts}-{msg['realm']}-{msg['template']}.txt"
-        (OUTBOX / fname).write_text(
+        (outbox / fname).write_text(
             f"To: {msg['to']}\nFrom: {msg['brand']} <no-reply@{msg['realm']}.local>\n"
             f"Subject: {msg['subject']}\n\n{msg['body']}\n", encoding="utf-8")
         # Cloud: also PUSH to the mailbox service so the demo inbox works across separate Fly apps
@@ -113,7 +129,7 @@ class ConsoleAdapter:
         rec = {"ts": ts, "realm": msg["realm"], "template": msg["template"], "to": msg["to"],
                "mode": "console", "sent": False, "outbox_file": fname, "mailbox_ingest": ingest_status,
                "note": "rendered to outbox; NOT sent (dev console adapter — Mode Protocol)"}
-        with AUDIT.open("a", encoding="utf-8") as fh:
+        with email_audit_path().open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec, sort_keys=True) + "\n")
         return rec
 
@@ -122,8 +138,8 @@ def _record_sent(msg: dict[str, Any], mode: str, provider_id: str | None) -> dic
     rec = {"ts": int(time.time()), "realm": msg["realm"], "template": msg["template"],
            "to": msg["to"], "mode": mode, "sent": True, "provider_id": provider_id,
            "note": f"sent via {mode}"}
-    OUTBOX.mkdir(parents=True, exist_ok=True)
-    with AUDIT.open("a", encoding="utf-8") as fh:
+    email_outbox_dir().mkdir(parents=True, exist_ok=True)
+    with email_audit_path().open("a", encoding="utf-8") as fh:
         fh.write(json.dumps(rec, sort_keys=True) + "\n")
     return rec
 
@@ -206,7 +222,12 @@ def send(realm: str, template: str, to: str, props: dict[str, Any] | None = None
 
 
 def _self_test() -> int:
+    import tempfile
     fails: list[str] = []
+    # sandbox the outbox: gates the call-time resolver (red if it ignores the env) AND keeps the tree clean
+    sandbox = tempfile.TemporaryDirectory(prefix="email-port-selftest-")
+    previous_data_dir = os.environ.get("TAEDRI_DATA_DIR")
+    os.environ["TAEDRI_DATA_DIR"] = sandbox.name
 
     def ck(name, ok, detail=""):
         print(f"  [{'ok' if ok else 'FAIL'}] {name}{(': ' + detail) if detail and not ok else ''}")
@@ -218,7 +239,11 @@ def _self_test() -> int:
     ck("console: realm-branded render (Baltor)", rec["realm"] == "baltor")
     ck("console: mode=console, sent=False (Mode Protocol — no silent send)",
        rec["mode"] == "console" and rec["sent"] is False)
-    ck("console: written to outbox + audit", (OUTBOX / rec["outbox_file"]).exists() and AUDIT.exists())
+    ck("console: written to outbox + audit",
+       (email_outbox_dir() / rec["outbox_file"]).exists() and email_audit_path().exists())
+    ck("outbox honors the configured data dir at CALL time (runtime state never lands in the tree)",
+       email_outbox_dir() == Path(sandbox.name) / "email-outbox"
+       and not (_LEGACY_OUTBOX / rec["outbox_file"]).exists())
     # cross-app mailbox ingest push (the cloud delivery path): best-effort, OBSERVABLE, never blocks.
     # Gate the deliver()→push logic by capturing the HTTP call — the unit gap that let container-only
     # testing be the first to catch a stale-image regression. Patches the module-global _post_json
@@ -245,7 +270,8 @@ def _self_test() -> int:
         _post_json = _boom
         rec_fail = send("baltor", "verify_email", "push2@example.test", {"verify_url": "/mailbox/verify?realm=baltor&account=acct_y"})
         ck("mailbox ingest: failure recorded (failed:...), never silent, never blocks the local outbox write",
-           str(rec_fail.get("mailbox_ingest", "")).startswith("failed:") and (OUTBOX / rec_fail["outbox_file"]).exists())
+           str(rec_fail.get("mailbox_ingest", "")).startswith("failed:")
+           and (email_outbox_dir() / rec_fail["outbox_file"]).exists())
     finally:
         _post_json = real_post
         if prev_ingest is None:
@@ -281,7 +307,8 @@ def _self_test() -> int:
     except ValueError:
         ck("invalid recipient rejected", True)
     # no secret in the audit trail
-    blob = AUDIT.read_text(encoding="utf-8") if AUDIT.exists() else ""
+    audit = email_audit_path()
+    blob = audit.read_text(encoding="utf-8") if audit.exists() else ""
     ck("no secret-shaped material in the audit trail", not _SECRET_RE.search(blob))
 
     print("\n" + ("PASS — email_port: one standardized send(realm,template,to,props) contract; console adapter "
@@ -289,6 +316,11 @@ def _self_test() -> int:
                   "Resend/Postmark are owner-gated seams (NotConfigured without a key, never a fake send); "
                   "secret/template/recipient guards hold; no secret in the trail."
                   if not fails else f"{len(fails)} FAILURES: {fails}"))
+    if previous_data_dir is None:
+        os.environ.pop("TAEDRI_DATA_DIR", None)
+    else:
+        os.environ["TAEDRI_DATA_DIR"] = previous_data_dir
+    sandbox.cleanup()
     return 0 if not fails else 1
 
 

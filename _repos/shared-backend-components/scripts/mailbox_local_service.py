@@ -42,7 +42,8 @@ from urllib.parse import parse_qs, urlparse
 
 REPO = next((_ar for _ar in Path(__file__).resolve().parents if (_ar / ".aidoneright-root").exists()), Path(__file__).resolve().parents[1])
 from scripts._repo_paths import resource as _resource
-OUTBOX = _resource("dist") / "email-outbox"
+from scripts.email_port import email_outbox_dir
+OUTBOX = email_outbox_dir()   # resolved at service start; single source = email_port (the writer)
 SERVICE_REGISTRY = _resource("architecture") / "local_service_registry.json"
 IDENTITY_REGISTRY = _resource("architecture") / "identity_realm_registry.json"
 SERVICE_ID = "mailbox_local_service"
@@ -257,7 +258,7 @@ def main() -> int:
     port = _port()
     httpd = ThreadingHTTPServer((bind_host, port), _Handler)
     print(f"mailbox (transactional-email inbox) → http://{bind_host}:{port}/mailbox/  "
-          f"(reads {OUTBOX.relative_to(REPO)}, verify completes verify_identifier — real)")
+          f"(reads {OUTBOX}, verify completes verify_identifier — real)")
     try:
         httpd.serve_forever()
     finally:

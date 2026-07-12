@@ -43,8 +43,10 @@ from typing import Any, Callable
 
 REPO_ROOT = next((_ar for _ar in Path(__file__).resolve().parents if (_ar / ".aidoneright-root").exists()), Path(__file__).resolve().parents[1])
 from scripts._repo_paths import resource as _resource
+from scripts._repo_paths import install as _install
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+_install()  # all code roots (src.openhubforai auth kit, …) — standalone runs must not depend on the caller
 
 # SQLite-WAL append-log behind audit-events + the migration suffix (SINGLE SOURCE — defined once
 # in scripts._jsonl_store, never re-typed here)

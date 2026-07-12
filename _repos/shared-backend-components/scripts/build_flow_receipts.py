@@ -16,7 +16,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from scripts import billing_plane, email_port  # the standardized ports
 
-OUTBOX = _resource("dist") / "email-outbox"
+OUTBOX = email_port.email_outbox_dir()   # single source = email_port (the writer)
 OUT = _resource("dist") / "flow-receipts.json"
 
 
