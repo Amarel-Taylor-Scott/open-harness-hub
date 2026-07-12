@@ -15,8 +15,14 @@ there".
 | `aidonerightcorp/taedri` | Gateway/server code as deployed, designed web screens, deploy shape (Dockerfile, fly.toml, 4 workflows), runbooks, the **served** corpus snapshot (search index + card files, gzipped in git) |
 | monorepo (`_repos/shared-backend-components`) | The **factory** that generates and improves the corpus (foundry loops, kernel packs, benchmarks, promotion gates) and the bundle builder that originally assembled the repo |
 
-The taedri repo keeps monorepo-stable paths (`repo/_repos/shared-backend-components/…`) so files carry the
-same identity on both sides and diffs stay meaningful.
+**Layout is FLAT since 2026-07-12 (owner request: "everything contained in taedri.dev"):** the taedri repo
+root IS the code root — `scripts/`, `catalog/`, `data/`, `web/`, `schemas/`, `vocabularies/`,
+`architecture/` at top level (commit `be8ac33`, 2,731 history-preserving renames). A small `_repos/`
+support folder remains for the two libraries the gateway imports (`openhubforai` auth kit, `teleon` ids)
+plus `_moved_dirs.json` (entries rewritten to flat paths); `.aidoneright-root` anchors `repo_root()` at the
+repo root. **Path mapping for PRs from the monorepo:** monorepo `_repos/shared-backend-components/<path>`
+→ taedri `<path>` (strip the prefix). Verified before ship: both self-tests PASS from the flat root, and a
+local docker build + container smoke served /health + the 557,439 count.
 
 ## The freeze (enforced in code, not prose)
 
