@@ -48,6 +48,9 @@ _COMPRESSIBLE_DATA_ROOTS = ("repo/_repos/shared-backend-components/catalog",
 FLY_REGION_DEFAULT = "iad"
 FLY_VM_MEMORY = "8gb"                            # measured 2026-07-11: serving + full-corpus admin reindex on 4gb
                                                  # starved the box (critical health, 27s responses); 8gb holds both
+FLY_VM_CPUS = 4                                  # Fly caps shared-CPU memory at 2048 MiB x cpus: 8gb REQUIRES cpus=4.
+                                                 # cpus=2 + 8gb fails every machine update (proven 2026-07-11 deploy
+                                                 # 29172275598) while health checks stay green on the OLD release.
 INTERNAL_PORT = 8080
 BUNDLE_DIR = _SBC / "dist" / "capability-saas-deploy"
 
@@ -119,7 +122,7 @@ primary_region = "{FLY_REGION_DEFAULT}"
 
 [[vm]]
   cpu_kind = "shared"
-  cpus = 2
+  cpus = {FLY_VM_CPUS}
   memory = "{FLY_VM_MEMORY}"
 """
 
@@ -428,6 +431,18 @@ def deploy() -> dict[str, Any]:
             "results": results, "candidate": True, "serves_truth": False}
 
 
+def bundle_push_freeze_reason(remote_main_head: str, overwrite_env: Optional[str],
+                              owner_repo: str = "aidonerightcorp/taedri") -> Optional[str]:
+    """SPLIT FREEZE (2026-07-12): the taedri repo is the direct development home; the bundle push
+    force-replaces the ENTIRE remote history. An existing remote main freezes the push unless the
+    overwrite env is exactly "1". Pure so the self-test proves both branches. docs/TAEDRI-REPO-SPLIT.md."""
+    if remote_main_head and overwrite_env != "1":
+        return (f"{owner_repo} main exists (HEAD {remote_main_head[:9]}) and is the direct development home "
+                "since the 2026-07-12 split — a bundle push would FORCE-REPLACE its history. Open a pull "
+                "request branch to reconcile, or set TAEDRI_BUNDLE_OVERWRITE=1 to overwrite deliberately.")
+    return None
+
+
 def push_github(repo_name: str = "taedri") -> dict[str, Any]:
     """Create the deploy repo + push the bundle — GUARDED on GITHUB_TOKEN. Sets the Fly secret when both tokens exist."""
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
@@ -461,6 +476,19 @@ def push_github(repo_name: str = "taedri") -> dict[str, Any]:
     except urllib.error.HTTPError as error:
         if error.code != 422:  # 422 = already exists -> proceed to push
             return {"pushed": False, "error": f"repo create failed: {error.code}"}
+    branch_probe = urllib.request.Request(
+        f"https://api.github.com/repos/{owner}/{repo_name}/branches/main",
+        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
+    try:
+        with urllib.request.urlopen(branch_probe, timeout=30) as response:
+            remote_main_head = str(json.loads(response.read().decode()).get("commit", {}).get("sha", ""))
+    except urllib.error.HTTPError:
+        remote_main_head = ""  # no main branch yet -> fresh repo, safe to push
+    freeze = bundle_push_freeze_reason(remote_main_head, os.environ.get("TAEDRI_BUNDLE_OVERWRITE"),
+                                       owner_repo=f"{owner}/{repo_name}")
+    if freeze:
+        return {"pushed": False, "reason": freeze, "frozen_by": "docs/TAEDRI-REPO-SPLIT.md",
+                "candidate": True, "serves_truth": False}
     remote = f"https://x-access-token:{token}@github.com/{owner}/{repo_name}.git"
     commands = [
         ["git", "init", "-q", "-b", "main"],
@@ -544,6 +572,14 @@ def _self_test() -> int:
             os.environ[name] = value
     checks.append(("push-github without token -> dry-run plan",
                    dry_git["pushed"] is False and "dry_run_plan" in dry_git, ""))
+
+    # (6) split freeze: a live remote main refuses the overwrite unless explicitly overridden (both branches).
+    frozen = bundle_push_freeze_reason("58f8285cdeadbeef", None)
+    released = bundle_push_freeze_reason("58f8285cdeadbeef", "1")
+    fresh = bundle_push_freeze_reason("", None)
+    checks.append(("split freeze: live remote main blocks the force-push; override + fresh repo pass",
+                   frozen is not None and "FORCE-REPLACE" in frozen and released is None and fresh is None,
+                   str(frozen)[:200]))
 
     ok = all(passed for _n, passed, _d in checks)
     print(f"{'PASS' if ok else 'FAIL'} - build_capability_saas_bundle: computed manifest "
