@@ -1,0 +1,86 @@
+id: "pipeline/candidate-primitive-promotion-scoring"
+type: pipeline
+version: "0.1.0"
+name: "Candidate primitive promotion scoring"
+description: "Score normalized candidate primitives for promotion readiness and route them to promotion, review, hold, or reject queues with quality index records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "planning", "routing", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.evaluation"
+tags: ["promotion", "candidate-primitives", "quality-gates", "review-routing", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Score candidate primitives using usefulness, demand, complexity, time savings, deployment frequency, capability gap, cost savings, deployment value, model-swap value, privacy risk, license risk, and dedupe risk."
+pipeline_kind: "research_web.candidate_primitive_promotion_scoring"
+
+inputs:
+  - name: "input_path"
+    type: "string"
+    schema: "schemas/normalized-object-record.schema.json"
+  - name: "output_dir"
+    type: "string"
+  - name: "weights_json"
+    type: "string"
+outputs:
+  - name: "promotion_decisions"
+    type: "object[]"
+    schema: "schemas/promotion-decision.schema.json"
+  - name: "index_records"
+    type: "object[]"
+    schema: "schemas/index-record.schema.json"
+  - name: "review_tickets"
+    type: "object[]"
+    schema: "schemas/review-ticket.schema.json"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/candidate-primitive-promotion-patterns"
+
+steps:
+  - id: "load_promotion_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/candidate-primitive-promotion-patterns"
+    inputs:
+      query: "candidate primitive promotion scoring quality gates review routing"
+      top_k: 10
+
+  - id: "score_candidates"
+    kind: "tool"
+    ref: "tool/candidate-primitive-promotion-scorer"
+    inputs:
+      input_path: "$.inputs.input_path"
+      output_dir: "$.inputs.output_dir"
+      weights_json: "$.inputs.weights_json"
+
+  - id: "emit_quality_index"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      input_path: "$.outputs.promotion_decisions"
+      index_kinds: ["quality", "facet"]
+
+  - id: "route_review"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "candidate-primitive-promotion-scoring"
+      applied_layers: ["promotion_score", "quality_index", "privacy_license_penalty", "dedupe_review", "review_ticket_routing"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.promotion_decisions"
+    op: "is_truthy"
+    value: true
+    label: "Promotion decisions are emitted."
+  - kind: "deterministic"
+    target: "$.outputs.index_records"
+    op: "is_truthy"
+    value: true
+    label: "Quality index records are emitted."

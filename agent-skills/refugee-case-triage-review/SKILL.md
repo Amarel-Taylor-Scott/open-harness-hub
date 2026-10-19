@@ -1,0 +1,53 @@
+---
+name: refugee-case-triage-review
+description: Review refugee case packets for vulnerability, documentation gaps, deadline
+  risk, referral needs, and safety concerns.
+when_to_use: 'Pipeline kind: review.'
+---
+
+# Refugee Case Triage review pipeline
+
+Benchmarkable refugee case triage review pipeline with normalization, grep, RAG, harness review, severity calibration, evidence gaps, and risk-register output.
+
+## Task
+
+Review refugee case packets for vulnerability, documentation gaps, deadline risk, referral needs, and safety concerns.
+
+## Steps
+
+1. **structured_to_prose** — `processor` → `processor/structured-to-prose`
+2. **redact_pii** — `processor` → `processor/redact-pii-text`
+3. **normalize_evidence** — `processor` → `processor/packet-evidence-normalizer`
+4. **grep_flags** — `rule_pack` → `rule-pack/grep-refugee-case-triage-flags`
+5. **retrieve_context** — `rule_pack` → `rule-pack/rag-refugee-case-triage-retrieval-policy`
+6. **control_matrix** — `processor` → `processor/control-matrix-builder`
+7. **review_harness** — `harness` → `harness/refugee-case-triage-review`
+8. **dedupe_findings** — `processor` → `processor/finding-deduplicator`
+9. **calibrate_severity** — `processor` → `processor/severity-calibrator`
+10. **extract_evidence_gaps** — `processor` → `processor/evidence-gap-extractor`
+11. **route_owners** — `processor` → `processor/remediation-owner-router`
+12. **check_citations** — `processor` → `processor/citation-span-checker`
+13. **grade** — `processor` → `processor/llm-judge`
+14. **redaction_audit** — `processor` → `processor/packet-redaction-audit`
+15. **risk_register** — `processor` → `processor/risk-register-updater`
+16. **summary** — `processor` → `processor/review-summary-composer`
+
+## Defaults
+
+- **persona**: persona/refugee-case-reviewer
+- **model_adapter**: adapter/ollama-default
+- **knowledge_packs**: `knowledge-pack/refugee-case-triage-frameworks`
+- **rule_packs**: `rule-pack/grep-refugee-case-triage-flags`, `rule-pack/rag-refugee-case-triage-retrieval-policy`
+
+## Success criteria
+
+- rubric `rubric/refugee-case-triage-quality-v1` threshold 0.7
+- deterministic `$.steps.redaction_audit.output.result.pass` == `True`
+- deterministic `$.steps.check_citations.output.result.pass` == `True`
+
+## Provenance
+
+- Hub component: `pipeline/refugee-case-triage-review` v0.1.0
+- License: `MIT`
+- Industry: humanitarian.refugee, legal.immigration
+- Full source manifest: see `references/manifest.yaml`

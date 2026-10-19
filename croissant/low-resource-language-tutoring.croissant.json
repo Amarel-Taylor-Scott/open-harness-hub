@@ -1,0 +1,77 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/low-resource-language-tutoring",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Low-resource-language tutoring scaffold (Marathi, Swahili, Twi — school subjects)",
+  "description": "Knowledge Corpus scaffold for tutoring school subjects (mathematics,\nscience, basic literacy) in low-resource languages including Marathi,\nSwahili, and Twi. Provides key concept glossaries, worked example\ntemplates, and curriculum alignment notes for standard primary/secondary\ncurricula in Maharashtra (India), East Africa, and West Africa respectively.\nDesigned to run entirely on-device; no cloud dependency.\n\nHONEST INGESTION CONTRACT:\n- Coverage is partial and curriculum-approximate. This corpus MUST be\n  presented to students as supplementary, not authoritative.\n- Subject-matter experts for each language community should review and\n  extend entries before production use.\n- Entries that are uncertain are flagged with \"coverage: partial\".\n- No proprietary curriculum content is included; all entries derive from\n  public-domain syllabi and open educational resources.\n\nCAPABILITY LIFT (structural): frontier models have sparse training data\nfor low-resource languages, especially in school-subject domains. Marathi\nSTEM vocabulary, Twi arithmetic terminology, and Swahili science glossaries\nare not well represented in public LLM training corpora. This corpus\nprovides the vocabulary layer that a base model lacks — the gap is\nstructural because it cannot close by scaling the model without acquiring\nthe missing training data (sparse_data mechanism). The corpus is an\non-device retrieval source available when network is absent.\nlift_reason: no_addressable_source (offline) + sparse_data mechanism.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/low-resource-language-tutoring",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-28",
+  "keywords": [
+    "on-device",
+    "offline",
+    "low-resource-language",
+    "marathi",
+    "swahili",
+    "twi",
+    "global-south",
+    "tutoring",
+    "education",
+    "sparse-data",
+    "structural-lift",
+    "gemma"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-28",
+  "citation": "Maharashtra State Board of Secondary and Higher Secondary Education — public syllabus (open access); Kenya Institute of Curriculum Development — primary curriculum frameworks (open access); Ghana Education Service — national primary school curriculum (open access); Open educational resources in Marathi, Swahili, and Twi curated from Wikipedia, Wikibooks, and public-domain school texts"
+}

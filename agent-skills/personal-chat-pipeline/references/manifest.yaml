@@ -1,0 +1,72 @@
+id: "pipeline/personal-chat-pipeline"
+type: pipeline
+version: "0.1.0"
+name: "Personal chat pipeline (preference + memory + tool-aware)"
+description: |
+  Wraps `harness/chat-with-memory` in a concrete pipeline that
+  loads user preferences, resolves any tool calls, and persists
+  the turn to the memory backend.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["dialogue", "memory", "tool_use"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.chat"
+tags: ["chat", "memory", "personal-assistant"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: "Multi-turn personal chat with preference + memory awareness."
+pipeline_kind: "agent_loop"
+
+inputs:
+  - name: "user_id"
+    type: "string"
+  - name: "conversation_id"
+    type: "string"
+  - name: "user_turn"
+    type: "string"
+outputs:
+  - name: "assistant_turn"
+    type: "string"
+  - name: "tool_calls"
+    type: "object[]"
+  - name: "memory_updates"
+    type: "object[]"
+
+defaults:
+  persona: "persona/personal-assistant"
+  model_adapter: "adapter/anthropic-claude-sonnet"
+  rule_packs:
+    - "rule-pack/grep-personal-info-leakage"
+  knowledge_packs:
+    - "knowledge-pack/user-preference-schema"
+
+steps:
+  - id: "load_prefs"
+    kind: "processor"
+    ref: "processor/preference-loader"
+    inputs:
+      user_id: "$.inputs.user_id"
+      scope:   "all"
+  - id: "chat"
+    kind: "harness"
+    ref: "harness/chat-with-memory"
+    inputs:
+      user_id:         "$.inputs.user_id"
+      conversation_id: "$.inputs.conversation_id"
+      user_turn:       "$.inputs.user_turn"
+  - id: "leakage_check"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-personal-info-leakage"
+    inputs:
+      text: "$.steps.chat.output.assistant_turn"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "personal-chat-pipeline"
+      applied_layers: ["persona", "memory", "tools", "leakage_check"]

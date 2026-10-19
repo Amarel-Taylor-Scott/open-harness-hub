@@ -1,0 +1,68 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/dataset/code-review-samples",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Synthetic code-review samples (3 cases)",
+  "description": "Three synthetic code bundles for testing\n`pipeline/code-security-review`. Fully synthetic — values that\nlook like AWS keys / JWT / Slack tokens follow the format\ndocumented in AWS / RFC 7519 / Slack docs but are not real\ncredentials.\n\nCases:\n - sample-clean-python.json — Flask endpoint with parameterized\n   SQL, env-based secrets, hashed passwords, @login_required,\n   CSRF-honoring. Expected 0 findings.\n - sample-vulnerable-python.json — Django views with hardcoded\n   AWS access key + secret + GitHub PAT + Slack token + private\n   key block, SQL string-format injection, MD5 password hashing,\n   pickle.loads on request.body, eval of user query, subprocess\n   with shell=True + format-string, DEBUG=True. Expected many\n   critical findings.\n - sample-mixed-js.json — Node/Express + React with SQL string\n   concat (CWE-89), Function() constructor on user input\n   (CWE-94), dangerouslySetInnerHTML + innerHTML XSS (CWE-79),\n   hardcoded JWT. Expected mixed signals.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "url": "https://open-harness-hub.dev/dataset/code-review-samples",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-20",
+  "keywords": [
+    "security",
+    "synthetic",
+    "cwe",
+    "sast"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-20"
+}

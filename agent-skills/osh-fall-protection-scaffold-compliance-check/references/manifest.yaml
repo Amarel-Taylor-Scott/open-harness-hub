@@ -1,0 +1,188 @@
+id: "pipeline/osh-fall-protection-scaffold-compliance-check"
+type: pipeline
+version: "0.1.0"
+name: "OSH fall-protection & scaffold compliance check (DO 198 / OSHA 1926)"
+description: |
+  Review a construction-site safety packet (job hazard analysis, scaffold
+  inspection tags, toolbox-talk logs, safety-officer accreditation) for
+  fall-protection and scaffolding compliance, grounded in the Philippine
+  Occupational Safety and Health Standards (RA 11058 + DOLE Department Order
+  198 s. 2018) cross-walked to OSHA 29 CFR 1926 (Subpart L scaffolds, Subpart
+  M fall protection, Focus Four). It flags: working at height without fall
+  protection, scaffold erected/used without a competent person, scaffold
+  defects, and a site at/above the size threshold operating without a
+  DOLE/PRC-accredited safety officer — then routes worker-safety flags to the
+  DOLE Regional Office (OSH division) alongside the building-code path.
+
+  Standard hybrid RAG bundle (Bundle A) over the OSHA-1926 corpus with a
+  deterministic grep pre-screen for the Focus-Four signals; the
+  safety-officer accreditation is an accountability_or_license signal a model
+  cannot hold, so its absence is flagged and routed, never assumed satisfied.
+  Detection + routing + citations only; no worker PII stored; no advice on
+  evading safety requirements.
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["construction", "construction.safety", "infrastructure"]
+capability: ["evaluation", "extraction", "verification", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+lifecycle_position: "api.review"
+freshness: "volatile"
+eu_ai_act_risk: "high_risk"
+tags: ["occupational-safety", "philippines", "fall-protection", "scaffold", "ra-11058", "do-198", "osha-1926", "focus-four", "negative-space"]
+created: "2026-05-29"
+updated: "2026-05-29"
+attribution:
+  source_url: "https://www.osha.gov/construction"
+  source_kind: "other"
+  author: "RA 11058 + DOLE DO 198 s.2018 (OSHS) cross-walked to OSHA 29 CFR 1926 Subparts L/M + Focus Four; DOLE/OSHC (per data/source-registry/ph-building-safety.json)"
+  license: "see-source"
+task: "Review a construction-site safety packet for fall-protection and scaffolding compliance under RA 11058 / DO 198 (cross-walked to OSHA 1926 Subparts L/M), flag missing fall protection, scaffold-without-competent-person, scaffold defects, and missing accredited safety officer, recommend whether work should stop, and route worker-safety flags to the DOLE Regional Office with citations."
+pipeline_kind: "review"
+inputs:
+  - name: "site_packet"
+    type: "string|object"
+    schema: "job_hazard_analysis, work_at_height {height_m, fall_protection_present}, scaffold {competent_person, defects[]}, safety_officer {accredited, prc_dole_no|null}, worker_count, toolbox_talks[]"
+outputs:
+  - name: "findings"
+    type: "object[]"
+    schema: "{code, severity, citation, route_to, evidence_ids}"
+  - name: "stop_work_recommended"
+    type: "boolean"
+  - name: "routing_packet"
+    type: "object"
+  - name: "score"
+    type: "number"
+defaults:
+  persona: "persona/construction-safety-officer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/osha-construction-1926"
+  rule_packs:
+    - "rule-pack/grep-construction-safety-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.site_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "injection_gate"
+    kind: "processor"
+    ref: "processor/prompt-injection-detector"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+      source: "user"
+  # ── Conditional (IF): Focus-Four / scaffold deterministic flags ────
+  - id: "grep_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-construction-safety-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  # ── Knowledge retrieval: OSHA 1926 / OSHS provisions (Bundle A) ────
+  - id: "rag_against_osha"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_red_flags.output.fired"
+      corpus: "knowledge-pack/osha-construction-1926"
+      top_k: 8
+  # ── Action (model call): grade the packet, recommend stop-work ─────
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/workplace-safety-incident-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.rag_against_osha.output.passages"
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.review_harness.output", config: {} }
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.calibrate_severity.output.result" }
+  # ── Action: route worker-safety flags to DOLE OSH division ─────────
+  - id: "route_owner"
+    kind: "processor"
+    ref: "processor/remediation-owner-router"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  # ── Stop/End + human router: imminent-danger fall/scaffold hazard ──
+  - id: "escalate_human"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      case_id: "$.steps.review_harness.output.case_id"
+      reason: "Imminent-danger fall-protection or scaffold-collapse hazard, or site at/above threshold with no accredited safety officer (accountability signal a model cannot satisfy) — confirm before issuing the stop-work recommendation."
+      severity: "critical"
+      payload: "$.steps.route_owner.output.result"
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/construction-safety-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "osh-fall-protection-scaffold-compliance-check"
+      applied_layers: ["persona", "privacy", "heuristic", "grep", "rag", "classifier"]
+success_criteria:
+  - rubric: "rubric/construction-safety-quality-v1"
+    threshold: 0.62
+  - kind: "deterministic"
+    target: "$.steps.injection_gate.output.allow"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "site packet passed injection screen before retrieval"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "every safety finding cites RA 11058 / DO 198 / OSHA 1926"
+worked_example:
+  input:
+    work_at_height: { height_m: 4.5, fall_protection_present: false }
+    scaffold: { competent_person: false, defects: ["missing guardrail on north bay", "mudsill not full-bearing"] }
+    safety_officer: { accredited: false, prc_dole_no: null }
+    worker_count: 22
+    toolbox_talks: ["2026-05-26 general PPE"]
+  expected_output:
+    stop_work_recommended: true
+    findings:
+      - code: "NO_FALL_PROTECTION_AT_HEIGHT"
+        severity: "critical"
+        citation: "OSHA 29 CFR 1926.501 (fall protection ≥6 ft / ~1.8 m) ⇄ RA 11058 / DO 198 fall-protection requirement [verify threshold in DO 198]"
+        route_to: "DOLE Regional Office (OSH division); site safety officer"
+        evidence_ids: ["work_at_height"]
+      - code: "SCAFFOLD_NO_COMPETENT_PERSON"
+        severity: "high"
+        citation: "OSHA 29 CFR 1926.451/.454 (competent person for scaffolds) ⇄ DO 198 scaffold competent-person requirement [verify]"
+        route_to: "DOLE Regional Office (OSH division)"
+        evidence_ids: ["scaffold"]
+      - code: "SCAFFOLD_DEFECTS"
+        severity: "high"
+        citation: "OSHA 29 CFR 1926.451 (guardrails, full-bearing sills) [verify]"
+        route_to: "site safety officer; DOLE"
+        evidence_ids: ["scaffold.defects"]
+      - code: "MISSING_ACCREDITED_SAFETY_OFFICER"
+        severity: "critical"
+        citation: "RA 11058 + DO 198 s.2018 — accredited safety officer required at/above site-size threshold [verify worker/floor threshold]"
+        route_to: "DOLE Regional Office (OSH division)"
+        evidence_ids: ["safety_officer", "worker_count"]
+    routing_packet:
+      escalated_to_human: true
+      escalation_reason: "imminent fall-protection + scaffold hazard with no accredited safety officer on a 22-worker site"
+      disclosure: "DO 198 clause numbers and thresholds flagged [verify] pending current OSHS re-ingestion; OSHA 1926 used as cross-walk reference."
+    metadata:
+      jurisdiction: "PH × construction-occupational-safety (OSHA 1926 cross-walk)"
+      lift_reasons: ["accountability_or_license", "embodiment_required", "volatile_fact"]
+      durability_class: "structural"
+      source_registry: "data/source-registry/ph-building-safety.json"
+      safety_stance: "detection + routing + citations only; no evasion guidance; no worker PII"

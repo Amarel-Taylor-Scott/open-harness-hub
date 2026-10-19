@@ -1,0 +1,108 @@
+id: "pipeline/public-source-blueprints-to-scan-jobs"
+type: pipeline
+version: "0.1.0"
+name: "Public source blueprints to scan jobs"
+description: "Turns governed public-source blueprints into resumable object-factory scan jobs that can be consumed by containerized workers without embedding scraped source bodies in the catalog."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "governance", "routing", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["public-sources", "object-factory", "container-workers", "queue-ready", "shards"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit queue-ready scan jobs and shard manifests from public-source blueprints, with source governance and excluded-scope policy attached to every job."
+pipeline_kind: "research_web.public_source_scan_job_emission"
+inputs:
+  - name: "public_source_blueprints"
+    type: "array"
+  - name: "scan_policy"
+    type: "object"
+  - name: "excluded_scopes"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "job_count"
+    type: "integer"
+  - name: "job_counts_by_type"
+    type: "json"
+  - name: "shard_manifests"
+    type: "jsonl"
+  - name: "scan_jobs"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/public-source-blueprint-catalog"
+    - "knowledge-pack/public-source-scan-job-patterns"
+steps:
+  - id: "govern-public-source-blueprint-batch"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "public_source_blueprint_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+  - id: "normalize-blueprints"
+    kind: "tool"
+    ref: "tool/public-source-blueprint-normalizer"
+    inputs:
+      public_source_blueprints: "$.inputs.public_source_blueprints"
+      scan_policy: "$.inputs.scan_policy"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "emit-scan-jobs"
+    kind: "tool"
+    ref: "tool/public-source-scan-job-emitter"
+    inputs:
+      blueprints: "$.inputs.public_source_blueprints"
+      output_dir: "$.inputs.output_dir"
+      tenant_id: "tenant-public-catalog"
+      scan_policy: "$.inputs.scan_policy"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "route-emitted-jobs"
+    kind: "tool"
+    ref: "tool/object-factory-job-router"
+    inputs:
+      job_manifest: "$.steps.emit-scan-jobs.files"
+      worker_registry:
+        source_discovery: "container.worker.discovery"
+        source_snapshot: "container.worker.snapshot"
+        page_to_markdown: "container.worker.markdown"
+        source_ingest: "container.worker.ingest"
+        entity_linking: "container.worker.entity_linking"
+        fuzzy_dedupe: "container.worker.dedupe"
+        dedupe_index: "container.worker.index"
+        publish_review: "container.worker.review"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.job_count"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "At least one queue-ready object-factory job is emitted."
+  - kind: "semantic"
+    target: "$.job_counts_by_type"
+    must_cover:
+      - "source_discovery"
+      - "source_snapshot"
+      - "page_to_markdown"
+      - "source_ingest"
+      - "entity_linking"
+      - "fuzzy_dedupe"
+      - "dedupe_index"
+      - "publish_review"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The emitted job plan covers the full public-source scan lifecycle."

@@ -1,0 +1,212 @@
+id: "pipeline/ph-occupancy-permit-prerequisite-gate"
+type: pipeline
+version: "0.1.0"
+name: "PH Certificate-of-Occupancy prerequisite gate"
+description: |
+  A yes/no occupancy-readiness gate for a Philippine building before a
+  Certificate of Occupancy (CO) can issue under PD 1096 Sec. 307. It checks
+  that every statutory prerequisite is present and currently valid: the
+  Fire Safety Inspection Certificate (FSIC) under RA 9514, the licensed
+  structural / architectural sign-off recorded on the building permit, and
+  the final building inspection record — then returns OCCUPANCY_READY or
+  NOT_READY with the specific missing/expired prerequisite and a citation,
+  routing each gap to the responsible authority (OBO, BFP).
+
+  High-precision legal RAG bundle (Bundle B): a dense + exact-id leg over the
+  national permit/occupancy corpus, official-source verification of each
+  retrieved clause, per-claim citation coverage, and a hard abstain. Because
+  FSIC status (BFP) and the OBO inspection record are tier-4 (counter-only),
+  any prerequisite whose status is not human-verified forces a NOT_READY +
+  PERMIT_RECORD_UNVERIFIABLE route to a human — the gate never infers a
+  "probably issued" CO. Detection and routing with citations only; no
+  occupant PII.
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["construction.permitting", "government.permitting", "infrastructure"]
+capability: ["evaluation", "verification", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+lifecycle_position: "api.review"
+freshness: "volatile"
+eu_ai_act_risk: "high_risk"
+tags: ["building-safety", "philippines", "occupancy-permit", "certificate-of-occupancy", "fire-code", "ra-9514", "pd-1096", "negative-space"]
+created: "2026-05-29"
+updated: "2026-05-29"
+attribution:
+  source_url: "https://bfp.gov.ph"
+  source_kind: "other"
+  author: "PD 1096 Sec. 307 (Certificate of Occupancy) + RA 9514 (Fire Code) IRR; OBO / BFP (per data/source-registry/ph-building-safety.json)"
+  license: "see-source"
+task: "Decide whether a Philippine building is occupancy-ready by checking that the Certificate of Occupancy prerequisites (valid FSIC under RA 9514, licensed sign-off on permit, final inspection record) are present and unexpired; return OCCUPANCY_READY or NOT_READY with the missing prerequisite, a PD 1096 / RA 9514 citation, and a route to the responsible authority; abstain to a human when any prerequisite status is not human-verified."
+pipeline_kind: "evaluate"
+inputs:
+  - name: "occupancy_packet"
+    type: "string|object"
+    schema: "address, building_permit_no, fsic_status {present|expired|absent, valid_through}, licensed_signoff {prc_no|null}, final_inspection_status, occupancy_classification"
+outputs:
+  - name: "decision"
+    type: "string"
+    schema: "OCCUPANCY_READY | NOT_READY | UNVERIFIABLE"
+  - name: "prerequisite_findings"
+    type: "object[]"
+    schema: "{prerequisite, status, citation, route_to, severity}"
+  - name: "routing_packet"
+    type: "object"
+  - name: "score"
+    type: "number"
+defaults:
+  persona: "persona/permit-review-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/national-building-permit-and-occupancy-procedures-low-digitization"
+    - "knowledge-pack/municipal-permit-review-frameworks"
+  rule_packs:
+    - "rule-pack/grep-municipal-permit-review-flags"
+    - "rule-pack/rag-municipal-permit-review-retrieval-policy"
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.occupancy_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "injection_gate"
+    kind: "processor"
+    ref: "processor/prompt-injection-detector"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+      source: "user"
+  - id: "normalize_evidence"
+    kind: "processor"
+    ref: "processor/packet-evidence-normalizer"
+    inputs: { trace: "$.steps.redact_pii.output", config: {} }
+  # ── Conditional (IF): grep missing/expired prerequisite signals ────
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-municipal-permit-review-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  # ── Knowledge retrieval: the CO / FSIC statutory prerequisites ─────
+  - id: "retrieve_prereqs"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-municipal-permit-review-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_flags.output.fired"
+      corpus: "knowledge-pack/national-building-permit-and-occupancy-procedures-low-digitization"
+      top_k: 10
+  - id: "verify_sources"
+    kind: "processor"
+    ref: "processor/official-sources-checker"
+    inputs:
+      candidates: "$.steps.retrieve_prereqs.output.passages"
+      jurisdiction_hint: "PH"
+      freshness_window_days: 365
+      allowlist_pack_ref: "rule-pack/rag-municipal-permit-review-retrieval-policy"
+  # ── Action (model call): decide ready / not-ready per prerequisite ──
+  - id: "gate_harness"
+    kind: "harness"
+    ref: "harness/municipal-permit-review-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.verify_sources.output.accepted"
+      evidence: "$.steps.normalize_evidence.output.result"
+  - id: "dedupe_findings"
+    kind: "processor"
+    ref: "processor/finding-deduplicator"
+    inputs: { trace: "$.steps.gate_harness.output", config: {} }
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs: { trace: "$.steps.dedupe_findings.output.result", config: {} }
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs: { response_markdown: "$.steps.calibrate_severity.output.result" }
+  - id: "route_owner"
+    kind: "processor"
+    ref: "processor/remediation-owner-router"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  # ── Stop/End + human router for unverifiable BFP/OBO records ───────
+  - id: "escalate_human"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      case_id: "$.steps.normalize_evidence.output.result.case_id"
+      reason: "FSIC and OBO final-inspection records are tier-4 (counter-only); route to human when any prerequisite status is not human-verified — never infer an issued CO."
+      severity: "high"
+      payload: "$.steps.route_owner.output.result"
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs: { trace: "$.steps.calibrate_severity.output.result", config: {} }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/municipal-permit-review-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "ph-occupancy-permit-prerequisite-gate"
+      applied_layers: ["privacy", "heuristic", "grep", "rag", "official_sources", "persona", "classifier"]
+success_criteria:
+  - rubric: "rubric/municipal-permit-review-quality-v1"
+    threshold: 0.68
+  - kind: "deterministic"
+    target: "$.steps.injection_gate.output.allow"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "occupancy packet passed injection screen before clause retrieval"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.passes"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "every prerequisite decision cites PD 1096 / RA 9514"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "no occupant PII leaks into the decision packet"
+worked_example:
+  input:
+    address: "Commercial mixed-use, Quezon City, NCR"
+    building_permit_no: "QC-BP-redacted"
+    occupancy_classification: "Group E (business) [verify PD 1096 use group]"
+    fsic_status: { present: false, valid_through: null, note: "FSIC not in packet" }
+    licensed_signoff: { prc_no: "PRC-CE-redacted (present on permit)" }
+    final_inspection_status: "passed (record attached)"
+  expected_output:
+    decision: "NOT_READY"
+    prerequisite_findings:
+      - prerequisite: "Fire Safety Inspection Certificate (FSIC)"
+        status: "absent"
+        citation: "RA 9514 (Fire Code of the Philippines) IRR — valid FSIC is a prerequisite to the Certificate of Occupancy [verify section]"
+        route_to: "Bureau of Fire Protection (BFP) district office"
+        severity: "critical"
+      - prerequisite: "Licensed sign-off on permit"
+        status: "present"
+        citation: "PD 1096 IRR professional sign-off requirement [verify]"
+        route_to: "—"
+        severity: "low"
+      - prerequisite: "Final building inspection record"
+        status: "present"
+        citation: "PD 1096 Sec. 207 (Building Official duties) [verify]"
+        route_to: "—"
+        severity: "low"
+    routing_packet:
+      escalated_to_human: true
+      escalation_reason: "FSIC status is tier-4 (BFP counter); confirm absence with BFP before a CO decision is finalized."
+      disclosure: "Clause numbers flagged [verify] pending current IRR / RA 9514 IRR re-ingestion."
+    metadata:
+      jurisdiction: "PH × construction-building-safety"
+      lift_reasons: ["no_addressable_source", "volatile_fact", "accountability_or_license"]
+      durability_class: "structural"
+      source_registry: "data/source-registry/ph-building-safety.json"
+      safety_stance: "detection + routing + citations only; abstain on unverifiable prerequisite; no PII"

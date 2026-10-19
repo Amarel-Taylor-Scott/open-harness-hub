@@ -1,0 +1,87 @@
+id: "pipeline/synthetic-data-gen-with-teacher-llm"
+type: pipeline
+version: "0.1.0"
+name: "Synthetic-data generation with teacher LLM"
+description: |
+  Use a teacher LLM to generate (input, output) training pairs for a
+  downstream student fine-tune. Includes filtering for diversity +
+  difficulty + safety. The pattern that won the prompt-recovery class
+  of competitions.
+
+  Verified by Open Harness Hub mining of wlifferth's "Starter Notebook:
+  Generating More Data With Gemma" (1820 votes) on llm-prompt-recovery.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai"]
+capability: ["generation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "external"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://www.kaggle.com/code/wlifferth/starter-notebook-generating-more-data-with-gemma"
+  source_kind: "kaggle"
+  author: "William Lifferth (1820 votes)"
+  license: "Apache-2.0"
+
+task: |
+  Generate N synthetic (input, output) pairs for fine-tuning a student
+  model. Filter for diversity, difficulty, and safety. Output Unsloth-
+  ready JSONL.
+pipeline_kind: "synthetic_data_gen"
+
+inputs:
+  - name: "task_description"
+    type: "string"
+  - name: "n_pairs"
+    type: "integer"
+  - name: "diversity_threshold"
+    type: "number"
+outputs:
+  - name: "pairs"
+    type: "object[]"
+  - name: "rejected"
+    type: "object[]"
+  - name: "stats"
+    type: "object"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "spawn_seeds"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Generate N diverse seed prompts for the task. Output as JSON array."}]
+
+  - id: "expand_pairs"
+    kind: "processor"
+    ref: "processor/persona-set-generator"
+    inputs:
+      topic: "$.steps.spawn_seeds.output.text"
+      n_personas: "$.inputs.n_pairs"
+
+  - id: "filter_diversity"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.expand_pairs.output.personas"
+      method: "weighted_sum"
+      k: "$.inputs.n_pairs"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "synthetic-data-gen"
+      applied_layers: ["model_call"]
+
+success_criteria: []

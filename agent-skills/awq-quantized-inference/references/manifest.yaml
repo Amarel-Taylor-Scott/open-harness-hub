@@ -1,0 +1,76 @@
+id: "pipeline/awq-quantized-inference"
+type: pipeline
+version: "0.1.0"
+name: "AWQ-quantized LLM inference (alternative to bitsandbytes nf4)"
+description: |
+  Serve a 4-bit AWQ (Activation-aware Weight Quantization) checkpoint
+  for inference. AWQ preserves activation statistics, generally
+  delivering lower perplexity drop than naive nf4. The de-facto
+  Kaggle pattern when you need 32B+ in 24GB of VRAM AND care about
+  quality (vs bitsandbytes when you care about LoRA training).
+
+  Verified by Open Harness Hub mining across 7 of 35 kernels:
+  takanashihumbert EEDI-Qwen-2.5-32B-AWQ (650), yekenot AIMO-2-DeepSeek-
+  R1-distill-7B-awq (1087), mbmmurad QwQ-32B-AWQ (1097), aerdem4 EEDI-
+  Qwen32B-vLLM (594), jagatkiran Qwen14B + Qwen32B-AWQ (672), itahiro
+  DeepSeek-R1-distill-7B (1399, vLLM serves AWQ).
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai"]
+capability: ["serving", "generation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.generation"
+tags: ["awq", "4bit", "quantization", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://github.com/casper-hansen/AutoAWQ"
+  source_kind: "github"
+  author:      "AutoAWQ + multiple top Kaggle kernels (LMSYS/EEDI/AIMO 2)"
+  license:     "Apache-2.0"
+
+task: |
+  Load an AWQ-quantized checkpoint via vLLM (or transformers + AutoAWQ),
+  run inference with batched prompts, return completions + per-token
+  logprobs. Drop-in alternative to bitsandbytes nf4.
+pipeline_kind: "serving"
+
+inputs:
+  - name: "prompts"
+    type: "string[]"
+  - name: "model_id"
+    type: "string"
+outputs:
+  - name: "completions"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/vllm-awq-local"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.prompts" }
+
+  - id: "infer"
+    kind: "processor"
+    ref: "processor/vllm-batched-sampling"
+    inputs:
+      prompts: "$.inputs.prompts"
+      sampling_params: { temperature: 0.0, max_tokens: 512 }
+      model_adapter_ref: "adapter/vllm-awq-local"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "awq-quantized-inference"
+      applied_layers: ["generation"]
+
+success_criteria: []

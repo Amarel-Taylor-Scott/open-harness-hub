@@ -1,0 +1,118 @@
+id: "pipeline/deep-research-supervisor-workers"
+type: pipeline
+version: "0.1.0"
+name: "Deep research: supervisor + parallel workers"
+description: |
+  LangChain's open_deep_research pattern. A supervisor LLM decomposes
+  the user query into research briefs and dispatches N parallel
+  researcher subagents (each gets its own context + tools), then
+  compresses and writes the final report.
+
+  Verified by Open Harness Hub clone:
+  `langchain-ai/open_deep_research/src/open_deep_research/deep_researcher.py`
+  (~700 LOC) + `prompts.py`.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "media", "cross_industry"]
+capability: ["research", "retrieval", "reasoning"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/langchain-ai/open_deep_research"
+  source_kind: "github"
+  author: "LangChain"
+  license: "MIT"
+
+task: |
+  Given a research query, dispatch parallel research workers each
+  scoped to a sub-topic, compress their findings, write a synthesized
+  report with citations.
+pipeline_kind: "research_web"
+
+inputs:
+  - name: "query"
+    type: "string"
+  - name: "n_workers"
+    type: "integer"
+  - name: "depth"
+    type: "integer"
+outputs:
+  - name: "report_markdown"
+    type: "markdown"
+  - name: "worker_outputs"
+    type: "object[]"
+  - name: "citations"
+    type: "Citation[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/web-search-allowlist-default"
+
+steps:
+  - id: "redact_query"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.query" }
+
+  - id: "clarify"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Generate clarifying questions if the user's query is ambiguous. Otherwise output `CLEAR`."}]
+
+  - id: "brief_writer"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Write a research brief: scope, sub-questions, expected source types. Output a JSON brief."}]
+
+  - id: "decompose_to_workers"
+    kind: "processor"
+    ref: "processor/sub-question-decomposer"
+    inputs:
+      compound_question: "$.steps.brief_writer.output.text"
+      max_subquestions: "$.inputs.n_workers"
+
+  - id: "dispatch_workers"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "For EACH sub-question, conduct independent research: search, verify sources, take notes with citations. Output a JSON array of {sub_q, notes, citations}."}]
+      context: "$.steps.decompose_to_workers.output.subquestions"
+
+  - id: "compress_notes"
+    kind: "processor"
+    ref: "processor/llmlingua-context-compressor"
+    inputs:
+      context: "$.steps.dispatch_workers.output.text"
+      instruction: "$.inputs.query"
+      compression_rate: 0.4
+
+  - id: "write_report"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Write a one-page research report from the worker findings. Cite every factual claim by chunk index."}]
+      context: "$.steps.compress_notes.output.compressed"
+
+  - id: "verify_citations"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.write_report.output.text"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.80

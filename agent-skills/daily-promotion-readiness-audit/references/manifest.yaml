@@ -1,0 +1,77 @@
+id: "pipeline/daily-promotion-readiness-audit"
+type: pipeline
+version: "0.1.0"
+name: "Daily promotion readiness audit"
+description: "Audits a staged daily production run and routes rows by candidate-load readiness, review blockers, embedding execution blockers, and active promotion readiness."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "retrieval", "planning"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["components", "promotion", "daily-factory", "review-gate", "embedding-execution", "postgres"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Determine which staged daily component candidates are ready for candidate-table load and which remain blocked from active promotion."
+pipeline_kind: "research_web.daily_promotion_readiness_audit"
+inputs:
+  - name: "daily_run_dir"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+outputs:
+  - name: "promotion_readiness"
+    type: "jsonl"
+  - name: "promotion_review_queue"
+    type: "jsonl"
+  - name: "readiness_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-promotion-readiness-patterns"
+    - "knowledge-pack/daily-production-run-patterns"
+steps:
+  - id: "load-readiness-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-promotion-readiness-patterns"
+    inputs:
+      query: "candidate load readiness active promotion review embedding blockers"
+      top_k: 20
+  - id: "plan-promotion-readiness"
+    kind: "tool"
+    ref: "tool/daily-promotion-readiness-planner"
+    inputs:
+      daily_run_dir: "$.inputs.daily_run_dir"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.plan-promotion-readiness.counts.candidate_load_ready"
+    op: ">="
+    value: 1
+    severity: "medium"
+    label: "At least one staged candidate is structurally ready for candidate-table loading."
+  - kind: "deterministic"
+    target: "$.plan-promotion-readiness.counts.structural_blocked"
+    op: "=="
+    value: 0
+    severity: "high"
+    label: "No structurally blocked rows remain before candidate-table loading."
+  - kind: "semantic"
+    target: "$.plan-promotion-readiness"
+    must_cover:
+      - "candidate load"
+      - "active promotion"
+      - "review tickets"
+      - "embedding execution"
+      - "no Postgres side effects"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The readiness plan preserves the promotion boundary."

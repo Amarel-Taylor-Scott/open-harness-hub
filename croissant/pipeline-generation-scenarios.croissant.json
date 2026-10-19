@@ -1,0 +1,189 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/pipeline-generation-scenarios",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Cost-aware pipeline generation scenarios",
+  "description": "Synthetic scenario prompts and expected planning constraints for generating safe, cost-bounded moderation and review pipelines.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/pipeline-generation-scenarios",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-25",
+  "keywords": [
+    "pipeline-generation",
+    "cost-aware",
+    "moderation",
+    "scenario-tests"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-25",
+  "citation": "Open Harness Hub synthetic scenario design",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "pipeline-generation-scenarios__scenario-prompts",
+      "name": "scenario-prompts.jsonl",
+      "description": "Data file backing knowledge pack pipeline-generation-scenarios.",
+      "contentUrl": "data/pipeline-generation-scenarios/scenario-prompts.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "4140 B",
+      "sha256": "c9d339e3bb68aa68c2963304f6622b885698e5c54f3043e938a87ad22bb665ec"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "pipeline-generation-scenarios__records",
+      "name": "pipeline-generation-scenarios__records",
+      "description": "Records parsed from scenario-prompts.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/cost_band",
+          "name": "cost_band",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "cost_band"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/expected_constraints",
+          "name": "expected_constraints",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "expected_constraints"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/prompt",
+          "name": "prompt",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "prompt"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/recommended_components",
+          "name": "recommended_components",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "recommended_components"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/safety_boundary",
+          "name": "safety_boundary",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "safety_boundary"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "pipeline-generation-scenarios__records/tags",
+          "name": "tags",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "pipeline-generation-scenarios__scenario-prompts"
+            },
+            "extract": {
+              "column": "tags"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+id: "pipeline/statute-clarity-review"
+type: pipeline
+version: "0.1.0"
+name: "Statute / regulation clarity & interpretation-risk review"
+description: |
+  End-to-end pipeline that reviews a STATUTE, REGULATION, ORDINANCE,
+  or AGENCY RULE and produces a structured assessment of drafting
+  quality + interpretation risk:
+
+  Output:
+   - per-section findings tagged with canon (ejusdem generis,
+     expressio unius, etc.) OR drafting-failure category
+   - severity (critical / high / medium / low)
+   - suggested smallest-fix redline OR "requires policy decision"
+   - rubric score (rubric/statute-clarity-v1)
+
+  Use cases:
+   - Pre-enactment legislative-counsel review
+   - Regulatory comment drafting (highlight ambiguity to comment on)
+   - Plain-language statute summaries for the regulated population
+   - "Is this drafted in a way a court can apply?" pre-litigation
+     assessment
+
+  NOT legal advice; not jurisdiction-specific outside the cited
+  authorities; descriptive, not predictive.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.compliance", "government", "government.regulatory"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.grading"
+tags: ["law", "statute", "regulation", "interpretation", "drafting", "canons"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+task: |
+  Given the text of a statute, regulation, ordinance, or agency rule,
+  produce a structured assessment of drafting quality and
+  interpretation risk: per-section findings tagged with canon /
+  failure category / severity / suggested redline, plus a rubric
+  score against `rubric/statute-clarity-v1`.
+pipeline_kind: "grading"
+
+inputs:
+  - name: "statute_text"
+    type: "string"
+  - name: "jurisdiction"
+    type: "string"
+  - name: "statute_type"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "suggested_redlines"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/legal-clarity-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-statute-ambiguity-flags"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.statute_text"
+
+  - id: "grep_ambiguity"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-statute-ambiguity-flags"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "rag_canons"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_ambiguity.output.hits"
+      corpus: "knowledge-pack/legal-interpretation-canons"
+      top_k: 8
+
+  - id: "review"
+    kind: "harness"
+    ref: "harness/statute-clarity-review"
+    inputs:
+      statute_text: "$.steps.normalize.output.prose"
+      jurisdiction: "$.inputs.jurisdiction"
+      statute_type: "$.inputs.statute_type"
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review.output"
+      rubric_ref: "rubric/statute-clarity-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "statute-clarity-review"
+      applied_layers: ["persona", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/statute-clarity-v1"
+    threshold: 0.7

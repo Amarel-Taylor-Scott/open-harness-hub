@@ -1,0 +1,191 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/procedure-knowledge-object-patterns",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Procedure knowledge object patterns",
+  "description": "Reusable patterns for turning checklists, review questions, decision gates, evidence requirements, escalation rules, and versioned facts into indexed RAG objects.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/procedure-knowledge-object-patterns",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-25",
+  "keywords": [
+    "procedure-objects",
+    "checklists",
+    "questions",
+    "alert-review",
+    "versioned-facts",
+    "wayback"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-25",
+  "citation": "Open Harness Hub procedure knowledge object architecture",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "procedure-knowledge-object-patterns__patterns",
+      "name": "patterns.jsonl",
+      "description": "Data file backing knowledge pack procedure-knowledge-object-patterns.",
+      "contentUrl": "data/procedure-knowledge-object-patterns/patterns.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "2449 B",
+      "sha256": "62b51fa8d25dd6d95802e4eae91e13fd652372dd96598fd016359faeeef913d0"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "procedure-knowledge-object-patterns__records",
+      "name": "procedure-knowledge-object-patterns__records",
+      "description": "Records parsed from patterns.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/type",
+          "name": "type",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "type"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/summary",
+          "name": "summary",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "summary"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/fields",
+          "name": "fields",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "fields"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/domain",
+          "name": "domain",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "domain"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/questions",
+          "name": "questions",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "questions"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "procedure-knowledge-object-patterns__records/archive_strategy",
+          "name": "archive_strategy",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "procedure-knowledge-object-patterns__patterns"
+            },
+            "extract": {
+              "column": "archive_strategy"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

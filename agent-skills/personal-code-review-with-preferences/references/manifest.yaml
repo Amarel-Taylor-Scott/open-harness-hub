@@ -1,0 +1,77 @@
+id: "pipeline/personal-code-review-with-preferences"
+type: pipeline
+version: "0.1.0"
+name: "Personal code review with preference layer"
+description: "Review a code diff through the user's personal-preference layer. Loads the user's preferences pack, runs the personal-coding-reviewer persona, gates output against the personal-style rule pack, refuses to ship review comments that contain disallowed idioms."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry: ["cross_industry"]
+capability: ["evaluation", "safety_gating"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["personal", "code-review", "preferences"]
+created: "2026-05-22"
+updated: "2026-05-22"
+
+attribution:
+  source_url: "https://github.com/Amarel-Taylor-Scott/open-harness-hub"
+  source_kind: "other"
+  author: "Open Harness Hub contributors"
+  license: "MIT"
+
+task: "Review a code diff applying the reviewer's personal preferences."
+pipeline_kind: "review"
+
+inputs:
+  - name: "diff_packet"
+    type: "string|object"
+
+outputs:
+  - name: "review_comments"
+    type: "object[]"
+  - name: "style_violations"
+    type: "object[]"
+
+defaults:
+  persona: "persona/personal-coding-reviewer"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/personal-preferences-template"
+  rule_packs:
+    - "rule-pack/grep-personal-style-flags"
+
+steps:
+  - id: "load_preferences"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs: { query: "personal preferences for code review", corpus: "knowledge-pack/personal-preferences-template", top_k: 50 }
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.diff_packet" }
+  - id: "review_with_persona"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      rubric_ref: "rubric/code-security-review-v1"
+  - id: "style_gate"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-personal-style-flags"
+    inputs: { text: "$.steps.review_with_persona.output.notes" }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "personal-code-review-with-preferences"
+      applied_layers: ["personal_preferences", "persona", "review", "style_gate"]
+
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.style_gate.output.fired"
+    op: "=="
+    value: []
+    severity: "high"
+    label: "No personal-style violations in the review comments"

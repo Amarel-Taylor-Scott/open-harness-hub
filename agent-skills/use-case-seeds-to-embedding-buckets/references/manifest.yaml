@@ -1,0 +1,114 @@
+id: "pipeline/use-case-seeds-to-embedding-buckets"
+type: pipeline
+version: "0.1.0"
+name: "Use case seeds to embedding buckets"
+description: "Converts cross-domain use-case seeds into deterministic object_embedding stubs, embedding_bucket dimensions, and vector index references for low-cost comparison blocking and pgvector backfill."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "finance", "legal", "media", "creative", "energy", "healthcare", "cross_industry"]
+capability: ["retrieval", "classification", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.product"
+tags: ["use-case-seeds", "object-embeddings", "embedding-buckets", "pgvector", "comparison-blocking", "hybrid-search"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit deterministic embedding stubs and bucket dimensions for seed-derived candidate primitives before real embedding generation."
+pipeline_kind: "research_web.use_case_seed_embedding_buckets"
+inputs:
+  - name: "seeds"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "object_embeddings"
+    type: "jsonl"
+  - name: "embedding_bucket_dimensions"
+    type: "jsonl"
+  - name: "vector_index_records"
+    type: "jsonl"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/cross-domain-use-case-seeds"
+    - "knowledge-pack/use-case-seed-embedding-bucket-patterns"
+    - "knowledge-pack/use-case-seed-entity-ref-patterns"
+steps:
+  - id: "govern-use-case-seeds"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "synthetic_use_case_seed_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+  - id: "export-embedding-bucket-rows"
+    kind: "tool"
+    ref: "tool/use-case-seed-embedding-bucket-exporter"
+    inputs:
+      seeds: "$.inputs.seeds"
+      output_dir: "$.inputs.output_dir"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "preflight-embedding-relationships"
+    kind: "tool"
+    ref: "tool/factory-jsonl-relationship-preflight"
+    inputs:
+      source_records:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.dedupe_cluster"
+      dimension_values:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.object_embedding"
+  - id: "prepare-bulk-copy"
+    kind: "tool"
+    ref: "tool/factory-jsonl-bulk-copy-loader"
+    inputs:
+      source_records:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.source_record"
+      normalized_objects:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.normalized_object"
+      canonical_entities:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.canonical_entity"
+      object_entity_refs:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.object_entity_ref"
+      dedupe_clusters:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.dedupe_cluster"
+      dimension_values:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.dimension_value"
+      object_embeddings:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.object_embedding"
+      index_records:
+        - "$.steps.export-embedding-bucket-rows.row_family_paths.index_record"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.row_counts.object_embedding"
+    op: ">"
+    value: 0
+    severity: "high"
+    label: "At least one object_embedding stub is emitted."
+  - kind: "semantic"
+    target: "$.row_counts"
+    must_cover:
+      - "embedding bucket dimension"
+      - "vector index reference"
+      - "comparison blocking"
+      - "pgvector backfill"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "Embedding bucket outputs support low-cost search and comparison work."

@@ -1,0 +1,122 @@
+id: "pipeline/code-security-review"
+type: pipeline
+version: "0.1.0"
+name: "Code security review (CWE-cite-first AppSec audit)"
+description: |
+  Review source code against `rubric/code-security-review-v1`. Uses
+  the SAME chain shape as ESG / radiology / contract review:
+  structured-to-prose → secrets-redact → GREP (vuln + secrets) → RAG
+  against OWASP / CWE → judge → audit.
+
+  Fourth vertical proving the architecture is industry-agnostic.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "security.appsec", "software", "software.codereview"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["security", "appsec", "sast", "cwe", "owasp"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://cwe.mitre.org/"
+  source_kind: "other"
+  author:      "CWE + OWASP Top 10 + OWASP Top 10 for LLM Apps (composite)"
+  license:     "CC-BY-4.0"
+
+task: |
+  Given source code (string OR structured dict with multiple files),
+  identify CWE-cited vulnerabilities + hardcoded secrets + license
+  issues + propose fixes. Score against the rubric.
+pipeline_kind: "review"
+
+inputs:
+  - name: "code_bundle"
+    type: "string|object"
+  - name: "language"
+    type: "string"
+  - name: "framework"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "secrets_found"
+    type: "object[]"
+  - name: "fixes_proposed"
+    type: "object[]"
+
+defaults:
+  persona: "persona/security-engineer-cite-first"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-code-vulnerabilities"
+  knowledge_packs:
+    - "knowledge-pack/owasp-top-10-llm"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.code_bundle"
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+
+  - id: "grep_vulnerabilities"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-code-vulnerabilities"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "rag_against_owasp"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_vulnerabilities.output.fired"
+      corpus: "knowledge-pack/owasp-top-10-llm"
+      top_k: 6
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/code-security-review-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "code-security-review"
+      applied_layers: ["persona", "pii_redact", "grep", "rag", "judge"]
+
+success_criteria:
+  - kind: deterministic
+    label: "no production secrets in code"
+    target: "$.steps.grep_vulnerabilities.output.hit_count"
+    op: "<="
+    value: 30
+    severity: high
+
+  - kind: composite
+    label: "no critical-severity vulnerabilities OR all have fixes proposed"
+    op: "OR"
+    children:
+      - kind: regex
+        target: "$.steps.redact_pii.output.text"
+        pattern: "AKIA[A-Z0-9]{16}"
+        must_match: false
+      - kind: deterministic
+        target: "$.steps.grep_vulnerabilities.output.hit_count"
+        op: "is_truthy"
+        value: null

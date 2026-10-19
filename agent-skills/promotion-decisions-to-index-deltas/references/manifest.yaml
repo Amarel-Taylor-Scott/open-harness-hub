@@ -1,0 +1,76 @@
+id: "pipeline/promotion-decisions-to-index-deltas"
+type: pipeline
+version: "0.1.0"
+name: "Promotion decisions to index deltas"
+description: "Convert promotion-decision JSONL shards into replayable quality, facet, and cost index deltas so candidate scoring updates search indexes incrementally."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["evaluation", "governance", "retrieval", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.indexing"
+tags: ["promotion", "index-delta", "quality-index", "facet-index", "cost-index", "incremental-build", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Emit replayable partition manifests and quality/facet/cost index deltas from promotion decisions so high-volume candidate scoring can update operational indexes without a full rebuild."
+pipeline_kind: "research_web.promotion_decisions_to_index_deltas"
+
+inputs:
+  - name: "input_path"
+    type: "string"
+    schema: "schemas/promotion-decision.schema.json"
+  - name: "partition_id"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "partition_manifest"
+    type: "object"
+    schema: "schemas/partition-manifest.schema.json"
+  - name: "index_deltas"
+    type: "object[]"
+    schema: "schemas/index-delta-record.schema.json"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/promotion-index-delta-patterns"
+
+steps:
+  - id: "load_promotion_delta_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/promotion-index-delta-patterns"
+    inputs:
+      query: "promotion decision quality facet cost index delta replay"
+      top_k: 10
+
+  - id: "emit_promotion_index_deltas"
+    kind: "tool"
+    ref: "tool/promotion-index-delta-emitter"
+    inputs:
+      input_path: "$.inputs.input_path"
+      partition_id: "$.inputs.partition_id"
+      output_dir: "$.inputs.output_dir"
+
+  - id: "replay_audit"
+    kind: "tool"
+    ref: "tool/partition-registry-replay-verifier"
+    inputs:
+      manifest_dirs: ["$.inputs.output_dir"]
+      replay_report_output: "$.inputs.output_dir/replay-report.json"
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.partition_manifest"
+    op: "is_truthy"
+    value: true
+    label: "Promotion partition manifest is emitted."
+  - kind: "deterministic"
+    target: "$.outputs.index_deltas"
+    op: "is_truthy"
+    value: true
+    label: "Promotion index deltas are emitted."

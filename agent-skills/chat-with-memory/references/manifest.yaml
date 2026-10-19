@@ -1,0 +1,98 @@
+id: "harness/chat-with-memory"
+type: harness
+version: "0.1.0"
+name: "Persistent chat with memory (multi-turn, preference-aware)"
+description: |
+  Multi-turn chat harness with persistent memory across sessions.
+  Loads user preferences, recalls prior conversation context, and
+  honors the user's stated rules (don't reveal X, always cite Y,
+  decline Z requests).
+
+  Memory layers (Anthropic Memory tool / OpenAI threads /
+  LangGraph checkpointer / local file) are abstracted via
+  `memory_backend` config.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["dialogue", "memory", "tool_use"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["chat", "memory", "personal-assistant", "multi-turn"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, privacy, tools]
+consumes: [persona_block, tool_definition, rag_doc]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "chat_loop"
+    label: "user turn → memory recall → preference check → response (tools as needed)"
+    entrypoints: ["/api/chat/turn"]
+    steps:
+      - "load user preferences"
+      - "recall conversation history (last N turns + summary of older turns)"
+      - "for each user turn:"
+      - "  detect intent (Q&A / action-request / vent / coaching / silent)"
+      - "  if action-request: check tool_autonomy preference"
+      - "  generate response respecting preferences"
+      - "  optionally call tools (calendar / search / email-draft)"
+      - "  redact PII from any externally-bound output"
+      - "  persist turn to memory backend"
+    consumes: [persona_block, tool_definition, rag_doc]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "no private-topic leakage when conversation forks to a different person"
+      - "tool calls respect tool_autonomy preference"
+      - "memory persistence respects retention preference"
+knowledge_packs:
+  - id: "user_prefs"
+    label: "User preference pack"
+    kind: knowledge_pack
+    types: [rag_doc]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+logic_packs:
+  - id: "persona_default"
+    label: "Personal-assistant persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{user_id: string, conversation_id: string, user_turn: string}"
+  output: "{assistant_turn: string, tool_calls: object[], memory_updates: object[]}"
+model_targets:
+  - id: "anthropic_claude"
+    label: "Anthropic Claude (good multi-turn + tool-use)"
+    transport: "anthropic"
+    role: "Strong multi-turn coherence + tool calling."
+    capabilities: [text_generation, chat, tool_use, long_context]
+    required: false
+    default: true
+    trust_boundary: "external"
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Local fallback when offline / privacy-sensitive."
+    capabilities: [text_generation, chat]
+    required: false
+    default: false
+    trust_boundary: "local"
+input_verification:
+  - "user_id resolves to a known user-preferences pack"
+  - "conversation_id ties to an active memory thread"
+output_verification:
+  - "no private-topic leakage to wrong audience"
+  - "tool-call list respects tool_autonomy preference"
+privacy_boundaries:
+  raw_input:      "stays in the memory backend the user owns"
+  derived_output: "stays with the user"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/personal-chat-pipeline"

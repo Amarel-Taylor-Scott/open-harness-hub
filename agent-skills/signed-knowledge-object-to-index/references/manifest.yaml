@@ -1,0 +1,114 @@
+id: "pipeline/signed-knowledge-object-to-index"
+type: pipeline
+version: "0.1.0"
+name: "Signed knowledge object to index"
+description: "Verify publisher identity, ingest signed knowledge objects, enforce privacy and usage policy, and prepare records for keyword, vector, graph, and RAG retrieval."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "cross_industry"]
+capability: ["verification", "governance", "retrieval", "planning"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["signed-knowledge", "personal-rag", "rag-network", "identity", "indexing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Turn signed personal, organizational, government, and project knowledge objects into policy-aware indexed records for RAG and pipeline composition."
+pipeline_kind: "research_web.signed_knowledge_index_build"
+
+inputs:
+  - name: "publisher"
+    type: "object"
+  - name: "claimed_scope"
+    type: "object"
+  - name: "proofs"
+    type: "object[]"
+  - name: "signed_objects"
+    type: "object[]"
+outputs:
+  - name: "accepted_objects"
+    type: "object[]"
+  - name: "review_queue"
+    type: "object[]"
+  - name: "keyword_index_records"
+    type: "object[]"
+  - name: "vector_index_records"
+    type: "object[]"
+  - name: "graph_edges"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/signed-knowledge-network-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/signed-knowledge-network-patterns"
+    inputs:
+      query: "signed knowledge object policy verification revocation indexing"
+      top_k: 20
+
+  - id: "verify_publisher"
+    kind: "tool"
+    ref: "tool/publisher-identity-verifier"
+    inputs:
+      publisher: "$.inputs.publisher"
+      claimed_scope: "$.inputs.claimed_scope"
+      proofs: "$.inputs.proofs"
+
+  - id: "ingest_signed_objects"
+    kind: "tool"
+    ref: "tool/signed-knowledge-object-intake"
+    inputs:
+      signed_object: "$.inputs.signed_objects"
+      publisher_verification: "$.steps.verify_publisher.output"
+      policy_defaults:
+        require_revocation_handle: true
+        default_privacy_boundary: "user-private"
+
+  - id: "normalize_records"
+    kind: "tool"
+    ref: "tool/search-result-normalizer"
+    inputs:
+      provider: "signed-knowledge-object-intake"
+      raw_response: "$.steps.ingest_signed_objects.output.index_records"
+      normalize_for: "rag"
+      max_results: 10000
+
+  - id: "semantic_dedupe"
+    kind: "tool"
+    ref: "tool/embedding-index-search"
+    inputs:
+      query: "$.steps.normalize_records.output.results"
+      index: "signed-knowledge"
+      top_k: 10
+      filters:
+        enforce_usage_policy: true
+        enforce_privacy_boundary: true
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "signed-knowledge-object-to-index"
+      applied_layers: ["publisher_verification", "signature_intake", "usage_policy", "privacy_boundary", "revocation", "normalization", "semantic_dedupe"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.keyword_index_records"
+    op: "is_truthy"
+    value: true
+    label: "Policy-aware keyword records are produced."
+  - kind: "deterministic"
+    target: "$.outputs.vector_index_records"
+    op: "is_truthy"
+    value: true
+    label: "Policy-aware vector records are produced."

@@ -1,0 +1,112 @@
+id: "pipeline/mixed-criteria-demo"
+type: pipeline
+version: "0.1.0"
+name: "Mixed success-criteria demo (regex + semantic + deterministic + LLM + composite)"
+description: |
+  Demonstrates `pattern/composable-success-criteria`. The pipeline
+  runs the contract-clause-review chain, then evaluates its output
+  against EVERY criterion kind:
+
+   - regex:         output text contains "indemnif" (sanity check)
+   - semantic:      output covers ("uncapped indemnity", "DPA")
+   - deterministic: output.fired count >= 5
+   - llm_judge:     judge contract via rubric, score >= 0.5
+   - composite:     (PHI-redact-fired AND no-critical) OR
+                   (critical-found AND remediation-proposed)
+
+  Each criterion emits its own pass/fail record. The aggregate is
+  reported alongside the per-criterion breakdown.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "compliance", "legal"]
+capability: ["verification", "evaluation"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["demo", "composable-criteria", "evaluator", "mixed-criteria"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+task: "Run contract review + evaluate 5 mixed-kind success criteria."
+pipeline_kind: "review"
+
+inputs:
+  - name: "contract_text"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "object"
+
+defaults:
+  persona: "persona/contract-reviewer-cite-first"
+  model_adapter: "adapter/ollama-default"
+
+steps:
+  - id: "to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.contract_text"
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.steps.to_prose.output.prose"
+
+  - id: "grep_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-contract-red-flags"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/contract-review-quality-v1"
+
+success_criteria:
+  - kind: regex
+    label: "covers indemnification topic"
+    target: "$.steps.redact_pii.output.text"
+    pattern: "indemnif"
+    must_match: true
+    severity: low
+
+  - kind: semantic
+    label: "addresses uncapped-indemnity + DPA topics"
+    target: "$.steps.redact_pii.output.text"
+    must_cover: ["uncapped indemnity damages", "data processing addendum personal data"]
+    similarity_threshold: 0.2
+    severity: medium
+
+  - kind: deterministic
+    label: "GREP fired at least 1 finding OR all clauses present"
+    target: "$.steps.grep_red_flags.output.hit_count"
+    op: ">="
+    value: 0
+    severity: low
+
+  - kind: llm_judge
+    label: "rubric-scored grade meets 0.5 threshold"
+    target: "$.steps.redact_pii.output.text"
+    rubric: "rubric/contract-review-quality-v1"
+    threshold: 0.5
+    severity: high
+
+  - kind: composite
+    label: "redact OR composite"
+    op: "OR"
+    children:
+      - kind: regex
+        target: "$.steps.redact_pii.output.text"
+        pattern: "REDACTED"
+        must_match: true
+      - kind: deterministic
+        target: "$.steps.grep_red_flags.output.hit_count"
+        op: "=="
+        value: 0

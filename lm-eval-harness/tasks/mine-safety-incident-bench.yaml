@@ -1,0 +1,64 @@
+# Auto-generated from Open Harness Hub manifest `benchmark/mine-safety-incident-bench` v0.1.0.
+# Edit the source manifest at catalog/benchmarks/mine-safety-incident-bench.yaml and re-run
+# `python scripts/emit/lm_eval_harness.py`.
+task: mine-safety-incident-bench
+tag:
+- evaluation
+- expansion-v4
+- mine-safety-incident
+- verification
+description: Synthetic benchmark for mine safety incident review quality, evidence grounding, and redaction safety.
+dataset_path: open-harness-hub/mine-safety-incident-samples
+dataset_name: null
+output_type: generate_until
+training_split: train
+validation_split: val
+test_split: test
+doc_to_text: '# Persona: persona/mine-safety-reviewer
+
+
+  {{prompt}}'
+doc_to_target: '{{ideal}}'
+generation_kwargs:
+  max_gen_toks: 512
+  temperature: 0.0
+  top_p: 1.0
+  until:
+  - '
+
+
+    '
+metric_list:
+- metric: domain_coverage
+  aggregation: mean
+  higher_is_better: true
+- metric: evidence_grounding
+  aggregation: mean
+  higher_is_better: true
+- metric: severity_confidence
+  aggregation: mean
+  higher_is_better: true
+- metric: evidence_gap_quality
+  aggregation: mean
+  higher_is_better: true
+- metric: actionability
+  aggregation: mean
+  higher_is_better: true
+- metric: auditability
+  aggregation: mean
+  higher_is_better: true
+- metric: weighted_rubric_score
+  aggregation: mean
+  higher_is_better: true
+num_fewshot: 0
+metadata:
+  version: 0.1.0
+  open_harness_hub_id: benchmark/mine-safety-incident-bench
+  rubric: rubric/mine-safety-incident-quality-v1
+  pipeline: pipeline/mine-safety-incident-review
+  reproducibility:
+    commit_sha: worktree-generated-2026-05-24
+    dataset_version: 0.1.0
+    run_date: '2026-05-24'
+    hardware: local-dev
+    seed: 17

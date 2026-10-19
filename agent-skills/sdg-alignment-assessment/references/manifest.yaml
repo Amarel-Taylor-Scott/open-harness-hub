@@ -1,0 +1,123 @@
+id: "pipeline/sdg-alignment-assessment"
+type: pipeline
+version: "0.1.0"
+name: "UN SDG alignment-claim assessment"
+description: |
+  End-to-end pipeline that takes a policy / program / project /
+  investment description and produces a per-claim SDG alignment
+  assessment with target + indicator citations, counter-target
+  risks, additionality discussion, and a quality grade.
+
+  Use cases:
+   - Corporate CSRD ESRS optional SDG mapping disclosure review
+   - GRI SDG-mapping disclosure review
+   - Impact-investor (IFC, GIIN, Acumen, BlueOrchard) due diligence
+   - NGO theory-of-change review against SDG framework
+   - Government budget tagging audit
+   - Foundation grant-proposal SDG-alignment claim review
+
+  Output:
+   - per-claim findings with SDG goal + target + indicator codes
+   - alignment type (direct / indirect / enabling / symbolic /
+     counter / misaligned)
+   - counter-target risks
+   - geographic + temporal fit assessment
+   - additionality assessment
+   - SDG-washing markers list
+   - rubric score (rubric/sdg-alignment-v1)
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "sustainability", "nonprofit", "government", "humanitarian"]
+capability: ["evaluation", "extraction", "verification", "classification"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.grading"
+tags: ["sdg", "agenda-2030", "alignment", "impact", "sdg-washing"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+attribution:
+  source_url:  "https://sdgs.un.org/goals"
+  source_kind: "other"
+  author:      "United Nations (SDG reference)"
+  license:     "CC-BY-3.0-IGO"
+
+task: |
+  Given a policy / program / project / investment description and
+  optional geography + time-horizon hints, produce a per-claim SDG
+  alignment assessment with target/indicator citations, counter-
+  target risks, additionality discussion, and a rubric grade
+  against `rubric/sdg-alignment-v1`.
+pipeline_kind: "grading"
+
+inputs:
+  - name: "claim_text"
+    type: "string"
+  - name: "claim_geography"
+    type: "string"
+  - name: "claim_time_horizon"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "suggested_strengthening"
+    type: "object[]"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/sdg-alignment-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/classifier-sdg-mapping"
+
+steps:
+  - id: "normalize"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.claim_text"
+
+  - id: "classify_candidate_sdgs"
+    kind: "rule_pack"
+    ref: "rule-pack/classifier-sdg-mapping"
+    inputs:
+      text: "$.steps.normalize.output.prose"
+
+  - id: "rag_sdg_drilldown"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.classify_candidate_sdgs.output.labels"
+      corpus: "knowledge-pack/un-sdg-17-goals"
+      top_k: 16
+
+  - id: "review"
+    kind: "harness"
+    ref: "harness/sdg-alignment-review"
+    inputs:
+      claim_text: "$.steps.normalize.output.prose"
+      claim_geography: "$.inputs.claim_geography"
+      claim_time_horizon: "$.inputs.claim_time_horizon"
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.review.output"
+      rubric_ref: "rubric/sdg-alignment-v1"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "sdg-alignment-assessment"
+      applied_layers: ["persona", "classifier", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/sdg-alignment-v1"
+    threshold: 0.7

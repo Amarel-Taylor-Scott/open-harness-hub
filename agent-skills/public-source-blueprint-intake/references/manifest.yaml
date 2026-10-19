@@ -1,0 +1,118 @@
+id: "pipeline/public-source-blueprint-intake"
+type: pipeline
+version: "0.1.0"
+name: "Public source blueprint intake"
+description: "Turns public source blueprints for esoteric verticals into governed scan, archive, conversion, extraction, entity-linking, dedupe, indexing, and review plans."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["automotive", "energy", "manufacturing", "construction", "government", "cross_industry"]
+capability: ["retrieval", "extraction", "classification", "governance", "evaluation"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["public-sources", "scraper-blueprints", "archive-capture", "object-factory", "esoteric-industries"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Create governed public-source scan and normalization jobs for source families that can generate candidate primitives at scale."
+pipeline_kind: "research_web.public_source_blueprint_intake"
+inputs:
+  - name: "public_source_blueprints"
+    type: "array"
+  - name: "scan_policy"
+    type: "object"
+  - name: "excluded_scopes"
+    type: "array"
+outputs:
+  - name: "scan_jobs"
+    type: "array"
+  - name: "extraction_contracts"
+    type: "array"
+  - name: "review_routes"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/public-source-blueprint-catalog"
+    - "knowledge-pack/esoteric-industry-source-surfaces"
+steps:
+  - id: "govern-public-source-blueprints"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "public_source_blueprint_batch"
+        license: "CC-BY-4.0"
+        privacy_boundary: "public"
+      source_policy:
+        excluded_scopes: "$.inputs.excluded_scopes"
+        require_license: true
+        forbid_private_source_bodies: true
+  - id: "normalize-blueprints"
+    kind: "tool"
+    ref: "tool/public-source-blueprint-normalizer"
+    inputs:
+      public_source_blueprints: "$.inputs.public_source_blueprints"
+      scan_policy: "$.inputs.scan_policy"
+      excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "scan-source-surface"
+    kind: "tool"
+    ref: "tool/primitive-source-surface-scanner"
+    inputs:
+      source_surface: "$.steps.normalize-blueprints.scan_jobs[0]"
+      query_plan: "$.inputs.scan_policy"
+      include_raw: false
+  - id: "capture-archive"
+    kind: "tool"
+    ref: "tool/web-archive-capture-lookup"
+    inputs:
+      url: "$.steps.scan-source-surface.records[0].source_url"
+      archive_provider: "internet_archive"
+  - id: "convert-page"
+    kind: "tool"
+    ref: "tool/page-to-markdown-converter"
+    inputs:
+      source_record: "$.steps.scan-source-surface.records[0]"
+      snapshot_pointer: "$.steps.capture-archive.selected_capture.snapshot_pointer"
+      conversion_policy:
+        preserve_tables: true
+        emit_source_spans: true
+  - id: "extract-normalized-objects"
+    kind: "tool"
+    ref: "tool/normalized-object-extractor"
+    inputs:
+      markdown_pointer: "$.steps.convert-page.markdown_pointer"
+      extraction_contracts: "$.steps.normalize-blueprints.extraction_contracts"
+  - id: "link-entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.steps.extract-normalized-objects.objects"
+      entity_types: ["publisher", "jurisdiction", "vertical", "workflow", "law", "agency", "source_surface"]
+  - id: "dedupe-objects"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.extract-normalized-objects.objects"
+      match_features: ["title", "content_hash", "source_url", "jurisdiction", "effective_date"]
+  - id: "emit-index-records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.extract-normalized-objects.objects"
+      emit: ["keyword", "vector", "graph", "facet", "freshness", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.scan_jobs"
+    must_cover:
+      - "source governance"
+      - "archive capture"
+      - "page to markdown"
+      - "entity linking"
+      - "fuzzy dedupe"
+      - "index record emission"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Public-source blueprints produce guarded scan and normalization plans."

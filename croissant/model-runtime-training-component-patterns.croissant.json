@@ -1,0 +1,233 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/model-runtime-training-component-patterns",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Model runtime and training component patterns",
+  "description": "Seed patterns for local model runtimes, Kubernetes inference and training runtimes, fine-tuning jobs, evaluation gates, and federated reviewed-knowledge sharing.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/model-runtime-training-component-patterns",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-26",
+  "keywords": [
+    "components",
+    "training",
+    "fine-tuning",
+    "local-models",
+    "kubernetes",
+    "federated-knowledge"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-26",
+  "citation": "User-provided Gemma 4 DueCare federated deployment architecture note, 2026-05-26; docs/codex/million-object-goal.md; docs/architecture/low-cost-hosting-plan.md",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "model-runtime-training-component-patterns__patterns",
+      "name": "patterns.jsonl",
+      "description": "Data file backing knowledge pack model-runtime-training-component-patterns.",
+      "contentUrl": "data/model-runtime-training-component-patterns/patterns.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "8037 B",
+      "sha256": "2efdbc96dc333f62451470b9587f97cf230e3f596cce3e0799f93b931a510224"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "model-runtime-training-component-patterns__records",
+      "name": "model-runtime-training-component-patterns__records",
+      "description": "Records parsed from patterns.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/title",
+          "name": "title",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "title"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/domain",
+          "name": "domain",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "domain"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/task",
+          "name": "task",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "task"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/inputs",
+          "name": "inputs",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "inputs"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/outputs",
+          "name": "outputs",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "outputs"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/required_stages",
+          "name": "required_stages",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "required_stages"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/label_paths",
+          "name": "label_paths",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "label_paths"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/risk_tier",
+          "name": "risk_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "risk_tier"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "model-runtime-training-component-patterns__records/excluded_scope",
+          "name": "excluded_scope",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "model-runtime-training-component-patterns__patterns"
+            },
+            "extract": {
+              "column": "excluded_scope"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

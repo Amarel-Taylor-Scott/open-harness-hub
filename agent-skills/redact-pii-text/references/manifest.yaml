@@ -1,0 +1,66 @@
+id: "harness/redact-pii-text"
+type: harness
+version: "0.1.0"
+name: "Redact PII (text)"
+description: |
+  Deterministic text PII redactor. Regex + NER patterns + a per-pattern
+  replacement contract; emits an audit log of (sha256(original), action).
+  No model call by default.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["anonymization", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["pii", "redaction", "safety_gate"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+kind: "safety_gate"
+tier: "primary"
+applied_layers: []
+consumes: [grep_rule]
+emits:    [audit_template]
+
+logic_paths:
+  - id: "redact"
+    label: "Redact PII in text input"
+    steps:
+      - "load privacy patterns (rule-pack/privacy-pii-text-en)"
+      - "scan input with each pattern"
+      - "replace match → generalized placeholder"
+      - "record sha256(original) and replacement action to audit log"
+    consumes: [grep_rule]
+    emits:    [audit_template]
+    model_call: "none"
+    verification: ["audit log produced", "no original PII in output"]
+
+knowledge_packs: []
+logic_packs: []
+
+model_io:
+  input:  "{text: string}"
+  output: "{redacted_text: string, audit: AuditRow[]}"
+
+model_targets:
+  - id: "no_model"
+    label: "Deterministic — no model call"
+    transport: "none"
+    role: "This harness is a pure gate."
+    required: true
+    default: true
+    trust_boundary: "local"
+
+input_verification:
+  - "input size <= 64 KB"
+output_verification:
+  - "audit log row count == match count"
+  - "no critical PII tokens remain (final pass)"
+
+privacy_boundaries:
+  raw_input:      "never written to disk; audit log stores hashes only"
+  derived_output: "safe to pass to downstream harnesses"
+  external_calls: "none"

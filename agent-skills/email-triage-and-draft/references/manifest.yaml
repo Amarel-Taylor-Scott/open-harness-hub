@@ -1,0 +1,116 @@
+id: "pipeline/email-triage-and-draft"
+type: pipeline
+version: "0.1.0"
+name: "Email triage + reply draft"
+description: |
+  Customer-support email workflow. Layered chain:
+    redact PII →
+    grep (prompt-injection guard on email body — emails often carry attack
+      content from untrusted senders) →
+    classify intent (top-K from a controlled intent vocabulary) →
+    route to the right specialist persona →
+    retrieve account / policy context →
+    draft response →
+    human-review gate for sensitive intents (refund, legal, escalation).
+
+  Mirrors anthropic-cookbook `patterns/agents/routing`, langgraph
+  `examples/customer-support`, openai/swarm handoff.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["retail", "retail.support", "cross_industry"]
+capability: ["classification", "routing", "reasoning", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given an inbound customer email, classify intent, retrieve relevant
+  account + policy context, draft a response, and route to a human if
+  the intent is sensitive (refund > $X, legal, escalation, threat).
+pipeline_kind: "triage_email"
+
+inputs:
+  - name: "email_body"
+    type: "string"
+  - name: "sender_email"
+    type: "string"
+  - name: "account_id"
+    type: "string"
+outputs:
+  - name: "intent_label"
+    type: "string"
+  - name: "draft_reply"
+    type: "markdown"
+  - name: "human_review_required"
+    type: "boolean"
+  - name: "routing_decision"
+    type: "string"
+
+defaults:
+  persona: "persona/support-agent"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "redact_pii"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.email_body" }
+
+  - id: "guard_prompt_injection"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.steps.redact_pii.output.redacted_text" }
+
+  - id: "classify_intent"
+    kind: "processor"
+    ref: "processor/intent-dispatcher"
+    inputs:
+      message: "$.steps.redact_pii.output.redacted_text"
+      routes:
+        - { intent: "billing_question",    handler: "billing_specialist" }
+        - { intent: "refund_request",      handler: "human_review" }
+        - { intent: "product_question",    handler: "product_specialist" }
+        - { intent: "complaint",           handler: "complaint_specialist" }
+        - { intent: "legal_threat",        handler: "legal_human_review" }
+        - { intent: "spam_or_unrelated",   handler: "auto_close" }
+        - { intent: "feature_request",     handler: "product_feedback" }
+        - { intent: "technical_issue",     handler: "tech_support" }
+
+  - id: "draft_response"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Draft a response to this customer email. Acknowledge the situation in one sentence, confirm the goal, propose the next concrete step. Match the routing-decision handler's tone. Refuse to commit to refunds, legal positions, or policy exceptions — those route to a human."}]
+      context:
+        - "$.steps.redact_pii.output.redacted_text"
+        - "$.steps.classify_intent.output.selected_route"
+
+  - id: "trace_audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "email-triage-and-draft"
+      applied_layers: ["persona", "grep", "classifier", "routing"]
+
+  - id: "escalate_if_sensitive"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    when: "$.steps.classify_intent.output.selected_route IN ['human_review', 'legal_human_review']"
+    inputs:
+      case_id: "$.inputs.account_id"
+      reason:  "Sensitive intent classified; routing to human."
+      severity: "medium"
+      payload:
+        intent: "$.steps.classify_intent.output.selected_route"
+        draft:  "$.steps.draft_response.output.text"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.70

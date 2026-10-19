@@ -1,0 +1,106 @@
+id: "pipeline/source-governance-entity-dedupe-index"
+type: pipeline
+version: "0.1.0"
+name: "Source governance entity dedupe index"
+description: "Normalize source records, apply governance routing, extract and link entities, fuzzy-dedupe objects, and emit keyword, vector, graph, facet, freshness, and review records."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "verification", "extraction", "retrieval", "routing"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["source-governance", "entity-resolution", "dedupe", "fuzzy-logic", "indexing", "million-primitives"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Prepare raw source records and extracted objects for scalable, trustworthy indexing by applying governance, entity linking, deduplication, and index record emission."
+pipeline_kind: "research_web.source_governance_entity_dedupe_index"
+
+inputs:
+  - name: "source_records"
+    type: "object[]"
+  - name: "candidate_objects"
+    type: "object[]"
+  - name: "tenant_policy"
+    type: "object"
+outputs:
+  - name: "normalized_objects"
+    type: "object[]"
+  - name: "canonical_entities"
+    type: "object[]"
+  - name: "dedupe_clusters"
+    type: "object[]"
+  - name: "index_records"
+    type: "object"
+  - name: "review_tickets"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/primitive-source-surface-map"
+    - "knowledge-pack/occupation-source-surface-map"
+    - "knowledge-pack/procedure-knowledge-object-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "route_source_governance"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record: "$.inputs.source_records"
+      tenant_policy: "$.inputs.tenant_policy"
+
+  - id: "link_entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.inputs.source_records"
+      record: "$.inputs.candidate_objects"
+      entity_types: ["organization", "government_agency", "law_or_regulation", "occupation", "skill", "tool", "model", "dataset", "paper", "vulnerability", "jurisdiction", "concept"]
+      linker_indexes: ["catalog", "source-records", "verified-publishers"]
+
+  - id: "dedupe_candidates"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.inputs.candidate_objects"
+      thresholds:
+        exact_id: true
+        fuzzy_ratio: 0.92
+        simhash_hamming: 3
+        vector_similarity: 0.88
+        entity_overlap: 0.70
+      match_features: ["ids", "urls", "hashes", "normalized_title", "aliases", "simhash", "vector", "entity_graph"]
+
+  - id: "emit_index_records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.dedupe_candidates.output.canonical_records"
+      canonical_entities: "$.steps.link_entities.output.canonical_entities"
+      emit: ["keyword", "vector", "graph", "facet", "freshness", "quality", "review"]
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "source-governance-entity-dedupe-index"
+      applied_layers: ["governance_routing", "entity_linking", "fuzzy_dedupe", "index_record_emission", "review_queue"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.dedupe_clusters"
+    op: "is_truthy"
+    value: true
+    label: "Candidate records are clustered or explicitly emitted as unique."
+  - kind: "deterministic"
+    target: "$.outputs.index_records"
+    op: "is_truthy"
+    value: true
+    label: "Search and graph index records are emitted."

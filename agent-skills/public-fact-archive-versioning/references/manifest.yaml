@@ -1,0 +1,93 @@
+id: "pipeline/public-fact-archive-versioning"
+type: pipeline
+version: "0.1.0"
+name: "Public fact archive versioning"
+description: "Track volatile public facts by querying archived captures, optionally requesting new snapshots, hashing content, diffing versions, and emitting versioned knowledge objects for RAG."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "government", "healthcare.public_health", "cross_industry"]
+capability: ["retrieval", "verification", "governance", "evaluation"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "external"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.versioning"
+tags: ["versioned-facts", "wayback", "archive-org", "cdc", "public-health", "rag"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Create dated, archived, hashable knowledge objects for public facts so pipelines can cite the source version valid at review time."
+pipeline_kind: "research_web.public_fact_archive_versioning"
+
+inputs:
+  - name: "source_url"
+    type: "string"
+  - name: "publisher"
+    type: "string"
+  - name: "date_of_interest"
+    type: "string"
+  - name: "capture_policy"
+    type: "object"
+outputs:
+  - name: "versioned_fact"
+    type: "object"
+  - name: "archive_captures"
+    type: "object[]"
+  - name: "diff_summary"
+    type: "markdown"
+  - name: "retrieval_policy"
+    type: "object"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/procedure-knowledge-object-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "lookup_archived_captures"
+    kind: "tool"
+    ref: "tool/web-archive-capture-lookup"
+    inputs:
+      url: "$.inputs.source_url"
+      from_date: "$.inputs.date_of_interest"
+      to_date: "$.inputs.date_of_interest"
+      archive_provider: "internet_archive"
+
+  - id: "request_snapshot_if_allowed"
+    kind: "tool"
+    ref: "tool/web-archive-snapshot-request"
+    inputs:
+      url: "$.inputs.source_url"
+      archive_provider: "internet_archive"
+      capture_policy: "$.inputs.capture_policy"
+
+  - id: "normalize_versioned_fact"
+    kind: "tool"
+    ref: "tool/search-result-normalizer"
+    inputs:
+      provider: "web-archive"
+      raw_response:
+        source_url: "$.inputs.source_url"
+        publisher: "$.inputs.publisher"
+        date_of_interest: "$.inputs.date_of_interest"
+        captures: "$.steps.lookup_archived_captures.output.captures"
+        snapshot: "$.steps.request_snapshot_if_allowed.output"
+      normalize_for: "rag"
+      max_results: 20
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "public-fact-archive-versioning"
+      applied_layers: ["archive_lookup", "snapshot_policy", "versioned_fact_normalization", "retrieval_policy"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.versioned_fact"
+    op: "is_truthy"
+    value: true
+    label: "A dated versioned fact object is produced or queued for review."

@@ -1,0 +1,261 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/standards-regulatory-source-map",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Standards and regulatory source map",
+  "description": "High-value standards, regulatory, public enforcement, disclosure, and public-health source surfaces for generating versioned facts, procedure objects, controls, evidence requirements, and RAG records.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/standards-regulatory-source-map",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-25",
+  "keywords": [
+    "standards",
+    "regulations",
+    "public-facts",
+    "controls",
+    "source-surfaces",
+    "versioned-facts"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-25",
+  "citation": "Official public source documentation and Open Harness Hub source-surface planning",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "standards-regulatory-source-map__surfaces",
+      "name": "surfaces.jsonl",
+      "description": "Data file backing knowledge pack standards-regulatory-source-map.",
+      "contentUrl": "data/standards-regulatory-source-map/surfaces.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "5430 B",
+      "sha256": "2f45de2805294b3b17b40ff478facd4448b4d36d3f7078bd7db012941c82c9b0"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "standards-regulatory-source-map__records",
+      "name": "standards-regulatory-source-map__records",
+      "description": "Records parsed from surfaces.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/type",
+          "name": "type",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "type"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/family",
+          "name": "family",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "family"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/publisher",
+          "name": "publisher",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "publisher"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/url",
+          "name": "url",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "url"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/coverage",
+          "name": "coverage",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "coverage"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/extract",
+          "name": "extract",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "extract"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/trust_tier",
+          "name": "trust_tier",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "trust_tier"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/freshness",
+          "name": "freshness",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "freshness"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/docs_url",
+          "name": "docs_url",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "docs_url"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/fields",
+          "name": "fields",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "fields"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "standards-regulatory-source-map__records/summary",
+          "name": "summary",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "standards-regulatory-source-map__surfaces"
+            },
+            "extract": {
+              "column": "summary"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

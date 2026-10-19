@@ -1,0 +1,132 @@
+id: "harness/aml-investigation"
+type: harness
+version: "0.1.0"
+name: "AML Investigation"
+description: |
+  Harness for AML suspicious-transaction review. Composes the
+  AML-analyst persona, sanctions-screening heuristic, FATF-typology
+  classifier, financial-PII privacy gate, FATF-typology RAG,
+  sanctions-check tool, transaction-graph-query tool, and a
+  citation-first response policy. Output is a SAR-style narrative
+  draft and a structured risk score; never a SAR filing.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["finance", "finance.aml"]
+capability: ["reasoning", "classification", "verification", "tool_use", "safety_gating"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers:
+  - persona
+  - grep
+  - classifier
+  - heuristic
+  - rag
+  - tools
+  - privacy
+
+consumes:
+  - persona_block
+  - grep_rule
+  - classifier_rule
+  - heuristic_rule
+  - rag_doc
+  - tool_definition
+  - entity_signal
+emits:
+  - reasoning_step
+  - extracted_fact
+  - modus_operandi
+  - audit_template
+
+logic_paths:
+  - id: "review_transaction_bundle"
+    label: "Review a transaction bundle and produce a SAR-style narrative draft"
+    entrypoints: ["/api/aml/review"]
+    steps:
+      - "redact financial PII (rule-pack/financial-pii-en)"
+      - "sanctions screen (rule-pack/sanctions-screening) — if hit, halt routine review and escalate"
+      - "query transaction graph 2-hops (tool/transaction-graph-query)"
+      - "score against FATF typologies (rule-pack/aml-typologies-fatf)"
+      - "retrieve FATF typology RAG sections"
+      - "compose persona + retrieved context + tool results + structured graph"
+      - "call model"
+      - "produce structured findings: typology matches, supporting evidence, escalation path"
+      - "draft SAR-style narrative; never a final SAR"
+      - "verify every claim cited"
+    consumes: [persona_block, grep_rule, classifier_rule, heuristic_rule, rag_doc, tool_definition, entity_signal]
+    emits: [reasoning_step, extracted_fact, modus_operandi, audit_template]
+    model_call: "required"
+    verification:
+      - "no financial PII in output"
+      - "sanctions hit, if present, halts routine output and routes to escalation procedure"
+      - "every typology match cites at least one FATF section and one transaction edge"
+
+knowledge_packs:
+  - id: "fatf_typologies"
+    label: "FATF typology RAG"
+    kind: knowledge_pack
+    types: [rag_doc]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+  - id: "sanctions_lists"
+    label: "Sanctions list reference"
+    kind: knowledge_pack
+    types: [entity_signal]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+
+logic_packs:
+  - id: "aml_persona"
+    label: "AML analyst persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "response_policy_aml"
+    label: "AML response policy (no intent assertions, sanctions-first, cite-typology)"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+
+model_io:
+  input:  "{transactions: TransactionEdge[], entities: Entity[], context: KnowledgeObject[]}"
+  output: "{sanctions_hits: SanctionsHit[], typology_matches: TypologyMatch[], narrative_draft: markdown, risk_score: 0..1, escalation: 'route_to_OFAC' | 'enhanced_due_diligence' | 'monitor' | 'close', trace: TraceFrame[]}"
+
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default; financial data stays on-prem."
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "self_hosted"
+    label: "Self-hosted enterprise inference"
+    transport: "openai_compatible"
+    role: "On-prem OpenAI-compatible endpoint inside the institution's perimeter."
+    required: false
+    default: false
+    trust_boundary: "local"
+
+input_verification:
+  - "financial PII redacted before model call"
+  - "sanctions screening run BEFORE typology classification"
+  - "if sanctions hit (severity ≥ high) → output is escalation routing, NOT a typology narrative"
+output_verification:
+  - "no financial PII in narrative draft (re-scan)"
+  - "every typology match cites a transaction edge and a FATF section"
+  - "no intent assertions about named individuals"
+  - "narrative is labeled DRAFT and is not a SAR filing"
+
+privacy_boundaries:
+  raw_input:      "stays inside the institution's perimeter"
+  derived_output: "narrative + risk score may be shared with the BSA officer; never with external systems by default"
+  external_calls: "external judge / LLM call only after explicit BSA-officer opt-in"

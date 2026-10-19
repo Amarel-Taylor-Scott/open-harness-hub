@@ -1,0 +1,70 @@
+id: "pipeline/space-launch-review"
+type: pipeline
+version: "0.1.0"
+name: "Space launch + range safety review (FAA Part 450 / NASA / ITAR)"
+description: "Vertical 30 — commercial space launch compliance: FSA / Ec / FTS / ITAR / 25-yr disposal / MPL."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["space", "space.launch", "space.export_control", "space.orbital", "compliance"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["space", "faa-part-450", "range-safety"]
+created: "2026-05-21"
+updated: "2026-05-21"
+attribution:
+  source_url: "https://www.faa.gov/space"
+  source_kind: "other"
+  author: "FAA 14 CFR Part 450 + NASA-STD-8719.25 + ITAR/EAR (composite)"
+  license: "CC-BY-4.0"
+task: "Review commercial space launch readiness packet."
+pipeline_kind: "review"
+inputs:
+  - name: "launch_packet"
+    type: "string|object"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "critical_findings_count"
+    type: "integer"
+defaults:
+  persona: "persona/space-launch-safety-officer"
+  model_adapter: "adapter/ollama-default"
+  rule_packs: ["rule-pack/grep-space-launch-flags"]
+  knowledge_packs: ["knowledge-pack/space-launch-frameworks"]
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.launch_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-space-launch-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "rag_against_faa"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs: { query: "$.steps.grep_red_flags.output.fired", corpus: "knowledge-pack/space-launch-frameworks", top_k: 6 }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/space-launch-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "space-launch-review"
+      applied_layers: ["persona", "pii_redact", "grep", "rag", "judge"]
+success_criteria:
+  - rubric: "rubric/space-launch-quality-v1"
+    threshold: 0.6

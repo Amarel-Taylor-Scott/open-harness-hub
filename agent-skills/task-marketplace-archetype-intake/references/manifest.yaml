@@ -1,0 +1,110 @@
+id: "pipeline/task-marketplace-archetype-intake"
+type: pipeline
+version: "0.1.0"
+name: "Task marketplace archetype intake"
+description: "Turn task-marketplace metadata or user exports into reusable task archetype primitives with privacy gates, entity records, dedupe clusters, index records, and review tickets."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["extraction", "planning", "governance", "routing", "retrieval"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "pre_api.source_intake"
+tags: ["task-marketplace", "workflow-archetypes", "source-governance", "entity-linking", "dedupe", "indexing", "review-routing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Normalize task-marketplace metadata into reusable workflow primitives while preserving privacy, provenance, license review, dedupe, index, and review-ticket boundaries."
+pipeline_kind: "research_web.task_marketplace_archetype_intake"
+
+inputs:
+  - name: "input_path"
+    type: "string"
+    schema: "schemas/source-record.schema.json"
+  - name: "output_dir"
+    type: "string"
+outputs:
+  - name: "normalized_objects"
+    type: "object[]"
+    schema: "schemas/normalized-object-record.schema.json"
+  - name: "entities"
+    type: "object[]"
+    schema: "schemas/entity-record.schema.json"
+  - name: "dedupe_clusters"
+    type: "object[]"
+    schema: "schemas/dedupe-cluster.schema.json"
+  - name: "index_records"
+    type: "object[]"
+    schema: "schemas/index-record.schema.json"
+  - name: "review_tickets"
+    type: "object[]"
+    schema: "schemas/review-ticket.schema.json"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/task-marketplace-archetype-patterns"
+
+steps:
+  - id: "load_task_marketplace_patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/task-marketplace-archetype-patterns"
+    inputs:
+      query: "task marketplace workflow archetype acceptance criteria privacy dedupe review"
+      top_k: 10
+
+  - id: "source_governance"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record_path: "$.inputs.input_path"
+      required_boundary: "metadata_only_no_pii"
+
+  - id: "normalize_archetypes"
+    kind: "tool"
+    ref: "tool/task-marketplace-archetype-normalizer"
+    inputs:
+      input_path: "$.inputs.input_path"
+      output_dir: "$.inputs.output_dir"
+
+  - id: "entity_linking"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      input_path: "$.outputs.entities"
+      entity_types: ["source", "skill", "concept", "workflow"]
+
+  - id: "dedupe"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      input_path: "$.outputs.normalized_objects"
+      cluster_hint: "task_family"
+
+  - id: "emit_index_records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      input_path: "$.outputs.normalized_objects"
+      index_kinds: ["keyword", "vector", "graph", "facet"]
+
+  - id: "review_routing"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "task-marketplace-archetype-intake"
+      applied_layers: ["source_governance", "privacy_gate", "entity_linking", "fuzzy_dedupe", "index_record_emission", "review_ticket_routing"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.normalized_objects"
+    op: "is_truthy"
+    value: true
+    label: "Normalized task archetypes are emitted."
+  - kind: "deterministic"
+    target: "$.outputs.review_tickets"
+    op: "is_truthy"
+    value: true
+    label: "Review tickets are emitted for marketplace-derived candidates."

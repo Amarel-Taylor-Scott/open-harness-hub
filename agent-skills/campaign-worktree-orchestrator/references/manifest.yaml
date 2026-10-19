@@ -1,0 +1,48 @@
+id: "harness/campaign-worktree-orchestrator"
+type: harness
+version: "0.1.0"
+name: "Campaign worktree orchestrator"
+description: "Harness pattern for coordinating multiple long-running coding agents across isolated worktrees with campaign state, worker queues, merge policy, retries, and audit logs."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["governance", "evaluation", "serving"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "dated"
+tags: ["agentic-harness", "campaign-state", "worktree", "multi-agent", "orchestration"]
+created: "2026-05-25"
+updated: "2026-05-25"
+kind: "utility_surface"
+tier: "primary"
+applied_layers: ["tools", "privacy", "heuristic"]
+knowledge_packs:
+  - id: "orchestration_patterns"
+    label: "Agentic orchestration harness patterns"
+    kind: "knowledge_pack"
+    types: ["orchestration_pattern", "long_running_agent_control"]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+model_targets:
+  - id: "none"
+    label: "No direct model target"
+    transport: "none"
+    role: "Coordinates external coding agents and workers."
+    capabilities: ["campaign_state", "worker_queue", "worktree_isolation", "audit_log"]
+    required: false
+    default: true
+    trust_boundary: "local"
+model_io:
+  input: "campaign manifest, worker goals, repository policy, merge policy, budget envelope"
+  output: "campaign state, worker assignments, merge candidates, blocked tickets, audit log"
+  transport: "none"
+input_verification: ["each worker has isolated worktree or branch", "merge policy is explicit", "permission policy is explicit"]
+output_verification: ["worker state is persisted", "conflicts are routed to review", "audit log includes changed files and validation evidence"]
+privacy_boundaries:
+  raw_input: "Campaign state may include repo paths, logs, and operational traces; keep tenant-scoped."
+  derived_output: "Published summaries must omit secrets, private paths, and unreviewed user data."
+  external_calls: "External calls depend on configured worker adapters and must be declared per worker."
+contributes_to: ["pipeline/agentic-orchestration-harness-intake"]

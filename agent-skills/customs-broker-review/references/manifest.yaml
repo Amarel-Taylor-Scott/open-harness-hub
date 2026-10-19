@@ -1,0 +1,78 @@
+id: "pipeline/customs-broker-review"
+type: pipeline
+version: "0.1.0"
+name: "Customs entry review (US CBP + UFLPA + USMCA + WCO)"
+description: "Vertical 29 — customs-entry compliance: ISF 10+2, HTS classification, FTA origin, UFLPA, AD/CVD."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["customs", "customs.entry", "customs.tariff", "customs.fta", "trade", "compliance"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["customs", "cbp", "uflpa", "usmca"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://www.cbp.gov/trade"
+  source_kind: "other"
+  author: "US CBP 19 CFR + 19 USC + UFLPA + USMCA + WCO SAFE (composite)"
+  license: "CC-BY-4.0"
+
+task: "Review customs entry packet (ISF + HTS + valuation + FTA preference + UFLPA + AD/CVD risk)."
+pipeline_kind: "review"
+
+inputs:
+  - name: "entry_packet"
+    type: "string|object"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "critical_findings_count"
+    type: "integer"
+
+defaults:
+  persona: "persona/customs-broker"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-customs-broker-flags"
+  knowledge_packs:
+    - "knowledge-pack/customs-cbp-wco-frameworks"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.entry_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-customs-broker-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "rag_against_cbp"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs: { query: "$.steps.grep_red_flags.output.fired", corpus: "knowledge-pack/customs-cbp-wco-frameworks", top_k: 6 }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/customs-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "customs-broker-review"
+      applied_layers: ["persona", "pii_redact", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric: "rubric/customs-quality-v1"
+    threshold: 0.6

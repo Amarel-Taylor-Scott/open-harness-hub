@@ -1,0 +1,105 @@
+id: "pipeline/costed-blueprint-route-matrix"
+type: pipeline
+version: "0.1.0"
+name: "Costed blueprint route matrix"
+description: "Composes model routing, active pricing, cloud runtime pricing, guardrails, and A/B test planning into comparable deployment options for a sentence-to-pipeline SaaS request."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "government", "finance", "humanitarian", "cross_industry"]
+capability: ["planning", "routing", "evaluation", "governance"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.product"
+tags: ["cost-estimation", "sentence-to-pipeline", "model-routing", "pricing", "ab-testing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Build cheap, balanced, quality-first, and local-first blueprint options with guardrails, pricing snapshots, runtime estimates, and A/B cost-quality evaluation arms."
+pipeline_kind: "meta_build.costed_blueprint"
+inputs:
+  - name: "task_parse"
+    type: "json"
+  - name: "model_registry"
+    type: "array"
+  - name: "runtime_constraints"
+    type: "object"
+  - name: "cost_policy"
+    type: "object"
+outputs:
+  - name: "route_matrix"
+    type: "json"
+  - name: "ab_plan"
+    type: "json"
+  - name: "pricing_assumptions"
+    type: "array"
+  - name: "deployment_next_steps"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/costed-blueprint-route-patterns"
+    - "knowledge-pack/local-demo-verified-fact-patterns"
+steps:
+  - id: "route-models"
+    kind: "tool"
+    ref: "tool/model-capability-router"
+    inputs:
+      task: "$.inputs.task_parse"
+      adapter_registry: "$.inputs.model_registry"
+      cost_policy: "$.inputs.cost_policy"
+  - id: "lookup-model-pricing"
+    kind: "tool"
+    ref: "tool/model-pricing-lookup"
+    inputs:
+      provider: "$.steps.route-models.selected_adapter"
+      usage_shape: "$.inputs.cost_policy.usage_shape"
+  - id: "lookup-runtime-pricing"
+    kind: "tool"
+    ref: "tool/cloud-runtime-pricing-lookup"
+    inputs:
+      cloud: "$.inputs.runtime_constraints.cloud"
+      resources: "$.inputs.runtime_constraints.resources"
+  - id: "build-route-matrix"
+    kind: "tool"
+    ref: "tool/blueprint-route-matrix-builder"
+    inputs:
+      task_parse: "$.inputs.task_parse"
+      model_routes: "$.steps.route-models"
+      pricing_snapshots:
+        - "$.steps.lookup-model-pricing"
+        - "$.steps.lookup-runtime-pricing"
+      runtime_constraints: "$.inputs.runtime_constraints"
+  - id: "plan-cost-quality-ab"
+    kind: "tool"
+    ref: "tool/blueprint-ab-cost-quality-planner"
+    inputs:
+      route_matrix: "$.steps.build-route-matrix"
+      cost_policy: "$.inputs.cost_policy"
+  - id: "emit-terraform-placeholder"
+    kind: "tool"
+    ref: "tool/terraform-blueprint-emitter"
+    inputs:
+      deployment_plan: "$.steps.build-route-matrix"
+      cloud: "$.inputs.runtime_constraints.cloud"
+      include_mcp_plan: true
+success_criteria:
+  - kind: "semantic"
+    target: "$.route_matrix"
+    must_cover:
+      - "cheap route"
+      - "balanced route"
+      - "quality-first route"
+      - "pricing assumptions"
+      - "guardrails"
+      - "review queue"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Route matrix covers cost, quality, safety, and review tradeoffs."
+  - kind: "deterministic"
+    target: "$.ab_plan"
+    op: "is_truthy"
+    value: true
+    severity: "medium"
+    label: "A/B cost-quality plan is emitted."

@@ -1,0 +1,91 @@
+id: "pipeline/community-moderation-knowledge-object-intake"
+type: pipeline
+version: "0.1.0"
+name: "Community moderation knowledge object intake"
+description: "Turns social media and group moderation policies, rules, appeals, escalation triggers, and transparency requirements into governed candidate knowledge objects."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["media", "retail", "security", "cross_industry"]
+capability: ["classification", "routing", "governance", "evaluation", "retrieval"]
+modality: ["text", "image", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "pre_api.ingest"
+tags: ["social-media", "community-moderation", "appeals", "trust-and-safety", "knowledge-objects"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Normalize community moderation source material into candidate knowledge objects with governance, entity linking, dedupe, index records, and high-risk review routing."
+pipeline_kind: "research_web.community_moderation_knowledge_object_intake"
+inputs:
+  - name: "moderation_sources"
+    type: "array"
+  - name: "excluded_scopes"
+    type: "array"
+outputs:
+  - name: "normalized_objects"
+    type: "array"
+  - name: "review_tickets"
+    type: "array"
+  - name: "index_records"
+    type: "array"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/community-moderation-knowledge-objects"
+steps:
+  - id: "govern-moderation-sources"
+    kind: "tool"
+    ref: "tool/source-record-governance-router"
+    inputs:
+      source_record:
+        source_type: "community_moderation_source_batch"
+        license: "source_specific"
+        privacy_boundary: "mixed"
+      source_policy:
+        require_license: true
+        forbid_private_source_bodies: true
+        require_redaction_before_external_model: true
+        excluded_scopes: "$.inputs.excluded_scopes"
+  - id: "normalize-moderation-objects"
+    kind: "tool"
+    ref: "tool/community-moderation-object-normalizer"
+    inputs:
+      moderation_sources: "$.inputs.moderation_sources"
+      excluded_scopes: "$.inputs.excluded_scopes"
+      policy:
+        high_risk_auto_action_allowed: false
+        require_review_for_child_safety: true
+        require_review_for_crisis_or_violence: true
+        emit_transparency_event: true
+  - id: "link-moderation-entities"
+    kind: "tool"
+    ref: "tool/entity-recognition-linker"
+    inputs:
+      text: "$.steps.normalize-moderation-objects.normalized_objects"
+      entity_types: ["source", "workflow", "concept", "organization", "jurisdiction"]
+  - id: "dedupe-moderation-objects"
+    kind: "tool"
+    ref: "tool/fuzzy-dedupe-clusterer"
+    inputs:
+      candidate_records: "$.steps.normalize-moderation-objects.normalized_objects"
+      match_features: ["title", "policy_scope", "action_type", "evidence_requirement", "appeal_route"]
+  - id: "emit-moderation-index-records"
+    kind: "tool"
+    ref: "tool/index-record-emitter"
+    inputs:
+      normalized_objects: "$.steps.normalize-moderation-objects.normalized_objects"
+      emit: ["keyword", "vector", "graph", "facet", "quality"]
+success_criteria:
+  - kind: "semantic"
+    target: "$.normalized_objects"
+    must_cover:
+      - "community rule"
+      - "moderator checklist"
+      - "escalation trigger"
+      - "appeal review"
+      - "transparency log"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Community moderation procedures become reusable knowledge objects."

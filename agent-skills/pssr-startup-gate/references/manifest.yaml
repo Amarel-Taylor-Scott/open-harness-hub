@@ -1,0 +1,66 @@
+id: "pipeline/pssr-startup-gate"
+type: pipeline
+version: "0.1.0"
+name: "PSM Pre-Startup Safety Review (PSSR) gate"
+description: "Apply 29 CFR 1910.119(i) PSSR as a deterministic gate before unit start-up after maintenance — open Cat-A items / unresolved PHA / training gaps block hydrocarbon introduction."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["energy", "compliance"]
+capability: ["safety_gating", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["psm", "pssr", "refinery", "go-nogo"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.119"
+  source_kind: "other"
+  author: "OSHA 29 CFR 1910.119(i) PSSR + CCPS Guidelines (composite)"
+  license: "CC-BY-4.0"
+
+task: "Apply PSM Pre-Startup Safety Review GO/NO-GO gate."
+pipeline_kind: "review"
+
+inputs:
+  - name: "pssr_packet"
+    type: "string|object"
+outputs:
+  - name: "verdict"
+    type: "string"
+  - name: "items"
+    type: "object[]"
+  - name: "nogo_triggers"
+    type: "string[]"
+
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/technician-checklists"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.pssr_packet" }
+  - id: "checklist_gate"
+    kind: "processor"
+    ref: "processor/checklist-evaluator"
+    inputs:
+      candidate: "$.steps.structured_to_prose.output.prose"
+      checklist_id: "psm-pssr"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "pssr-startup-gate"
+      applied_layers: ["structured_to_prose", "checklist_evaluator"]
+
+success_criteria:
+  - kind: deterministic
+    target: "$.steps.checklist_gate.output.verdict"
+    op: "=="
+    value: "go"
+    severity: "critical"
+    label: "PSSR gate must return GO before hydrocarbon introduction"

@@ -1,0 +1,99 @@
+id: "harness/appsec-code-audit"
+type: harness
+version: "0.1.0"
+name: "AppSec Code Audit harness"
+description: |
+  CWE-cite-first AppSec audit harness for source-code review. Detects
+  secrets-in-code + injection + crypto/auth weaknesses + describes
+  attack vectors + proposes fixes.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["security", "security.appsec", "software"]
+capability: ["evaluation", "extraction", "verification", "reasoning"]
+modality:   ["text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["security", "sast", "cwe", "owasp", "harness"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, privacy, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "audit_code"
+    label: "code bundle → secrets+vuln GREP → CWE/OWASP citations → grade + fixes"
+    entrypoints: ["/api/appsec/audit"]
+    steps:
+      - "structured-to-prose"
+      - "PII / secrets redact"
+      - "code-vulnerabilities GREP (29 CWE-cited rules)"
+      - "RAG against OWASP Top 10 LLM + MITRE ATT&CK"
+      - "judge against code-security-review rubric"
+      - "propose concrete fixes (parameterized query, version bump, alternative library)"
+      - "audit trace"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "every finding cites CWE-ID + OWASP category + CVE (if applicable)"
+      - "attack vector + impact described (no 'looks unsafe')"
+      - "concrete proposed fix provided"
+      - "code smells separated from real vulnerabilities"
+knowledge_packs:
+  - id: "owasp"
+    label: "OWASP Top 10 + OWASP Top 10 LLM + MITRE ATT&CK"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+logic_packs:
+  - id: "persona_default"
+    label: "Security engineer cite-first persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "response_policy"
+    label: "Attack-vector-described response policy"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+model_io:
+  input:  "{code_bundle: string|object, language: string, framework: string}"
+  output: "{grade: number, findings: object[], secrets_found: object[], fixes_proposed: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local audit; reproducible without API keys."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude (deep code review)"
+    transport: "anthropic"
+    role: "Optional frontier judge for complex codepath analysis."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "redact PII / production secrets before model call"
+  - "reject input larger than 4 MB"
+output_verification:
+  - "every finding has CWE-ID"
+  - "no secrets in graded output"
+  - "no false-positive smells with critical severity"
+privacy_boundaries:
+  raw_input:      "stays local; production secrets must be redacted upstream"
+  derived_output: "may sync to hub only after anonymization gate"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in"
+contributes_to:
+  - "pipeline/code-security-review"
+  - "pipeline/full-vendor-due-diligence"

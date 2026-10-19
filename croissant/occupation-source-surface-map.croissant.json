@@ -1,0 +1,262 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
+  },
+  "@type": "sc:Dataset",
+  "@id": "https://open-harness-hub.dev/knowledge-pack/occupation-source-surface-map",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
+  "name": "Occupation source surface map",
+  "description": "Source surfaces for converting occupation taxonomies, job descriptions, public role classifications, and job requirements data into work atoms, questions, procedures, facts, and pipeline primitives.",
+  "version": "0.1.0",
+  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+  "url": "https://open-harness-hub.dev/knowledge-pack/occupation-source-surface-map",
+  "creator": [
+    {
+      "@type": "sc:Person",
+      "name": "Open Harness Hub contributors"
+    }
+  ],
+  "datePublished": "2026-05-25",
+  "keywords": [
+    "occupations",
+    "job-descriptions",
+    "work-atoms",
+    "onet",
+    "esco",
+    "bls-ors",
+    "procedure-objects"
+  ],
+  "isLiveDataset": false,
+  "dateModified": "2026-05-25",
+  "citation": "O*NET; ESCO; BLS Occupational Requirements Survey; Open Harness Hub occupation-to-procedure plan",
+  "distribution": [
+    {
+      "@type": "cr:FileObject",
+      "@id": "occupation-source-surface-map__surfaces",
+      "name": "surfaces.jsonl",
+      "description": "Data file backing knowledge pack occupation-source-surface-map.",
+      "contentUrl": "data/occupation-source-surface-map/surfaces.jsonl",
+      "encodingFormat": "application/jsonlines",
+      "contentSize": "2961 B",
+      "sha256": "44044dde524ea4acf03ea3016721b006e1239eaa613e76932e7787ba2504656b"
+    }
+  ],
+  "recordSet": [
+    {
+      "@type": "cr:RecordSet",
+      "@id": "occupation-source-surface-map__records",
+      "name": "occupation-source-surface-map__records",
+      "description": "Records parsed from surfaces.jsonl.",
+      "field": [
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/id",
+          "name": "id",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "id"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/type",
+          "name": "type",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "type"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/name",
+          "name": "name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "name"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/publisher",
+          "name": "publisher",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "publisher"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/url",
+          "name": "url",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "url"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/api_url",
+          "name": "api_url",
+          "dataType": "sc:URL",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "api_url"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/coverage",
+          "name": "coverage",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "coverage"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/use_for",
+          "name": "use_for",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "use_for"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/freshness",
+          "name": "freshness",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "freshness"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/privacy_note",
+          "name": "privacy_note",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "privacy_note"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/fields",
+          "name": "fields",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "fields"
+            }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "occupation-source-surface-map__records/summary",
+          "name": "summary",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": {
+              "@id": "occupation-source-surface-map__surfaces"
+            },
+            "extract": {
+              "column": "summary"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

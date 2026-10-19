@@ -1,0 +1,62 @@
+id: "pipeline/component-pipeline-template-expansion"
+type: pipeline
+version: "0.1.0"
+name: "Component pipeline template expansion"
+description: "Turns a task sentence into a reusable component pipeline template with explicit pre-LLM, LLM, post-LLM, and control-flow stages."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "routing", "serving", "verification"]
+modality: ["structured", "text", "image", "audio", "video"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.orchestration"
+tags: ["components", "pipeline-template", "pre-llm", "llm", "post-llm", "control-flow"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Expand a user task into an off-the-shelf pipeline template made from reusable components and control-flow steps."
+pipeline_kind: "component_pipeline_template_expansion"
+inputs:
+  - name: "task"
+    type: "string"
+  - name: "cost_profile"
+    type: "string"
+outputs:
+  - name: "component_pipeline_template"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/component-layer-control-flow-patterns"
+steps:
+  - id: "retrieve-layer-patterns"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/component-layer-control-flow-patterns"
+    inputs:
+      query: "pre_llm llm post_llm control_flow loop iterate branch retry human_review cache_lookup"
+      top_k: 20
+  - id: "expand-template"
+    kind: "tool"
+    ref: "tool/component-pipeline-template-expander"
+    inputs:
+      task: "$.inputs.task"
+      cost_profile: "$.inputs.cost_profile"
+  - id: "check-sensitive-output"
+    kind: "tool"
+    ref: "tool/sensitive-data-object-gate"
+    inputs:
+      reason: "Template output must not contain raw private user data or unsafe publisher data."
+success_criteria:
+  - kind: "semantic"
+    target: "$.component_pipeline_template"
+    must_cover:
+      - "pre_llm"
+      - "llm"
+      - "post_llm"
+      - "control_flow"
+      - "iterate"
+    similarity_threshold: 0.55
+    severity: "high"
+    label: "Template contains the required reusable component layers."

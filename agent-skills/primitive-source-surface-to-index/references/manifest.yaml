@@ -1,0 +1,120 @@
+id: "pipeline/primitive-source-surface-to-index"
+type: pipeline
+version: "0.1.0"
+name: "Primitive source surface to index"
+description: "Scan source surfaces, normalize candidate primitives, apply verified-source rules, and prepare records for keyword, vector, graph, and model-polished search."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "cross_industry"]
+capability: ["retrieval", "planning", "evaluation", "governance"]
+modality: ["text", "structured"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "volatile"
+lifecycle_position: "cross_cutting.discovery"
+tags: ["primitive-database", "source-surfaces", "million-primitives", "verified-sources", "indexing"]
+created: "2026-05-25"
+updated: "2026-05-25"
+
+task: "Convert routine source-surface scans and verified-source submissions into indexed candidate primitives for search and blueprint generation."
+pipeline_kind: "research_web.primitive_index_build"
+
+inputs:
+  - name: "source_surface_ids"
+    type: "string[]"
+  - name: "scan_window"
+    type: "object"
+  - name: "verified_submissions"
+    type: "object[]"
+outputs:
+  - name: "candidate_primitives"
+    type: "object[]"
+  - name: "keyword_index_records"
+    type: "object[]"
+  - name: "vector_index_records"
+    type: "object[]"
+  - name: "graph_edges"
+    type: "object[]"
+  - name: "publisher_review_queue"
+    type: "object[]"
+
+defaults:
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/primitive-source-surface-map"
+    - "knowledge-pack/capability-gap-discovery-patterns"
+  rule_packs:
+    - "rule-pack/grep-prompt-injection-heuristics"
+
+steps:
+  - id: "load_source_surfaces"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/primitive-source-surface-map"
+    inputs:
+      query: "$.inputs.source_surface_ids"
+      top_k: 100
+
+  - id: "scan_surfaces"
+    kind: "tool"
+    ref: "tool/primitive-source-surface-scanner"
+    inputs:
+      source_surface: "$.steps.load_source_surfaces.output.docs"
+      query_plan:
+        window: "$.inputs.scan_window"
+        output_goal: "candidate_primitives"
+      max_records: 10000
+
+  - id: "verified_source_intake"
+    kind: "tool"
+    ref: "tool/verified-source-publisher-intake"
+    inputs:
+      publisher: "$.inputs.verified_submissions.publisher"
+      submission: "$.inputs.verified_submissions.submission"
+      verification: "$.inputs.verified_submissions.verification"
+
+  - id: "normalize_records"
+    kind: "tool"
+    ref: "tool/search-result-normalizer"
+    inputs:
+      provider: "primitive-source-surface-scanner"
+      raw_response:
+        scanned: "$.steps.scan_surfaces.output.records"
+        verified: "$.steps.verified_source_intake.output.normalized_records"
+      normalize_for: "rag"
+      max_results: 10000
+
+  - id: "score_gap_signals"
+    kind: "tool"
+    ref: "tool/capability-gap-signal-scorer"
+    inputs:
+      finding: "$.steps.normalize_records.output.results"
+
+  - id: "semantic_catalog_dedupe"
+    kind: "tool"
+    ref: "tool/embedding-index-search"
+    inputs:
+      query: "$.steps.normalize_records.output.results"
+      index: "catalog"
+      top_k: 10
+      filters:
+        types: ["pipeline", "tool", "processor", "rule-pack", "knowledge-pack", "rubric", "benchmark"]
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "primitive-source-surface-to-index"
+      applied_layers: ["source_surface_map", "surface_scan", "verified_source_intake", "normalization", "gap_scoring", "semantic_dedupe", "index_preparation"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.outputs.candidate_primitives"
+    op: "is_truthy"
+    value: true
+    label: "Candidate primitives are produced."
+  - kind: "deterministic"
+    target: "$.outputs.keyword_index_records"
+    op: "is_truthy"
+    value: true
+    label: "Keyword index records are produced."

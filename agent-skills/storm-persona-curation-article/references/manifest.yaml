@@ -1,0 +1,113 @@
+id: "pipeline/storm-persona-curation-article"
+type: pipeline
+version: "0.1.0"
+name: "STORM: persona-curation + outline-fanout article"
+description: |
+  Stanford OVAL's STORM pattern. Generate N personas with different
+  perspectives → run simulated dialogue per persona to curate
+  knowledge → outline → parallel-expand each outline section →
+  polish into final article.
+
+  Verified by Open Harness Hub clone: `stanford-oval/storm` —
+  `knowledge_storm/storm_wiki/modules/{persona_generator,knowledge_curation,outline_generation,article_generation,article_polish}.py`.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "media", "education"]
+capability: ["research", "generation", "summarization"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "external"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url: "https://github.com/stanford-oval/storm"
+  source_kind: "github"
+  author: "Stanford OVAL"
+  license: "MIT"
+
+task: |
+  Given a research topic, produce a Wikipedia-style article with
+  multi-perspective knowledge curation, outlined sections expanded in
+  parallel, and a final polish pass.
+pipeline_kind: "writing_long_form"
+
+inputs:
+  - name: "topic"
+    type: "string"
+  - name: "n_personas"
+    type: "integer"
+  - name: "max_sections"
+    type: "integer"
+outputs:
+  - name: "article_markdown"
+    type: "markdown"
+  - name: "outline"
+    type: "object[]"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "personas"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/web-search-allowlist-default"
+    - "rule-pack/privacy-pii-text-en"
+
+steps:
+  - id: "redact_topic"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.topic" }
+
+  - id: "generate_personas"
+    kind: "processor"
+    ref: "processor/persona-set-generator"
+    inputs:
+      topic: "$.steps.redact_topic.output.redacted_text"
+      n_personas: "$.inputs.n_personas"
+
+  - id: "curate_knowledge"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "For each persona, conduct a simulated dialogue to curate facts about the topic. Output a JSON list of {persona, facts, sources}."}]
+      context: "$.steps.generate_personas.output.personas"
+
+  - id: "outline"
+    kind: "processor"
+    ref: "processor/skeleton-outliner"
+    inputs:
+      topic: "$.steps.redact_topic.output.redacted_text"
+      curated_knowledge: "$.steps.curate_knowledge.output.text"
+      max_sections: "$.inputs.max_sections"
+
+  - id: "expand_sections"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Expand each outline section into a 200-400 word paragraph with citations. Output a JSON array of {section_title, content, citations}."}]
+      context: "$.steps.outline.output.outline"
+
+  - id: "polish"
+    kind: "processor"
+    ref: "processor/self-refine-critique"
+    inputs:
+      draft: "$.steps.expand_sections.output.text"
+      task: "Polish into a Wikipedia-style article with consistent tone."
+      max_iterations: 2
+
+  - id: "verify_citations"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.polish.output.final"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.75

@@ -1,0 +1,102 @@
+id: "pipeline/deepseek-r1-code-interpreter-math"
+type: pipeline
+version: "0.1.0"
+name: "DeepSeek-R1 / QwQ + Python code-interpreter for math reasoning"
+description: |
+  The winning AIMO-2 shape: a reasoning-distilled LLM (DeepSeek-R1-
+  Distill-Qwen-7B / QwQ-32B) generates Python code that solves a math
+  problem, the code runs in a Jupyter / sandbox kernel, and the output
+  feeds back as the answer (or the LLM iterates if execution fails or
+  the answer is implausible). Majority-vote across N rollouts is the
+  standard ensembling.
+
+  Verified by Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B
+  (1399 votes), lewtun "Updated Code Interpretation" (1173 votes,
+  Lewis Tunstall HF), mbmmurad QwQ-32B-preview optimized inference
+  (1097 votes), yekenot DeepSeek-R1-distill-7B-AWQ (1087 votes),
+  abdurrafae "Improved Code Interpretation" (1001 votes). 5-of-5 top
+  AIMO kernels follow this shape.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "scientific_research", "education"]
+capability: ["reasoning", "tool_use", "code_execution"]
+modality:   ["text", "code"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.tool_use"
+tags: ["aimo", "deepseek-r1", "qwq", "code-interpreter", "majority-vote", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2"
+  source_kind: "kaggle"
+  author:      "itahiro (1399), lewtun (1173), mbmmurad (1097), yekenot (1087), abdurrafae (1001)"
+  license:     "Apache-2.0"
+
+task: |
+  Given a math word problem, generate a Python program that computes
+  the answer, run it in a sandboxed kernel, parse the result. Repeat
+  N times with diverse sampling; majority-vote the parsed answers.
+pipeline_kind: "tool_augmented_reasoning"
+
+inputs:
+  - name: "math_problem"
+    type: "string"
+  - name: "n_rollouts"
+    type: "integer"
+  - name: "max_tool_turns"
+    type: "integer"
+outputs:
+  - name: "final_answer"
+    type: "string"
+  - name: "majority_count"
+    type: "integer"
+  - name: "per_rollout"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/vllm-awq-local"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.math_problem" }
+
+  - id: "rollouts"
+    kind: "processor"
+    ref: "processor/action-sampler-multi-rollout"
+    inputs:
+      task:      "$.inputs.math_problem"
+      n_samples: "$.inputs.n_rollouts"
+
+  - id: "execute_and_iterate"
+    kind: "processor"
+    ref: "processor/iterative-revise-loop"
+    inputs:
+      initial_prompt: "Generate a Python program. Wrap code in ```python ... ```; execute; parse final number. If error, fix and retry."
+      inner_harness_ref: "harness/code-act-jupyter"
+      verifier_refs: []
+      max_iterations: "$.inputs.max_tool_turns"
+      cost_ceiling_usd: 0.20
+      convergence_policy: "all_pass"
+
+  - id: "majority"
+    kind: "processor"
+    ref: "processor/multi-vector-fusion"
+    inputs:
+      ranked_lists: "$.steps.execute_and_iterate.output"
+      method: "weighted_sum"
+      k: 1
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "deepseek-r1-code-interpreter-math"
+      applied_layers: ["reasoning", "tool_use", "ensemble"]
+
+success_criteria: []

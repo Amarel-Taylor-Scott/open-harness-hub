@@ -1,0 +1,63 @@
+id: "pipeline/theory-batch-governance-to-embedding"
+type: pipeline
+version: "0.1.0"
+name: "Theory batch governance to embedding"
+description: "Connects a theory-derived component batch to promotion readiness, review queues, embedding execution planning, and vector readiness without mutating Postgres."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "security.defensive", "cross_industry"]
+capability: ["governance", "embedding", "planning", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "cross_cutting.storage"
+tags: ["theory-to-components", "promotion", "embedding-execution", "review-gate", "daily-factory"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Prepare theory-derived component candidates for candidate-table load, review, and embedding execution."
+pipeline_kind: "research_web.theory_batch_governance_to_embedding"
+inputs:
+  - name: "theory_batch_summary"
+    type: "json"
+  - name: "load_audit_summary"
+    type: "json"
+outputs:
+  - name: "promotion_readiness"
+    type: "jsonl"
+  - name: "promotion_review_queue"
+    type: "jsonl"
+  - name: "embedding_execution_plan"
+    type: "json"
+  - name: "vector_readiness_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/theory-to-component-patterns"
+steps:
+  - id: "plan-governance-and-embeddings"
+    kind: "tool"
+    ref: "tool/theory-batch-governance-bridge"
+    inputs:
+      theory_batch_summary: "$.inputs.theory_batch_summary"
+      load_audit_summary: "$.inputs.load_audit_summary"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "theory-batch-governance-to-embedding"
+      applied_layers: ["promotion_readiness", "review_queue", "embedding_plan", "vector_readiness"]
+success_criteria:
+  - kind: "deterministic"
+    target: "$.steps.plan-governance-and-embeddings.promotion.counts.candidate_load_ready"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "At least 1,000 theory-derived candidates are structurally ready for candidate-table load."
+  - kind: "deterministic"
+    target: "$.steps.plan-governance-and-embeddings.embedding.planned_completion_rows"
+    op: ">="
+    value: 1000
+    severity: "high"
+    label: "At least 1,000 theory-derived candidates have planned embedding completion rows."

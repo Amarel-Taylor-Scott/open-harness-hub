@@ -1,0 +1,258 @@
+id: "pipeline/contract-renewal-risk-cite-or-abstain"
+type: pipeline
+version: "0.1.0"
+name: "Contract renewal-risk review (cite-or-abstain)"
+description: |
+  Surface the renewal-risk clauses in a commercial contract + account
+  packet and ground EACH risk finding in a cited clause span or
+  renewal-risk framework entry — otherwise abstain. High-precision
+  legal/regulated RAG bundle (Bundle B) wired as a governed gate:
+
+   - structured-to-prose + PII redaction (account packets carry names);
+   - GREP triage for auto-renewal / notice-window / price-escalator /
+     termination-for-convenience / assignment red flags;
+   - hybrid retrieval over the contract-law clause library + the
+     renewal-risk framework corpus, fused + cross-encoder reranked;
+   - a renewal-risk analyst harness emits one finding per risk with a
+     per-claim citation to the clause or framework span;
+   - DETERMINISTIC cite-or-abstain gate: a renewal-risk finding that
+     does not cite a clause/framework span fails citation-coverage and
+     blocks publication, so an unsupported "this auto-renews in 30 days"
+     claim cannot ship without the clause behind it.
+
+  Negative-space task: base models confidently assert renewal terms
+  ("notice period is 60 days") that the contract does not contain.
+  Here every term must trace to the cited clause or be abstained.
+
+  NOT legal advice; descriptive over the provided contract only.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["legal", "legal.contract", "customer_success", "customer_success.renewal"]
+capability: ["extraction", "retrieval", "verification", "evaluation"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["knowledge-grounded-qa", "cite-or-abstain", "bundle-b", "contract", "renewal-risk"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.acc.com/resource-library"
+  source_kind: "other"
+  author: "ACC Contract Playbook patterns + composite commercial clause library + renewal-risk frameworks"
+  license: "CC-BY-4.0"
+
+task: |
+  Given a commercial contract plus an account packet, surface
+  renewal-risk findings (auto-renewal, notice window, price escalator,
+  termination, assignment, value-realization gaps) where EACH finding
+  cites the clause span or renewal-risk framework entry that grounds
+  it, or abstain. Publication is blocked unless citation coverage and
+  the hallucination score clear threshold.
+pipeline_kind: "review"
+
+examples:
+  - name: "Auto-renewal + short notice window, each grounded in a cited clause"
+    input:
+      packet:
+        contract_text: >
+          12. TERM. This Agreement commences on the Effective Date and
+          continues for an initial term of twelve (12) months. It shall
+          automatically renew for successive twelve (12) month terms
+          unless either party gives written notice of non-renewal at
+          least ninety (90) days prior to the end of the then-current
+          term. 13. FEES. On each renewal the annual fee shall increase
+          by the greater of 7% or CPI. 19. ASSIGNMENT. Customer may not
+          assign this Agreement without Provider's prior written consent.
+        account_notes: "Champion left last quarter; product usage down 40% QoQ; no exec sponsor identified."
+      contract_type: "SaaS-MSA"
+      jurisdiction: "US-DE"
+    expected_output:
+      abstained: false
+      score: 0.81
+      citation_coverage: 1.0
+      findings:
+        - risk: "auto_renewal_with_notice_window"
+          severity: "high"
+          claim: "Auto-renews for 12 months unless written non-renewal notice is given >= 90 days before term end."
+          evidence_span: "automatically renew for successive twelve (12) month terms unless either party gives written notice of non-renewal at least ninety (90) days prior"
+          citation: "[clause-12] TERM"
+        - risk: "price_escalator"
+          severity: "medium"
+          claim: "Renewal fee increases by the greater of 7% or CPI."
+          evidence_span: "the annual fee shall increase by the greater of 7% or CPI"
+          citation: "[clause-13] FEES"
+        - risk: "value_realization_gap"
+          severity: "high"
+          claim: "Adoption decline + lost champion materially raise non-renewal risk ahead of the notice deadline."
+          evidence_span: "usage down 40% QoQ; no exec sponsor identified"
+          citation: "[renewal-risk-framework] adoption-and-sponsorship signal"
+      evidence_gaps:
+        - field: "renewal_calendar_date"
+          note: "Term end date not stated in packet; compute the 90-day notice deadline once the Effective Date is supplied."
+      notes: >
+        Every renewal-risk finding cites a clause span or a framework
+        entry, so citation-span-check + citation-coverage pass and the
+        review is published. A finding asserting a notice period the
+        contract does not contain would fail the gate and abstain.
+
+inputs:
+  - name: "packet"
+    type: "string|object"
+  - name: "contract_type"
+    type: "string"
+  - name: "jurisdiction"
+    type: "string"
+outputs:
+  - name: "findings"
+    type: "object[]"
+  - name: "score"
+    type: "number"
+  - name: "citation_coverage"
+    type: "number"
+  - name: "evidence_gaps"
+    type: "object[]"
+  - name: "abstained"
+    type: "boolean"
+  - name: "trace"
+    type: "object[]"
+
+defaults:
+  persona: "persona/renewal-risk-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/contract-law-clauses"
+    - "knowledge-pack/customer-renewal-risk-frameworks"
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/grep-customer-renewal-risk-flags"
+    - "rule-pack/hybrid-retrieval-policy"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.packet"
+
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+
+  - id: "chunk_contract"
+    kind: "chunker"
+    ref: "processor/page-aware-chunker"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-customer-renewal-risk-flags"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_flags.output.fired"
+      corpus: "knowledge-pack/contract-law-clauses"
+      top_k: 10
+
+  - id: "rerank"
+    kind: "processor"
+    ref: "processor/cross-encoder-reranker"
+    inputs:
+      query: "$.steps.grep_flags.output.fired"
+      passages: "$.steps.retrieve_context.output.passages"
+      top_k: 5
+
+  - id: "review_harness"
+    kind: "harness"
+    ref: "harness/customer-renewal-risk-review"
+    inputs:
+      packet: "$.steps.redact_pii.output.text"
+      context: "$.steps.rerank.output.passages"
+
+  - id: "dedupe_findings"
+    kind: "processor"
+    ref: "processor/finding-deduplicator"
+    inputs:
+      trace: "$.steps.review_harness.output"
+      config: {}
+
+  - id: "calibrate_severity"
+    kind: "processor"
+    ref: "processor/severity-calibrator"
+    inputs:
+      trace: "$.steps.dedupe_findings.output.result"
+      config: {}
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs:
+      trace: "$.steps.calibrate_severity.output.result"
+      config: {}
+
+  - id: "citation_coverage"
+    kind: "processor"
+    ref: "processor/citation-coverage"
+    inputs:
+      response_markdown: "$.steps.review_harness.output.findings"
+
+  - id: "extract_evidence_gaps"
+    kind: "processor"
+    ref: "processor/evidence-gap-extractor"
+    inputs:
+      trace: "$.steps.calibrate_severity.output.result"
+      config: {}
+
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.calibrate_severity.output.result"
+      rubric_ref: "rubric/customer-renewal-risk-quality-v1"
+
+  - id: "redaction_audit"
+    kind: "processor"
+    ref: "processor/packet-redaction-audit"
+    inputs:
+      trace: "$.steps.calibrate_severity.output.result"
+      config: {}
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "contract-renewal-risk-cite-or-abstain"
+      applied_layers: ["privacy", "chunk", "grep", "rag", "rerank", "harness", "dedupe", "severity", "citation", "judge", "redaction_audit"]
+
+success_criteria:
+  - rubric: "rubric/customer-renewal-risk-quality-v1"
+    threshold: 0.68
+    label: "renewal-risk findings grounded + scored to rubric"
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+    label: "every renewal-risk finding cites a clause/framework span (else abstain)"
+  - kind: "deterministic"
+    target: "$.steps.citation_coverage.output.coverage"
+    op: ">="
+    value: 0.9
+    severity: "high"
+    label: "citation coverage >= 0.9"
+  - kind: "deterministic"
+    target: "$.steps.redaction_audit.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "publication redaction audit passes"

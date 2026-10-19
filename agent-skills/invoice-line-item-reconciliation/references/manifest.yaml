@@ -1,0 +1,158 @@
+id: "pipeline/invoice-line-item-reconciliation"
+type: pipeline
+version: "0.1.0"
+name: "Invoice line-item extraction + deterministic total reconciliation"
+description: |
+  Negative-space task: a bare VLM/LLM can read an invoice and copy out the
+  printed grand total, but it cannot reliably RECOMPUTE the arithmetic that
+  proves the total is internally consistent — line_total = qty × unit_price
+  (minus line discount), Σ line_totals = subtotal, subtotal − discounts =
+  net, net × vat_rate = vat_amount, net + vat = grand_total. Models drift on
+  multi-row sums, silently "agree" with a wrong printed total, and produce a
+  different answer on re-run. This pipeline forces the model to do ONLY the
+  extraction (each field tied to its source line/cell), then runs the math
+  as a DETERMINISTIC verifier outside the model and FAILS the run when the
+  printed total does not reconcile to the recomputed total within tolerance.
+
+  Capability lift is structural: the failure is architectural (token-level
+  arithmetic over many rows is unreliable and non-reproducible), so a
+  deterministic reconciliation gate keeps lifting no matter how the model
+  improves — and it costs zero model tokens.
+
+  Bundle: High-precision regulated extraction (taxonomy Bundle B) wired with
+  an OCR pre-pass for the character-level field accuracy a VLM blurs, a
+  canonical-schema mapper so heterogeneous invoice layouts become one row
+  shape, and post-call deterministic verification gates.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["procurement.contracting", "finance.fraud", "tax.indirect"]
+capability: ["extraction", "verification", "evaluation", "retrieval"]
+modality: ["image", "text", "structured", "tabular"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+freshness: "stable"
+tags: ["document-media-intelligence", "invoice", "line-item", "reconciliation", "deterministic-gate", "structural-lift", "bundle-b"]
+created: "2026-05-29"
+updated: "2026-05-29"
+task: |
+  Given a scanned/photographed or digital invoice, extract every line item
+  (description, qty, unit_price, line_discount, line_total) plus header
+  totals (subtotal, total_discount, net, vat_rate, vat_amount, grand_total,
+  currency), then deterministically verify that every line recomputes and
+  that the document foots to its printed grand total within a rounding
+  tolerance. Output: per-line extraction + a reconciliation verdict
+  (reconciled | discrepancy) with the exact failing equation(s) cited.
+pipeline_kind: "extract"
+inputs:
+  - name: "invoice_image"
+    type: "bytes"
+  - name: "rounding_tolerance_minor_units"
+    type: "integer"
+outputs:
+  - name: "line_items"
+    type: "object[]"
+  - name: "header_totals"
+    type: "object"
+  - name: "reconciliation_verdict"
+    type: "string"
+  - name: "failing_equations"
+    type: "object[]"
+  - name: "recomputed_grand_total"
+    type: "integer"
+  - name: "review_ticket"
+    type: "object"
+defaults:
+  persona: "persona/invoice-audit-reviewer"
+  model_adapter: "adapter/gemma-4-26b-vision"
+  knowledge_packs: ["knowledge-pack/procure-to-pay-invoice-audit-frameworks"]
+  rule_packs: ["rule-pack/grep-procure-to-pay-invoice-audit-flags", "rule-pack/rag-procure-to-pay-invoice-audit-retrieval-policy"]
+steps:
+  # --- INPUT GATING: deterministic OCR pre-pass (char accuracy the VLM blurs) ---
+  - id: "ocr_prepass"
+    kind: "processor"
+    ref: "processor/on-device-ocr-prepass"
+    inputs: { image_bytes: "$.inputs.invoice_image", language_hint: "auto", engine: "tesseract" }
+  # --- ACTION (model call): structured extraction ONLY — no arithmetic asked of the model ---
+  - id: "inject_schema"
+    kind: "processor"
+    ref: "processor/inject-output-schema"
+    inputs:
+      schema:
+        line_items: "[{description, qty, unit_price_minor, line_discount_minor, line_total_minor, source_row}]"
+        header: "{subtotal_minor, total_discount_minor, net_minor, vat_rate_bps, vat_amount_minor, grand_total_minor, currency}"
+  - id: "extract_fields"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "{{persona.invoice-audit-reviewer}}"},
+         {"role": "user", "content": "Using the OCR text block as the source of truth, extract every invoice line item and the header totals into the given JSON schema. Money is in integer MINOR units (cents). vat_rate is in basis points. Copy values verbatim from the document; do NOT compute, sum, or 'fix' any number — extraction only. Tie each line to its source_row. Return null for any unreadable field."}]
+      context:
+        ocr_text: "$.steps.ocr_prepass.output.prompt_block"
+  - id: "coerce_json"
+    kind: "processor"
+    ref: "processor/json-schema-repair"
+    inputs: { text: "$.steps.extract_fields.output.text" }
+  # --- canonicalize heterogeneous layouts into ONE row shape ---
+  - id: "canonicalize_lines"
+    kind: "processor"
+    ref: "processor/tabular-schema-canonicalizer"
+    inputs:
+      table: "$.steps.coerce_json.output.json.line_items"
+      target_schema: { description: "string", qty: "number", unit_price_minor: "integer", line_discount_minor: "integer", line_total_minor: "integer" }
+      min_match_confidence: 0.8
+  # --- KNOWLEDGE: retrieve the control/framework context for the flags that fired ---
+  - id: "grep_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-procure-to-pay-invoice-audit-flags"
+    inputs: { text: "$.steps.ocr_prepass.output.ocr_text" }
+  - id: "retrieve_context"
+    kind: "rule_pack"
+    ref: "rule-pack/rag-procure-to-pay-invoice-audit-retrieval-policy"
+    inputs: { query: "$.steps.grep_flags.output.fired", corpus: "knowledge-pack/procure-to-pay-invoice-audit-frameworks", top_k: 8 }
+  # --- DETERMINISTIC RECONCILIATION (the lift): math runs OUTSIDE the model ---
+  - id: "build_reconciliation_matrix"
+    kind: "processor"
+    ref: "processor/control-matrix-builder"
+    inputs: { trace: "$.steps.canonicalize_lines.output", config: { checks: ["line_total = qty*unit_price - line_discount", "subtotal = sum(line_total)", "net = subtotal - total_discount", "vat_amount = round(net * vat_rate_bps / 10000)", "grand_total = net + vat_amount"] } }
+  - id: "verify_foots_to_total"
+    kind: "processor"
+    ref: "processor/verify-deterministic-criterion"
+    inputs:
+      target_value: "$.steps.build_reconciliation_matrix.output.result.all_equations_hold"
+      op: "is_truthy"
+      value: null
+  # --- CONDITIONAL: on discrepancy, route to human review (Stop/escalate) ---
+  - id: "escalate_on_discrepancy"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    when: "$.steps.verify_foots_to_total.output.pass == false"
+    inputs: { trace: "$.steps.build_reconciliation_matrix.output.result", reason: "invoice totals do not reconcile to recomputed grand total" }
+  # --- OUTPUT: audit trace + summary ---
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.build_reconciliation_matrix.output.result", config: {} }
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "invoice-line-item-reconciliation"
+      applied_layers: ["ocr_prepass", "extract", "json_repair", "canonicalize", "grep", "rag", "reconcile_deterministic", "escalate", "summary"]
+success_criteria:
+  - kind: "deterministic"
+    label: "every reconciliation equation holds (document foots to printed grand total)"
+    target: "$.steps.verify_foots_to_total.output.pass"
+    op: "=="
+    value: true
+    severity: "critical"
+  - kind: "deterministic"
+    label: "no invoice line dropped — every source row is mapped or sent to unmapped for review"
+    target: "$.steps.canonicalize_lines.output.unmapped_columns"
+    op: "is_falsy"
+    value: null
+    severity: "high"
+  - rubric: "rubric/procure-to-pay-invoice-audit-quality-v1"
+    threshold: 0.70

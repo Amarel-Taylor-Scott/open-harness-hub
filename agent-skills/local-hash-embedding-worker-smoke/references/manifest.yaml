@@ -1,0 +1,82 @@
+id: "pipeline/local-hash-embedding-worker-smoke"
+type: pipeline
+version: "0.1.0"
+name: "Local hash embedding worker smoke"
+description: "Runs a deterministic local embedding worker against a daily embedding execution sample and validates the emitted vector rows."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "local-worker", "hashing-vectorizer"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Generate local deterministic vectors for a daily embedding execution sample and prove the stored rows pass vector readiness."
+pipeline_kind: "research_web.local_hash_embedding_worker_smoke"
+inputs:
+  - name: "embedding_plan"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+  - name: "limit"
+    type: "integer"
+outputs:
+  - name: "completed_embedding_rows"
+    type: "jsonl"
+  - name: "stored_vector_rows"
+    type: "jsonl"
+  - name: "vector_readiness_summary"
+    type: "json"
+  - name: "local_hash_embedding_worker_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/local-hash-embedding-worker-patterns"
+steps:
+  - id: "load-local-hash-worker-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/local-hash-embedding-worker-patterns"
+    inputs:
+      query: "local deterministic hashing vector embedding worker readiness"
+      top_k: 20
+  - id: "run-local-hash-embedding-worker"
+    kind: "tool"
+    ref: "tool/local-hash-embedding-worker"
+    inputs:
+      embedding_plan: "$.inputs.embedding_plan"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+      limit: "$.inputs.limit"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.run-local-hash-embedding-worker.vector_readiness.readiness_status"
+    op: "=="
+    value: "ready"
+    severity: "high"
+    label: "The local worker output passes vector readiness."
+  - kind: "deterministic"
+    target: "$.run-local-hash-embedding-worker.missing_text_rows"
+    op: "=="
+    value: 0
+    severity: "high"
+    label: "Every sampled embedding row joined back to planned source text."
+  - kind: "semantic"
+    target: "$.run-local-hash-embedding-worker"
+    must_cover:
+      - "deterministic"
+      - "local"
+      - "vector"
+      - "readiness"
+      - "dimensions"
+      - "quality boundary"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The local worker boundary is explicit."

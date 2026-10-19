@@ -1,0 +1,98 @@
+id: "pipeline/research-entity"
+type: pipeline
+version: "0.1.0"
+name: "Research Entity"
+description: |
+  Given an entity name + entity kind (company / person / place / product),
+  produce a sourced one-page profile. Verifiable, cited, redacted.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry"]
+capability: ["research", "retrieval", "extraction", "summarization", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "mixed"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given (entity_name, entity_kind, optional_country), produce a one-page
+  sourced profile with: short description, key facts, recent events,
+  conflict-or-controversy section, and a citation list. Every claim is
+  cited; PII is redacted before any external call.
+pipeline_kind: "research_entity"
+
+inputs:
+  - name: "entity_name"
+    type: "string"
+  - name: "entity_kind"
+    type: "enum[company, person, place, product]"
+  - name: "country"
+    type: "string"
+  - name: "freshness_window_days"
+    type: "integer"
+
+outputs:
+  - name: "profile_markdown"
+    type: "markdown"
+  - name: "citations"
+    type: "Citation[]"
+  - name: "trace"
+    type: "TraceFrame[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs: []
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+    - "rule-pack/web-search-allowlist-default"
+
+steps:
+  - id: "redact_query"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs: { text: "$.inputs.entity_name" }
+
+  - id: "plan"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Plan a 5-step research outline for {entity_name} ({entity_kind})."}]
+
+  - id: "search"
+    kind: "tool"
+    ref: "tool/web-search"
+    inputs:
+      query: "$.steps.redact_query.output.redacted_text"
+      max_results: 10
+
+  - id: "verify_sources"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Score each source for credibility; drop low-credibility entries."}]
+      context: "$.steps.search.output.results"
+
+  - id: "extract_facts"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Extract typed facts (date, claim, evidence_url) from accepted sources."}]
+      context: "$.steps.verify_sources.output.accepted"
+
+  - id: "compose"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Compose a one-page profile from extracted facts. Cite every claim. Refuse if fewer than 3 independent corroborating sources for a controversial claim."}]
+      context: "$.steps.extract_facts.output.facts"
+
+success_criteria:
+  - rubric: "rubric/research-entity-v1"
+    threshold: 0.75

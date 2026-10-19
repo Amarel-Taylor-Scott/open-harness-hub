@@ -1,0 +1,109 @@
+id: "harness/code-act-jupyter"
+type: harness
+version: "0.1.0"
+name: "Code-Act Jupyter (tool-augmented reasoning via sandboxed Python)"
+description: |
+  Harness that wraps a model call with a Python execution loop. The
+  model emits `<code>...</code>` blocks; the harness runs them in a
+  sandboxed Jupyter kernel; stdout / stderr / repr feed back into the
+  next turn. Loop terminates when the model emits a `<final>...
+  </final>` block or `max_tool_turns` is reached.
+
+  The classic AIMO-2 + ChartQA + math-reasoning shape, verified by
+  Open Harness Hub mining: itahiro DeepSeek-R1-distill-7B (1399
+  votes), lewtun "Updated Code Interpretation" (1173), abdurrafae
+  (1001), mbmmurad QwQ-32B (1097).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:    ["ai", "scientific_research", "education"]
+capability:  ["reasoning", "tool_use", "code_execution"]
+modality:    ["text", "code"]
+lifecycle:   "beta"
+trust_boundary: "local"
+freshness:   "stable"
+tags: ["code-act", "tool-use", "jupyter", "kaggle-verified"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers:
+  - persona
+  - tools
+
+consumes:
+  - tool_definition
+  - persona_block
+emits:
+  - reasoning_step
+  - tool_call
+  - tool_observation
+
+logic_paths:
+  - id: "code_act_loop"
+    label: "Prompt → code → execute → observe → repeat"
+    entrypoints: ["/api/code-act"]
+    steps:
+      - "compose persona + task"
+      - "call model"
+      - "extract <code>...</code> blocks"
+      - "execute in sandbox kernel"
+      - "feed observation back as user turn"
+      - "stop on <final>...</final> or max_turns"
+    consumes: [tool_definition, persona_block]
+    emits: [tool_call, tool_observation, reasoning_step]
+    model_call: "required"
+    verification:
+      - "no shell escape / subprocess.run with untrusted args"
+      - "kernel restart on memory > 4GB or wall > 60s"
+      - "stdout truncated at 16KB per turn"
+
+knowledge_packs: []
+
+logic_packs:
+  - id: "persona_default"
+    label: "Default persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "tool_registry"
+    label: "Python tool registry"
+    kind: logic_pack
+    types: [tool_definition]
+    required: true
+
+model_io:
+  input:  "{messages: ChatMessage[], tools: ToolDef[]}"
+  output: "{final: string, transcript: Turn[]}"
+
+model_targets:
+  - id: "local_vllm"
+    label: "Local vLLM (AWQ)"
+    transport: "vllm"
+    role: "Reasoning-distilled model (DeepSeek-R1 / QwQ / Qwen-32B-AWQ)."
+    capabilities: ["text_generation", "chat", "tool_use"]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Fallback for small-model code-act."
+    capabilities: ["text_generation", "chat", "tool_use"]
+    required: false
+    default: false
+    trust_boundary: "local"
+
+input_verification:
+  - "redact PII before model call"
+  - "reject input larger than 32 KB"
+output_verification:
+  - "code blocks executed in sandbox"
+  - "no network egress from kernel (default)"
+  - "final answer extracted from <final>...</final>"
+
+privacy_boundaries:
+  raw_input:      "stays local to the kernel process"
+  derived_output: "transcript may be synced post-anonymization"
+  external_calls: "kernel network egress is off by default"

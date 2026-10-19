@@ -1,0 +1,82 @@
+id: "pipeline/pgvector-embedding-load-plan"
+type: pipeline
+version: "0.1.0"
+name: "Pgvector embedding load plan"
+description: "Turns stored vector JSONL rows into accepted/rejected load evidence and reviewable SQL for the canonical Postgres object_embedding table."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "postgres", "daily-factory", "load-plan"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Convert completed local embedding worker vector rows into reviewable pgvector object_embedding load SQL."
+pipeline_kind: "research_web.pgvector_embedding_load_plan"
+inputs:
+  - name: "stored_vectors_jsonl"
+    type: "string"
+  - name: "source_embedding_rows_jsonl"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+outputs:
+  - name: "object_embedding_load_sql"
+    type: "sql"
+  - name: "accepted_object_embedding_load_rows"
+    type: "jsonl"
+  - name: "rejected_object_embedding_load_rows"
+    type: "jsonl"
+  - name: "pgvector_embedding_load_plan_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/pgvector-embedding-load-patterns"
+steps:
+  - id: "load-pgvector-load-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/pgvector-embedding-load-patterns"
+    inputs:
+      query: "pgvector embedding load dimension source text replay sql"
+      top_k: 20
+  - id: "plan-pgvector-embedding-load"
+    kind: "tool"
+    ref: "tool/pgvector-embedding-load-planner"
+    inputs:
+      stored_vectors_jsonl: "$.inputs.stored_vectors_jsonl"
+      source_embedding_rows_jsonl: "$.inputs.source_embedding_rows_jsonl"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.plan-pgvector-embedding-load.accepted_rows"
+    op: ">="
+    value: 1
+    severity: "high"
+    label: "At least one vector row is accepted for pgvector loading."
+  - kind: "deterministic"
+    target: "$.plan-pgvector-embedding-load.rejected_rows"
+    op: "=="
+    value: 0
+    severity: "medium"
+    label: "The sample has no schema-blocked vector rows."
+  - kind: "semantic"
+    target: "$.plan-pgvector-embedding-load"
+    must_cover:
+      - "pgvector"
+      - "object_embedding"
+      - "dimension"
+      - "source text"
+      - "reviewable SQL"
+      - "side effect free"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The Postgres load boundary is explicit."

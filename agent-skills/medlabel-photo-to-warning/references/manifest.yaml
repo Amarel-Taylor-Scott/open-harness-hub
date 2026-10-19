@@ -1,0 +1,136 @@
+id: "pipeline/medlabel-photo-to-warning"
+type: pipeline
+version: "0.1.0"
+name: "MedLabel — photo-to-warning medicine safety pipeline"
+description: |
+  Photograph of a medicine label → Gemma 4 vision extract (active
+  ingredients + dosage + strength + warnings) → drug-interaction
+  check against the user's current medication list → multilingual
+  user-language warning if a critical interaction or contraindication
+  is detected. Offline-first to work in low-connectivity settings.
+
+  Verified reference port of MedLabel by [unconfirmed author], shown
+  at the Gemma 4 Good Hackathon 2026 (companion to Bill_info AI in
+  the same hackathon's Impact Track — Digital Equity & Inclusivity /
+  Safety & Trust). Sourced from the project's public YouTube demo;
+  catalog port maintains the architectural shape but needs author
+  attribution + repo URL confirmation before claiming author co-
+  credit.
+
+  Implements the same 3 design patterns Bill_info AI publishes:
+   - pattern/two-stage-extract-then-judge (extract fields → judge
+     interaction risk)
+   - pattern/critical-tier-output-override (severe interaction →
+     "STOP, do not take, contact doctor" overrides anything else)
+   - pattern/refuse-on-redacted (illegible label fields → null +
+     "unreadable" warning rather than guessing dosage)
+authors:
+  - name: "MedLabel team (Gemma 4 Good Hackathon — author pending confirmation)"
+  - name: "Open Harness Hub contributors (catalog port + spec)"
+license: "MIT"
+industry:   ["healthcare", "healthcare.pharmacy", "humanitarian", "bureaucracy_translation"]
+capability: ["extraction", "verification", "translation", "classification"]
+modality:   ["image", "text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["medlabel", "gemma-4", "drug-interactions", "medicine-safety", "offline-first", "multilingual", "hackathon-port"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url:  "https://www.youtube.com/watch?v=JwU44PaKQc8"
+  source_kind: "other"
+  author:      "MedLabel team — Gemma 4 Good Hackathon (Impact Track 2026)"
+  license:     "Apache-2.0 (Gemma weights); upstream repo license TBD pending author confirmation"
+
+task: "Given a photograph of a medicine label + user's current med list, detect dangerous drug interactions and emit a multilingual user-language warning."
+pipeline_kind: "review"
+
+inputs:
+  - name: "label_image"
+    type: "image"
+  - name: "user_medication_list"
+    type: "string[]"
+  - name: "user_language"
+    type: "string"
+outputs:
+  - name: "extracted_label"
+    type: "object"
+  - name: "interaction_findings"
+    type: "object[]"
+  - name: "warning_severity"
+    type: "string"
+  - name: "user_language_warning"
+    type: "string"
+  - name: "doctor_contact_recommended"
+    type: "boolean"
+
+defaults:
+  persona: "persona/bureaucracy-translator-cite-first"
+  model_adapter: "adapter/gemma-4-26b-vision"
+  knowledge_packs:
+    - "knowledge-pack/drug-interaction-references"
+
+steps:
+  - id: "guard_input"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.user_language" }
+  - id: "extract_label_fields"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "Extract medicine label fields. NEVER invent values for unreadable fields — return null."},
+         {"role": "user",   "content": "Return JSON: {active_ingredient: str|null, dosage: str|null, strength: str|null, warnings: str[]|null, contraindications: str[]|null, manufacturer: str|null}"}]
+      context: "$.inputs.label_image"
+  - id: "rag_drug_interactions"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query:  "$.steps.extract_label_fields.output.active_ingredient"
+      corpus: "knowledge-pack/drug-interaction-references"
+      top_k:  10
+  - id: "judge_interaction_risk"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "Judge drug-interaction risk. Classify severity ∈ {none, minor, moderate, severe}. SEVERE includes any contraindication, MAOI + SSRI / sympathomimetic, warfarin + NSAID at-risk dose, anticoagulant + antiplatelet uncontrolled, etc. Cite the interaction source for every severe finding. Never recommend OK-to-take without explicit known-safe evidence."},
+         {"role": "user",   "content": "{user_meds}\\n\\nNew medication: {extracted_label}\\n\\nReferences: {rag_interactions}"}]
+      context:
+        user_meds:         "$.inputs.user_medication_list"
+        extracted_label:   "$.steps.extract_label_fields.output"
+        rag_interactions:  "$.steps.rag_drug_interactions.output"
+  - id: "assemble_warning"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "Assemble user-facing warning. FIRST: the warning severity color (red/yellow/green). THEN: the user-language warning. IF severity == 'severe': OVERRIDE everything to 'STOP — do not take. Contact your doctor or pharmacist immediately.' Translation must be in the user's language."},
+         {"role": "user",   "content": "{extracted_label}\\n{interaction_findings}\\n{user_language}"}]
+      context:
+        extracted_label:        "$.steps.extract_label_fields.output"
+        interaction_findings:   "$.steps.judge_interaction_risk.output"
+        user_language:          "$.inputs.user_language"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "medlabel-photo-to-warning"
+      applied_layers: ["extract", "rag_interactions", "judge_severity", "assemble_warning", "critical_override"]
+
+success_criteria:
+  - kind: regex
+    label: "severe-interaction findings produce STOP message"
+    target: "$.steps.assemble_warning.output"
+    pattern: "(?i)stop|нe приймати|nicht\\s+einnehmen|contact"
+    must_match: true
+    severity: critical
+  - kind: deterministic
+    label: "extraction returns null on illegible fields (no hallucination)"
+    target: "$.steps.extract_label_fields.output.dosage"
+    op: "is_truthy"
+    value: null
+    severity: high

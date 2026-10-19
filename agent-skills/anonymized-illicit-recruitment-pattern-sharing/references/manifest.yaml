@@ -1,0 +1,113 @@
+id: "pipeline/anonymized-illicit-recruitment-pattern-sharing"
+type: pipeline
+version: "0.1.0"
+name: "Anonymized cross-org pattern sharing for illicit recruitment corridors"
+description: |
+  Mechanism for cross-industry knowledge sharing of systemic bad
+  actors (rogue labor brokers, repeat-offender contractors, illicit
+  recruitment corridors) WITHOUT leaking corporate-confidential
+  supply-chain information. The shape:
+
+   1. Each org's audit pipeline emits a `pattern_indicator` record
+      (HMACed broker ID + corridor + indicator categories + observation
+      window).
+   2. Indicators are bucketed; counts < `k` (default k = 5) are
+      dropped (k-anonymity).
+   3. Surviving buckets are signed and published to a shared hub.
+   4. Member orgs query the hub: "have these indicators been seen
+      against this corridor / broker?" — returns aggregate count +
+      severity, never per-org provenance.
+
+  Use case: a beverage company audits a tier-3 packaging supplier in
+  Mae Sot and finds 3 indicators. The hub already shows 14 indicators
+  from 4 other orgs against the same broker in the same corridor in
+  the last 90 days → trigger heightened review across all members.
+
+  Inspired by reviewer feedback on the DueCare ecosystem; aligned with
+  FATF Recommendation 18 information-sharing principles (adapted to
+  ESG / forced-labor context).
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "supply_chain", "compliance"]
+capability: ["retrieval", "verification", "anonymization"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "hub"
+lifecycle_position: "post_api.share"
+tags: ["esg", "k-anonymity", "cross-org", "forced-labor", "csddd"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://www.fatf-gafi.org/en/topics/Information-sharing.html"
+  source_kind: "other"
+  author:      "FATF Rec. 18 (adapted to ESG / forced-labor)"
+  license:     "CC-BY-4.0"
+
+task: |
+  Given an org's per-supplier finding set, emit hub-suitable
+  k-anonymized pattern indicators; query the hub for matching
+  indicators from peer orgs; surface aggregate signals back to the
+  org's compliance team.
+pipeline_kind: "anonymization_and_sharing"
+
+inputs:
+  - name: "org_findings"
+    type: "object[]"
+  - name: "k_anonymity_threshold"
+    type: "integer"
+  - name: "hub_endpoint"
+    type: "string"
+outputs:
+  - name: "shared_indicators"
+    type: "object[]"
+  - name: "matched_peer_aggregates"
+    type: "object[]"
+  - name: "rejected_below_k"
+    type: "object[]"
+
+defaults:
+  persona: "persona/esg-auditor"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/privacy-pii-text-en"
+
+steps:
+  - id: "redact_to_indicator"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.inputs.org_findings"
+
+  - id: "hash_broker_id"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "hash-broker-id"
+      applied_layers: ["anonymization"]
+
+  - id: "k_anonymity_gate"
+    kind: "processor"
+    ref: "processor/cost-ceiling-gate"
+    inputs:
+      k_threshold: "$.inputs.k_anonymity_threshold"
+      candidate_set: "$.steps.hash_broker_id.output"
+
+  - id: "query_hub"
+    kind: "tool"
+    ref: "tool/web-search"
+    inputs:
+      query: "$.steps.k_anonymity_gate.output.published"
+      endpoint: "$.inputs.hub_endpoint"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "anonymized-illicit-recruitment-pattern-sharing"
+      applied_layers: ["anonymization", "online"]
+
+success_criteria:
+  - rubric:    "rubric/esg-supplier-compliance-v1"
+    threshold: 0.6

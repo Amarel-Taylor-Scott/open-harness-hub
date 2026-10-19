@@ -1,0 +1,191 @@
+id: "pipeline/bill-info-extract-fraud-detect-recommend"
+type: pipeline
+version: "0.1.0"
+name: "Bill_info AI — photo-to-action bureaucracy translator with Verbraucherzentrale-grounded fraud detection"
+description: |
+  Photograph → structured-field extraction (Gemma 4 26B vision) →
+  deterministic business-rule validation → Gemma 4 26B fraud-detect
+  call against Verbraucherzentrale 10-indicator taxonomy → action-
+  first user-language output with critical-tier override on fraud.
+
+  Verified port of Sviatoslav Grabovsky's Bill_info AI (Gemma 4 Good
+  Hackathon, Hugging Face Space at Svityk/bill-info-ai). Eval set:
+  28 documents (Reddit-sourced real letters, redacted documents for
+  refusal testing, clear synthetic cases, adversarial edge cases).
+  Reported metrics: 96% extraction success (27/28), 95.8% field
+  accuracy, 100% refusal accuracy on 7 redacted documents, 8.5s
+  average latency, three-level fraud classification (legitimate /
+  suspicious / likely_scam).
+
+  Implements 3 design patterns published from this work:
+   - pattern/two-stage-extract-then-judge (focused fraud-detect call
+     does not compete with extraction for model attention)
+   - pattern/critical-tier-output-override (likely_scam classification
+     overrides every other output component to anti-scam guidance)
+   - pattern/refuse-on-redacted (null on redacted fields; user sees
+     'unknown' in their language, never a hallucinated value)
+authors:
+  - name: "Sviatoslav Grabovsky (Bill_info AI, original)"
+  - name: "Open Harness Hub contributors (port + spec)"
+license: "MIT"
+industry:   ["bureaucracy_translation", "bureaucracy_translation.payment_letters", "bureaucracy_translation.fraud_screening", "humanitarian", "humanitarian.refugee"]
+capability: ["evaluation", "extraction", "verification", "translation", "classification"]
+modality:   ["image", "text"]
+lifecycle:  "beta"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["bill-info-ai", "gemma-4", "verbraucherzentrale", "fake-inkasso", "refugee-protection", "ukrainian", "german", "hackathon-verified"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url:  "https://huggingface.co/spaces/Svityk/bill-info-ai"
+  source_kind: "huggingface"
+  author:      "Sviatoslav Grabovsky — Bill_info AI, Gemma 4 Good Hackathon (Impact Track — Digital Equity & Inclusivity)"
+  license:     "Apache-2.0 (Gemma weights) + MIT (code)"
+
+task: |
+  Given a photograph or scan of a bureaucratic document (German
+  payment letter — Inkasso / Mahnung / phone bill / etc.), output:
+  (a) one concrete next-24h action in the user's language,
+  (b) urgency banner color (red/yellow/green),
+  (c) three-level fraud classification with cited indicators,
+  (d) full translation + 3-5 recommended steps,
+  (e) ready-to-send reply draft in the document's source language.
+  On critical-tier fraud: override every output to anti-scam
+  guidance.
+pipeline_kind: "agent_loop"
+
+inputs:
+  - name: "document_pages"
+    type: "image[]"
+  - name: "user_language"
+    type: "string"
+  - name: "jurisdiction"
+    type: "string"
+outputs:
+  - name: "next_24h_action"
+    type: "string"
+  - name: "urgency_banner"
+    type: "string"
+  - name: "fraud_classification"
+    type: "string"
+  - name: "fraud_indicators"
+    type: "object[]"
+  - name: "extracted_fields"
+    type: "object"
+  - name: "user_language_explanation"
+    type: "string"
+  - name: "recommended_steps"
+    type: "string[]"
+  - name: "reply_draft_source_language"
+    type: "string"
+  - name: "validation_errors"
+    type: "object[]"
+
+defaults:
+  persona: "persona/bureaucracy-translator-cite-first"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-fake-inkasso-fraud-flags"
+  knowledge_packs:
+    - "knowledge-pack/verbraucherzentrale-fake-inkasso-indicators"
+
+steps:
+  # ---- STAGE 1: extract structured fields ----
+  - id: "guard_input"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.user_language" }
+  - id: "extract_fields_gemma_vision"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "{{persona.bureaucracy-translator-cite-first}}"},
+         {"role": "user",   "content": "Extract every relevant field from the document images. Return JSON with: amount, currency, deadline, recipient_name, recipient_type (company|private_person), sender_name, sender_address, iban, creditor, document_type (Inkasso|Mahnung|Rechnung|etc.), reference_number. Return null for any field that is missing, redacted, or unreadable."}]
+      context: "$.inputs.document_pages"
+
+  # ---- VALIDATION LAYER (deterministic; catches what LLM alone cannot) ----
+  - id: "validate_business_rules"
+    kind: "processor"
+    ref: "processor/verify-deterministic-criterion"
+    inputs:
+      target_value: "$.steps.extract_fields_gemma_vision.output"
+      op: "is_truthy"
+      value: null
+
+  # ---- STAGE 1.5: GREP fraud indicators on raw OCR text ----
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.steps.extract_fields_gemma_vision.output"
+  - id: "grep_fake_inkasso_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-fake-inkasso-fraud-flags"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+
+  # ---- STAGE 2: focused fraud-detect LLM call (SEPARATE from extraction!) ----
+  - id: "fraud_detect_gemma"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "{{persona.bureaucracy-translator-cite-first}}"},
+         {"role": "user",   "content": "Given the extracted document fields + the GREP indicators that fired, evaluate this document against the 10 Verbraucherzentrale Fake-Inkasso indicators. Return classification ∈ {legitimate, suspicious, likely_scam} with cited indicators + tier (critical|supporting) + quoted German evidence."}]
+      context:
+        extracted: "$.steps.extract_fields_gemma_vision.output"
+        grep_hits: "$.steps.grep_fake_inkasso_flags.output.fired"
+
+  # ---- RAG: cite Verbraucherzentrale criteria for any fired indicators ----
+  - id: "rag_against_verbraucherzentrale"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.fraud_detect_gemma.output.indicators"
+      corpus: "knowledge-pack/verbraucherzentrale-fake-inkasso-indicators"
+      top_k: 6
+
+  # ---- STAGE 3: assemble action-first output with critical override ----
+  - id: "assemble_user_facing"
+    kind: "harness"
+    ref: "harness/text-safety-review"
+    inputs:
+      messages: |
+        [{"role": "system", "content": "{{persona.bureaucracy-translator-cite-first}}"},
+         {"role": "user",   "content": "Assemble the user-facing output. FIRST: one concrete next-24h action. THEN: urgency banner color. IF fraud_classification == 'likely_scam': OVERRIDE recommendations to anti-scam guidance + leave reply_draft empty. OTHERWISE: full translation + 3-5 steps + reply draft in source language."}]
+      context:
+        extracted:        "$.steps.extract_fields_gemma_vision.output"
+        fraud:            "$.steps.fraud_detect_gemma.output"
+        verbraucher_refs: "$.steps.rag_against_verbraucherzentrale.output"
+        user_language:    "$.inputs.user_language"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "bill-info-extract-fraud-detect-recommend"
+      applied_layers: ["extract", "validate_deterministic", "grep_fraud", "fraud_detect_llm", "rag_authority", "assemble"]
+
+success_criteria:
+  - rubric:    "rubric/bureaucracy-translation-quality-v1"
+    threshold: 0.85
+  - kind: deterministic
+    label: "next-24h action present"
+    target: "$.steps.assemble_user_facing.output"
+    op: "is_truthy"
+    value: null
+    severity: critical
+  - kind: composite
+    label: "critical-tier override enforced when likely_scam"
+    op: "OR"
+    children:
+      - kind: deterministic
+        target: "$.steps.fraud_detect_gemma.output"
+        op: "!="
+        value: "likely_scam"
+      - kind: regex
+        target: "$.steps.assemble_user_facing.output"
+        pattern: "do not pay|не платіть|nicht zahlen"
+        must_match: true

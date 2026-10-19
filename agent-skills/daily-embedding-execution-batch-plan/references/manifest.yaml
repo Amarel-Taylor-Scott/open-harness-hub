@@ -1,0 +1,81 @@
+id: "pipeline/daily-embedding-execution-batch-plan"
+type: pipeline
+version: "0.1.0"
+name: "Daily embedding execution batch plan"
+description: "Builds provider-neutral embedding worker batches, cost estimates, and vector readiness evidence from a staged daily production run."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["embedding", "retrieval", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "mixed"
+freshness: "stable"
+lifecycle_position: "cross_cutting.storage"
+tags: ["embeddings", "vector-search", "pgvector", "daily-factory", "cost-estimation", "worker-shards"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Plan embedding execution batches for a staged daily production run and prove vector search is not ready until vectors are stored."
+pipeline_kind: "research_web.daily_embedding_execution_batch_plan"
+inputs:
+  - name: "daily_run_dir"
+    type: "string"
+  - name: "output_dir"
+    type: "string"
+  - name: "run_id"
+    type: "string"
+outputs:
+  - name: "embedding_model_profiles"
+    type: "json"
+  - name: "embedding_batches"
+    type: "jsonl"
+  - name: "embedding_completion_stubs"
+    type: "jsonl"
+  - name: "vector_readiness_summary"
+    type: "json"
+  - name: "daily_embedding_execution_summary"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-embedding-execution-patterns"
+steps:
+  - id: "load-embedding-execution-checks"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-embedding-execution-patterns"
+    inputs:
+      query: "embedding batch sharding cost vector readiness no provider call"
+      top_k: 20
+  - id: "plan-daily-embedding-execution"
+    kind: "tool"
+    ref: "tool/daily-embedding-execution-batch-planner"
+    inputs:
+      daily_run_dir: "$.inputs.daily_run_dir"
+      output_dir: "$.inputs.output_dir"
+      run_id: "$.inputs.run_id"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.plan-daily-embedding-execution.embedding_plan.planned_completion_rows"
+    op: ">="
+    value: 1
+    severity: "high"
+    label: "Embedding work rows are converted into planned completion rows."
+  - kind: "deterministic"
+    target: "$.plan-daily-embedding-execution.vector_readiness.readiness_status"
+    op: "=="
+    value: "not_ready"
+    severity: "medium"
+    label: "Vector search remains blocked until actual vectors are stored."
+  - kind: "semantic"
+    target: "$.plan-daily-embedding-execution"
+    must_cover:
+      - "model profile"
+      - "batch"
+      - "estimated tokens"
+      - "cost"
+      - "vector readiness"
+      - "no provider call"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The plan preserves the execution boundary."

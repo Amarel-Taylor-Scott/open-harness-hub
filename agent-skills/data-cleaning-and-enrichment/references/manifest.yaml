@@ -1,0 +1,103 @@
+id: "harness/data-cleaning-and-enrichment"
+type: harness
+version: "0.1.0"
+name: "Data cleaning + entity enrichment harness"
+description: |
+  Cross-vertical harness that normalizes a raw customer / vendor /
+  applicant record: addresses → USPS standardized + geocoded;
+  phones → E.164; names → canonical with given/family split;
+  countries → ISO 3166 codes; dates → ISO 8601; emails →
+  deliverable check; entities → linked to OpenCorporates /
+  Companies House. Output is a clean, enrichable record ready for
+  downstream pipelines (ESG / AML / claims / benefits / etc.).
+
+  Strictly local-first; external tool calls (USPS / Google Geocode /
+  OpenCorporates) opt-in via env-var keys.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["cross_industry", "retail", "finance", "healthcare", "government", "insurance"]
+capability: ["format_conversion", "verification", "extraction", "anonymization"]
+modality:   ["text", "structured"]
+lifecycle:  "beta"
+trust_boundary: "mixed"
+freshness:  "stable"
+tags: ["enrichment", "address", "phone", "dedup", "data-cleaning"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [grep, tools]
+consumes: [grep_rule, tool_definition]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "clean_and_enrich_record"
+    label: "raw record → standardized + enriched record"
+    entrypoints: ["/api/enrich/record"]
+    steps:
+      - "parse address → USPS standardized + libpostal fallback"
+      - "normalize phones → E.164 (libphonenumber)"
+      - "canonicalize names → given_name + family_name + middle + suffix + honorific"
+      - "resolve countries → ISO 3166 alpha-2/alpha-3/numeric"
+      - "parse dates → ISO 8601"
+      - "validate USPS deliverable (if US + tool/usps-address-validator configured)"
+      - "geocode (if tool/google-geocode configured)"
+      - "entity-link to OpenCorporates (if vendor / B2B record + tool/opencorporates-lookup configured)"
+      - "validate SWIFT BIC (if payment / bank record)"
+      - "compute dedup key for entity resolution"
+    consumes: [grep_rule, tool_definition]
+    emits: [reasoning_step, context_snippet]
+    model_call: "optional"
+    verification:
+      - "every field has provenance (source step + confidence)"
+      - "no PII synthesis (e.g. don't FILL IN missing SSN)"
+      - "external-tool calls audited per record"
+knowledge_packs:
+  - id: "iso_codes"
+    label: "ISO 3166 country + ISO 4217 currency + ISO 9362 BIC"
+    kind: knowledge_pack
+    types: [rag_doc]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs: []
+model_io:
+  input:  "{record: object, profile: string}"
+  output: "{standardized: object, enriched: object, dedup_key: string, provenance: object[]}"
+model_targets:
+  - id: "no_model"
+    label: "Deterministic, no LLM"
+    transport: "none"
+    role: "Pure deterministic enrichment; LLM only as fallback for ambiguous addresses."
+    capabilities: []
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "local_ollama_fallback"
+    label: "Local Ollama (ambiguity arbitration)"
+    transport: "ollama"
+    role: "Disambiguate addresses or names when deterministic parsing is ambiguous."
+    capabilities: [text_generation]
+    required: false
+    default: false
+    trust_boundary: "local"
+input_verification:
+  - "reject record larger than 16 KB"
+  - "redact PII before any external-tool call (sanitize SSN / DOB before geocoding endpoint)"
+output_verification:
+  - "every enriched field has provenance"
+  - "external-tool call audit recorded"
+  - "no synthesized PII in output"
+privacy_boundaries:
+  raw_input:      "stays local; external tool calls send sanitized fields only"
+  derived_output: "may sync to hub only after anonymization gate"
+  external_calls: "USPS / Google Geocode / OpenCorporates / SWIFT BIC — only when their env keys are set AND user opted in"
+data_protection:
+  data_categories:              ["dpv:Identifying", "dpv:Address", "dpv:Communication"]
+  hipaa_safe_harbor_categories: ["hsh:01", "hsh:02", "hsh:04", "hsh:05"]
+contributes_to:
+  - "pipeline/customer-record-enrichment"
+  - "pipeline/full-vendor-due-diligence"
+  - "pipeline/benefits-adjudication-review"
+  - "pipeline/insurance-claim-review"

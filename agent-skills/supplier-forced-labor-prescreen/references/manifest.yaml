@@ -1,0 +1,237 @@
+id: "pipeline/supplier-forced-labor-prescreen"
+type: pipeline
+version: "0.1.0"
+name: "Supplier forced-labour pre-screen (UFLPA / WRO / high-risk-sector triage gate)"
+description: |
+  CHEAP STAGE-1 triage gate for modern-slavery supplier screening. Given a
+  minimal supplier identity (name, country, product, parent), it decides —
+  before any expensive deep-tier audit — whether the supplier should be
+  routed to full forced-labour due diligence, based on keyword/exact-id hits
+  against UFLPA Entity-List / CBP Withhold-Release-Order signals, the UFLPA
+  high-priority sectors (cotton, polysilicon, tomatoes), and ILO/UNODC
+  high-risk-sector + high-risk-corridor markers in the regulatory pack.
+
+  Negative-space task: a procurement team onboarding thousands of suppliers
+  cannot run a full audit on every one, and a bare model asked "is this
+  supplier risky?" invents a plausible-sounding risk score with no traceable
+  basis. The durable lift is a *cheap, deterministic, cited* screen that
+  separates "no signal -> standard onboarding" from "signal -> escalate to
+  full audit", so the expensive Stage-2 pipeline
+  (`pipeline/apparel-forced-labor-trace-review`) only runs where a real
+  signal exists. This is the "screen before you collect" half of the
+  capability-gap framework applied to supplier intake.
+
+  Bundle: Cheap keyword-first (taxonomy Bundle C) — exact-id / keyword
+  retrieval against the due-diligence pack as the cost floor, a cost-ceiling
+  gate so the screen stays cheap, and a corrective route: any sanctions/WRO
+  hit OR a high-risk sector+corridor co-occurrence escalates to the full
+  audit; otherwise the supplier passes with a cited "no-signal" rationale.
+  This pipeline makes NO forced-labour determination — it only routes.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["supply_chain.due_diligence", "esg.modern_slavery", "procurement.vendor_risk", "compliance"]
+capability: ["classification", "routing", "retrieval", "verification"]
+modality: ["text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+lifecycle_position: "pre_api.triage"
+freshness: "stable"
+tags: ["anti-trafficking", "forced-labor", "uflpa", "wro", "supplier-screening", "triage-gate", "keyword-first"]
+created: "2026-05-29"
+updated: "2026-05-29"
+
+attribution:
+  source_url: "https://www.dhs.gov/uflpa-entity-list"
+  source_kind: "other"
+  author: "US UFLPA Entity List + CBP Withhold Release Orders (snapshot); ILO/UNODC high-risk-sector typology — composite educational extracts"
+  license: "public-resource"
+  notes: |
+    Cheap cited routing gate over public UFLPA/CBP signals + high-risk-sector
+    markers. NOT a determination; routes a supplier to standard onboarding or
+    full forced-labour due diligence.
+
+task: "Pre-screen a supplier (name, country, product, parent) for forced-labour risk signals and route it: standard-onboarding (no signal) | escalate-to-full-audit (signal found), citing the matched signal."
+pipeline_kind: "route"
+
+inputs:
+  - name: "supplier_record"
+    type: "string|object"
+    description: "{ supplier_name: string, country: string, product_category: string, parent_company: string|null, tier: integer }"
+
+outputs:
+  - name: "routing_decision"
+    type: "string"
+    description: "standard-onboarding | escalate-to-full-audit"
+  - name: "matched_signals"
+    type: "object[]"
+    description: "Each: {signal_type (uflpa_entity|cbp_wro|high_risk_sector|high_risk_corridor), matched_term, citation, severity}"
+  - name: "next_pipeline"
+    type: "string|null"
+    description: "When escalated: pipeline/apparel-forced-labor-trace-review"
+  - name: "screen_cost"
+    type: "object"
+
+defaults:
+  persona: "persona/vendor-risk-analyst"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/csddd-and-forced-labor-indicators"
+    - "knowledge-pack/sanctions-list-shape"
+  rule_packs:
+    - "rule-pack/grep-apparel-forced-labor-trace-flags"
+    - "rule-pack/sanctions-screening"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.supplier_record" }
+
+  - id: "canonicalize_name"
+    kind: "processor"
+    ref: "processor/name-canonicalize"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+
+  - id: "normalize_country"
+    kind: "processor"
+    ref: "processor/iso-country-normalize"
+    inputs: { country: "$.inputs.supplier_record" }
+
+  - id: "cost_gate"
+    kind: "processor"
+    ref: "processor/cost-ceiling-gate"
+    inputs:
+      candidate_set: "$.steps.canonicalize_name.output"
+      ceiling: "stage1-keyword-only"
+
+  - id: "sanctions_wro_screen"
+    kind: "rule_pack"
+    ref: "rule-pack/sanctions-screening"
+    inputs:
+      text: "$.steps.canonicalize_name.output.result"
+      corpus: "knowledge-pack/sanctions-list-shape"
+
+  - id: "grep_sector_corridor"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-apparel-forced-labor-trace-flags"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+
+  - id: "retrieve_risk_basis"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-apparel-forced-labor-trace-flags"
+    inputs: { text: "$.steps.normalize_country.output.result" }
+
+  - id: "entity_link"
+    kind: "processor"
+    ref: "processor/entity-resolution-link"
+    inputs:
+      candidate: "$.steps.canonicalize_name.output.result"
+      corpus: "knowledge-pack/sanctions-list-shape"
+
+  - id: "classify_route"
+    kind: "processor"
+    ref: "processor/policy-exception-classifier"
+    inputs:
+      candidate:
+        sanctions_hits: "$.steps.sanctions_wro_screen.output"
+        sector_corridor_hits: "$.steps.grep_sector_corridor.output.fired"
+        entity_match: "$.steps.entity_link.output.result"
+      policy: "any sanctions/WRO hit OR (high-risk sector AND high-risk corridor) => escalate-to-full-audit"
+
+  - id: "check_citations"
+    kind: "processor"
+    ref: "processor/citation-span-checker"
+    inputs: { trace: "$.steps.classify_route.output", config: {} }
+
+  - id: "escalate_if_signal"
+    kind: "processor"
+    ref: "processor/escalate-human-review"
+    inputs:
+      trace: "$.steps.classify_route.output"
+      reason: "forced-labour signal found in Stage-1 pre-screen; route to pipeline/apparel-forced-labor-trace-review"
+
+  - id: "summary"
+    kind: "processor"
+    ref: "processor/review-summary-composer"
+    inputs: { trace: "$.steps.classify_route.output", config: {} }
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "supplier-forced-labor-prescreen"
+      applied_layers: ["grep", "classifier", "heuristic"]
+
+success_criteria:
+  - kind: "deterministic"
+    target: "$.steps.classify_route.output.result.routing_decision"
+    op: "in"
+    value: ["standard-onboarding", "escalate-to-full-audit"]
+    severity: "high"
+    label: "screen emits a valid routing decision"
+  - kind: "deterministic"
+    target: "$.steps.check_citations.output.result.pass"
+    op: "=="
+    value: true
+    severity: "high"
+    label: "every matched signal cites its source list / corpus span"
+  - kind: "deterministic"
+    target: "$.steps.cost_gate.output.result.within_ceiling"
+    op: "=="
+    value: true
+    severity: "medium"
+    label: "Stage-1 screen stays within the keyword-only cost ceiling"
+
+related_patterns:
+  - "pattern/corrective-rag"
+  - "pattern/routing"
+
+examples:
+  - name: "Cotton supplier in UFLPA high-priority region — escalate"
+    input:
+      supplier_record:
+        supplier_name: "[Spinning Mill Co.]"
+        country: "China (Xinjiang Uyghur Autonomous Region)"
+        product_category: "cotton yarn"
+        parent_company: null
+        tier: 2
+    expected_output:
+      routing_decision: "escalate-to-full-audit"
+      matched_signals:
+        - signal_type: "high_risk_sector"
+          matched_term: "cotton"
+          citation: "US UFLPA — high-priority sector: cotton; rebuttable presumption under UFLPA / Tariff Act §307"
+          severity: "high"
+        - signal_type: "high_risk_corridor"
+          matched_term: "Xinjiang Uyghur Autonomous Region"
+          citation: "US UFLPA Entity List region; CBP Withhold Release Orders — XUAR forced-labour presumption"
+          severity: "critical"
+      next_pipeline: "pipeline/apparel-forced-labor-trace-review"
+      screen_cost:
+        model_calls: 0
+        note: "Keyword/exact-id only; no model call needed to route."
+      notes: >
+        Co-occurrence of a UFLPA high-priority sector (cotton) and a
+        high-risk corridor (XUAR) trips the escalation policy. The screen
+        makes no determination — it routes to the full Stage-2 audit pipeline
+        with the cited signals.
+  - name: "Domestic packaging supplier — no signal, standard onboarding"
+    input:
+      supplier_record:
+        supplier_name: "[Cardboard Box Inc.]"
+        country: "Germany"
+        product_category: "corrugated packaging"
+        parent_company: "[EU Packaging Group]"
+        tier: 1
+    expected_output:
+      routing_decision: "standard-onboarding"
+      matched_signals: []
+      next_pipeline: null
+      screen_cost:
+        model_calls: 0
+        note: "No sanctions/WRO hit, no high-risk sector, no high-risk corridor."
+      notes: >
+        No signal on any axis; supplier proceeds to standard onboarding with
+        a cited no-signal rationale. The expensive audit pipeline is not run,
+        preserving the screen-before-you-collect cost discipline.

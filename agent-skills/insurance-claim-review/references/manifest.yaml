@@ -1,0 +1,90 @@
+id: "pipeline/insurance-claim-review"
+type: pipeline
+version: "0.1.0"
+name: "Insurance claim review (NAIC fraud-aware)"
+description: |
+  Eighth vertical proving the architecture's industry-agnosticism.
+  Same 6-step chain — only persona/rule-pack/knowledge-pack/rubric
+  change.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["insurance", "insurance.claims", "insurance.fraud", "finance"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["insurance", "fraud", "naic", "claims"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+attribution:
+  source_url:  "https://content.naic.org/topics/fraud"
+  source_kind: "other"
+  author:      "NAIC + CAIF + ABI (composite)"
+  license:     "CC-BY-4.0"
+
+task: "Grade an insurance claim submission against the rubric + surface fraud indicators."
+pipeline_kind: "review"
+
+inputs:
+  - name: "claim_packet"
+    type: "string|object"
+  - name: "line_of_business"
+    type: "string"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "indicators"
+    type: "object[]"
+  - name: "disposition"
+    type: "string"
+
+defaults:
+  persona: "persona/insurance-claims-adjuster"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-insurance-fraud-red-flags"
+  knowledge_packs:
+    - "knowledge-pack/insurance-fraud-typologies"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs:
+      data: "$.inputs.claim_packet"
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs:
+      text: "$.steps.structured_to_prose.output.prose"
+  - id: "grep_indicators"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-insurance-fraud-red-flags"
+    inputs:
+      text: "$.steps.redact_pii.output.text"
+  - id: "rag_against_typologies"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs:
+      query: "$.steps.grep_indicators.output.fired"
+      corpus: "knowledge-pack/insurance-fraud-typologies"
+      top_k: 6
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/insurance-claim-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "insurance-claim-review"
+      applied_layers: ["persona", "pii_redact", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric:    "rubric/insurance-claim-quality-v1"
+    threshold: 0.6

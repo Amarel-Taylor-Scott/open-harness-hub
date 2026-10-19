@@ -1,0 +1,93 @@
+id: "harness/esg-pillar-review"
+type: harness
+version: "0.1.0"
+name: "ESG pillar (E / S / G) deep-dive review harness"
+description: |
+  Wraps the ESG pillar deep-dive review flow as a reusable harness.
+  Reviews ONE pillar (E, S, or G) at SASB + ISSB + TCFD + GRI depth,
+  cross-checks against greenwashing rule pack, and emits framework-
+  coded findings with disclosure-code citations.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["esg", "esg.csrd", "sustainability", "climate", "compliance"]
+capability: ["evaluation", "verification", "retrieval", "reasoning"]
+modality:   ["text", "structured"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "stable"
+tags: ["esg", "sasb", "gri", "tcfd", "issb", "harness"]
+created: "2026-05-24"
+updated: "2026-05-24"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, grep, rag, tools]
+consumes: [grep_rule, rag_doc, persona_block, response_policy]
+emits: [reasoning_step, context_snippet, extracted_fact]
+logic_paths:
+  - id: "review_esg_pillar"
+    label: "disclosure + pillar (E|S|G) → industry SASB topics → framework alignment → greenwashing scan → grade"
+    entrypoints: ["/api/esg/pillar-review"]
+    steps:
+      - "classify company into SICS industry"
+      - "fetch SASB industry-specific material topics for pillar"
+      - "fire greenwashing GREP pack"
+      - "RAG against SASB+GRI+TCFD+ISSB pack per material topic"
+      - "judge per esg-pillar-depth-v1 rubric"
+      - "propose specific drafting fixes per gap"
+      - "emit audit trace"
+    consumes: [grep_rule, rag_doc, persona_block, response_policy]
+    emits: [reasoning_step, context_snippet, extracted_fact]
+    model_call: "required"
+    verification:
+      - "every finding cites disclosure code (SASB / ISSB / GRI / TCFD)"
+      - "greenwashing-flag list attached"
+      - "double-materiality covered for every material topic"
+knowledge_packs:
+  - id: "esg_frameworks"
+    label: "SASB + GRI + TCFD + ISSB + SBTi reference pack"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "dated"
+logic_packs:
+  - id: "persona_default"
+    label: "ESG Pillar Analyst persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{disclosure_text: string, pillar: enum[E,S,G], company_industry_hint: string}"
+  output: "{grade: number, findings: object[], suggested_fixes: object[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local review."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude Sonnet"
+    transport: "anthropic"
+    role: "Optional frontier judge for board-grade review."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "reject input larger than 1 MB"
+  - "validate pillar in {E, S, G}"
+output_verification:
+  - "every finding cites a framework disclosure code"
+  - "greenwashing-flag list present (may be empty)"
+  - "rubric/esg-pillar-depth-v1 score recorded"
+privacy_boundaries:
+  raw_input:      "stays local; disclosure text is usually public"
+  derived_output: "may sync to hub"
+  external_calls: "only on explicit user opt-in"
+contributes_to:
+  - "pipeline/esg-pillar-deep-dive"

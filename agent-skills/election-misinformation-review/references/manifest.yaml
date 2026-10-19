@@ -1,0 +1,78 @@
+id: "pipeline/election-misinformation-review"
+type: pipeline
+version: "0.1.0"
+name: "Election misinformation / disinformation / synthetic-media review"
+description: "Vertical 23 — election integrity. Same 6-step chain."
+authors: [{ name: "Open Harness Hub contributors" }]
+license: "MIT"
+industry:   ["election_integrity", "media", "media.factcheck"]
+capability: ["evaluation", "extraction", "verification"]
+modality:   ["text", "image"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+lifecycle_position: "api.review"
+tags: ["election-integrity", "misinformation", "deepfake"]
+created: "2026-05-21"
+updated: "2026-05-21"
+
+attribution:
+  source_url: "https://www.cisa.gov/topics/election-security"
+  source_kind: "other"
+  author: "EAC + CISA + DHS + C2PA + ACT (composite)"
+  license: "CC-BY-4.0"
+
+task: "Review election-related content for mis/dis/mal-information + synthetic-media indicators + voter-suppression vectors."
+pipeline_kind: "review"
+
+inputs:
+  - name: "content_packet"
+    type: "string|object"
+outputs:
+  - name: "grade"
+    type: "number"
+  - name: "findings"
+    type: "object[]"
+  - name: "info_disorder_classification"
+    type: "string"
+
+defaults:
+  persona: "persona/election-integrity-analyst"
+  model_adapter: "adapter/ollama-default"
+  rule_packs:
+    - "rule-pack/grep-election-misinformation-flags"
+  knowledge_packs:
+    - "knowledge-pack/election-integrity-frameworks"
+
+steps:
+  - id: "structured_to_prose"
+    kind: "processor"
+    ref: "processor/structured-to-prose"
+    inputs: { data: "$.inputs.content_packet" }
+  - id: "redact_pii"
+    kind: "processor"
+    ref: "processor/redact-pii-text"
+    inputs: { text: "$.steps.structured_to_prose.output.prose" }
+  - id: "grep_red_flags"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-election-misinformation-flags"
+    inputs: { text: "$.steps.redact_pii.output.text" }
+  - id: "rag_against_frameworks"
+    kind: "rule_pack"
+    ref: "rule-pack/hybrid-retrieval-policy"
+    inputs: { query: "$.steps.grep_red_flags.output.fired", corpus: "knowledge-pack/election-integrity-frameworks", top_k: 6 }
+  - id: "grade"
+    kind: "processor"
+    ref: "processor/llm-judge"
+    inputs:
+      candidate: "$.steps.redact_pii.output.text"
+      rubric_ref: "rubric/election-integrity-quality-v1"
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "election-misinformation-review"
+      applied_layers: ["persona", "pii_redact", "grep", "rag", "judge"]
+
+success_criteria:
+  - rubric: "rubric/election-integrity-quality-v1"
+    threshold: 0.6

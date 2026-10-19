@@ -1,0 +1,104 @@
+id: "harness/personal-corpus-search"
+type: harness
+version: "0.1.0"
+name: "Personal corpus search (RAG over user's own files / notes / docs)"
+description: |
+  Search the user's personal corpus — their own files, notes,
+  emails, calendar, contacts — and return answer + citations
+  scoped to ONLY the user's data. Authorization-gated; refuses
+  to answer questions about a person from third-party data
+  unless the user has explicitly authorized.
+
+  Trust boundary is local — the user's data does not leave their
+  device unless they choose a hosted model arm.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["personal_productivity", "cross_industry"]
+capability: ["retrieval", "reasoning", "memory"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+freshness:  "volatile"
+tags: ["personal-rag", "search", "memory"]
+created: "2026-05-20"
+updated: "2026-05-20"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers: [persona, privacy, grep, rag, tools]
+consumes: [persona_block, rag_doc, tool_definition]
+emits: [reasoning_step, context_snippet]
+logic_paths:
+  - id: "personal_rag_answer"
+    label: "query → personal corpus retrieve → cite-first answer"
+    entrypoints: ["/api/personal/search"]
+    steps:
+      - "load user preferences (incl. privacy gates)"
+      - "scope retrieval to user's own corpus (calendar / contacts / notes / docs / emails)"
+      - "retrieve top-K from each source (hybrid BM25 + dense)"
+      - "rerank with cross-encoder"
+      - "compose persona + retrieved + tool registry"
+      - "generate answer with citations to source URIs / file paths"
+      - "redact any third-party PII before answer is returned"
+    consumes: [persona_block, rag_doc, tool_definition]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "every claim cites a personal corpus source URI"
+      - "no third-party PII in answer body"
+      - "no synthesis of information not actually in the corpus"
+knowledge_packs:
+  - id: "user_corpus"
+    label: "User's personal corpus (configured per user)"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+  - id: "user_prefs"
+    label: "User preference pack"
+    kind: knowledge_pack
+    types: [rag_doc]
+    required: true
+    trust_boundary: "local"
+    freshness: "volatile"
+logic_packs:
+  - id: "persona_default"
+    label: "Personal-assistant persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+model_io:
+  input:  "{user_id: string, query: string, scope: string[]}"
+  output: "{answer: string, citations: object[], source_uris: string[]}"
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local — keeps personal data on-device."
+    capabilities: [text_generation, chat]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "anthropic_claude"
+    label: "Anthropic Claude (hosted — user must explicitly opt in)"
+    transport: "anthropic"
+    role: "Optional hosted model arm when user accepts the trust-boundary tradeoff."
+    capabilities: [text_generation, chat, long_context]
+    required: false
+    default: false
+    trust_boundary: "external"
+input_verification:
+  - "user_id resolves to a known user corpus + preferences"
+  - "query smaller than 4 KB"
+output_verification:
+  - "no third-party PII"
+  - "every claim cited"
+  - "external calls only if user opted in"
+privacy_boundaries:
+  raw_input:      "the query stays on user's device"
+  derived_output: "the answer stays with the user"
+  external_calls: "only if model_target.trust_boundary == external AND user opted in via env"
+contributes_to:
+  - "pipeline/personal-search-pipeline"

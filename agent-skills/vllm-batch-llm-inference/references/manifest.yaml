@@ -1,0 +1,82 @@
+id: "pipeline/vllm-batch-llm-inference"
+type: pipeline
+version: "0.1.0"
+name: "vLLM batch LLM inference (with logits-processor-zoo)"
+description: |
+  Serve many prompts through a single vLLM engine with shared KV cache
+  + prefix caching. Optional logits-processor-zoo entries
+  (SuppressTokens / AllowedTokens / FixedTokenBias) constrain output
+  to a fixed-format token grammar — useful for retrieval-rerank
+  letter outputs, JSON skeletons, or multiple-choice answers.
+
+  Verified by Open Harness Hub mining: jagatkiran Qwen14B-Retrieval-
+  Qwen32B-logits-processor-zoo (672 votes, EEDI), aerdem4 Eedi-Qwen32B-
+  vllm-with-logits-processor-zoo (594 votes, EEDI), itahiro DeepSeek-
+  R1-distill-7B (1399 votes, AIMO 2), mbmmurad QwQ-32B-preview (1097
+  votes, AIMO 2), yekenot DeepSeek-R1-distill-7B-awq (1087 votes).
+  Confirmed pattern in 7 of 35 mined kernels.
+authors:
+  - name: "Open Harness Hub contributors (port)"
+license: "MIT"
+industry:   ["ai", "education"]
+capability: ["serving", "generation"]
+modality:   ["text"]
+lifecycle:  "stable"
+trust_boundary: "local"
+lifecycle_position: "api.generation"
+tags: ["vllm", "logits-processor-zoo", "kaggle-verified", "batch-serving"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+attribution:
+  source_url:  "https://github.com/vllm-project/vllm"
+  source_kind: "github"
+  author:      "vLLM contributors + jagatkiran/aerdem4/itahiro Kaggle kernels"
+  license:     "Apache-2.0"
+
+task: |
+  Given N prompts and a vLLM-served model, batch-generate completions
+  with shared KV cache + optional logits-processor-zoo constraints.
+  Output structured completions for downstream scoring or ensembling.
+pipeline_kind: "serving"
+
+inputs:
+  - name: "prompts"
+    type: "string[]"
+  - name: "sampling_params"
+    type: "object"
+  - name: "logits_processors"
+    type: "object[]"
+outputs:
+  - name: "completions"
+    type: "object[]"
+  - name: "token_logprobs"
+    type: "object[]"
+
+defaults:
+  persona: "persona/research-analyst"
+  model_adapter: "adapter/vllm-awq-local"
+
+steps:
+  - id: "guard"
+    kind: "rule_pack"
+    ref: "rule-pack/grep-prompt-injection-heuristics"
+    inputs: { text: "$.inputs.prompts" }
+
+  - id: "serve"
+    kind: "processor"
+    ref: "processor/vllm-batched-sampling"
+    inputs:
+      prompts:           "$.inputs.prompts"
+      sampling_params:   "$.inputs.sampling_params"
+      logits_processors: "$.inputs.logits_processors"
+      model_adapter_ref: "adapter/vllm-awq-local"
+
+  - id: "audit"
+    kind: "processor"
+    ref: "processor/audit-trace-emitter"
+    inputs:
+      step_id: "vllm-batch-llm-inference"
+      applied_layers: ["generation"]
+
+success_criteria: []

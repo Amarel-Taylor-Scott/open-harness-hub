@@ -1,0 +1,62 @@
+id: "pipeline/daily-stage-ledger-resume-audit"
+type: pipeline
+version: "0.1.0"
+name: "Daily stage ledger resume audit"
+description: "Builds a resumable stage ledger for a daily component factory run so interrupted 1K to 5K candidate batches can resume from the next missing stage instead of rebuilding prior stages."
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry: ["ai", "software.devops", "cross_industry"]
+capability: ["planning", "governance", "evaluation"]
+modality: ["structured", "text"]
+lifecycle: "experimental"
+trust_boundary: "local"
+freshness: "stable"
+lifecycle_position: "cross_cutting.scale"
+tags: ["components", "daily-factory", "resume", "stage-ledger", "multi-day-goal"]
+created: "2026-05-26"
+updated: "2026-05-26"
+
+task: "Inspect one daily production run directory, prove which stages have durable summaries, and emit the next safe resume action."
+pipeline_kind: "research_web.daily_stage_ledger_resume_audit"
+inputs:
+  - name: "run_dir"
+    type: "string"
+  - name: "output_path"
+    type: "string"
+outputs:
+  - name: "stage_ledger"
+    type: "json"
+defaults:
+  knowledge_packs:
+    - "knowledge-pack/daily-factory-stage-contracts"
+steps:
+  - id: "load-stage-contracts"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/daily-factory-stage-contracts"
+    inputs:
+      query: "daily factory stage prerequisites resume commands closeout readiness"
+      top_k: 20
+  - id: "build-stage-ledger"
+    kind: "tool"
+    ref: "tool/daily-stage-ledger-builder"
+    inputs:
+      run_dir: "$.inputs.run_dir"
+      output_path: "$.inputs.output_path"
+success_criteria:
+  - kind: "deterministic"
+    target: "$.build-stage-ledger.stage_count"
+    op: ">="
+    value: 5
+    severity: "high"
+    label: "The ledger covers the minimum daily factory stages."
+  - kind: "semantic"
+    target: "$.build-stage-ledger"
+    must_cover:
+      - "stage status"
+      - "resume actions"
+      - "closeout readiness"
+      - "operator approval boundary"
+    similarity_threshold: 0.55
+    severity: "medium"
+    label: "The ledger explains how to resume safely without applying SQL."

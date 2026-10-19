@@ -1,0 +1,136 @@
+id: "harness/text-safety-review"
+type: harness
+version: "0.1.0"
+name: "Text Safety Review"
+description: |
+  A general-purpose text harness that composes persona + GREP +
+  RAG + tools + (optional) online grounding around a model call.
+  Designed to produce cited, bounded, citation-first responses.
+authors:
+  - name: "Open Harness Hub contributors"
+    url: "https://github.com/open-harness-hub"
+license: "MIT"
+industry:    ["cross_industry"]
+capability:  ["safety_gating", "retrieval", "reasoning", "dialogue"]
+modality:    ["text"]
+lifecycle:   "beta"
+trust_boundary: "local"
+freshness:   "stable"
+tags: ["safety", "rag", "grep", "citations"]
+created: "2026-05-19"
+updated: "2026-05-19"
+
+kind: "model_harness"
+tier: "primary"
+applied_layers:
+  - persona
+  - grep
+  - rag
+  - tools
+
+consumes:
+  - grep_rule
+  - rag_doc
+  - citation_edge
+  - tool_definition
+  - persona_block
+  - context_snippet
+emits:
+  - reasoning_step
+  - context_snippet
+
+logic_paths:
+  - id: "respond_with_citations"
+    label: "Prompt → grounded cited response"
+    entrypoints: ["/api/respond"]
+    steps:
+      - "normalize chat messages"
+      - "redact PII (via rule-pack/privacy-pii-text-en)"
+      - "fire GREP rules; record severity hits"
+      - "retrieve top-k RAG with BM25, optional dense, RRF merge"
+      - "expand retrieved docs with 1-hop citation graph"
+      - "compose persona + retrieved context + tool registry"
+      - "call model"
+      - "stream response + per-layer trace"
+      - "verify every claim cited"
+    consumes: [grep_rule, rag_doc, citation_edge, tool_definition, persona_block]
+    emits: [reasoning_step, context_snippet]
+    model_call: "required"
+    verification:
+      - "layer trace recorded"
+      - "citation coverage check"
+      - "rubric score >= 0.6"
+
+knowledge_packs:
+  - id: "core_rag"
+    label: "Domain RAG corpus"
+    kind: knowledge_pack
+    types: [rag_doc, citation_edge]
+    required: true
+    trust_boundary: "local"
+    freshness: "stable"
+
+logic_packs:
+  - id: "persona_default"
+    label: "Default persona"
+    kind: logic_pack
+    types: [persona_block]
+    required: true
+  - id: "tool_registry"
+    label: "Tool registry"
+    kind: logic_pack
+    types: [tool_definition, tool_example]
+    required: false
+  - id: "response_policy"
+    label: "Response policy"
+    kind: logic_pack
+    types: [response_policy]
+    required: true
+
+model_io:
+  input:  "{messages: ChatMessage[], context: KnowledgeObject[]}"
+  output: "{text: string, citations: Citation[], trace: TraceFrame[]}"
+
+model_targets:
+  - id: "local_ollama"
+    label: "Local Ollama"
+    transport: "ollama"
+    role: "Default local generation; reproducible without API keys."
+    capabilities: ["text_generation", "chat", "tool_use"]
+    required: false
+    default: true
+    trust_boundary: "local"
+  - id: "openai_compatible"
+    label: "OpenAI-compatible endpoint"
+    transport: "openai_compatible"
+    role: "Optional remote inference."
+    capabilities: ["text_generation", "chat", "tool_use"]
+    required: false
+    default: false
+    trust_boundary: "external"
+  - id: "anthropic_judge"
+    label: "Anthropic Claude (judge)"
+    transport: "anthropic"
+    role: "Optional external judge for high-stakes outputs."
+    capabilities: ["text_generation", "chat"]
+    required: false
+    default: false
+    trust_boundary: "external"
+
+input_verification:
+  - "redact PII before model call"
+  - "reject input larger than 32 KB"
+  - "GREP severity 'critical' triggers refusal path"
+output_verification:
+  - "every claim has a citation"
+  - "no PII leaks from RAG into response"
+  - "no exact echo of system prompt"
+
+privacy_boundaries:
+  raw_input:      "stays local to the running harness process"
+  derived_output: "may be synced to the hub only after anonymization gate"
+  external_calls: "only when model_target.trust_boundary == 'external' AND user opted in"
+
+contributes_to:
+  - "pipeline/research-entity"
+  - "pipeline/verify-claim-against-corpus"

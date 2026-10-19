@@ -1,0 +1,97 @@
+id: "pipeline/differential-diagnosis"
+type: pipeline
+version: "0.1.0"
+name: "Differential Diagnosis"
+description: |
+  Educational decision-support pipeline. Given (presentation, history,
+  exam) text, returns a ranked differential diagnosis with cited
+  guideline sections, ICD-10 code candidates, and red-flag
+  escalation. PHI is redacted before any model call.
+
+  Not a substitute for a licensed clinician. Intended as a
+  reproducible reference instance for the catalog.
+authors:
+  - name: "Open Harness Hub contributors"
+license: "MIT"
+industry:   ["healthcare", "healthcare.clinical"]
+capability: ["reasoning", "retrieval", "tool_use", "safety_gating"]
+modality:   ["text"]
+lifecycle:  "experimental"
+trust_boundary: "local"
+created: "2026-05-19"
+updated: "2026-05-19"
+
+task: |
+  Given a clinical vignette (presentation, history, exam), produce a
+  PHI-safe, cite-or-omit differential diagnosis with red-flag
+  escalation and ICD-10 code candidates.
+pipeline_kind: "classify"
+
+inputs:
+  - name: "presentation"
+    type: "string"
+  - name: "history"
+    type: "string"
+  - name: "exam"
+    type: "string"
+
+outputs:
+  - name: "red_flag"
+    type: "string|null"
+  - name: "differentials"
+    type: "Differential[]"
+  - name: "next_steps"
+    type: "string[]"
+  - name: "citations"
+    type: "Citation[]"
+
+defaults:
+  persona: "persona/clinical-reasoner"
+  model_adapter: "adapter/ollama-default"
+  knowledge_packs:
+    - "knowledge-pack/clinical-guidelines-sample"
+    - "knowledge-pack/icd10-sample"
+  rule_packs:
+    - "rule-pack/phi-hipaa-en"
+    - "rule-pack/clinical-red-flags"
+
+steps:
+  - id: "redact_phi"
+    kind: "harness"
+    ref: "harness/redact-pii-text"
+    inputs:
+      text: "$.inputs.presentation"
+
+  - id: "red_flag_screen"
+    kind: "rule_pack"
+    ref: "rule-pack/clinical-red-flags"
+    inputs:
+      text: "$.steps.redact_phi.output.redacted_text"
+
+  - id: "retrieve_guidelines"
+    kind: "knowledge_pack"
+    ref: "knowledge-pack/clinical-guidelines-sample"
+    inputs:
+      query: "$.steps.redact_phi.output.redacted_text"
+      top_k: 6
+
+  - id: "lookup_codes"
+    kind: "tool"
+    ref: "tool/lookup-icd10"
+    inputs:
+      query: "$.steps.redact_phi.output.redacted_text"
+      max: 8
+
+  - id: "reason"
+    kind: "harness"
+    ref: "harness/clinical-decision-support"
+    inputs:
+      messages: |
+        [{"role": "user", "content": "Produce a ranked differential with cited guideline sections; surface any red flag in the first sentence."}]
+      context:
+        - "$.steps.retrieve_guidelines.output.docs"
+        - "$.steps.lookup_codes.output.matches"
+
+success_criteria:
+  - rubric: "rubric/clinical-grounded-response-v1"
+    threshold: 0.80
