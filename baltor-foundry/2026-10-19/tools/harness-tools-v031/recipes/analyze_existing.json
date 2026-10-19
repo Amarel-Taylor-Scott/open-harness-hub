@@ -1,0 +1,14 @@
+{
+  "schema": "baltor.harness/1",
+  "name": "existing-spatial-v02-audit",
+  "seed": 1,
+  "canvas": {"width": 0,"height": 0,"fps": 0},
+  "nodes": [
+    {"id":"sample","op":"video.sample","deps":[],"params":{"input":"inputs/reference.mp4","every":48,"max_frames":20}},
+    {"id":"metrics","op":"frames.metrics","deps":["sample"],"params":{"from":"sampled"}},
+    {"id":"contact","op":"frames.contact","deps":["sample"],"params":{"from":"sampled"}},
+    {"id":"probe","op":"video.probe","deps":[],"params":{"input":"inputs/reference.mp4"}},
+    {"id":"lint","op":"layout.lint","deps":[],"params":{"input":"inputs/layouts.json"}},
+    {"id":"hash","op":"artifact.hash","deps":[],"params":{"source":"inputs/reference.mp4"}}
+  ]
+}

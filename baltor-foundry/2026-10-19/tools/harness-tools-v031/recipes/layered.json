@@ -1,0 +1,878 @@
+{
+  "schema": "baltor.harness/1",
+  "name": "motion-composer-layered-v3",
+  "seed": 4271,
+  "canvas": {
+    "width": 400,
+    "height": 720,
+    "fps": 15
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "frames": 60,
+      "mode": "survival",
+      "title": "THE LAST SIGNAL",
+      "caption": "ONE STATIC WORLD. MANY MOTIONS.",
+      "label": "BALTOR  /  MOTION FOUNDRY",
+      "camera": {
+        "pan": 0.3,
+        "zoom": 1.08,
+        "shake": 0.1
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 3,
+        "panels": 1
+      },
+      "palette": [
+        "#64F4DB"
+      ]
+    },
+    {
+      "id": "joint-study",
+      "frames": 60,
+      "mode": "blueprint",
+      "title": "MOTION HAS RULES",
+      "caption": "PARTS. JOINTS. CONSTRAINTS.",
+      "label": "KINEMATIC STUDY  /  02",
+      "camera": {
+        "pan": 0.08,
+        "zoom": 1.12,
+        "shake": 0
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          14,
+          12,
+          12,
+          12
+        ],
+        "border": 2,
+        "panels": 1
+      },
+      "palette": [
+        "#62E8F3"
+      ]
+    },
+    {
+      "id": "graph-study",
+      "frames": 60,
+      "mode": "nodes",
+      "title": "COMPOSE THE AGENT",
+      "caption": "SMALL TOOLS. RELIABLE GRAPHS.",
+      "label": "BALTOR HARNESS  /  03",
+      "camera": {
+        "pan": 0.18,
+        "zoom": 1.05,
+        "shake": 0
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 3,
+        "panels": 1
+      },
+      "palette": [
+        "#B6FF90"
+      ]
+    },
+    {
+      "id": "decision",
+      "frames": 60,
+      "mode": "comic",
+      "title": "EVERY SHOT IS A DAG",
+      "caption": "CUT. PAN. ZOOM. RETIME. REPEAT.",
+      "label": "COMIC MOTION  /  04",
+      "camera": {
+        "pan": 0.05,
+        "zoom": 1.15,
+        "shake": 0.3
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 5,
+        "panels": 2
+      },
+      "palette": [
+        "#FF8996"
+      ]
+    },
+    {
+      "id": "summary",
+      "frames": 60,
+      "mode": "infographic",
+      "title": "ONE RECIPE MANY FILMS",
+      "caption": "HASHED. TESTED. REUSABLE.",
+      "label": "DETERMINISTIC OUTPUT  /  05",
+      "camera": {
+        "pan": 0,
+        "zoom": 1.0,
+        "shake": 0
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 3,
+        "panels": 1
+      },
+      "palette": [
+        "#FFC275"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "frames",
+      "op": "scene.frames",
+      "deps": [],
+      "params": {
+        "presentation": false
+      }
+    },
+    {
+      "id": "timeline",
+      "op": "timeline.compile",
+      "deps": []
+    },
+    {
+      "id": "sound",
+      "op": "audio.synth",
+      "deps": []
+    },
+    {
+      "id": "camera2d",
+      "op": "frames.transform",
+      "deps": [
+        "frames"
+      ],
+      "params": {
+        "from": "frames",
+        "zoom_start": 1.0,
+        "zoom_end": 1.065,
+        "pan_x": 0.014,
+        "pan_y": -0.009,
+        "contrast": 1.035,
+        "saturation": 1.1
+      }
+    },
+    {
+      "id": "spatial",
+      "op": "frames.spatial",
+      "deps": [
+        "camera2d"
+      ],
+      "params": {
+        "from": "stages/camera2d"
+      }
+    },
+    {
+      "id": "branding",
+      "op": "frames.overlay",
+      "deps": [
+        "camera2d"
+      ],
+      "params": {
+        "from": "stages/camera2d",
+        "elements": [
+          {
+            "id": "header_1",
+            "kind": "text",
+            "text": "BALTOR  /  MOTION FOUNDRY",
+            "x": 0.057,
+            "y": 0.062,
+            "w": 0.88,
+            "h": 0.025,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#64F4DB",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 30,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 60
+          },
+          {
+            "id": "title_1",
+            "kind": "pill",
+            "text": "THE LAST SIGNAL",
+            "x": 0.048,
+            "y": 0.155,
+            "w": 0.9,
+            "h": 0.115,
+            "anchor": "top_left",
+            "padding": [
+              10,
+              11,
+              8,
+              13
+            ],
+            "color": "#64F4DB",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 40,
+            "scale": 3,
+            "start_frame": 0,
+            "end_frame": 60
+          },
+          {
+            "id": "caption_1",
+            "kind": "pill",
+            "text": "ONE STATIC WORLD. MANY MOTIONS.",
+            "x": 0.048,
+            "y": 0.811,
+            "w": 0.9,
+            "h": 0.093,
+            "anchor": "top_left",
+            "padding": [
+              6,
+              9,
+              5,
+              10
+            ],
+            "color": "#64F4DB",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 50,
+            "scale": 2,
+            "start_frame": 0,
+            "end_frame": 60
+          },
+          {
+            "id": "rule_1",
+            "kind": "line",
+            "text": "",
+            "x": 0.055,
+            "y": 0.106,
+            "w": 0.89,
+            "h": 0.001,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#64F4DB",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 20,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 60
+          },
+          {
+            "id": "border_1",
+            "kind": "border",
+            "text": "",
+            "x": 0.001,
+            "y": 0.001,
+            "w": 0.998,
+            "h": 0.998,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#64F4DB",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 80,
+            "scale": 2,
+            "start_frame": 0,
+            "end_frame": 60
+          },
+          {
+            "id": "header_2",
+            "kind": "text",
+            "text": "KINEMATIC STUDY  /  02",
+            "x": 0.057,
+            "y": 0.062,
+            "w": 0.88,
+            "h": 0.025,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#62E8F3",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 30,
+            "scale": 1,
+            "start_frame": 60,
+            "end_frame": 120
+          },
+          {
+            "id": "title_2",
+            "kind": "pill",
+            "text": "MOTION HAS RULES",
+            "x": 0.048,
+            "y": 0.155,
+            "w": 0.9,
+            "h": 0.115,
+            "anchor": "top_left",
+            "padding": [
+              10,
+              11,
+              8,
+              13
+            ],
+            "color": "#62E8F3",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 40,
+            "scale": 3,
+            "start_frame": 60,
+            "end_frame": 120
+          },
+          {
+            "id": "caption_2",
+            "kind": "pill",
+            "text": "PARTS. JOINTS. CONSTRAINTS.",
+            "x": 0.048,
+            "y": 0.811,
+            "w": 0.9,
+            "h": 0.093,
+            "anchor": "top_left",
+            "padding": [
+              6,
+              9,
+              5,
+              10
+            ],
+            "color": "#62E8F3",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 50,
+            "scale": 2,
+            "start_frame": 60,
+            "end_frame": 120
+          },
+          {
+            "id": "rule_2",
+            "kind": "line",
+            "text": "",
+            "x": 0.055,
+            "y": 0.106,
+            "w": 0.89,
+            "h": 0.001,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#62E8F3",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 20,
+            "scale": 1,
+            "start_frame": 60,
+            "end_frame": 120
+          },
+          {
+            "id": "border_2",
+            "kind": "border",
+            "text": "",
+            "x": 0.001,
+            "y": 0.001,
+            "w": 0.998,
+            "h": 0.998,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#62E8F3",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 80,
+            "scale": 2,
+            "start_frame": 60,
+            "end_frame": 120
+          },
+          {
+            "id": "header_3",
+            "kind": "text",
+            "text": "BALTOR HARNESS  /  03",
+            "x": 0.057,
+            "y": 0.062,
+            "w": 0.88,
+            "h": 0.025,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#B6FF90",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 30,
+            "scale": 1,
+            "start_frame": 120,
+            "end_frame": 180
+          },
+          {
+            "id": "title_3",
+            "kind": "pill",
+            "text": "COMPOSE THE AGENT",
+            "x": 0.048,
+            "y": 0.155,
+            "w": 0.9,
+            "h": 0.115,
+            "anchor": "top_left",
+            "padding": [
+              10,
+              11,
+              8,
+              13
+            ],
+            "color": "#B6FF90",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 40,
+            "scale": 3,
+            "start_frame": 120,
+            "end_frame": 180
+          },
+          {
+            "id": "caption_3",
+            "kind": "pill",
+            "text": "SMALL TOOLS. RELIABLE GRAPHS.",
+            "x": 0.048,
+            "y": 0.811,
+            "w": 0.9,
+            "h": 0.093,
+            "anchor": "top_left",
+            "padding": [
+              6,
+              9,
+              5,
+              10
+            ],
+            "color": "#B6FF90",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 50,
+            "scale": 2,
+            "start_frame": 120,
+            "end_frame": 180
+          },
+          {
+            "id": "rule_3",
+            "kind": "line",
+            "text": "",
+            "x": 0.055,
+            "y": 0.106,
+            "w": 0.89,
+            "h": 0.001,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#B6FF90",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 20,
+            "scale": 1,
+            "start_frame": 120,
+            "end_frame": 180
+          },
+          {
+            "id": "border_3",
+            "kind": "border",
+            "text": "",
+            "x": 0.001,
+            "y": 0.001,
+            "w": 0.998,
+            "h": 0.998,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#B6FF90",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 80,
+            "scale": 2,
+            "start_frame": 120,
+            "end_frame": 180
+          },
+          {
+            "id": "header_4",
+            "kind": "text",
+            "text": "COMIC MOTION  /  04",
+            "x": 0.057,
+            "y": 0.062,
+            "w": 0.88,
+            "h": 0.025,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#FF8996",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 30,
+            "scale": 1,
+            "start_frame": 180,
+            "end_frame": 240
+          },
+          {
+            "id": "title_4",
+            "kind": "pill",
+            "text": "EVERY SHOT IS A DAG",
+            "x": 0.048,
+            "y": 0.155,
+            "w": 0.9,
+            "h": 0.115,
+            "anchor": "top_left",
+            "padding": [
+              10,
+              11,
+              8,
+              13
+            ],
+            "color": "#FF8996",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 40,
+            "scale": 3,
+            "start_frame": 180,
+            "end_frame": 240
+          },
+          {
+            "id": "caption_4",
+            "kind": "pill",
+            "text": "CUT. PAN. ZOOM. RETIME. REPEAT.",
+            "x": 0.048,
+            "y": 0.811,
+            "w": 0.9,
+            "h": 0.093,
+            "anchor": "top_left",
+            "padding": [
+              6,
+              9,
+              5,
+              10
+            ],
+            "color": "#FF8996",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 50,
+            "scale": 2,
+            "start_frame": 180,
+            "end_frame": 240
+          },
+          {
+            "id": "rule_4",
+            "kind": "line",
+            "text": "",
+            "x": 0.055,
+            "y": 0.106,
+            "w": 0.89,
+            "h": 0.001,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#FF8996",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 20,
+            "scale": 1,
+            "start_frame": 180,
+            "end_frame": 240
+          },
+          {
+            "id": "border_4",
+            "kind": "border",
+            "text": "",
+            "x": 0.001,
+            "y": 0.001,
+            "w": 0.998,
+            "h": 0.998,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#FF8996",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 80,
+            "scale": 2,
+            "start_frame": 180,
+            "end_frame": 240
+          },
+          {
+            "id": "header_5",
+            "kind": "text",
+            "text": "DETERMINISTIC OUTPUT  /  05",
+            "x": 0.057,
+            "y": 0.062,
+            "w": 0.88,
+            "h": 0.025,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#FFC275",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 30,
+            "scale": 1,
+            "start_frame": 240,
+            "end_frame": 300
+          },
+          {
+            "id": "title_5",
+            "kind": "pill",
+            "text": "ONE RECIPE MANY FILMS",
+            "x": 0.048,
+            "y": 0.155,
+            "w": 0.9,
+            "h": 0.115,
+            "anchor": "top_left",
+            "padding": [
+              10,
+              11,
+              8,
+              13
+            ],
+            "color": "#FFC275",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 40,
+            "scale": 3,
+            "start_frame": 240,
+            "end_frame": 300
+          },
+          {
+            "id": "caption_5",
+            "kind": "pill",
+            "text": "HASHED. TESTED. REUSABLE.",
+            "x": 0.048,
+            "y": 0.811,
+            "w": 0.9,
+            "h": 0.093,
+            "anchor": "top_left",
+            "padding": [
+              6,
+              9,
+              5,
+              10
+            ],
+            "color": "#FFC275",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 50,
+            "scale": 2,
+            "start_frame": 240,
+            "end_frame": 300
+          },
+          {
+            "id": "rule_5",
+            "kind": "line",
+            "text": "",
+            "x": 0.055,
+            "y": 0.106,
+            "w": 0.89,
+            "h": 0.001,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#FFC275",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 20,
+            "scale": 1,
+            "start_frame": 240,
+            "end_frame": 300
+          },
+          {
+            "id": "border_5",
+            "kind": "border",
+            "text": "",
+            "x": 0.001,
+            "y": 0.001,
+            "w": 0.998,
+            "h": 0.998,
+            "anchor": "top_left",
+            "padding": [
+              1,
+              2,
+              1,
+              2
+            ],
+            "color": "#FFC275",
+            "fill": "#061525",
+            "opacity": 0.98,
+            "z": 80,
+            "scale": 2,
+            "start_frame": 240,
+            "end_frame": 300
+          },
+          {
+            "id": "global_progress_bg",
+            "kind": "rect",
+            "x": 0.055,
+            "y": 0.952,
+            "w": 0.89,
+            "h": 0.007,
+            "anchor": "top_left",
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "color": "#8FEBDD",
+            "fill": "#162836",
+            "opacity": 0.9,
+            "z": 90,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 0
+          },
+          {
+            "id": "global_progress",
+            "kind": "progress",
+            "x": 0.055,
+            "y": 0.952,
+            "w": 0.89,
+            "h": 0.007,
+            "anchor": "top_left",
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "color": "#8FEBDD",
+            "fill": "#162836",
+            "opacity": 1,
+            "z": 91,
+            "value": 0,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "measure",
+      "op": "frames.metrics",
+      "deps": [
+        "branding"
+      ],
+      "params": {
+        "from": "stages/branding"
+      }
+    },
+    {
+      "id": "contact",
+      "op": "frames.contact",
+      "deps": [
+        "branding"
+      ],
+      "params": {
+        "from": "stages/branding"
+      }
+    },
+    {
+      "id": "mp4",
+      "op": "video.encode",
+      "deps": [
+        "branding",
+        "sound"
+      ],
+      "params": {
+        "from": "stages/branding"
+      }
+    },
+    {
+      "id": "probe",
+      "op": "video.probe",
+      "deps": [
+        "mp4"
+      ]
+    },
+    {
+      "id": "hash",
+      "op": "artifact.hash",
+      "deps": [
+        "mp4"
+      ],
+      "params": {
+        "source": "media/video.mp4"
+      }
+    }
+  ]
+}

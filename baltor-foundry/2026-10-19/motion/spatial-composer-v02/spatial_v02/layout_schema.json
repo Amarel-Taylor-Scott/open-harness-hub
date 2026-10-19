@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://baltor.ai/schemas/spatial-layout-v0.2.json",
+  "title": "Baltor Motion Spatial Layout Configuration v0.2",
+  "type": "object",
+  "required": [
+    "schema",
+    "fps",
+    "duration_sec",
+    "working_canvas",
+    "output",
+    "safe_profile",
+    "layouts",
+    "shots"
+  ],
+  "properties": {
+    "schema": {
+      "const": "baltor.spatial.composer/0.2"
+    },
+    "fps": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 240
+    },
+    "duration_sec": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "working_canvas": {
+      "$ref": "#/$defs/canvas"
+    },
+    "output": {
+      "$ref": "#/$defs/canvas"
+    },
+    "safe_profile": {
+      "enum": [
+        "reels",
+        "shorts",
+        "tiktok",
+        "vertical_general",
+        "landscape",
+        "square",
+        "full"
+      ]
+    },
+    "layouts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/layout"
+      }
+    },
+    "shots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/shot"
+      }
+    },
+    "layers": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "dimension_families": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "canvas": {
+      "type": "object",
+      "required": [
+        "w",
+        "h"
+      ],
+      "properties": {
+        "w": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "h": {
+          "type": "integer",
+          "minimum": 2
+        }
+      }
+    },
+    "rect": {
+      "type": "object",
+      "required": [
+        "w",
+        "h"
+      ],
+      "properties": {
+        "space": {
+          "type": "string",
+          "minLength": 1
+        },
+        "anchor": {
+          "enum": [
+            "top_left",
+            "top_center",
+            "top_right",
+            "middle_left",
+            "center",
+            "middle_right",
+            "bottom_left",
+            "bottom_center",
+            "bottom_right",
+            "upper_third_left",
+            "upper_third_center",
+            "upper_third_right",
+            "lower_third_left",
+            "lower_third_center",
+            "lower_third_right"
+          ]
+        },
+        "dx": {
+          "type": "number"
+        },
+        "dy": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "h": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "w_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "h_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "padding": {
+      "oneOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0
+              },
+              "minItems": 4,
+              "maxItems": 4
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "top": {
+              "type": "number",
+              "minimum": 0
+            },
+            "right": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bottom": {
+              "type": "number",
+              "minimum": 0
+            },
+            "left": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        }
+      ]
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "box",
+        "z",
+        "layer"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "text",
+            "pill",
+            "tag",
+            "metric",
+            "button",
+            "box",
+            "line",
+            "progress",
+            "circle",
+            "reticle",
+            "waveform",
+            "image",
+            "pointer",
+            "panel_grid"
+          ]
+        },
+        "box": {
+          "$ref": "#/$defs/rect"
+        },
+        "z": {
+          "type": "integer"
+        },
+        "layer": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "font_size": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "min_font_size": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "padding": {
+          "$ref": "#/$defs/padding"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "start": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "in": {
+          "type": "number",
+          "minimum": 0
+        },
+        "out": {
+          "type": "number",
+          "minimum": 0
+        },
+        "blend": {
+          "enum": [
+            "normal",
+            "screen",
+            "multiply",
+            "add"
+          ]
+        },
+        "align": {
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        "valign": {
+          "enum": [
+            "top",
+            "center",
+            "bottom"
+          ]
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "required": [
+        "name",
+        "description",
+        "elements"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+    "shot": {
+      "type": "object",
+      "required": [
+        "id",
+        "start",
+        "end",
+        "layout"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "start": {
+          "type": "number",
+          "minimum": 0
+        },
+        "end": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "layout": {
+          "type": "string"
+        },
+        "narration_cue": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

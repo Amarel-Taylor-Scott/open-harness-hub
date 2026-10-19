@@ -1,0 +1,323 @@
+{
+  "schema": "baltor.harness/1",
+  "name": "motion-composer-modular-v2",
+  "seed": 4271,
+  "canvas": {
+    "width": 400,
+    "height": 720,
+    "fps": 15
+  },
+  "shots": [
+    {
+      "id": "opening",
+      "frames": 60,
+      "mode": "survival",
+      "title": "THE LAST SIGNAL",
+      "caption": "ONE STATIC WORLD. MANY MOTIONS.",
+      "label": "BALTOR  /  MOTION FOUNDRY",
+      "camera": {
+        "pan": 0.3,
+        "zoom": 1.08,
+        "shake": 0.1
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 3,
+        "panels": 1
+      },
+      "palette": [
+        "#64F4DB"
+      ]
+    },
+    {
+      "id": "joint-study",
+      "frames": 60,
+      "mode": "blueprint",
+      "title": "MOTION HAS RULES",
+      "caption": "PARTS. JOINTS. CONSTRAINTS.",
+      "label": "KINEMATIC STUDY  /  02",
+      "camera": {
+        "pan": 0.08,
+        "zoom": 1.12,
+        "shake": 0
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          14,
+          12,
+          12,
+          12
+        ],
+        "border": 2,
+        "panels": 1
+      },
+      "palette": [
+        "#62E8F3"
+      ]
+    },
+    {
+      "id": "graph-study",
+      "frames": 60,
+      "mode": "nodes",
+      "title": "COMPOSE THE AGENT",
+      "caption": "SMALL TOOLS. RELIABLE GRAPHS.",
+      "label": "BALTOR HARNESS  /  03",
+      "camera": {
+        "pan": 0.18,
+        "zoom": 1.05,
+        "shake": 0
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 3,
+        "panels": 1
+      },
+      "palette": [
+        "#B6FF90"
+      ]
+    },
+    {
+      "id": "decision",
+      "frames": 60,
+      "mode": "comic",
+      "title": "EVERY SHOT IS A DAG",
+      "caption": "CUT. PAN. ZOOM. RETIME. REPEAT.",
+      "label": "COMIC MOTION  /  04",
+      "camera": {
+        "pan": 0.05,
+        "zoom": 1.15,
+        "shake": 0.3
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 5,
+        "panels": 2
+      },
+      "palette": [
+        "#FF8996"
+      ]
+    },
+    {
+      "id": "summary",
+      "frames": 60,
+      "mode": "infographic",
+      "title": "ONE RECIPE MANY FILMS",
+      "caption": "HASHED. TESTED. REUSABLE.",
+      "label": "DETERMINISTIC OUTPUT  /  05",
+      "camera": {
+        "pan": 0,
+        "zoom": 1.0,
+        "shake": 0
+      },
+      "layout": {
+        "title_anchor": "top",
+        "caption_anchor": "bottom",
+        "padding": [
+          12,
+          14,
+          12,
+          14
+        ],
+        "border": 3,
+        "panels": 1
+      },
+      "palette": [
+        "#FFC275"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "frames",
+      "op": "scene.frames",
+      "deps": []
+    },
+    {
+      "id": "timeline",
+      "op": "timeline.compile",
+      "deps": []
+    },
+    {
+      "id": "sound",
+      "op": "audio.synth",
+      "deps": []
+    },
+    {
+      "id": "camera2d",
+      "op": "frames.transform",
+      "deps": [
+        "frames"
+      ],
+      "params": {
+        "from": "frames",
+        "zoom_start": 1.0,
+        "zoom_end": 1.065,
+        "pan_x": 0.014,
+        "pan_y": -0.009,
+        "contrast": 1.035,
+        "saturation": 1.1
+      }
+    },
+    {
+      "id": "spatial",
+      "op": "frames.spatial",
+      "deps": [
+        "camera2d"
+      ],
+      "params": {
+        "from": "stages/camera2d"
+      }
+    },
+    {
+      "id": "branding",
+      "op": "frames.overlay",
+      "deps": [
+        "camera2d"
+      ],
+      "params": {
+        "from": "stages/camera2d",
+        "elements": [
+          {
+            "id": "version_badge",
+            "kind": "pill",
+            "text": "CLI  V0.3",
+            "x": 0.97,
+            "y": 0.12,
+            "w": 0.27,
+            "h": 0.033,
+            "anchor": "top_right",
+            "padding": [
+              4,
+              7,
+              3,
+              7
+            ],
+            "color": "#7AF2DE",
+            "fill": "#0A1420",
+            "opacity": 0.95,
+            "z": 40,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 0
+          },
+          {
+            "id": "timeline_track",
+            "kind": "rect",
+            "x": 0.055,
+            "y": 0.957,
+            "w": 0.89,
+            "h": 0.008,
+            "anchor": "top_left",
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "color": "#A2BBCF",
+            "fill": "#18334A",
+            "opacity": 0.75,
+            "z": 42,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 0
+          },
+          {
+            "id": "timeline_progress",
+            "kind": "progress",
+            "x": 0.055,
+            "y": 0.957,
+            "w": 0.89,
+            "h": 0.008,
+            "anchor": "top_left",
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "color": "#7AF2DE",
+            "fill": "#18334A",
+            "opacity": 1,
+            "z": 43,
+            "value": 0.0,
+            "scale": 1,
+            "start_frame": 0,
+            "end_frame": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "measure",
+      "op": "frames.metrics",
+      "deps": [
+        "branding"
+      ],
+      "params": {
+        "from": "stages/branding"
+      }
+    },
+    {
+      "id": "contact",
+      "op": "frames.contact",
+      "deps": [
+        "branding"
+      ],
+      "params": {
+        "from": "stages/branding"
+      }
+    },
+    {
+      "id": "mp4",
+      "op": "video.encode",
+      "deps": [
+        "branding",
+        "sound"
+      ],
+      "params": {
+        "from": "stages/branding"
+      }
+    },
+    {
+      "id": "probe",
+      "op": "video.probe",
+      "deps": [
+        "mp4"
+      ]
+    },
+    {
+      "id": "hash",
+      "op": "artifact.hash",
+      "deps": [
+        "mp4"
+      ],
+      "params": {
+        "source": "media/video.mp4"
+      }
+    }
+  ]
+}

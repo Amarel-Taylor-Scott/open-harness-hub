@@ -1,0 +1,25 @@
+{
+  "schema": "baltor.harness_worker_adapter_proposal/1",
+  "status": "INTEGRATION_PROPOSAL_NOT_REGISTERED_IN_EXISTING_BALTORCTL",
+  "worker_id": "baltor.capability_distiller.v0.4",
+  "binary_by_platform": {
+    "linux_amd64": "bin/baltor-distill-linux-amd64",
+    "linux_arm64": "bin/baltor-distill-linux-arm64",
+    "darwin_arm64": "bin/baltor-distill-darwin-arm64",
+    "windows_amd64": "bin/baltor-distill-windows-amd64.exe"
+  },
+  "allowlisted_commands": ["doctor", "scan", "propose", "timeline", "layout", "variants", "hash"],
+  "paths": {"inputs_read_only": "/inputs", "outputs_read_write": "/outputs"},
+  "execution": {"shell": false, "network": "disabled", "allow_host_credentials": false, "allow_dynamic_code": false, "run_timeout_seconds": 60, "max_processes": 32, "memory_mib": 256, "max_output_mib": 100},
+  "requires": ["os_level_container_or_vm", "pre_staged_approved_inputs", "version_pinned_binary", "license_review_before_3rdparty_dependency_bundle"],
+  "proposed_dag": [
+    {"id": "discover", "op": "skill.scan", "inputs": ["local_skill_root"], "outputs": ["skills.json"]},
+    {"id": "propose", "op": "skill.propose", "depends_on": ["discover"], "outputs": ["nonexecutable_proposals.json"]},
+    {"id": "editorial", "op": "storyboard.compile", "inputs": ["approved_story.json"], "outputs": ["storyboard.json", "timeline.csv", "captions.srt"]},
+    {"id": "variants", "op": "variation.grid", "depends_on": ["editorial"], "outputs": ["variants.json"]},
+    {"id": "layoutqa", "op": "layout.lint", "depends_on": ["editorial"], "outputs": ["layout_report.json"]},
+    {"id": "render", "op": "video.master", "depends_on": ["variants", "layoutqa"], "status": "FUTURE_NOT_IMPLEMENTED_HERE"},
+    {"id": "mediaqa", "op": "video.quality", "depends_on": ["render"], "status": "FUTURE_NOT_IMPLEMENTED_HERE"},
+    {"id": "approval", "op": "human.approve_publication", "depends_on": ["mediaqa"], "status": "EXPLICIT_APPROVAL_REQUIRED"}
+  ]
+}

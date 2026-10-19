@@ -1,0 +1,27 @@
+{
+  "schema": "baltor.operator_contracts/1",
+  "version": "0.3.1",
+  "claim": "Implemented operations below have been executed in the Linux/amd64 test environment; image/MP4 output quality is not expert validated.",
+  "runtime": {"runner": "Go 1.23+ build, stdlib only", "media_runtime": "ffmpeg + ffprobe for encoding/extraction/probing", "network": "not requested by any operator", "kernel_sandbox": "not supplied; use OCI/container/VM"},
+  "operators": [
+    {"op":"scene.frames","input":"recipe.canvas + shots; params.presentation defaults true","output":"frames/frame_%05d.png, timeline.json","determinism":"native bit-stable same build","caps":"up to 1800 frames; <=300M pixels"},
+    {"op":"audio.synth","input":"recipe seed/canvas/shots","output":"audio/score.wav","determinism":"native bit-stable same build","caps":"<=125 seconds 48K mono PCM"},
+    {"op":"timeline.compile","input":"recipe.shots","output":"analysis/timeline.csv","determinism":"native bit-stable","caps":"up to 80 shots"},
+    {"op":"frames.transform","input":"params.from frame stage, zoom_start, zoom_end, pan_x, pan_y, contrast, saturation","output":"stages/<node_id>/frame_%05d.png","determinism":"native bit-stable same build","caps":"zoom .6-2.5; pan +/- .3; contrast .5-1.6; saturation 0-2.5"},
+    {"op":"frames.overlay","input":"params.from frame stage + elements[]","output":"stages/<node_id>/frame_%05d.png","determinism":"native bit-stable same build","caps":"40 sorted elements; text, pill, rect, line, progress, reticle, border"},
+    {"op":"frames.metrics","input":"params.from frame stage","output":"analysis/frame_metrics.csv + frame_report.json","determinism":"native bit-stable same build","caps":"16x16 sampled luma; cut heuristic is not camera reconstruction"},
+    {"op":"frames.spatial","input":"params.from frame stage","output":"analysis/spatial_score.json","determinism":"native bit-stable same build","caps":"3x3 occupancy proposals; no semantic subject detection"},
+    {"op":"frames.contact","input":"params.from frame stage","output":"analysis/contact_sheet.png","determinism":"native bit-stable same build","caps":"12 thumbnail frames maximum"},
+    {"op":"video.encode","input":"params.from frame stage and optional audio/score.wav","output":"media/video.mp4","determinism":"tested bit-stable same ffmpeg/libx264 build","caps":"5 minute ffmpeg subprocess timeout"},
+    {"op":"video.sample","input":"params.input staged inputs/ref.mp4; every; max_frames","output":"sampled/frame_%05d.png","determinism":"same ffmpeg version","caps":"max 90 frames, 500MB input, 2 minute timeout"},
+    {"op":"video.probe","input":"params.input workspace-local MP4 or staged input","output":"analysis/video_info.json","determinism":"same ffprobe version","caps":"15 second timeout"},
+    {"op":"layout.lint","input":"params.input staged v0.2 layouts.json","output":"analysis/layout_lint.json","determinism":"native bit-stable same build","caps":"syntactic bounds only, not visual collision checks"},
+    {"op":"artifact.hash","input":"params.source workspace-relative file","output":"analysis/artifact_hash.json","determinism":"native SHA256","caps":"only workspace or staged input paths"}
+  ],
+  "security_contract": {
+    "allowed": "declared fixed operators and parameters only",
+    "not_allowed": "arbitrary code execution, dynamic plugin loading, shell, network downloads, credential access, social publishing",
+    "input_policy": "explicit ingest; no overwrite; path traversal and symlink rejection",
+    "runtime_policy": "use OCI container/VM, no network, least privilege; untrusted media decoding still has risk"
+  }
+}

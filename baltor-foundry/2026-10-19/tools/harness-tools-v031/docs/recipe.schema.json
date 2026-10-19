@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:baltor:harness:recipe-v1",
+  "title": "Baltor Harness Recipe v1",
+  "type": "object",
+  "required": ["schema", "name", "seed", "canvas", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const":"baltor.harness/1"},
+    "name": {"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$"},
+    "seed": {"type":"integer","minimum":0},
+    "canvas": {"type":"object","required":["width","height","fps"],"additionalProperties":false,"properties":{"width":{"type":"integer","minimum":0,"maximum":1080},"height":{"type":"integer","minimum":0,"maximum":1920},"fps":{"type":"integer","minimum":0,"maximum":60}}},
+    "shots": {"type":"array","maxItems":80,"items":{"type":"object","required":["id","frames","mode","camera"],"additionalProperties":false,"properties":{
+      "id":{"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$"},"frames":{"type":"integer","minimum":1,"maximum":1800},"mode":{"enum":["survival","blueprint","nodes","comic","infographic"]},
+      "title":{"type":"string","maxLength":110},"caption":{"type":"string","maxLength":160},"label":{"type":"string","maxLength":70},"palette":{"type":"array","maxItems":4,"items":{"type":"string"}},
+      "camera":{"type":"object","properties":{"pan":{"type":"number","minimum":-3,"maximum":3},"zoom":{"type":"number","minimum":0.7,"maximum":2.5},"shake":{"type":"number","minimum":0,"maximum":2}},"additionalProperties":false},
+      "layout":{"type":"object","properties":{"title_anchor":{"enum":["top","middle","bottom"]},"caption_anchor":{"enum":["top","middle","bottom"]},"padding":{"type":"array","minItems":4,"maxItems":4,"items":{"type":"integer","minimum":0,"maximum":150}},"border":{"type":"integer","minimum":0,"maximum":25},"panels":{"type":"integer","minimum":0,"maximum":4},"hud":{"type":"string"}},"additionalProperties":false}
+    }}},
+    "nodes": {"type":"array","minItems":1,"maxItems":48,"items":{"type":"object","required":["id","op"],"additionalProperties":false,"properties":{"id":{"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$"},"op":{"enum":["scene.frames","audio.synth","timeline.compile","frames.transform","frames.overlay","frames.metrics","frames.spatial","frames.contact","video.encode","video.sample","video.probe","layout.lint","artifact.hash"]},"deps":{"type":"array","items":{"type":"string"}},"params":{"type":"object","maxProperties":20}}}}
+  },
+  "$comment":"Validating schema alone is insufficient: run baltorctl validate for DAG structure, closed per-op parameters, aggregate resource caps and dependency checks."
+}

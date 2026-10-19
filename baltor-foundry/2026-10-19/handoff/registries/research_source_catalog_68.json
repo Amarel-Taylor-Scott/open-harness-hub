@@ -1,0 +1,1135 @@
+{
+  "schema": "baltor.research_sources/1",
+  "generated_from": "manually_curated_inventory",
+  "summary": {
+    "sources": 68,
+    "candidate_operators": 294,
+    "by_family": {
+      "Audio": 22,
+      "Code": 35,
+      "Data": 34,
+      "Eval": 18,
+      "Motion": 96,
+      "Optimization": 25,
+      "Security": 20,
+      "Skills": 44
+    },
+    "by_priority": {
+      "1": 145,
+      "2": 134,
+      "3": 15
+    }
+  },
+  "sources": [
+    {
+      "family": "Code",
+      "project": "Git",
+      "source_url": "https://git-scm.com/docs/git",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "repo.diff",
+        "repo.history",
+        "repo.worktree",
+        "repo.blame"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "Pytest",
+      "source_url": "https://github.com/pytest-dev/pytest",
+      "runtime": "python_cli",
+      "execution_mode": "algorithmic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "test.collect",
+        "test.run",
+        "test.junit_export",
+        "test.failures"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "Ruff",
+      "source_url": "https://github.com/astral-sh/ruff",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "python.lint",
+        "python.format",
+        "python.imports",
+        "python.rules.audit"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "Tree-sitter",
+      "source_url": "https://github.com/tree-sitter/tree-sitter",
+      "runtime": "native_parser",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "code.parse",
+        "code.syntax_tree",
+        "code.symbols",
+        "code.complexity_features",
+        "code.dependency_edges"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "ast-grep",
+      "source_url": "https://github.com/ast-grep/ast-grep",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "code.ast.search",
+        "code.ast.replace",
+        "code.ast.lint",
+        "code.ast.query"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "ripgrep",
+      "source_url": "https://github.com/BurntSushi/ripgrep",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "repo.search",
+        "repo.files",
+        "repo.regex_matches",
+        "repo.ignore_aware"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "uv",
+      "source_url": "https://github.com/astral-sh/uv",
+      "runtime": "native_cli",
+      "execution_mode": "environment_sensitive",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "python.env.lock",
+        "python.script.run",
+        "python.tool.resolve",
+        "python.package.audit"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "DuckDB",
+      "source_url": "https://duckdb.org/docs/stable/clients/cli/overview",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "data.query",
+        "data.csv_to_parquet",
+        "data.aggregate",
+        "data.dedupe",
+        "data.validate"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "SQLite",
+      "source_url": "https://sqlite.org/cli.html",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "db.query",
+        "db.migrate",
+        "db.index",
+        "db.integrity",
+        "db.export"
+      ]
+    },
+    {
+      "family": "Eval",
+      "project": "Inspect AI",
+      "source_url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "runtime": "python_framework",
+      "execution_mode": "model_inference",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "eval.inspect.run",
+        "eval.scorers",
+        "eval.sample.trace",
+        "eval.model.compare",
+        "eval.dataset"
+      ]
+    },
+    {
+      "family": "Eval",
+      "project": "Promptfoo",
+      "source_url": "https://github.com/promptfoo/promptfoo",
+      "runtime": "cli_framework",
+      "execution_mode": "model_inference",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "eval.dataset.run",
+        "eval.agent.redteam",
+        "eval.report",
+        "eval.baselines",
+        "eval.testcase.generate"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Blender",
+      "source_url": "https://docs.blender.org/manual/en/latest/advanced/command_line/arguments.html",
+      "runtime": "headless_app",
+      "execution_mode": "algorithmic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "blender.scene.build",
+        "blender.camera.animate",
+        "blender.material.apply",
+        "blender.render.frames",
+        "blender.render.turntable",
+        "blender.export.glb",
+        "blender.compositor"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "FFmpeg",
+      "source_url": "https://ffmpeg.org/ffmpeg-filters.html",
+      "runtime": "native_binary",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "video.xfade",
+        "video.zoompan",
+        "video.crop",
+        "video.concat",
+        "video.scale",
+        "video.stabilize",
+        "video.subtitle.burn",
+        "video.palette",
+        "video.framerate",
+        "video.encode",
+        "audio.duck",
+        "audio.loudnorm",
+        "audio.mix",
+        "audio.fade"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "OpenCV",
+      "source_url": "https://github.com/opencv/opencv",
+      "runtime": "native_python",
+      "execution_mode": "algorithmic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "vision.flow",
+        "vision.motion_segments",
+        "vision.track",
+        "vision.feature_match",
+        "vision.camera_hint",
+        "vision.edge",
+        "vision.histogram"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "OpenTimelineIO",
+      "source_url": "https://github.com/AcademySoftwareFoundation/OpenTimelineIO",
+      "runtime": "python_adapter",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "timeline.read",
+        "timeline.write",
+        "timeline.validate",
+        "timeline.merge",
+        "timeline.export_edl"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Playwright",
+      "source_url": "https://github.com/microsoft/playwright",
+      "runtime": "browser_worker",
+      "execution_mode": "environment_sensitive",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "browser.screenshot",
+        "browser.record",
+        "browser.trace",
+        "browser.scroll_capture",
+        "browser.layout.measure",
+        "browser.dom.snapshot"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "PySceneDetect",
+      "source_url": "https://www.scenedetect.com/docs/cli.html",
+      "runtime": "python_cli",
+      "execution_mode": "algorithmic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "shots.content_detect",
+        "shots.adaptive_detect",
+        "shots.fade_detect",
+        "shots.split",
+        "shots.keyframes"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "glTF Transform",
+      "source_url": "https://github.com/donmccurdy/glTF-Transform",
+      "runtime": "node_cli",
+      "execution_mode": "algorithmic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "gltf.inspect",
+        "gltf.optimize",
+        "gltf.simplify",
+        "gltf.compress",
+        "gltf.partition",
+        "gltf.texture.optimize"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "resvg",
+      "source_url": "https://github.com/linebender/resvg",
+      "runtime": "rust_native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "svg.rasterize",
+        "svg.check",
+        "svg.thumbnail",
+        "graphics.overlay.render"
+      ]
+    },
+    {
+      "family": "Optimization",
+      "project": "Google OR-Tools",
+      "source_url": "https://github.com/google/or-tools",
+      "runtime": "native_solver",
+      "execution_mode": "algorithmic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "opt.assignment",
+        "opt.schedule",
+        "opt.knapsack",
+        "opt.routing",
+        "opt.cp_sat",
+        "opt.min_cost_flow"
+      ]
+    },
+    {
+      "family": "Optimization",
+      "project": "Optuna",
+      "source_url": "https://github.com/optuna/optuna",
+      "runtime": "python_lib",
+      "execution_mode": "seeded_stateful",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "opt.search",
+        "opt.prune",
+        "opt.study",
+        "opt.pareto",
+        "opt.parameter_grid"
+      ]
+    },
+    {
+      "family": "Security",
+      "project": "Cosign",
+      "source_url": "https://github.com/sigstore/cosign",
+      "runtime": "native_cli",
+      "execution_mode": "identity_stateful",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "artifact.sign",
+        "artifact.verify",
+        "artifact.attest",
+        "oci.verify"
+      ]
+    },
+    {
+      "family": "Security",
+      "project": "Syft",
+      "source_url": "https://github.com/anchore/syft",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "artifact.sbom",
+        "artifact.dependencies",
+        "artifact.license_inventory",
+        "artifact.provenance"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Agent Skills Specification",
+      "source_url": "https://github.com/agentskills/agentskills",
+      "runtime": "metadata_rules",
+      "execution_mode": "deterministic_local",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "skill.frontmatter.validate",
+        "skill.inventory",
+        "skill.schema.emit",
+        "skill.lint",
+        "skill.provenance"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Anthropic Skills",
+      "source_url": "https://github.com/anthropics/skills",
+      "runtime": "skill_library",
+      "execution_mode": "human_review",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "skill.workflow.extract",
+        "skill.script.inventory",
+        "skill.templates.index",
+        "skill.fixtures.plan"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "MCP Reference Servers",
+      "source_url": "https://github.com/modelcontextprotocol/servers",
+      "runtime": "mcp_servers",
+      "execution_mode": "environment_sensitive",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "mcp.filesystem.read",
+        "mcp.git.inspect",
+        "mcp.fetch.extract",
+        "mcp.tool.catalog",
+        "mcp.tool.schema"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Official MCP Registry",
+      "source_url": "https://github.com/modelcontextprotocol/registry",
+      "runtime": "api_registry",
+      "execution_mode": "network_stateful",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "mcp.registry.discover",
+        "mcp.registry.metadata",
+        "mcp.registry.version",
+        "mcp.registry.dedupe",
+        "mcp.registry.classify"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "OpenAI Skills",
+      "source_url": "https://github.com/openai/skills",
+      "runtime": "skill_library",
+      "execution_mode": "human_review",
+      "priority": 1,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "skill.workflow.test",
+        "skill.readme.generate",
+        "skill.cli_contract.propose",
+        "skill.agents_yaml.describe"
+      ]
+    },
+    {
+      "family": "Audio",
+      "project": "Rubber Band",
+      "source_url": "https://breakfastquay.com/rubberband/",
+      "runtime": "native_cli",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "audio.time_stretch",
+        "audio.pitch_shift",
+        "audio.transient_preserve"
+      ]
+    },
+    {
+      "family": "Audio",
+      "project": "Silero VAD",
+      "source_url": "https://github.com/snakers4/silero-vad",
+      "runtime": "onnx_model",
+      "execution_mode": "model_inference",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "audio.vad",
+        "audio.speech_regions",
+        "audio.silence_trim"
+      ]
+    },
+    {
+      "family": "Audio",
+      "project": "aubio",
+      "source_url": "https://github.com/aubio/aubio",
+      "runtime": "native_cli",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "audio.pitch",
+        "audio.beat",
+        "audio.onset.aubio",
+        "audio.silence"
+      ]
+    },
+    {
+      "family": "Audio",
+      "project": "librosa",
+      "source_url": "https://github.com/librosa/librosa",
+      "runtime": "python_lib",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "audio.tempo",
+        "audio.onset",
+        "audio.beats",
+        "audio.spectral",
+        "audio.features"
+      ]
+    },
+    {
+      "family": "Audio",
+      "project": "whisper.cpp",
+      "source_url": "https://github.com/ggml-org/whisper.cpp",
+      "runtime": "native_model_binary",
+      "execution_mode": "model_inference",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "speech.transcribe",
+        "speech.segment",
+        "speech.translate",
+        "speech.confidence"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "Gitleaks",
+      "source_url": "https://github.com/gitleaks/gitleaks",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "repo.secrets.scan",
+        "repo.secrets.redact",
+        "repo.leak.report"
+      ]
+    },
+    {
+      "family": "Code",
+      "project": "Semgrep",
+      "source_url": "https://github.com/semgrep/semgrep",
+      "runtime": "cli_engine",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "code.semgrep.scan",
+        "code.security.findings",
+        "code.rule.quality"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "Apache Arrow",
+      "source_url": "https://arrow.apache.org/",
+      "runtime": "native_lib",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "data.arrow.convert",
+        "data.schema.validate",
+        "data.columnar.write"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "MarkItDown",
+      "source_url": "https://github.com/microsoft/markitdown",
+      "runtime": "python_cli",
+      "execution_mode": "environment_sensitive",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "document.markdown.convert",
+        "document.metadata.extract",
+        "document.batch_extract"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "NetworkX",
+      "source_url": "https://github.com/networkx/networkx",
+      "runtime": "python_lib",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "graph.components",
+        "graph.centrality",
+        "graph.shortest_path",
+        "graph.layout"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "Polars",
+      "source_url": "https://github.com/pola-rs/polars",
+      "runtime": "python_rust",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "data.lazy_transform",
+        "data.group",
+        "data.join",
+        "data.profile"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "RapidFuzz",
+      "source_url": "https://github.com/rapidfuzz/RapidFuzz",
+      "runtime": "python_native",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "text.fuzzy_match",
+        "text.deduplicate",
+        "text.similarity"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "Trafilatura",
+      "source_url": "https://github.com/adbar/trafilatura",
+      "runtime": "python_cli",
+      "execution_mode": "network_stateful",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "web.article.extract",
+        "web.links.extract",
+        "web.metadata",
+        "web.cleantext"
+      ]
+    },
+    {
+      "family": "Data",
+      "project": "yt-dlp",
+      "source_url": "https://github.com/yt-dlp/yt-dlp",
+      "runtime": "python_cli",
+      "execution_mode": "network_stateful",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "video.reference.metadata",
+        "video.reference.download_authorized",
+        "video.reference.subtitles"
+      ]
+    },
+    {
+      "family": "Eval",
+      "project": "Garak",
+      "source_url": "https://github.com/NVIDIA/garak",
+      "runtime": "python_cli",
+      "execution_mode": "model_inference",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "eval.probes",
+        "eval.detectors",
+        "eval.safety_report",
+        "eval.batch"
+      ]
+    },
+    {
+      "family": "Eval",
+      "project": "lm-evaluation-harness",
+      "source_url": "https://github.com/EleutherAI/lm-evaluation-harness",
+      "runtime": "python_framework",
+      "execution_mode": "model_inference",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "eval.lm_bench",
+        "eval.task_suite",
+        "eval.metrics",
+        "eval.model_matrix"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Godot",
+      "source_url": "https://docs.godotengine.org/en/latest/tutorials/editor/command_line_tutorial.html",
+      "runtime": "headless_app",
+      "execution_mode": "environment_sensitive",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "game.scene.render",
+        "game.physics.simulate",
+        "game.assets.import",
+        "game.capture",
+        "game.headless.test"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "ImageMagick",
+      "source_url": "https://imagemagick.org/",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "image.compose",
+        "image.resize",
+        "image.trim",
+        "image.montage",
+        "image.compare"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Manim",
+      "source_url": "https://github.com/ManimCommunity/manim",
+      "runtime": "python_renderer",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "math.scene.render",
+        "math.axes.animate",
+        "math.formula.transition",
+        "math.chart.animate",
+        "math.geometry.visualize",
+        "math.explainer.sequence"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Mermaid CLI",
+      "source_url": "https://github.com/mermaid-js/mermaid-cli",
+      "runtime": "node_cli",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "diagram.flowchart",
+        "diagram.sequence",
+        "diagram.export_svg",
+        "diagram.export_png"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Motion Canvas",
+      "source_url": "https://github.com/motion-canvas/motion-canvas",
+      "runtime": "node_renderer",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "motioncanvas.scene.render",
+        "motioncanvas.vector.animate",
+        "motioncanvas.timeline",
+        "motioncanvas.graphs"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Sharp",
+      "source_url": "https://github.com/lovell/sharp",
+      "runtime": "node_native",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "image.batch_resize",
+        "image.transcode",
+        "image.composite",
+        "image.metadata"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "trimesh",
+      "source_url": "https://github.com/mikedh/trimesh",
+      "runtime": "python_lib",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "mesh.inspect",
+        "mesh.repair",
+        "mesh.measure",
+        "mesh.slice",
+        "mesh.export"
+      ]
+    },
+    {
+      "family": "Optimization",
+      "project": "PyPSA",
+      "source_url": "https://github.com/PyPSA/PyPSA",
+      "runtime": "python_model",
+      "execution_mode": "solver_dependent",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "sdg.grid.optimize",
+        "sdg.energy_balance",
+        "sdg.scenario_compare"
+      ]
+    },
+    {
+      "family": "Optimization",
+      "project": "RDKit",
+      "source_url": "https://github.com/rdkit/rdkit",
+      "runtime": "native_python",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "chem.molecule.validate",
+        "chem.descriptors",
+        "chem.substructure",
+        "chem.conformers"
+      ]
+    },
+    {
+      "family": "Optimization",
+      "project": "SciPy",
+      "source_url": "https://github.com/scipy/scipy",
+      "runtime": "python_native",
+      "execution_mode": "algorithmic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "opt.nonlinear",
+        "opt.root",
+        "opt.integrate",
+        "opt.stats"
+      ]
+    },
+    {
+      "family": "Security",
+      "project": "Grype",
+      "source_url": "https://github.com/anchore/grype",
+      "runtime": "native_cli",
+      "execution_mode": "environment_sensitive",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "artifact.vulnerability.scan",
+        "artifact.advisory.matches",
+        "artifact.remediation"
+      ]
+    },
+    {
+      "family": "Security",
+      "project": "OPA",
+      "source_url": "https://github.com/open-policy-agent/opa",
+      "runtime": "native_cli",
+      "execution_mode": "deterministic_local",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "policy.rego.eval",
+        "policy.deny",
+        "policy.constraints"
+      ]
+    },
+    {
+      "family": "Security",
+      "project": "Trivy",
+      "source_url": "https://github.com/aquasecurity/trivy",
+      "runtime": "native_cli",
+      "execution_mode": "environment_sensitive",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "container.vuln.scan",
+        "repo.config.scan",
+        "artifact.license.scan"
+      ]
+    },
+    {
+      "family": "Security",
+      "project": "Wasmtime",
+      "source_url": "https://github.com/bytecodealliance/wasmtime",
+      "runtime": "wasm_runtime",
+      "execution_mode": "bounded_sandbox",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "wasm.module.run",
+        "wasm.component.validate",
+        "wasm.fuel_bound"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "BMad Method",
+      "source_url": "https://github.com/bmad-code-org/BMAD-METHOD",
+      "runtime": "skill_library",
+      "execution_mode": "human_review",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "workflow.prd.validate",
+        "workflow.architecture.audit",
+        "workflow.story.compile",
+        "workflow.testplan",
+        "workflow.requirement_trace"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Superpowers",
+      "source_url": "https://github.com/obra/superpowers",
+      "runtime": "skill_library",
+      "execution_mode": "human_review",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "workflow.red_green_refactor",
+        "workflow.checkpoint",
+        "workflow.baseline_eval",
+        "workflow.verification"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Trail of Bits Skills",
+      "source_url": "https://github.com/trailofbits/skills",
+      "runtime": "skill_library",
+      "execution_mode": "human_review",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "security.review.plan",
+        "security.issue_triage",
+        "security.rule_check",
+        "security.test_harness"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Vercel Agent Skills",
+      "source_url": "https://github.com/vercel-labs/agent-skills",
+      "runtime": "skill_library",
+      "execution_mode": "human_review",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "skill.react.rules",
+        "web.performance.audit",
+        "web.patterns.check",
+        "web.accessibility.rules"
+      ]
+    },
+    {
+      "family": "Skills",
+      "project": "Vercel Skills CLI",
+      "source_url": "https://github.com/vercel-labs/skills",
+      "runtime": "node_cli",
+      "execution_mode": "network_stateful",
+      "priority": 2,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "skill.package.discover",
+        "skill.package.install_plan",
+        "skill.package.diff",
+        "skill.package.inventory"
+      ]
+    },
+    {
+      "family": "Audio",
+      "project": "Kokoro TTS",
+      "source_url": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "runtime": "model_worker",
+      "execution_mode": "model_inference",
+      "priority": 3,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "audio.tts",
+        "audio.voice.select",
+        "audio.tts.batch"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Instruct-Particulate",
+      "source_url": "https://instruct-particulate.github.io/",
+      "runtime": "model_worker",
+      "execution_mode": "model_inference",
+      "priority": 3,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "rig.instruct.predict",
+        "rig.instruct.constraints"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Particulate",
+      "source_url": "https://github.com/RuiningLi/particulate",
+      "runtime": "cuda_model",
+      "execution_mode": "model_inference",
+      "priority": 3,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "rig.particulate.predict",
+        "rig.particulate.export_urdf",
+        "rig.particulate.export_glb"
+      ]
+    },
+    {
+      "family": "Motion",
+      "project": "Remotion",
+      "source_url": "https://www.remotion.dev/docs/",
+      "runtime": "node_renderer",
+      "execution_mode": "licensing_review",
+      "priority": 3,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "remotion.render",
+        "remotion.composition",
+        "remotion.props.variant",
+        "remotion.snapshot"
+      ]
+    },
+    {
+      "family": "Optimization",
+      "project": "OpenMM",
+      "source_url": "https://github.com/openmm/openmm",
+      "runtime": "native_gpu",
+      "execution_mode": "gpu_dependent",
+      "priority": 3,
+      "review_status": "candidate_research_not_executed",
+      "licensing": "review exact upstream version and bundled dependencies",
+      "proposed_operators": [
+        "molecular.energy",
+        "dynamics.simulate",
+        "molecular.forcefield"
+      ]
+    }
+  ]
+}

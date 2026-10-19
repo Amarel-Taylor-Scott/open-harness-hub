@@ -1,0 +1,14 @@
+{
+  "schema": "baltor.implemented_operator_contracts/1",
+  "version": "0.4.0",
+  "security_claim": "Pure Go metadata transformation; no arbitrary script execution, no network requests; OS sandbox supplied externally",
+  "operators": [
+    {"name":"skill.scan","command":"scan","inputs":{"root":"existing_local_directory"},"outputs":["scan.json"],"side_effects":"output file only","determinism":"same input tree and root path"},
+    {"name":"skill.propose","command":"propose","inputs":{"catalog":"scan_json"},"outputs":["proposals.json"],"side_effects":"output file only","determinism":"same JSON catalog","status":"emits NON-EXECUTABLE proposals"},
+    {"name":"layout.lint","command":"layout","inputs":{"input":"layout_json"},"outputs":["report.json"],"side_effects":"output file only","determinism":"same JSON inputs","limitations":"axis-aligned rectangles, timestamps, heuristics; no saliency/semantic understanding"},
+    {"name":"storyboard.compile","command":"timeline","inputs":{"input":"story_json"},"outputs":["compiled_storyboard.json","timeline.csv","captions.srt"],"side_effects":"output files only","determinism":"same JSON inputs","limitations":"does not render video; captions use text provided by storyboard"},
+    {"name":"variation.grid","command":"variants","inputs":{"input":"variation_json"},"outputs":["variants.json"],"side_effects":"output file only","determinism":"same JSON inputs","limits":{"max_variants":256}},
+    {"name":"artifact.sha256","command":"hash","inputs":{"input":"local_file"},"outputs":["sha256_json"],"side_effects":"stdout only","determinism":"same file bytes"},
+    {"name":"runtime.doctor","command":"doctor","inputs":{},"outputs":["capability_json"],"side_effects":"stdout only","determinism":"fixed tool version"}
+  ]
+}

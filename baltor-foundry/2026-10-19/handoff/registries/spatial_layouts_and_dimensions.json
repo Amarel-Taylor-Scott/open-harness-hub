@@ -1,0 +1,1801 @@
+{
+  "schema": "baltor.spatial.composer/0.2",
+  "rights": "Original procedural story and artwork. No reference media copied.",
+  "duration_sec": 65.0,
+  "fps": 24,
+  "working_canvas": {
+    "w": 540,
+    "h": 960
+  },
+  "output": {
+    "w": 1080,
+    "h": 1920
+  },
+  "safe_profile": "reels",
+  "safe_profile_notice": "These configurable regions are conservative authoring heuristics; platform UI overlays can change.",
+  "layout_keys": [
+    "cinematic",
+    "survival_hud",
+    "split_decision",
+    "forensic",
+    "comic",
+    "blueprint",
+    "art_deco",
+    "dashboard",
+    "quadrant",
+    "minimal_finale"
+  ],
+  "layouts": {
+    "cinematic": {
+      "name": "01 / CINEMATIC TITLE",
+      "description": "Large negative-space composition with a restrained headline, no container panels",
+      "elements": [
+        {
+          "id": "chapter",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.01,
+            "dy": 0.02,
+            "w": 0.52,
+            "h": 0.048
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "STUDY 01  /  CINEMATIC",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#85F4E8",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#85F4E8",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "headline",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.01,
+            "dy": 0.115,
+            "w": 0.92,
+            "h": 0.2
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "THE LAST\nSIGNAL",
+          "font_size": 56,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0,
+          "min_font_size": 28,
+          "line_spacing": 0.96,
+          "shadow": true,
+          "enter": "slide_up",
+          "in": 0.8
+        },
+        {
+          "id": "rule",
+          "kind": "line",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.34,
+            "w": 0.23,
+            "h": 0.003
+          },
+          "z": 46,
+          "layer": "decor",
+          "color": "#FA7A72",
+          "must_safe": true
+        },
+        {
+          "id": "standfirst",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.01,
+            "dy": 0.36,
+            "w": 0.86,
+            "h": 0.078
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "ONE VOICE. NO WAY HOME.",
+          "font_size": 19,
+          "color": "#85F4E8",
+          "font": "mono",
+          "padding": 0,
+          "start": 0.7
+        },
+        {
+          "id": "bottom_line",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.93,
+            "w": 0.82,
+            "h": 0.05
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "DAY 01     \u2022     23:48",
+          "font_size": 13,
+          "color": "#A3C2C8",
+          "font": "mono",
+          "padding": 0
+        }
+      ]
+    },
+    "survival_hud": {
+      "name": "02 / SURVIVAL INVENTORY",
+      "description": "Countdown-led narrative: modular inventory cards with exact resource quantities",
+      "elements": [
+        {
+          "id": "level",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.015,
+            "w": 0.61,
+            "h": 0.05
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "LEVEL 02  \u2022  SURVIVAL",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#FA7A72",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#FA7A72",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "inventory_card",
+          "kind": "box",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.088,
+            "w": 0.94,
+            "h": 0.325
+          },
+          "z": 25,
+          "layer": "panels",
+          "background": true,
+          "fill": "#0A1B29E9",
+          "outline": true,
+          "border": "#FA7A72",
+          "border_width": 2,
+          "radius": 13
+        },
+        {
+          "id": "inv_heading",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.05,
+            "dy": 0.105,
+            "w": 0.77,
+            "h": 0.06
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "SUPPLIES REMAINING",
+          "font_size": 19,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "inv_rule",
+          "kind": "line",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.05,
+            "dy": 0.171,
+            "w": 0.83,
+            "h": 0.003
+          },
+          "z": 46,
+          "layer": "decor",
+          "color": "#FA7A72",
+          "must_safe": true
+        },
+        {
+          "id": "inv_food_label",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.06,
+            "dy": 0.195,
+            "w": 0.25,
+            "h": 0.055
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "FOOD",
+          "font_size": 14,
+          "color": "#A3C2C8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "inv_food_val",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.06,
+            "dy": 0.249,
+            "w": 0.24,
+            "h": 0.087
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "02",
+          "font_size": 40,
+          "color": "#FA7A72",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "inv_water_label",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.37,
+            "dy": 0.195,
+            "w": 0.28,
+            "h": 0.055
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "WATER",
+          "font_size": 14,
+          "color": "#A3C2C8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "inv_water_val",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.37,
+            "dy": 0.249,
+            "w": 0.23,
+            "h": 0.087
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "01",
+          "font_size": 40,
+          "color": "#F1C878",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "inv_batt_label",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.68,
+            "dy": 0.195,
+            "w": 0.29,
+            "h": 0.055
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "BATTERY",
+          "font_size": 14,
+          "color": "#A3C2C8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "inv_batt_val",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.68,
+            "dy": 0.249,
+            "w": 0.26,
+            "h": 0.087
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "18%",
+          "font_size": 34,
+          "color": "#85F4E8",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "countdown",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.06,
+            "dy": 0.351,
+            "w": 0.79,
+            "h": 0.05
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "NEXT SAFE WINDOW  00:37",
+          "font_size": 13,
+          "color": "#85F4E8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "summary",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.04,
+            "dy": 0.475,
+            "w": 0.91,
+            "h": 0.08
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "EACH HOUR COSTS MORE.",
+          "font_size": 21,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0,
+          "shadow": true
+        },
+        {
+          "id": "capacity",
+          "kind": "progress",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.04,
+            "dy": 0.966,
+            "w": 0.91,
+            "h": 0.013
+          },
+          "z": 50,
+          "layer": "hud",
+          "value": "resource_level",
+          "color": "#FA7A72"
+        }
+      ]
+    },
+    "split_decision": {
+      "name": "03 / CHOOSE A PATH",
+      "description": "Two simultaneous camera crops separated by a visible film-strip gutter",
+      "elements": [
+        {
+          "id": "stage_dimmer",
+          "kind": "box",
+          "box": {
+            "space": "canvas",
+            "anchor": "top_left",
+            "dx": 0,
+            "dy": 0,
+            "w": 1,
+            "h": 1
+          },
+          "z": 18,
+          "layer": "framing",
+          "background": true,
+          "fill": "#091B2BA8",
+          "outline": false,
+          "must_safe": false
+        },
+        {
+          "id": "choice_label",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.014,
+            "w": 0.75,
+            "h": 0.05
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "YOU HAVE FIVE SECONDS",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#F1C878",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#F1C878",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "choice_headline",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.082,
+            "w": 0.93,
+            "h": 0.105
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "WHICH WAY?",
+          "font_size": 37,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "decisions",
+          "kind": "panel_grid",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.205,
+            "w": 0.96,
+            "h": 0.615
+          },
+          "z": 25,
+          "layer": "panels",
+          "rows": 1,
+          "cols": 2,
+          "gap": 8,
+          "labels": [
+            "LEFT / COVER",
+            "RIGHT / RUN"
+          ],
+          "crops": [
+            [
+              0.05,
+              0.38,
+              0.75,
+              0.93
+            ],
+            [
+              0.29,
+              0.31,
+              0.94,
+              0.95
+            ]
+          ],
+          "mirror_alternate": true,
+          "accent": "#85F4E8",
+          "color": "#F4F3E6",
+          "must_safe": true
+        },
+        {
+          "id": "decision_footer",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.85,
+            "w": 0.94,
+            "h": 0.08
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "ONE CHOICE CHANGES EVERYTHING.",
+          "font_size": 16,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0,
+          "align": "center"
+        }
+      ]
+    },
+    "forensic": {
+      "name": "04 / DOCUMENTARY CALLOUTS",
+      "description": "Inset detail, evidence tags, source-linked annotations, controlled negative space",
+      "elements": [
+        {
+          "id": "case",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.012,
+            "w": 0.53,
+            "h": 0.055
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "FIELD REPORT / 04",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#85F4E8",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#85F4E8",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "documentary",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.085,
+            "w": 0.91,
+            "h": 0.18
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "THE RADIO\nIS STILL ON",
+          "font_size": 32,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0,
+          "line_spacing": 1.04
+        },
+        {
+          "id": "monitor",
+          "kind": "image",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.5,
+            "dy": 0.285,
+            "w": 0.46,
+            "h": 0.315
+          },
+          "z": 23,
+          "layer": "insets",
+          "radius": 8,
+          "crop": [
+            0.31,
+            0.31,
+            0.78,
+            0.82
+          ],
+          "border": "#85F4E8",
+          "border_width": 3,
+          "outline": true,
+          "must_safe": true
+        },
+        {
+          "id": "monitor_label",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.52,
+            "dy": 0.313,
+            "w": 0.4,
+            "h": 0.047
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "DETAIL 01 / SIGNAL",
+          "font_size": 10,
+          "font": "bold",
+          "color": "#85F4E8",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#85F4E8",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "annotation_pointer",
+          "kind": "pointer",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.38,
+            "dy": 0.435,
+            "w": 0.15,
+            "h": 0.04
+          },
+          "z": 30,
+          "layer": "ui",
+          "color": "#85F4E8",
+          "target": [
+            0.45,
+            0.58
+          ],
+          "must_safe": true
+        },
+        {
+          "id": "observation",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.03,
+            "dy": 0.85,
+            "w": 0.91,
+            "h": 0.09
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "OBSERVATION  \u2022  THE SIGNAL REPEATS.",
+          "font_size": 17,
+          "color": "#85F4E8",
+          "font": "mono",
+          "padding": 0,
+          "max_lines": 2
+        }
+      ]
+    },
+    "comic": {
+      "name": "05 / GRAPHIC NOVEL",
+      "description": "Contrasting caption slab and asymmetrical dramatic typography",
+      "elements": [
+        {
+          "id": "hero_block",
+          "kind": "box",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.02,
+            "w": 0.68,
+            "h": 0.16
+          },
+          "z": 25,
+          "layer": "panels",
+          "background": true,
+          "fill": "#E57A68F2",
+          "outline": true,
+          "border": "#FA7A72",
+          "border_width": 0,
+          "radius": 3
+        },
+        {
+          "id": "onomatopeia",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.045,
+            "dy": 0.037,
+            "w": 0.59,
+            "h": 0.135
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "KNOCK!\nKNOCK!\nKNOCK!",
+          "font_size": 24,
+          "color": "#151520",
+          "font": "bold",
+          "padding": 0,
+          "min_font_size": 19,
+          "line_spacing": 0.94
+        },
+        {
+          "id": "comic_border",
+          "kind": "box",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.01,
+            "dy": 0.32,
+            "w": 0.96,
+            "h": 0.48
+          },
+          "z": 24,
+          "layer": "decor",
+          "background": false,
+          "outline": true,
+          "border": "#F1C878",
+          "border_width": 3,
+          "radius": 1
+        },
+        {
+          "id": "impact_ring",
+          "kind": "reticle",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.54,
+            "dy": 0.35,
+            "w": 0.3,
+            "h": 0.22
+          },
+          "z": 28,
+          "layer": "effects",
+          "color": "#FA7A72"
+        },
+        {
+          "id": "comic_counter",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.335,
+            "w": 0.43,
+            "h": 0.055
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "3  KNOCKS",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#FA7A72",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#FA7A72",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "comic_bottom",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.223,
+            "w": 0.94,
+            "h": 0.09
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "BUT NOBODY IS AT THE DOOR.",
+          "font_size": 17,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0
+        }
+      ]
+    },
+    "blueprint": {
+      "name": "06 / SIGNAL BLUEPRINT",
+      "description": "A technical explanatory layout combining reticle and right-aligned metadata",
+      "elements": [
+        {
+          "id": "telemetry",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.014,
+            "w": 0.59,
+            "h": 0.048
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "TELEMETRY  /  LIVE",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#85F4E8",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#85F4E8",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "tech_head",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.082,
+            "w": 0.95,
+            "h": 0.095
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "SIGNAL ORIGIN",
+          "font_size": 33,
+          "color": "#85F4E8",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "tech_reticle",
+          "kind": "reticle",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.22,
+            "dy": 0.28,
+            "w": 0.52,
+            "h": 0.37
+          },
+          "z": 28,
+          "layer": "effects",
+          "color": "#85F4E8"
+        },
+        {
+          "id": "telemetry_plate",
+          "kind": "box",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.49,
+            "dy": 0.23,
+            "w": 0.49,
+            "h": 0.245
+          },
+          "z": 25,
+          "layer": "panels",
+          "background": true,
+          "fill": "#061A28D9",
+          "outline": true,
+          "border": "#85F4E8",
+          "border_width": 1,
+          "radius": 4
+        },
+        {
+          "id": "freq",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.52,
+            "dy": 0.25,
+            "w": 0.42,
+            "h": 0.065
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "FREQUENCY\u00a0142.900",
+          "font_size": 15,
+          "color": "#F4F3E6",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "strength",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.52,
+            "dy": 0.328,
+            "w": 0.43,
+            "h": 0.065
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "CONFIDENCE  /  UNKNOWN",
+          "font_size": 13,
+          "color": "#F1C878",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "strength_bar",
+          "kind": "progress",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.52,
+            "dy": 0.435,
+            "w": 0.4,
+            "h": 0.013
+          },
+          "z": 50,
+          "layer": "hud",
+          "value": "signal_strength",
+          "color": "#85F4E8"
+        }
+      ]
+    },
+    "art_deco": {
+      "name": "07 / ART-DECO INTERTITLE",
+      "description": "Symmetrical gold guides and a centered intertitle instead of conventional top-left captions",
+      "elements": [
+        {
+          "id": "outer_decoration",
+          "kind": "box",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.025,
+            "dy": 0.05,
+            "w": 0.95,
+            "h": 0.84
+          },
+          "z": 15,
+          "layer": "framing",
+          "background": false,
+          "outline": true,
+          "border": "#E9BE76BA",
+          "border_width": 2,
+          "edge_marks": true,
+          "must_safe": true,
+          "radius": 2
+        },
+        {
+          "id": "top_deco",
+          "kind": "line",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.3,
+            "dy": 0.083,
+            "w": 0.4,
+            "h": 0.003
+          },
+          "z": 46,
+          "layer": "decor",
+          "color": "#F1C878",
+          "must_safe": true
+        },
+        {
+          "id": "act",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.32,
+            "dy": 0.128,
+            "w": 0.36,
+            "h": 0.055
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "ACT VII",
+          "font_size": 19,
+          "color": "#F1C878",
+          "font": "serif",
+          "padding": 0,
+          "align": "center"
+        },
+        {
+          "id": "gold_title",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.08,
+            "dy": 0.21,
+            "w": 0.84,
+            "h": 0.18
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "THE\nWATCHTOWER",
+          "font_size": 37,
+          "color": "#F4F3E6",
+          "font": "serif",
+          "padding": 0,
+          "align": "center",
+          "line_spacing": 1.15
+        },
+        {
+          "id": "gold_kicker",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.05,
+            "dy": 0.81,
+            "w": 0.9,
+            "h": 0.06
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "THE LAST LIGHT ON THE RIDGE",
+          "font_size": 14,
+          "color": "#F1C878",
+          "font": "serif",
+          "padding": 0,
+          "align": "center"
+        },
+        {
+          "id": "bottom_deco",
+          "kind": "line",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.3,
+            "dy": 0.904,
+            "w": 0.4,
+            "h": 0.003
+          },
+          "z": 46,
+          "layer": "decor",
+          "color": "#F1C878",
+          "must_safe": true
+        }
+      ]
+    },
+    "dashboard": {
+      "name": "08 / INFOGRAPHIC DATA",
+      "description": "Charts, quantitative hierarchy, tall side annotation, padded cards",
+      "elements": [
+        {
+          "id": "summary_header",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.01,
+            "dy": 0.016,
+            "w": 0.79,
+            "h": 0.055
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "SITUATION BRIEF  /  DAY 03",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#85F4E8",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#85F4E8",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "situation",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.01,
+            "dy": 0.105,
+            "w": 0.95,
+            "h": 0.16
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "THE CLOCK\nIS RUNNING OUT",
+          "font_size": 35,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "stat_card",
+          "kind": "box",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.285,
+            "w": 0.94,
+            "h": 0.345
+          },
+          "z": 25,
+          "layer": "panels",
+          "background": true,
+          "fill": "#061B2AEF",
+          "outline": true,
+          "border": "#85F4E8",
+          "border_width": 1,
+          "radius": 14
+        },
+        {
+          "id": "stat_big",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.05,
+            "dy": 0.305,
+            "w": 0.5,
+            "h": 0.17
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "18%",
+          "font_size": 76,
+          "color": "#FA7A72",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "stat_label",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.53,
+            "dy": 0.337,
+            "w": 0.4,
+            "h": 0.105
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "POWER REMAINING",
+          "font_size": 18,
+          "color": "#A3C2C8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "stat_progress",
+          "kind": "progress",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.06,
+            "dy": 0.489,
+            "w": 0.85,
+            "h": 0.013
+          },
+          "z": 50,
+          "layer": "hud",
+          "value": "resource_level",
+          "color": "#FA7A72"
+        },
+        {
+          "id": "stat_context",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.06,
+            "dy": 0.536,
+            "w": 0.85,
+            "h": 0.055
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "ESTIMATED RUN TIME  /  04:12",
+          "font_size": 14,
+          "color": "#85F4E8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "dashboard_footer",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.03,
+            "dy": 0.665,
+            "w": 0.93,
+            "h": 0.09
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "PLAN FOR FAILURE. MOVE BEFORE DARK.",
+          "font_size": 16,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0
+        }
+      ]
+    },
+    "quadrant": {
+      "name": "09 / FOUR CAMERA FEEDS",
+      "description": "2x2 four-view montage, localized labels, separation gutters, time-code bar",
+      "elements": [
+        {
+          "id": "stage_dimmer",
+          "kind": "box",
+          "box": {
+            "space": "canvas",
+            "anchor": "top_left",
+            "dx": 0,
+            "dy": 0,
+            "w": 1,
+            "h": 1
+          },
+          "z": 18,
+          "layer": "framing",
+          "background": true,
+          "fill": "#091B2BBF",
+          "outline": false,
+          "must_safe": false
+        },
+        {
+          "id": "grid_indicator",
+          "kind": "pill",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.012,
+            "w": 0.6,
+            "h": 0.052
+          },
+          "z": 45,
+          "layer": "annotations",
+          "text": "LIVE  /  QUAD FEED",
+          "font_size": 12,
+          "font": "bold",
+          "color": "#FA7A72",
+          "background": true,
+          "fill": "#081521E8",
+          "outline": true,
+          "border": "#FA7A72",
+          "padding": [
+            2,
+            9,
+            2,
+            9
+          ],
+          "radius": 7
+        },
+        {
+          "id": "grid_headline",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.083,
+            "w": 0.95,
+            "h": 0.08
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "EVERY DIRECTION IS A RISK",
+          "font_size": 21,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0
+        },
+        {
+          "id": "four_up",
+          "kind": "panel_grid",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.2,
+            "w": 0.96,
+            "h": 0.64
+          },
+          "z": 23,
+          "layer": "panels",
+          "rows": 2,
+          "cols": 2,
+          "gap": 7,
+          "labels": [
+            "CAM 01 / WEST",
+            "CAM 02 / EAST",
+            "CAM 03 / NORTH",
+            "CAM 04 / SOUTH"
+          ],
+          "crops": [
+            [
+              0.05,
+              0.15,
+              0.62,
+              0.73
+            ],
+            [
+              0.32,
+              0.31,
+              0.95,
+              0.83
+            ],
+            [
+              0.1,
+              0.44,
+              0.87,
+              0.95
+            ],
+            [
+              0.36,
+              0.1,
+              0.98,
+              0.65
+            ]
+          ],
+          "mirror_alternate": true,
+          "accent": "#FA7A72",
+          "color": "#F4F3E6",
+          "must_safe": true
+        },
+        {
+          "id": "grid_bottom",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.875,
+            "w": 0.88,
+            "h": 0.07
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "RECORDING  \u2022  04 CAMERAS",
+          "font_size": 14,
+          "color": "#FA7A72",
+          "font": "mono",
+          "padding": 0
+        }
+      ]
+    },
+    "minimal_finale": {
+      "name": "10 / MINIMAL CLIFFHANGER",
+      "description": "Just two typographic layers, a signal waveform and cliffhanger rhythm",
+      "elements": [
+        {
+          "id": "ending_part",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.055,
+            "w": 0.92,
+            "h": 0.065
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "DAY 04    /    00:00",
+          "font_size": 17,
+          "color": "#85F4E8",
+          "font": "mono",
+          "padding": 0
+        },
+        {
+          "id": "ending_headline",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.02,
+            "dy": 0.155,
+            "w": 0.93,
+            "h": 0.27
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "THE VOICE\nKNOWS YOUR\nNAME.",
+          "font_size": 48,
+          "color": "#F4F3E6",
+          "font": "bold",
+          "padding": 0,
+          "min_font_size": 28,
+          "line_spacing": 1.03,
+          "enter": "slide_up",
+          "shadow": true,
+          "in": 0.9
+        },
+        {
+          "id": "ending_rule",
+          "kind": "line",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.03,
+            "dy": 0.455,
+            "w": 0.36,
+            "h": 0.003
+          },
+          "z": 46,
+          "layer": "decor",
+          "color": "#FA7A72",
+          "must_safe": true
+        },
+        {
+          "id": "voice_wave",
+          "kind": "waveform",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.04,
+            "dy": 0.515,
+            "w": 0.91,
+            "h": 0.11
+          },
+          "z": 38,
+          "layer": "audio_visualizer",
+          "bars": 45,
+          "color": "#85F4E8",
+          "must_safe": true
+        },
+        {
+          "id": "end_lower",
+          "kind": "text",
+          "box": {
+            "space": "safe",
+            "anchor": "top_left",
+            "dx": 0.04,
+            "dy": 0.873,
+            "w": 0.88,
+            "h": 0.073
+          },
+          "z": 40,
+          "layer": "typography",
+          "text": "TRANSMISSION ENDS  /  TO BE CONTINUED",
+          "font_size": 13,
+          "color": "#A3C2C8",
+          "font": "mono",
+          "padding": 0
+        }
+      ]
+    }
+  },
+  "shots": [
+    {
+      "id": "01",
+      "start": 0.0,
+      "end": 6.5,
+      "layout": "cinematic",
+      "source_shot_seconds": 1.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "A single signal survives in the dark."
+    },
+    {
+      "id": "02",
+      "start": 6.5,
+      "end": 13.0,
+      "layout": "survival_hud",
+      "source_shot_seconds": 7.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Three supplies. A shrinking deadline."
+    },
+    {
+      "id": "03",
+      "start": 13.0,
+      "end": 19.5,
+      "layout": "split_decision",
+      "source_shot_seconds": 20.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Every direction carries a different risk."
+    },
+    {
+      "id": "04",
+      "start": 19.5,
+      "end": 26.0,
+      "layout": "forensic",
+      "source_shot_seconds": 29.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "The evidence points toward the radio tower."
+    },
+    {
+      "id": "05",
+      "start": 26.0,
+      "end": 32.5,
+      "layout": "comic",
+      "source_shot_seconds": 47.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Then the knocking starts."
+    },
+    {
+      "id": "06",
+      "start": 32.5,
+      "end": 39.0,
+      "layout": "blueprint",
+      "source_shot_seconds": 54.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Somewhere, a transmitter wakes up."
+    },
+    {
+      "id": "07",
+      "start": 39.0,
+      "end": 45.5,
+      "layout": "art_deco",
+      "source_shot_seconds": 43.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "The last light on the ridge."
+    },
+    {
+      "id": "08",
+      "start": 45.5,
+      "end": 52.0,
+      "layout": "dashboard",
+      "source_shot_seconds": 39.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Battery at eighteen percent."
+    },
+    {
+      "id": "09",
+      "start": 52.0,
+      "end": 58.5,
+      "layout": "quadrant",
+      "source_shot_seconds": 63.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Every camera sees a different threat."
+    },
+    {
+      "id": "10",
+      "start": 58.5,
+      "end": 65.0,
+      "layout": "minimal_finale",
+      "source_shot_seconds": 68.0,
+      "source_sample_span": 2.8,
+      "narration_cue": "Then the voice says your name."
+    }
+  ],
+  "layers": {
+    "sky": 0,
+    "parallax": 5,
+    "landmarks": 8,
+    "character": 10,
+    "foreground": 13,
+    "atmosphere": 17,
+    "framing": 20,
+    "panels": 25,
+    "insets": 27,
+    "effects": 28,
+    "decor": 35,
+    "audio_visualizer": 38,
+    "typography": 40,
+    "annotations": 45,
+    "hud": 50
+  },
+  "dimension_families": {
+    "Canvas": [
+      "width",
+      "height",
+      "aspect_ratio",
+      "fps",
+      "frame_number",
+      "pixel_aspect",
+      "render_scale",
+      "safe_profile",
+      "bleed_area",
+      "safe_zone",
+      "device_preview",
+      "overscan"
+    ],
+    "Spatial position": [
+      "anchor_15",
+      "x_relative",
+      "y_relative",
+      "offset_px",
+      "baseline",
+      "thirds_guide",
+      "rule_of_fifths",
+      "subject_anchor",
+      "focal_point",
+      "parent_anchor",
+      "alignment",
+      "grid_cell",
+      "column_span",
+      "row_span",
+      "sticky_region"
+    ],
+    "Sizing": [
+      "relative_width",
+      "relative_height",
+      "max_width",
+      "min_width",
+      "max_height",
+      "min_height",
+      "font_scale",
+      "fit_contain",
+      "fit_cover",
+      "crop_region",
+      "auto_fit",
+      "aspect_lock"
+    ],
+    "Spacing": [
+      "padding_top",
+      "padding_right",
+      "padding_bottom",
+      "padding_left",
+      "margin_top",
+      "margin_right",
+      "margin_bottom",
+      "margin_left",
+      "gap_x",
+      "gap_y",
+      "line_spacing",
+      "letter_spacing",
+      "baseline_gap",
+      "panel_gutter"
+    ],
+    "Typography": [
+      "family",
+      "weight",
+      "size",
+      "minimum_size",
+      "stroke_width",
+      "shadow",
+      "text_color",
+      "align_left",
+      "align_center",
+      "align_right",
+      "vertical_align",
+      "wrap",
+      "maximum_lines",
+      "ellipsis",
+      "tracking",
+      "kerning",
+      "leading",
+      "background_card",
+      "text_path",
+      "highlight_per_word",
+      "highlight_per_char",
+      "reveal_delay"
+    ],
+    "Shapes": [
+      "rect",
+      "rounded_rect",
+      "line",
+      "divider",
+      "progress",
+      "circle",
+      "reticle",
+      "ribbon",
+      "pointer",
+      "pill",
+      "metric",
+      "waveform",
+      "label",
+      "corner_marks",
+      "frame_border",
+      "grid_overlay"
+    ],
+    "Layering": [
+      "z_index",
+      "depth",
+      "alpha",
+      "blend_normal",
+      "blend_screen",
+      "blend_multiply",
+      "blend_add",
+      "clip_round",
+      "foreground_occlusion",
+      "mask",
+      "group",
+      "parent_space",
+      "nested_container",
+      "independent_timing",
+      "visibility",
+      "solo",
+      "lock"
+    ],
+    "Motion": [
+      "pan_x",
+      "pan_y",
+      "zoom",
+      "tilt",
+      "roll",
+      "crop_x",
+      "crop_y",
+      "shake_x",
+      "shake_y",
+      "ease_in",
+      "ease_out",
+      "stagger",
+      "hold",
+      "fade",
+      "slide",
+      "scale",
+      "typewriter",
+      "pop",
+      "wipe",
+      "parallax_depth"
+    ],
+    "Camera": [
+      "framing",
+      "subject_tracking",
+      "deadzone",
+      "lookahead",
+      "dolly",
+      "push_in",
+      "pull_out",
+      "whip",
+      "crash_zoom",
+      "focus_pull",
+      "overshoot",
+      "viewpoint",
+      "picture_in_picture"
+    ],
+    "Color": [
+      "foreground",
+      "background",
+      "accent",
+      "danger",
+      "temperature",
+      "tint",
+      "vignette",
+      "contrast",
+      "saturation",
+      "gamma",
+      "opacity",
+      "outline",
+      "grading",
+      "palette_lock"
+    ],
+    "Audio": [
+      "narration_cue",
+      "sound_event",
+      "music_duck",
+      "ambient_bed",
+      "beat_sync",
+      "stereo_pan",
+      "loudness",
+      "fade_in",
+      "fade_out",
+      "captions",
+      "subtitle_sync"
+    ],
+    "QA": [
+      "safe_area",
+      "font_readability",
+      "offscreen",
+      "text_collision",
+      "subject_collision",
+      "black_frame",
+      "subtitle_contrast",
+      "duration",
+      "cut_detect",
+      "camera_flow",
+      "edit_manifest",
+      "provenance",
+      "sample_rate",
+      "asset_rights"
+    ]
+  }
+}

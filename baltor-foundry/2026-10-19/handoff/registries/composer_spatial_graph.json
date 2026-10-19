@@ -1,0 +1,387 @@
+{
+  "schema": "baltor.composer_dag/0.2",
+  "engine": "Baltor Spatial Motion DAG v0.2",
+  "status_rule": "Prototype/planned nodes are documented but NOT executed in the current renderer unless specified by explicit adapter.",
+  "nodes": [
+    {
+      "id": "timeline",
+      "op": "timeline.resolve",
+      "deps": [],
+      "status": "implemented",
+      "implementation": "composer_v02.shot_at",
+      "output": "shot, local t, layout preset"
+    },
+    {
+      "id": "source_rights",
+      "op": "rights.check",
+      "deps": [],
+      "status": "implemented",
+      "implementation": "layouts.json + provenance manifest",
+      "output": "original-asset declaration"
+    },
+    {
+      "id": "canvas",
+      "op": "spatial.canvas",
+      "deps": [
+        "timeline"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine.Engine",
+      "output": "working dimensions, aspect, scale"
+    },
+    {
+      "id": "safe_zone",
+      "op": "spatial.safe",
+      "deps": [
+        "canvas"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine._screen_safe",
+      "output": "safe inset geometry"
+    },
+    {
+      "id": "scene_assets",
+      "op": "scene.plates",
+      "deps": [
+        "source_rights",
+        "timeline"
+      ],
+      "status": "implemented",
+      "implementation": "original.composer.ASSETS",
+      "output": "parallax plate stack"
+    },
+    {
+      "id": "camera",
+      "op": "camera.solve",
+      "deps": [
+        "timeline",
+        "canvas"
+      ],
+      "status": "implemented",
+      "implementation": "original.camera",
+      "output": "pan, zoom, shake"
+    },
+    {
+      "id": "background",
+      "op": "scene.parallax",
+      "deps": [
+        "scene_assets",
+        "camera"
+      ],
+      "status": "implemented",
+      "implementation": "original.paste_parallax",
+      "output": "sky/mountains/city/trees"
+    },
+    {
+      "id": "props",
+      "op": "scene.landmarks",
+      "deps": [
+        "background",
+        "camera"
+      ],
+      "status": "implemented",
+      "implementation": "original.paste_parallax",
+      "output": "environment props"
+    },
+    {
+      "id": "character",
+      "op": "rig.pose",
+      "deps": [
+        "props",
+        "timeline"
+      ],
+      "status": "implemented",
+      "implementation": "original.draw_hero",
+      "output": "animated stick-figure"
+    },
+    {
+      "id": "foreground",
+      "op": "scene.occlude",
+      "deps": [
+        "character"
+      ],
+      "status": "implemented",
+      "implementation": "original foreground plate",
+      "output": "foreground cutout and masks"
+    },
+    {
+      "id": "atmosphere",
+      "op": "fx.weather",
+      "deps": [
+        "foreground",
+        "timeline"
+      ],
+      "status": "implemented",
+      "implementation": "original.draw_extras",
+      "output": "rain, mist, signal pulses"
+    },
+    {
+      "id": "color_grade",
+      "op": "fx.grade",
+      "deps": [
+        "atmosphere"
+      ],
+      "status": "implemented",
+      "implementation": "original vignette",
+      "output": "palette consistency"
+    },
+    {
+      "id": "frame_crop",
+      "op": "camera.final_crop",
+      "deps": [
+        "color_grade",
+        "camera"
+      ],
+      "status": "implemented",
+      "implementation": "original.zoom_and_shake",
+      "output": "clean shot image without v0.1 captions"
+    },
+    {
+      "id": "shot_style",
+      "op": "layout.preset",
+      "deps": [
+        "timeline"
+      ],
+      "status": "implemented",
+      "implementation": "layouts.json",
+      "output": "element lists"
+    },
+    {
+      "id": "safe_candidate",
+      "op": "layout.activity_advisor",
+      "deps": [
+        "frame_crop",
+        "safe_zone"
+      ],
+      "status": "prototype",
+      "implementation": "analyze_spatial_video.py",
+      "output": "heuristic suggested text regions (offline analysis only)"
+    },
+    {
+      "id": "anchor_solver",
+      "op": "layout.anchors",
+      "deps": [
+        "shot_style",
+        "safe_zone"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine.resolve_box",
+      "output": "normalized anchored rectangles"
+    },
+    {
+      "id": "padding",
+      "op": "layout.padding",
+      "deps": [
+        "anchor_solver"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine.resolve_padding + inset",
+      "output": "top/right/bottom/left inset"
+    },
+    {
+      "id": "text_fit",
+      "op": "text.wrap_fit",
+      "deps": [
+        "padding",
+        "shot_style"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine._textfit",
+      "output": "wrapped/shrunk font and multiline positions"
+    },
+    {
+      "id": "timing",
+      "op": "element.visibility",
+      "deps": [
+        "timeline",
+        "shot_style"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine._active_alpha",
+      "output": "entry/exit opacity"
+    },
+    {
+      "id": "shape_layers",
+      "op": "shape.raster",
+      "deps": [
+        "anchor_solver",
+        "timing"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine._draw_node",
+      "output": "panels, reticles, waveforms"
+    },
+    {
+      "id": "text_layers",
+      "op": "text.raster",
+      "deps": [
+        "text_fit",
+        "timing"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine._draw_node",
+      "output": "typography and captions"
+    },
+    {
+      "id": "image_layers",
+      "op": "image.crop_fit",
+      "deps": [
+        "frame_crop",
+        "anchor_solver"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine._draw_node",
+      "output": "picture-in-picture and grid panel crops"
+    },
+    {
+      "id": "layer_sort",
+      "op": "layers.z_sort",
+      "deps": [
+        "shape_layers",
+        "text_layers",
+        "image_layers"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine.Engine.render",
+      "output": "visual stacking order"
+    },
+    {
+      "id": "layer_blend",
+      "op": "layers.alpha_blend",
+      "deps": [
+        "layer_sort",
+        "timing"
+      ],
+      "status": "implemented",
+      "implementation": "Pillow alpha_composite/ImageChops",
+      "output": "alpha, screen, multiply, add"
+    },
+    {
+      "id": "layout_qa",
+      "op": "qa.spatial",
+      "deps": [
+        "layer_blend",
+        "safe_zone"
+      ],
+      "status": "implemented",
+      "implementation": "layout_engine.inspect_layout",
+      "output": "offscreen and text-collision diagnostics"
+    },
+    {
+      "id": "video_pipe",
+      "op": "video.render_pipe",
+      "deps": [
+        "layer_blend",
+        "camera"
+      ],
+      "status": "implemented",
+      "implementation": "composer_v02.run_render",
+      "output": "frame-byte RGB pipe"
+    },
+    {
+      "id": "audio_bed",
+      "op": "audio.synthesize",
+      "deps": [
+        "timeline"
+      ],
+      "status": "implemented",
+      "implementation": "make_spatial_audio.py",
+      "output": "original ambient score and timed cues"
+    },
+    {
+      "id": "encode",
+      "op": "video.encode",
+      "deps": [
+        "video_pipe"
+      ],
+      "status": "implemented",
+      "implementation": "ffmpeg / libx264",
+      "output": "H264 video"
+    },
+    {
+      "id": "mux",
+      "op": "media.mux",
+      "deps": [
+        "encode",
+        "audio_bed"
+      ],
+      "status": "implemented",
+      "implementation": "ffmpeg / AAC",
+      "output": "finished MP4"
+    },
+    {
+      "id": "reference_measure",
+      "op": "reference.spatial_extract",
+      "deps": [
+        "mux"
+      ],
+      "status": "implemented",
+      "implementation": "analyze_spatial_video.py",
+      "output": "frame-by-frame feature CSV and heatmap"
+    },
+    {
+      "id": "qa_full_video",
+      "op": "qa.av_probe",
+      "deps": [
+        "mux",
+        "layout_qa"
+      ],
+      "status": "implemented",
+      "implementation": "ffprobe + tests/test_spatial.py",
+      "output": "duration, tracks, dimensions, continuity"
+    },
+    {
+      "id": "package",
+      "op": "asset.package",
+      "deps": [
+        "qa_full_video",
+        "reference_measure",
+        "source_rights"
+      ],
+      "status": "implemented",
+      "implementation": "make_package.py",
+      "output": "sources, presets, release manifests"
+    },
+    {
+      "id": "motion_inference",
+      "op": "motion.ai_articulation",
+      "deps": [
+        "scene_assets"
+      ],
+      "status": "planned",
+      "implementation": "Particulate/Articraft integration not performed",
+      "output": "inferred or authored motion graph"
+    },
+    {
+      "id": "subject_tracking",
+      "op": "layout.subject_tracking",
+      "deps": [
+        "frame_crop"
+      ],
+      "status": "planned",
+      "implementation": "detect/track subject and avoid face/limb captions",
+      "output": "semantic no-go zones"
+    },
+    {
+      "id": "beat_automation",
+      "op": "beat.story_and_motion",
+      "deps": [
+        "timeline",
+        "reference_measure"
+      ],
+      "status": "planned",
+      "implementation": "expand 6.5s shots to microbeats",
+      "output": "narration-aligned secondary cues"
+    },
+    {
+      "id": "human_review",
+      "op": "qa.editorial",
+      "deps": [
+        "package"
+      ],
+      "status": "human_required",
+      "implementation": "human asset and copy approval",
+      "output": "publication decision"
+    }
+  ]
+}

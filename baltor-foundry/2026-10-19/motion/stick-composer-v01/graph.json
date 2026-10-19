@@ -1,0 +1,169 @@
+{
+  "engine": "Baltor Shot Composer DAG v0.1",
+  "schedule": "per frame, topologically sorted",
+  "nodes": [
+    {
+      "id": "timeline",
+      "op": "timeline.resolve",
+      "deps": [],
+      "output": "shot, local time, beat"
+    },
+    {
+      "id": "camera",
+      "op": "camera.solve",
+      "deps": [
+        "timeline"
+      ],
+      "output": "pan, zoom, shake, tilt, crop"
+    },
+    {
+      "id": "sky",
+      "op": "image.plate",
+      "deps": [
+        "camera"
+      ],
+      "output": "base sky plate"
+    },
+    {
+      "id": "parallax",
+      "op": "image.parallax",
+      "deps": [
+        "sky",
+        "camera"
+      ],
+      "output": "mountain, city, far vegetation"
+    },
+    {
+      "id": "landmarks",
+      "op": "scene.landmarks",
+      "deps": [
+        "parallax",
+        "camera"
+      ],
+      "output": "bridge, radio tower, shelter"
+    },
+    {
+      "id": "rig",
+      "op": "actor.pose",
+      "deps": [
+        "timeline",
+        "camera",
+        "landmarks"
+      ],
+      "output": "2D stick figure with animated limbs"
+    },
+    {
+      "id": "foreground",
+      "op": "scene.occlude",
+      "deps": [
+        "rig",
+        "camera"
+      ],
+      "output": "near foliage and foreground cover"
+    },
+    {
+      "id": "atmosphere",
+      "op": "fx.weather",
+      "deps": [
+        "foreground",
+        "timeline"
+      ],
+      "output": "rain, motes, fog, alarm pulses"
+    },
+    {
+      "id": "grade",
+      "op": "fx.grade",
+      "deps": [
+        "atmosphere"
+      ],
+      "output": "vignette, film palette"
+    },
+    {
+      "id": "framing",
+      "op": "shot.framing",
+      "deps": [
+        "grade",
+        "timeline"
+      ],
+      "output": "push, zoom, crop, comic panel"
+    },
+    {
+      "id": "split_panel",
+      "op": "shot.split_panel",
+      "deps": [
+        "framing",
+        "timeline"
+      ],
+      "output": "two contrasting choice camera panes"
+    },
+    {
+      "id": "picture_in_picture",
+      "op": "shot.pip",
+      "deps": [
+        "split_panel",
+        "timeline"
+      ],
+      "output": "magnified cutaway crop in accent panel"
+    },
+    {
+      "id": "transition",
+      "op": "transition.cut_mask",
+      "deps": [
+        "picture_in_picture",
+        "timeline"
+      ],
+      "output": "whip, flash, dip-to-black"
+    },
+    {
+      "id": "caption",
+      "op": "text.motion",
+      "deps": [
+        "transition",
+        "timeline"
+      ],
+      "output": "kinetic text and typography"
+    },
+    {
+      "id": "border",
+      "op": "fx.border",
+      "deps": [
+        "caption",
+        "timeline"
+      ],
+      "output": "subtle keyed accent border"
+    },
+    {
+      "id": "encode",
+      "op": "video.encode",
+      "deps": [
+        "border"
+      ],
+      "output": "RGB24 frame pipe"
+    },
+    {
+      "id": "audio",
+      "op": "audio.events",
+      "deps": [
+        "timeline"
+      ],
+      "output": "ambient bed and timed SFX"
+    },
+    {
+      "id": "mux",
+      "op": "video.mux",
+      "deps": [
+        "encode",
+        "audio"
+      ],
+      "output": "1080x1920 H264 AAC MP4"
+    },
+    {
+      "id": "qa",
+      "op": "media.quality_check",
+      "deps": [
+        "mux"
+      ],
+      "output": "probe, motion, keyframes, provenance"
+    }
+  ]
+}
